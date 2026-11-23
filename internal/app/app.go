@@ -54,10 +54,7 @@ func Run(ctx context.Context, options Options, logger *slog.Logger) error {
 	}
 	logger.Info("library scanned", "dir", options.LibraryDir, "courses", len(catalog.Current().Courses))
 
-	if err := os.MkdirAll(filepath.Dir(options.DatabasePath), dataDirMode); err != nil {
-		return fmt.Errorf("create data dir for %s: %w", options.DatabasePath, err)
-	}
-	database, err := sqlite.Open(ctx, options.DatabasePath)
+	database, err := openDatabase(ctx, options.DatabasePath)
 	if err != nil {
 		return err
 	}

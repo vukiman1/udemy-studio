@@ -33,6 +33,6 @@ func newRootCommand(version string) *cobra.Command {
 		SilenceUsage:  true,
 		SilenceErrors: true,
 	}
-	root.AddCommand(newServeCommand(version), newVersionCommand(version))
+	root.AddCommand(newServeCommand(version), newPlanCommand(), newVersionCommand(version))
 	return root
 }

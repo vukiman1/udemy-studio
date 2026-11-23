@@ -106,11 +106,34 @@ tasks:
       - pnpm dev
 
   fixtures:udemy:
-    desc: Sanitize the Python oracle's saved/ output into testdata/
+    desc: Sanitize the Python oracle's saved/ curriculum and temp/ HLS masters into testdata/
     requires:
-      vars: [PYTHON_SAVED_DIR, PORTAL]
+      vars: [PYTHON_REPO, PORTAL]
     cmds:
-      - go run ./tools/sanitizefixture -in "{{.PYTHON_SAVED_DIR}}" -portal "{{.PORTAL}}"
+      - go run ./tools/sanitizefixture -in "{{.PYTHON_REPO}}/saved" -hls-in "{{.PYTHON_REPO}}/temp" -portal "{{.PORTAL}}"
+
+  fixtures:plan:
+    desc: Record the Python downloader's plan and HLS variants for each curriculum fixture
+    requires:
+      vars: [PYTHON_REPO]
+    env:
+      PYTHONPATH: "{{.PYTHON_REPO}}"
+    cmds:
+      - for: [course, edge_course]
+        cmd: >-
+          "{{.PYTHON_REPO}}/.venv/bin/python" tools/pyplangolden/plan_golden.py
+          testdata/udemy/python/{{.ITEM}}_content.json testdata/udemy/hls
+          testdata/udemy/plan/{{.ITEM | replace "course" "plan"}}_golden.json
+          testdata/udemy/plan/{{.ITEM | replace "course" "hls"}}_golden.json
+
+  fixtures:naming:
+    desc: Record pathvalidate and demoji output for every real title plus edge cases
+    requires:
+      vars: [PYTHON_REPO]
+    cmds:
+      - >-
+        "{{.PYTHON_REPO}}/.venv/bin/python" tools/pynaminggolden/naming_golden.py
+        testdata/udemy/python/course_content.json internal/naming/emoji_codes.json testdata/naming/naming_golden.json
 
   fixtures:subtitles:
     desc: Record pysrt digests of every SRT in a downloads/ tree

@@ -8,7 +8,6 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/vukiman1/udemy-studio/internal/adapter/chromecookie"
 	"github.com/vukiman1/udemy-studio/internal/adapter/pythondownloader"
 	"github.com/vukiman1/udemy-studio/internal/adapter/sqlite"
 	"github.com/vukiman1/udemy-studio/internal/jobs"
@@ -41,11 +40,7 @@ func newDownloads(ctx context.Context, options Options, database *sql.DB, catalo
 		logger.Info("downloads disabled; pass --python and --python-repo to enable them")
 		return downloads{}, nil
 	}
-	loginService := login.NewService(
-		chromecookie.NewStore(config.ChromeDataDir, chromecookie.Keychain{}),
-		sqlite.NewSettingsStore(database),
-		time.Now,
-	)
+	loginService := newLoginService(config.ChromeDataDir, database)
 	downloader := pythondownloader.New(pythondownloader.Config{
 		Python:          config.Python,
 		RepoDir:         config.PythonRepo,

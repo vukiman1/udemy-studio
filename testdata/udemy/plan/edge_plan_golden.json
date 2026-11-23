@@ -1,0 +1,1066 @@
+[
+ {
+  "continuous_numbers": false,
+  "skip_hls": false,
+  "course_dir": "edge-cases-course",
+  "chapters": [
+   {
+    "index": 1,
+    "id": 9001,
+    "dir": "01 - Orphan lecture before any chapter",
+    "lectures": [
+     {
+      "index": 1,
+      "id": 9001,
+      "class": "lecture",
+      "title": "001 Orphan lecture before any chapter",
+      "kind": "video",
+      "file": "001 Orphan lecture before any chapter.mp4",
+      "choices": {
+       "None": {
+        "type": "video",
+        "height": 720,
+        "width": 1280,
+        "url": "https://mp4-c.udemycdn.com/edge/orphan720.mp4?Expires=REDACTED"
+       },
+       "144": {
+        "type": "video",
+        "height": 360,
+        "width": 640,
+        "url": "https://mp4-c.udemycdn.com/edge/orphan360.mp4?Expires=REDACTED"
+       },
+       "240": {
+        "type": "video",
+        "height": 360,
+        "width": 640,
+        "url": "https://mp4-c.udemycdn.com/edge/orphan360.mp4?Expires=REDACTED"
+       },
+       "360": {
+        "type": "video",
+        "height": 360,
+        "width": 640,
+        "url": "https://mp4-c.udemycdn.com/edge/orphan360.mp4?Expires=REDACTED"
+       },
+       "432": {
+        "type": "video",
+        "height": 360,
+        "width": 640,
+        "url": "https://mp4-c.udemycdn.com/edge/orphan360.mp4?Expires=REDACTED"
+       },
+       "480": {
+        "type": "video",
+        "height": 360,
+        "width": 640,
+        "url": "https://mp4-c.udemycdn.com/edge/orphan360.mp4?Expires=REDACTED"
+       },
+       "576": {
+        "type": "video",
+        "height": 720,
+        "width": 1280,
+        "url": "https://mp4-c.udemycdn.com/edge/orphan720.mp4?Expires=REDACTED"
+       },
+       "600": {
+        "type": "video",
+        "height": 720,
+        "width": 1280,
+        "url": "https://mp4-c.udemycdn.com/edge/orphan720.mp4?Expires=REDACTED"
+       },
+       "720": {
+        "type": "video",
+        "height": 720,
+        "width": 1280,
+        "url": "https://mp4-c.udemycdn.com/edge/orphan720.mp4?Expires=REDACTED"
+       },
+       "900": {
+        "type": "video",
+        "height": 720,
+        "width": 1280,
+        "url": "https://mp4-c.udemycdn.com/edge/orphan720.mp4?Expires=REDACTED"
+       },
+       "1080": {
+        "type": "video",
+        "height": 720,
+        "width": 1280,
+        "url": "https://mp4-c.udemycdn.com/edge/orphan720.mp4?Expires=REDACTED"
+       },
+       "1440": {
+        "type": "video",
+        "height": 720,
+        "width": 1280,
+        "url": "https://mp4-c.udemycdn.com/edge/orphan720.mp4?Expires=REDACTED"
+       },
+       "2160": {
+        "type": "video",
+        "height": 720,
+        "width": 1280,
+        "url": "https://mp4-c.udemycdn.com/edge/orphan720.mp4?Expires=REDACTED"
+       }
+      },
+      "captions": [],
+      "assets": []
+     }
+    ]
+   },
+   {
+    "index": 1,
+    "id": 9100,
+    "dir": "01 - Start here 🚀 setup",
+    "lectures": [
+     {
+      "index": 1,
+      "id": 9002,
+      "class": "lecture",
+      "title": "001 🚀 Launch day 1",
+      "kind": "video",
+      "file": "001  Launch day 1.mp4",
+      "choices": {
+       "None": {
+        "type": "video",
+        "height": 1080,
+        "width": 1920,
+        "url": "https://mp4-c.udemycdn.com/edge/launch1080.mp4?Expires=REDACTED"
+       },
+       "144": {
+        "type": "hls",
+        "height": 360,
+        "width": 640,
+        "url": "https://example-portal.udemy.com/assets/44603894/files/2022-11-02_17-32-09-28d0366b50dd70827bdc0f3f325c5351/2/hls/AVC_640x360_90k_AAC-HE_64k/aa0083129e718b41a9ce259c00ffbc221074.m3u8?provider=cloudfront&token=REDACTED&v=1",
+        "playlist_file": "index_44603894_640x360.m3u8"
+       },
+       "240": {
+        "type": "hls",
+        "height": 360,
+        "width": 640,
+        "url": "https://example-portal.udemy.com/assets/44603894/files/2022-11-02_17-32-09-28d0366b50dd70827bdc0f3f325c5351/2/hls/AVC_640x360_90k_AAC-HE_64k/aa0083129e718b41a9ce259c00ffbc221074.m3u8?provider=cloudfront&token=REDACTED&v=1",
+        "playlist_file": "index_44603894_640x360.m3u8"
+       },
+       "360": {
+        "type": "hls",
+        "height": 360,
+        "width": 640,
+        "url": "https://example-portal.udemy.com/assets/44603894/files/2022-11-02_17-32-09-28d0366b50dd70827bdc0f3f325c5351/2/hls/AVC_640x360_90k_AAC-HE_64k/aa0083129e718b41a9ce259c00ffbc221074.m3u8?provider=cloudfront&token=REDACTED&v=1",
+        "playlist_file": "index_44603894_640x360.m3u8"
+       },
+       "432": {
+        "type": "hls",
+        "height": 432,
+        "width": 768,
+        "url": "https://example-portal.udemy.com/assets/44603894/files/2022-11-02_17-32-09-28d0366b50dd70827bdc0f3f325c5351/2/hls/AVC_768x432_225k_AAC-HE_64k/aa0083129e718b41a9ce259c00ffbc221074.m3u8?provider=cloudfront&token=REDACTED&v=1",
+        "playlist_file": "index_44603894_768x432.m3u8"
+       },
+       "480": {
+        "type": "hls",
+        "height": 432,
+        "width": 768,
+        "url": "https://example-portal.udemy.com/assets/44603894/files/2022-11-02_17-32-09-28d0366b50dd70827bdc0f3f325c5351/2/hls/AVC_768x432_225k_AAC-HE_64k/aa0083129e718b41a9ce259c00ffbc221074.m3u8?provider=cloudfront&token=REDACTED&v=1",
+        "playlist_file": "index_44603894_768x432.m3u8"
+       },
+       "576": {
+        "type": "hls",
+        "height": 576,
+        "width": 1024,
+        "url": "https://example-portal.udemy.com/assets/44603894/files/2022-11-02_17-32-09-28d0366b50dd70827bdc0f3f325c5351/2/hls/AVC_1024x576_375k_AAC-HE_64k/aa0083129e718b41a9ce259c00ffbc221074.m3u8?provider=cloudfront&token=REDACTED&v=1",
+        "playlist_file": "index_44603894_1024x576.m3u8"
+       },
+       "600": {
+        "type": "hls",
+        "height": 576,
+        "width": 1024,
+        "url": "https://example-portal.udemy.com/assets/44603894/files/2022-11-02_17-32-09-28d0366b50dd70827bdc0f3f325c5351/2/hls/AVC_1024x576_375k_AAC-HE_64k/aa0083129e718b41a9ce259c00ffbc221074.m3u8?provider=cloudfront&token=REDACTED&v=1",
+        "playlist_file": "index_44603894_1024x576.m3u8"
+       },
+       "720": {
+        "type": "hls",
+        "height": 720,
+        "width": 1280,
+        "url": "https://example-portal.udemy.com/assets/44603894/files/2022-11-02_17-32-09-28d0366b50dd70827bdc0f3f325c5351/2/hls/AVC_1280x720_600k_AAC-HE_64k/aa0083129e718b41a9ce259c00ffbc221074.m3u8?provider=cloudfront&token=REDACTED&v=1",
+        "playlist_file": "index_44603894_1280x720.m3u8"
+       },
+       "900": {
+        "type": "video",
+        "height": 1080,
+        "width": 1920,
+        "url": "https://mp4-c.udemycdn.com/edge/launch1080.mp4?Expires=REDACTED"
+       },
+       "1080": {
+        "type": "video",
+        "height": 1080,
+        "width": 1920,
+        "url": "https://mp4-c.udemycdn.com/edge/launch1080.mp4?Expires=REDACTED"
+       },
+       "1440": {
+        "type": "video",
+        "height": 1080,
+        "width": 1920,
+        "url": "https://mp4-c.udemycdn.com/edge/launch1080.mp4?Expires=REDACTED"
+       },
+       "2160": {
+        "type": "video",
+        "height": 1080,
+        "width": 1920,
+        "url": "https://mp4-c.udemycdn.com/edge/launch1080.mp4?Expires=REDACTED"
+       }
+      },
+      "captions": [
+       {
+        "language": "vi",
+        "url": "https://vtt-c.udemycdn.com/edge/vi.vtt?Expires=REDACTED",
+        "file": "001 🚀 Launch day 1_vi.vtt",
+        "srt_file": "001 🚀 Launch day 1_vi.srt"
+       },
+       {
+        "language": "fr",
+        "url": "https://vtt-c.udemycdn.com/edge/fr.vtt?Expires=REDACTED",
+        "file": "001 🚀 Launch day 1_fr.vtt",
+        "srt_file": "001 🚀 Launch day 1_fr.srt"
+       },
+       {
+        "language": "Deutsch",
+        "url": "https://vtt-c.udemycdn.com/edge/de.vtt?Expires=REDACTED",
+        "file": "001 🚀 Launch day 1_Deutsch.vtt",
+        "srt_file": "001 🚀 Launch day 1_Deutsch.srt"
+       },
+       {
+        "language": "ja",
+        "url": "https://vtt-c.udemycdn.com/edge/ja.vtt?Expires=REDACTED",
+        "file": "001 🚀 Launch day 1_ja.vtt",
+        "srt_file": "001 🚀 Launch day 1_ja.srt"
+       },
+       {
+        "language": "es",
+        "url": "https://vtt-c.udemycdn.com/edge/es.srt?Expires=REDACTED",
+        "file": "001 🚀 Launch day 1_es.srt",
+        "srt_file": "001 🚀 Launch day 1_es.srt"
+       }
+      ],
+      "assets": [
+       {
+        "type": "source_code",
+        "file": "001 code.zip",
+        "url": "https://att-c.udemycdn.com/edge/31?Expires=REDACTED"
+       },
+       {
+        "type": "external_link",
+        "file": "001 RFC 9110.url",
+        "url": "https://www.rfc-editor.org/rfc/rfc9110"
+       },
+       {
+        "type": "file",
+        "file": "001 notes/../cheat:sheet?.pdf",
+        "url": "https://att-c.udemycdn.com/edge/33?Expires=REDACTED"
+       }
+      ]
+     },
+     {
+      "index": 3,
+      "id": 9004,
+      "class": "quiz",
+      "title": "003 Quiz check yourself",
+      "kind": "quiz",
+      "file": "003 Quiz check yourself.html"
+     },
+     {
+      "index": 4,
+      "id": 9005,
+      "class": "lecture",
+      "title": "004 Empty stream urls",
+      "kind": "html",
+      "file": "004 Empty stream urls.html",
+      "has_body": true,
+      "assets": []
+     },
+     {
+      "index": 5,
+      "id": 9006,
+      "class": "lecture",
+      "title": "005 Only audio sources",
+      "kind": "video",
+      "file": "005 Only audio sources.mp4",
+      "choices": {
+       "None": {
+        "type": "hls",
+        "height": 720,
+        "width": 1280,
+        "url": "https://example-portal.udemy.com/assets/900001/files/edge/hls/720.m3u8?provider=cloudfront&token=REDACTED&v=1",
+        "playlist_file": "index_900001_1280x720.m3u8"
+       },
+       "144": {
+        "type": "hls",
+        "height": 240,
+        "width": 426,
+        "url": "https://example-portal.udemy.com/assets/900001/files/edge/hls/240-first.m3u8?provider=cloudfront&token=REDACTED&v=1",
+        "playlist_file": "index_900001_426x240.m3u8"
+       },
+       "240": {
+        "type": "hls",
+        "height": 240,
+        "width": 426,
+        "url": "https://example-portal.udemy.com/assets/900001/files/edge/hls/240-first.m3u8?provider=cloudfront&token=REDACTED&v=1",
+        "playlist_file": "index_900001_426x240.m3u8"
+       },
+       "360": {
+        "type": "hls",
+        "height": 240,
+        "width": 426,
+        "url": "https://example-portal.udemy.com/assets/900001/files/edge/hls/240-first.m3u8?provider=cloudfront&token=REDACTED&v=1",
+        "playlist_file": "index_900001_426x240.m3u8"
+       },
+       "432": {
+        "type": "hls",
+        "height": 240,
+        "width": 426,
+        "url": "https://example-portal.udemy.com/assets/900001/files/edge/hls/240-first.m3u8?provider=cloudfront&token=REDACTED&v=1",
+        "playlist_file": "index_900001_426x240.m3u8"
+       },
+       "480": {
+        "type": "hls",
+        "height": 720,
+        "width": 1280,
+        "url": "https://example-portal.udemy.com/assets/900001/files/edge/hls/720.m3u8?provider=cloudfront&token=REDACTED&v=1",
+        "playlist_file": "index_900001_1280x720.m3u8"
+       },
+       "576": {
+        "type": "hls",
+        "height": 720,
+        "width": 1280,
+        "url": "https://example-portal.udemy.com/assets/900001/files/edge/hls/720.m3u8?provider=cloudfront&token=REDACTED&v=1",
+        "playlist_file": "index_900001_1280x720.m3u8"
+       },
+       "600": {
+        "type": "hls",
+        "height": 720,
+        "width": 1280,
+        "url": "https://example-portal.udemy.com/assets/900001/files/edge/hls/720.m3u8?provider=cloudfront&token=REDACTED&v=1",
+        "playlist_file": "index_900001_1280x720.m3u8"
+       },
+       "720": {
+        "type": "hls",
+        "height": 720,
+        "width": 1280,
+        "url": "https://example-portal.udemy.com/assets/900001/files/edge/hls/720.m3u8?provider=cloudfront&token=REDACTED&v=1",
+        "playlist_file": "index_900001_1280x720.m3u8"
+       },
+       "900": {
+        "type": "hls",
+        "height": 720,
+        "width": 1280,
+        "url": "https://example-portal.udemy.com/assets/900001/files/edge/hls/720.m3u8?provider=cloudfront&token=REDACTED&v=1",
+        "playlist_file": "index_900001_1280x720.m3u8"
+       },
+       "1080": {
+        "type": "hls",
+        "height": 720,
+        "width": 1280,
+        "url": "https://example-portal.udemy.com/assets/900001/files/edge/hls/720.m3u8?provider=cloudfront&token=REDACTED&v=1",
+        "playlist_file": "index_900001_1280x720.m3u8"
+       },
+       "1440": {
+        "type": "hls",
+        "height": 720,
+        "width": 1280,
+        "url": "https://example-portal.udemy.com/assets/900001/files/edge/hls/720.m3u8?provider=cloudfront&token=REDACTED&v=1",
+        "playlist_file": "index_900001_1280x720.m3u8"
+       },
+       "2160": {
+        "type": "hls",
+        "height": 720,
+        "width": 1280,
+        "url": "https://example-portal.udemy.com/assets/900001/files/edge/hls/720.m3u8?provider=cloudfront&token=REDACTED&v=1",
+        "playlist_file": "index_900001_1280x720.m3u8"
+       }
+      },
+      "captions": [],
+      "assets": []
+     }
+    ]
+   },
+   {
+    "index": 2,
+    "id": 9200,
+    "dir": "02 - Reading material",
+    "lectures": [
+     {
+      "index": 1,
+      "id": 9007,
+      "class": "lecture",
+      "title": "001 Article lecture",
+      "kind": "html",
+      "file": "001 Article lecture.html",
+      "has_body": true,
+      "assets": [
+       {
+        "type": "article",
+        "file": "001 Article lecture.html"
+       }
+      ]
+     },
+     {
+      "index": 2,
+      "id": 9008,
+      "class": "lecture",
+      "title": "002 Ebook lecture",
+      "kind": "html",
+      "file": "002 Ebook lecture.html",
+      "has_body": false,
+      "assets": [
+       {
+        "type": "ebook",
+        "file": "002 book.epub",
+        "url": "https://att-c.udemycdn.com/edge/8?Expires=REDACTED"
+       }
+      ]
+     },
+     {
+      "index": 3,
+      "id": 9009,
+      "class": "lecture",
+      "title": "003 Slides lecture",
+      "kind": "html",
+      "file": "003 Slides lecture.html",
+      "has_body": false,
+      "assets": [
+       {
+        "type": "presentation",
+        "file": "003 slides.pdf",
+        "url": "https://att-c.udemycdn.com/edge/9?Expires=REDACTED"
+       }
+      ]
+     },
+     {
+      "index": 4,
+      "id": 9010,
+      "class": "lecture",
+      "title": "004 Audio lecture",
+      "kind": "html",
+      "file": "004 Audio lecture.html",
+      "has_body": false,
+      "assets": [
+       {
+        "type": "audio",
+        "file": "004 talk.mp3",
+        "url": "https://att-c.udemycdn.com/edge/10?Expires=REDACTED"
+       }
+      ]
+     },
+     {
+      "index": 5,
+      "id": 9011,
+      "class": "practice",
+      "title": "005 Practice build it",
+      "kind": "quiz",
+      "file": "005 Practice build it.html"
+     },
+     {
+      "index": 6,
+      "id": 9012,
+      "class": "role-play",
+      "title": "006 Role play negotiate",
+      "kind": "quiz",
+      "file": "006 Role play negotiate.html"
+     },
+     {
+      "index": 7,
+      "id": 9013,
+      "class": "lecture",
+      "title": "007 Empty body html",
+      "kind": "html",
+      "file": "007 Empty body html.html",
+      "has_body": false,
+      "assets": [
+       {
+        "type": "article",
+        "file": "007 Empty body html.html"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "index": 3,
+    "id": 9300,
+    "dir": "03 - CON_",
+    "lectures": [
+     {
+      "index": 1,
+      "id": 9014,
+      "class": "lecture",
+      "title": "001 name",
+      "kind": "video",
+      "file": "001 name.mp4",
+      "choices": {
+       "None": {
+        "type": "video",
+        "height": 720,
+        "width": 1280,
+        "url": "https://mp4-c.udemycdn.com/edge/dot720.mp4?Expires=REDACTED"
+       },
+       "144": {
+        "type": "video",
+        "height": 720,
+        "width": 1280,
+        "url": "https://mp4-c.udemycdn.com/edge/dot720.mp4?Expires=REDACTED"
+       },
+       "240": {
+        "type": "video",
+        "height": 720,
+        "width": 1280,
+        "url": "https://mp4-c.udemycdn.com/edge/dot720.mp4?Expires=REDACTED"
+       },
+       "360": {
+        "type": "video",
+        "height": 720,
+        "width": 1280,
+        "url": "https://mp4-c.udemycdn.com/edge/dot720.mp4?Expires=REDACTED"
+       },
+       "432": {
+        "type": "video",
+        "height": 720,
+        "width": 1280,
+        "url": "https://mp4-c.udemycdn.com/edge/dot720.mp4?Expires=REDACTED"
+       },
+       "480": {
+        "type": "video",
+        "height": 720,
+        "width": 1280,
+        "url": "https://mp4-c.udemycdn.com/edge/dot720.mp4?Expires=REDACTED"
+       },
+       "576": {
+        "type": "video",
+        "height": 720,
+        "width": 1280,
+        "url": "https://mp4-c.udemycdn.com/edge/dot720.mp4?Expires=REDACTED"
+       },
+       "600": {
+        "type": "video",
+        "height": 720,
+        "width": 1280,
+        "url": "https://mp4-c.udemycdn.com/edge/dot720.mp4?Expires=REDACTED"
+       },
+       "720": {
+        "type": "video",
+        "height": 720,
+        "width": 1280,
+        "url": "https://mp4-c.udemycdn.com/edge/dot720.mp4?Expires=REDACTED"
+       },
+       "900": {
+        "type": "video",
+        "height": 720,
+        "width": 1280,
+        "url": "https://mp4-c.udemycdn.com/edge/dot720.mp4?Expires=REDACTED"
+       },
+       "1080": {
+        "type": "video",
+        "height": 720,
+        "width": 1280,
+        "url": "https://mp4-c.udemycdn.com/edge/dot720.mp4?Expires=REDACTED"
+       },
+       "1440": {
+        "type": "video",
+        "height": 720,
+        "width": 1280,
+        "url": "https://mp4-c.udemycdn.com/edge/dot720.mp4?Expires=REDACTED"
+       },
+       "2160": {
+        "type": "video",
+        "height": 720,
+        "width": 1280,
+        "url": "https://mp4-c.udemycdn.com/edge/dot720.mp4?Expires=REDACTED"
+       }
+      },
+      "captions": [],
+      "assets": []
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "continuous_numbers": true,
+  "skip_hls": true,
+  "course_dir": "edge-cases-course",
+  "chapters": [
+   {
+    "index": 1,
+    "id": 9001,
+    "dir": "01 - Orphan lecture before any chapter",
+    "lectures": [
+     {
+      "index": 1,
+      "id": 9001,
+      "class": "lecture",
+      "title": "001 Orphan lecture before any chapter",
+      "kind": "video",
+      "file": "001 Orphan lecture before any chapter.mp4",
+      "choices": {
+       "None": {
+        "type": "video",
+        "height": 720,
+        "width": 1280,
+        "url": "https://mp4-c.udemycdn.com/edge/orphan720.mp4?Expires=REDACTED"
+       },
+       "144": {
+        "type": "video",
+        "height": 360,
+        "width": 640,
+        "url": "https://mp4-c.udemycdn.com/edge/orphan360.mp4?Expires=REDACTED"
+       },
+       "240": {
+        "type": "video",
+        "height": 360,
+        "width": 640,
+        "url": "https://mp4-c.udemycdn.com/edge/orphan360.mp4?Expires=REDACTED"
+       },
+       "360": {
+        "type": "video",
+        "height": 360,
+        "width": 640,
+        "url": "https://mp4-c.udemycdn.com/edge/orphan360.mp4?Expires=REDACTED"
+       },
+       "432": {
+        "type": "video",
+        "height": 360,
+        "width": 640,
+        "url": "https://mp4-c.udemycdn.com/edge/orphan360.mp4?Expires=REDACTED"
+       },
+       "480": {
+        "type": "video",
+        "height": 360,
+        "width": 640,
+        "url": "https://mp4-c.udemycdn.com/edge/orphan360.mp4?Expires=REDACTED"
+       },
+       "576": {
+        "type": "video",
+        "height": 720,
+        "width": 1280,
+        "url": "https://mp4-c.udemycdn.com/edge/orphan720.mp4?Expires=REDACTED"
+       },
+       "600": {
+        "type": "video",
+        "height": 720,
+        "width": 1280,
+        "url": "https://mp4-c.udemycdn.com/edge/orphan720.mp4?Expires=REDACTED"
+       },
+       "720": {
+        "type": "video",
+        "height": 720,
+        "width": 1280,
+        "url": "https://mp4-c.udemycdn.com/edge/orphan720.mp4?Expires=REDACTED"
+       },
+       "900": {
+        "type": "video",
+        "height": 720,
+        "width": 1280,
+        "url": "https://mp4-c.udemycdn.com/edge/orphan720.mp4?Expires=REDACTED"
+       },
+       "1080": {
+        "type": "video",
+        "height": 720,
+        "width": 1280,
+        "url": "https://mp4-c.udemycdn.com/edge/orphan720.mp4?Expires=REDACTED"
+       },
+       "1440": {
+        "type": "video",
+        "height": 720,
+        "width": 1280,
+        "url": "https://mp4-c.udemycdn.com/edge/orphan720.mp4?Expires=REDACTED"
+       },
+       "2160": {
+        "type": "video",
+        "height": 720,
+        "width": 1280,
+        "url": "https://mp4-c.udemycdn.com/edge/orphan720.mp4?Expires=REDACTED"
+       }
+      },
+      "captions": [],
+      "assets": []
+     }
+    ]
+   },
+   {
+    "index": 1,
+    "id": 9100,
+    "dir": "01 - Start here 🚀 setup",
+    "lectures": [
+     {
+      "index": 2,
+      "id": 9002,
+      "class": "lecture",
+      "title": "002 🚀 Launch day 1",
+      "kind": "video",
+      "file": "002  Launch day 1.mp4",
+      "choices": {
+       "None": {
+        "type": "video",
+        "height": 1080,
+        "width": 1920,
+        "url": "https://mp4-c.udemycdn.com/edge/launch1080.mp4?Expires=REDACTED"
+       },
+       "144": {
+        "type": "video",
+        "height": 540,
+        "width": 256,
+        "url": "https://mp4-c.udemycdn.com/edge/launch540.mp4?Expires=REDACTED"
+       },
+       "240": {
+        "type": "video",
+        "height": 540,
+        "width": 256,
+        "url": "https://mp4-c.udemycdn.com/edge/launch540.mp4?Expires=REDACTED"
+       },
+       "360": {
+        "type": "video",
+        "height": 540,
+        "width": 256,
+        "url": "https://mp4-c.udemycdn.com/edge/launch540.mp4?Expires=REDACTED"
+       },
+       "432": {
+        "type": "video",
+        "height": 540,
+        "width": 256,
+        "url": "https://mp4-c.udemycdn.com/edge/launch540.mp4?Expires=REDACTED"
+       },
+       "480": {
+        "type": "video",
+        "height": 540,
+        "width": 256,
+        "url": "https://mp4-c.udemycdn.com/edge/launch540.mp4?Expires=REDACTED"
+       },
+       "576": {
+        "type": "video",
+        "height": 540,
+        "width": 256,
+        "url": "https://mp4-c.udemycdn.com/edge/launch540.mp4?Expires=REDACTED"
+       },
+       "600": {
+        "type": "video",
+        "height": 540,
+        "width": 256,
+        "url": "https://mp4-c.udemycdn.com/edge/launch540.mp4?Expires=REDACTED"
+       },
+       "720": {
+        "type": "video",
+        "height": 540,
+        "width": 256,
+        "url": "https://mp4-c.udemycdn.com/edge/launch540.mp4?Expires=REDACTED"
+       },
+       "900": {
+        "type": "video",
+        "height": 1080,
+        "width": 1920,
+        "url": "https://mp4-c.udemycdn.com/edge/launch1080.mp4?Expires=REDACTED"
+       },
+       "1080": {
+        "type": "video",
+        "height": 1080,
+        "width": 1920,
+        "url": "https://mp4-c.udemycdn.com/edge/launch1080.mp4?Expires=REDACTED"
+       },
+       "1440": {
+        "type": "video",
+        "height": 1080,
+        "width": 1920,
+        "url": "https://mp4-c.udemycdn.com/edge/launch1080.mp4?Expires=REDACTED"
+       },
+       "2160": {
+        "type": "video",
+        "height": 1080,
+        "width": 1920,
+        "url": "https://mp4-c.udemycdn.com/edge/launch1080.mp4?Expires=REDACTED"
+       }
+      },
+      "captions": [
+       {
+        "language": "vi",
+        "url": "https://vtt-c.udemycdn.com/edge/vi.vtt?Expires=REDACTED",
+        "file": "002 🚀 Launch day 1_vi.vtt",
+        "srt_file": "002 🚀 Launch day 1_vi.srt"
+       },
+       {
+        "language": "fr",
+        "url": "https://vtt-c.udemycdn.com/edge/fr.vtt?Expires=REDACTED",
+        "file": "002 🚀 Launch day 1_fr.vtt",
+        "srt_file": "002 🚀 Launch day 1_fr.srt"
+       },
+       {
+        "language": "Deutsch",
+        "url": "https://vtt-c.udemycdn.com/edge/de.vtt?Expires=REDACTED",
+        "file": "002 🚀 Launch day 1_Deutsch.vtt",
+        "srt_file": "002 🚀 Launch day 1_Deutsch.srt"
+       },
+       {
+        "language": "ja",
+        "url": "https://vtt-c.udemycdn.com/edge/ja.vtt?Expires=REDACTED",
+        "file": "002 🚀 Launch day 1_ja.vtt",
+        "srt_file": "002 🚀 Launch day 1_ja.srt"
+       },
+       {
+        "language": "es",
+        "url": "https://vtt-c.udemycdn.com/edge/es.srt?Expires=REDACTED",
+        "file": "002 🚀 Launch day 1_es.srt",
+        "srt_file": "002 🚀 Launch day 1_es.srt"
+       }
+      ],
+      "assets": [
+       {
+        "type": "source_code",
+        "file": "002 code.zip",
+        "url": "https://att-c.udemycdn.com/edge/31?Expires=REDACTED"
+       },
+       {
+        "type": "external_link",
+        "file": "002 RFC 9110.url",
+        "url": "https://www.rfc-editor.org/rfc/rfc9110"
+       },
+       {
+        "type": "file",
+        "file": "002 notes/../cheat:sheet?.pdf",
+        "url": "https://att-c.udemycdn.com/edge/33?Expires=REDACTED"
+       }
+      ]
+     },
+     {
+      "index": 4,
+      "id": 9004,
+      "class": "quiz",
+      "title": "004 Quiz check yourself",
+      "kind": "quiz",
+      "file": "004 Quiz check yourself.html"
+     },
+     {
+      "index": 5,
+      "id": 9005,
+      "class": "lecture",
+      "title": "005 Empty stream urls",
+      "kind": "html",
+      "file": "005 Empty stream urls.html",
+      "has_body": true,
+      "assets": []
+     },
+     {
+      "index": 6,
+      "id": 9006,
+      "class": "lecture",
+      "title": "006 Only audio sources",
+      "kind": "video",
+      "file": "006 Only audio sources.mp4",
+      "choices": {
+       "None": null,
+       "144": null,
+       "240": null,
+       "360": null,
+       "432": null,
+       "480": null,
+       "576": null,
+       "600": null,
+       "720": null,
+       "900": null,
+       "1080": null,
+       "1440": null,
+       "2160": null
+      },
+      "captions": [],
+      "assets": []
+     }
+    ]
+   },
+   {
+    "index": 2,
+    "id": 9200,
+    "dir": "02 - Reading material",
+    "lectures": [
+     {
+      "index": 7,
+      "id": 9007,
+      "class": "lecture",
+      "title": "007 Article lecture",
+      "kind": "html",
+      "file": "007 Article lecture.html",
+      "has_body": true,
+      "assets": [
+       {
+        "type": "article",
+        "file": "007 Article lecture.html"
+       }
+      ]
+     },
+     {
+      "index": 8,
+      "id": 9008,
+      "class": "lecture",
+      "title": "008 Ebook lecture",
+      "kind": "html",
+      "file": "008 Ebook lecture.html",
+      "has_body": false,
+      "assets": [
+       {
+        "type": "ebook",
+        "file": "008 book.epub",
+        "url": "https://att-c.udemycdn.com/edge/8?Expires=REDACTED"
+       }
+      ]
+     },
+     {
+      "index": 9,
+      "id": 9009,
+      "class": "lecture",
+      "title": "009 Slides lecture",
+      "kind": "html",
+      "file": "009 Slides lecture.html",
+      "has_body": false,
+      "assets": [
+       {
+        "type": "presentation",
+        "file": "009 slides.pdf",
+        "url": "https://att-c.udemycdn.com/edge/9?Expires=REDACTED"
+       }
+      ]
+     },
+     {
+      "index": 10,
+      "id": 9010,
+      "class": "lecture",
+      "title": "010 Audio lecture",
+      "kind": "html",
+      "file": "010 Audio lecture.html",
+      "has_body": false,
+      "assets": [
+       {
+        "type": "audio",
+        "file": "010 talk.mp3",
+        "url": "https://att-c.udemycdn.com/edge/10?Expires=REDACTED"
+       }
+      ]
+     },
+     {
+      "index": 11,
+      "id": 9011,
+      "class": "practice",
+      "title": "011 Practice build it",
+      "kind": "quiz",
+      "file": "011 Practice build it.html"
+     },
+     {
+      "index": 12,
+      "id": 9012,
+      "class": "role-play",
+      "title": "012 Role play negotiate",
+      "kind": "quiz",
+      "file": "012 Role play negotiate.html"
+     },
+     {
+      "index": 13,
+      "id": 9013,
+      "class": "lecture",
+      "title": "013 Empty body html",
+      "kind": "html",
+      "file": "013 Empty body html.html",
+      "has_body": false,
+      "assets": [
+       {
+        "type": "article",
+        "file": "013 Empty body html.html"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "index": 3,
+    "id": 9300,
+    "dir": "03 - CON_",
+    "lectures": [
+     {
+      "index": 14,
+      "id": 9014,
+      "class": "lecture",
+      "title": "014 name",
+      "kind": "video",
+      "file": "014 name.mp4",
+      "choices": {
+       "None": {
+        "type": "video",
+        "height": 720,
+        "width": 1280,
+        "url": "https://mp4-c.udemycdn.com/edge/dot720.mp4?Expires=REDACTED"
+       },
+       "144": {
+        "type": "video",
+        "height": 720,
+        "width": 1280,
+        "url": "https://mp4-c.udemycdn.com/edge/dot720.mp4?Expires=REDACTED"
+       },
+       "240": {
+        "type": "video",
+        "height": 720,
+        "width": 1280,
+        "url": "https://mp4-c.udemycdn.com/edge/dot720.mp4?Expires=REDACTED"
+       },
+       "360": {
+        "type": "video",
+        "height": 720,
+        "width": 1280,
+        "url": "https://mp4-c.udemycdn.com/edge/dot720.mp4?Expires=REDACTED"
+       },
+       "432": {
+        "type": "video",
+        "height": 720,
+        "width": 1280,
+        "url": "https://mp4-c.udemycdn.com/edge/dot720.mp4?Expires=REDACTED"
+       },
+       "480": {
+        "type": "video",
+        "height": 720,
+        "width": 1280,
+        "url": "https://mp4-c.udemycdn.com/edge/dot720.mp4?Expires=REDACTED"
+       },
+       "576": {
+        "type": "video",
+        "height": 720,
+        "width": 1280,
+        "url": "https://mp4-c.udemycdn.com/edge/dot720.mp4?Expires=REDACTED"
+       },
+       "600": {
+        "type": "video",
+        "height": 720,
+        "width": 1280,
+        "url": "https://mp4-c.udemycdn.com/edge/dot720.mp4?Expires=REDACTED"
+       },
+       "720": {
+        "type": "video",
+        "height": 720,
+        "width": 1280,
+        "url": "https://mp4-c.udemycdn.com/edge/dot720.mp4?Expires=REDACTED"
+       },
+       "900": {
+        "type": "video",
+        "height": 720,
+        "width": 1280,
+        "url": "https://mp4-c.udemycdn.com/edge/dot720.mp4?Expires=REDACTED"
+       },
+       "1080": {
+        "type": "video",
+        "height": 720,
+        "width": 1280,
+        "url": "https://mp4-c.udemycdn.com/edge/dot720.mp4?Expires=REDACTED"
+       },
+       "1440": {
+        "type": "video",
+        "height": 720,
+        "width": 1280,
+        "url": "https://mp4-c.udemycdn.com/edge/dot720.mp4?Expires=REDACTED"
+       },
+       "2160": {
+        "type": "video",
+        "height": 720,
+        "width": 1280,
+        "url": "https://mp4-c.udemycdn.com/edge/dot720.mp4?Expires=REDACTED"
+       }
+      },
+      "captions": [],
+      "assets": []
+     }
+    ]
+   }
+  ]
+ }
+]

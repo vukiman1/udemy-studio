@@ -13,13 +13,9 @@ import (
 
 const (
 	defaultListenAddress = "127.0.0.1:8765"
-	appDataDirName       = "udemy-studio"
-	databaseFileName     = "app.db"
 	libraryDirEnv        = "UDEMY_STUDIO_LIBRARY"
 	pythonEnv            = "UDEMY_STUDIO_PYTHON"
 	pythonRepoEnv        = "UDEMY_STUDIO_PYTHON_REPO"
-	chromeDataDirSuffix  = "Library/Application Support/Google/Chrome"
-	defaultCaptionLang   = "en"
 )
 
 func newServeCommand(version string) *cobra.Command {
@@ -31,19 +27,8 @@ func newServeCommand(version string) *cobra.Command {
 			if options.Downloads.OutputDir == "" {
 				options.Downloads.OutputDir = options.LibraryDir
 			}
-			if options.Downloads.ChromeDataDir == "" {
-				home, err := os.UserHomeDir()
-				if err != nil {
-					return fmt.Errorf("resolve home dir for Chrome data: %w", err)
-				}
-				options.Downloads.ChromeDataDir = filepath.Join(home, chromeDataDirSuffix)
-			}
-			if options.DatabasePath == "" {
-				path, err := defaultDatabasePath()
-				if err != nil {
-					return err
-				}
-				options.DatabasePath = path
+			if err := applyDataDefaults(&options.DatabasePath, &options.Downloads.ChromeDataDir); err != nil {
+				return err
 			}
 			if err := resolvePaths(&options); err != nil {
 				return err
@@ -66,14 +51,6 @@ func newServeCommand(version string) *cobra.Command {
 	flags.StringVar(&options.Downloads.ChromeDataDir, "chrome-data-dir", "", "Chrome user data dir (default: ~/"+chromeDataDirSuffix+")")
 	flags.StringVar(&options.Downloads.CaptionLanguage, "caption-language", defaultCaptionLang, "caption language to download")
 	return command
-}
-
-func defaultDatabasePath() (string, error) {
-	configDir, err := os.UserConfigDir()
-	if err != nil {
-		return "", fmt.Errorf("resolve user config dir for the database: %w", err)
-	}
-	return filepath.Join(configDir, appDataDirName, databaseFileName), nil
 }
 
 // The downloader runs inside its own checkout, so a relative path would point somewhere else for it.
