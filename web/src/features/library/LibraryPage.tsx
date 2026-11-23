@@ -28,6 +28,9 @@ export function LibraryPage(): ReactElement {
     <main className="mx-auto max-w-[1100px] px-4 py-6">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold">Thư viện</h1>
+        <Link to="/downloads" className="ml-auto text-accent underline">
+          Tải khoá học
+        </Link>
         {target !== null && resumeCourse !== undefined && (
           <Link
             className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2.5 font-semibold text-on-accent"
