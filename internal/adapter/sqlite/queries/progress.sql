@@ -16,3 +16,6 @@ ON CONFLICT (lecture_key) DO UPDATE SET
 SELECT lecture_key, position_seconds, duration_seconds, completed_at, updated_at
 FROM lecture_progress
 ORDER BY updated_at DESC;
+
+-- name: RenameProgressKey :exec
+UPDATE OR IGNORE lecture_progress SET lecture_key = sqlc.arg(to_key) WHERE lecture_key = sqlc.arg(from_key);

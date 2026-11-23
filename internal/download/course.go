@@ -58,6 +58,9 @@ func Course(ctx context.Context, plan udemy.Plan, tools Tools, options Options, 
 	if err != nil {
 		return Summary{}, err
 	}
+	if err := writeManifest(courseDir, plan); err != nil {
+		return Summary{}, err
+	}
 	run := &courseDownload{tools: tools, options: options, logger: logger, onEvent: onEvent}
 	onEvent(jobs.Event{Kind: jobs.EventCourseStarted, CourseTitle: plan.CourseName, TotalLectures: options.Chapters.lectureCount(plan)})
 	for _, chapter := range plan.Chapters {

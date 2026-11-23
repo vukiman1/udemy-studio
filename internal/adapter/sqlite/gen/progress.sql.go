@@ -64,6 +64,20 @@ func (q *Queries) ListProgress(ctx context.Context) ([]LectureProgress, error) {
 	return items, nil
 }
 
+const renameProgressKey = `-- name: RenameProgressKey :exec
+UPDATE OR IGNORE lecture_progress SET lecture_key = ?1 WHERE lecture_key = ?2
+`
+
+type RenameProgressKeyParams struct {
+	ToKey   string
+	FromKey string
+}
+
+func (q *Queries) RenameProgressKey(ctx context.Context, arg RenameProgressKeyParams) error {
+	_, err := q.db.ExecContext(ctx, renameProgressKey, arg.ToKey, arg.FromKey)
+	return err
+}
+
 const upsertProgress = `-- name: UpsertProgress :exec
 INSERT INTO lecture_progress (lecture_key, position_seconds, duration_seconds, completed_at, updated_at)
 VALUES (?, ?, ?, ?, ?)

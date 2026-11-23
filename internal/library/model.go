@@ -21,8 +21,10 @@ type Chapter struct {
 }
 
 type Lecture struct {
-	ID          string
-	Key         string
+	ID  string
+	Key string
+	// PathKey is the key progress was saved under before a manifest gave the lecture its Udemy id.
+	PathKey     string
 	Number      int
 	Title       string
 	Kind        LectureKind

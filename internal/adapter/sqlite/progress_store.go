@@ -49,6 +49,13 @@ func (store *ProgressStore) Upsert(ctx context.Context, record progress.Record) 
 	return nil
 }
 
+func (store *ProgressStore) RenameKey(ctx context.Context, from, to string) error {
+	if err := store.queries.RenameProgressKey(ctx, gen.RenameProgressKeyParams{FromKey: from, ToKey: to}); err != nil {
+		return fmt.Errorf("rename progress %q to %q: %w", from, to, err)
+	}
+	return nil
+}
+
 func (store *ProgressStore) All(ctx context.Context) ([]progress.Record, error) {
 	rows, err := store.queries.ListProgress(ctx)
 	if err != nil {

@@ -83,3 +83,35 @@ func TestProgressStoreNeverClearsACompletion(t *testing.T) {
 		t.Errorf("CompletedAt = %v, %v; want %v", found.CompletedAt, err, completedAt)
 	}
 }
+
+func TestRenameKeyMovesProgressButNeverOverwrites(t *testing.T) {
+	store := openTestStore(t)
+	ctx := t.Context()
+	saved := time.Unix(100, 0).UTC()
+	for _, record := range []progress.Record{
+		{LectureKey: "course/01 - A/001 Moved", PositionSeconds: 5, DurationSeconds: 10, UpdatedAt: saved},
+		{LectureKey: "course/01 - A/002 Kept", PositionSeconds: 6, DurationSeconds: 10, UpdatedAt: saved},
+		{LectureKey: "udemy-lecture:2", PositionSeconds: 9, DurationSeconds: 10, UpdatedAt: saved},
+	} {
+		if err := store.Upsert(ctx, record); err != nil {
+			t.Fatalf("Upsert: %v", err)
+		}
+	}
+	for from, to := range map[string]string{"course/01 - A/001 Moved": "udemy-lecture:1", "course/01 - A/002 Kept": "udemy-lecture:2"} {
+		if err := store.RenameKey(ctx, from, to); err != nil {
+			t.Fatalf("RenameKey: %v", err)
+		}
+	}
+	positions := map[string]float64{}
+	records, err := store.All(ctx)
+	if err != nil {
+		t.Fatalf("All: %v", err)
+	}
+	for _, record := range records {
+		positions[record.LectureKey] = record.PositionSeconds
+	}
+	want := map[string]float64{"udemy-lecture:1": 5, "course/01 - A/002 Kept": 6, "udemy-lecture:2": 9}
+	if diff := cmp.Diff(want, positions); diff != "" {
+		t.Errorf("progress after renames (-want +got):\n%s", diff)
+	}
+}
