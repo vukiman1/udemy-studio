@@ -24,10 +24,11 @@ linters:
           files:
             - "**/internal/library/**"
             - "**/internal/learning/**"
+            - "**/internal/login/**"
+            - "**/internal/jobs/**"
             - "**/internal/progress/**"
             - "**/internal/subtitle/**"
             - "**/internal/search/**"
-            - "**/internal/jobs/**"
             - "**/internal/udemy/**"
             - "**/internal/download/**"
             - "**/internal/transcode/**"
