@@ -9,7 +9,7 @@ VALUES (?, ?, ?, ?, ?)
 ON CONFLICT (lecture_key) DO UPDATE SET
     position_seconds = excluded.position_seconds,
     duration_seconds = excluded.duration_seconds,
-    completed_at     = excluded.completed_at,
+    completed_at     = COALESCE(lecture_progress.completed_at, excluded.completed_at),
     updated_at       = excluded.updated_at;
 
 -- name: ListProgress :many

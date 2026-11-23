@@ -77,3 +77,20 @@ func TestOpenIsIdempotentOnAnExistingDatabase(t *testing.T) {
 		_ = database.Close()
 	}
 }
+
+func TestProgressStoreNeverClearsACompletion(t *testing.T) {
+	store := openTestStore(t)
+	ctx := t.Context()
+	completedAt := time.Unix(100, 0).UTC()
+	completed := progress.Record{LectureKey: "k", PositionSeconds: 10, DurationSeconds: 10, CompletedAt: &completedAt, UpdatedAt: completedAt}
+	staleSave := progress.Record{LectureKey: "k", PositionSeconds: 4, DurationSeconds: 10, UpdatedAt: time.Unix(200, 0).UTC()}
+	for _, record := range []progress.Record{completed, staleSave} {
+		if err := store.Upsert(ctx, record); err != nil {
+			t.Fatalf("Upsert: %v", err)
+		}
+	}
+	found, _, err := store.Find(ctx, "k")
+	if err != nil || found.CompletedAt == nil || !found.CompletedAt.Equal(completedAt) {
+		t.Errorf("CompletedAt = %v, %v; want %v", found.CompletedAt, err, completedAt)
+	}
+}
