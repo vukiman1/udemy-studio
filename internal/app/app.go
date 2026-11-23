@@ -37,8 +37,6 @@ type Options struct {
 	Downloads     DownloadOptions
 }
 
-const lanAccessCodeFileName = "lan-access-code"
-
 func Run(ctx context.Context, options Options, logger *slog.Logger) error {
 	if options.LibraryDir == "" {
 		return ErrMissingLibraryDir
@@ -82,9 +80,9 @@ func Run(ctx context.Context, options Options, logger *slog.Logger) error {
 		Jobs:     downloads.jobs,
 		Logger:   logger,
 	})
-	address := options.ListenAddress
+	address, accessCode := options.ListenAddress, ""
 	if options.LANMode {
-		address, handler, err = enableLANMode(address, handler, filepath.Join(filepath.Dir(options.DatabasePath), lanAccessCodeFileName))
+		address, handler, accessCode, err = enableLANMode(address, handler, filepath.Dir(options.DatabasePath))
 		if err != nil {
 			return err
 		}
@@ -93,28 +91,14 @@ func Run(ctx context.Context, options Options, logger *slog.Logger) error {
 	if err != nil {
 		return fmt.Errorf("listen on %s: %w", address, err)
 	}
+	if options.LANMode {
+		if err := announceLANMode(os.Stdout, listener.Addr(), accessCode); err != nil {
+			_ = listener.Close()
+			return err
+		}
+	}
 	logger.Info("http server listening", "addr", listener.Addr().String(), "version", options.Version)
 	return serve(ctx, listener, handler, logger, shutdownGracePeriod, downloads.workers()...)
-}
-
-func enableLANMode(address string, handler http.Handler, accessCodePath string) (string, http.Handler, error) {
-	lanAddress, err := lanListenAddress(address)
-	if err != nil {
-		return "", nil, err
-	}
-	accessCode, err := loadOrCreateAccessCode(accessCodePath)
-	if err != nil {
-		return "", nil, err
-	}
-	_, port, _ := net.SplitHostPort(lanAddress)
-	urls, err := lanURLs(port)
-	if err != nil {
-		return "", nil, err
-	}
-	if err := printLANInstructions(os.Stdout, urls, accessCode); err != nil {
-		return "", nil, fmt.Errorf("print LAN instructions: %w", err)
-	}
-	return lanAddress, httpapi.RequireLANAccess(accessCode, handler), nil
 }
 
 func serve(

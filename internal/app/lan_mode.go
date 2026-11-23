@@ -8,20 +8,52 @@ import (
 	"io"
 	"io/fs"
 	"net"
+	"net/http"
 	"net/url"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/vukiman1/udemy-studio/internal/platform/terminalqr"
+	"github.com/vukiman1/udemy-studio/internal/transport/httpapi"
 )
 
 const (
-	accessCodeBytes    = 8
-	accessCodeFileMode = 0o600
-	allInterfaces      = "0.0.0.0"
+	lanAccessCodeFileName = "lan-access-code"
+	accessCodeBytes       = 8
+	accessCodeFileMode    = 0o600
+	allInterfaces         = "0.0.0.0"
 )
 
 var accessCodeEncoding = base32.StdEncoding.WithPadding(base32.NoPadding)
+
+func enableLANMode(address string, handler http.Handler, dataDir string) (string, http.Handler, string, error) {
+	lanAddress, err := lanListenAddress(address)
+	if err != nil {
+		return "", nil, "", err
+	}
+	accessCode, err := loadOrCreateAccessCode(filepath.Join(dataDir, lanAccessCodeFileName))
+	if err != nil {
+		return "", nil, "", err
+	}
+	return lanAddress, httpapi.RequireLANAccess(accessCode, handler), accessCode, nil
+}
+
+// announceLANMode runs once the port is bound, so the QR code never points at a server that failed to start.
+func announceLANMode(output io.Writer, listening net.Addr, accessCode string) error {
+	_, port, err := net.SplitHostPort(listening.String())
+	if err != nil {
+		return fmt.Errorf("parse listening address %s: %w", listening, err)
+	}
+	urls, err := lanURLs(port)
+	if err != nil {
+		return err
+	}
+	if err := printLANInstructions(output, urls, accessCode); err != nil {
+		return fmt.Errorf("print LAN instructions: %w", err)
+	}
+	return nil
+}
 
 func loadOrCreateAccessCode(path string) (string, error) {
 	stored, err := os.ReadFile(path) //nolint:gosec // reason: path is derived from the operator's --db flag, never from a request
