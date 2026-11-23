@@ -17,6 +17,7 @@ import (
 	"time"
 
 	"github.com/vukiman1/udemy-studio/internal/jobs"
+	"github.com/vukiman1/udemy-studio/internal/platform/processgroup"
 	"github.com/vukiman1/udemy-studio/internal/platform/secret"
 )
 
@@ -89,7 +90,7 @@ func (downloader *Downloader) Download(ctx context.Context, job jobs.Job, token 
 		downloader.forwardEvents(eventsReader, onEvent)
 	}()
 	waitErr := command.Wait()
-	killProcessGroup(command.Process)
+	processgroup.Kill(command.Process)
 	<-eventsDone
 
 	if ctx.Err() != nil {
@@ -120,9 +121,7 @@ func (downloader *Downloader) command(ctx context.Context, job jobs.Job, token s
 	)
 	command.Stdout, command.Stderr = logFile, logFile
 	command.ExtraFiles = []*os.File{events}
-	startInOwnProcessGroup(command)
-	command.Cancel = func() error { return interruptProcessGroup(command.Process) }
-	command.WaitDelay = interruptGrace
+	processgroup.Interruptible(command, interruptGrace)
 	return command
 }
 
