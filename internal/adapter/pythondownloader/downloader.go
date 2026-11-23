@@ -27,6 +27,7 @@ const (
 	logFileMode        = 0o600
 	logDirMode         = 0o750
 	logTailBytes       = 2048
+	logUnavailable     = "(log unavailable)"
 	maxEventLineBytes  = 1 << 20
 )
 
@@ -95,7 +96,7 @@ func (downloader *Downloader) Download(ctx context.Context, job jobs.Job, token 
 		return ctx.Err()
 	}
 	if waitErr != nil {
-		return fmt.Errorf("downloader failed (%w); log %s ends with: %s", waitErr, logPath, logTail(logPath))
+		return fmt.Errorf("downloader failed (%w); log %s ends with: %s", waitErr, logPath, lastLogLine(logPath))
 	}
 	return nil
 }
@@ -170,14 +171,21 @@ func openLog(logPath string) (*os.File, error) {
 	return logFile, nil
 }
 
-func logTail(logPath string) string {
-	content, err := os.ReadFile(logPath) //nolint:gosec // reason: we wrote this log ourselves
+func lastLogLine(logPath string) string {
+	logFile, err := os.Open(logPath) //nolint:gosec // reason: we wrote this log ourselves
 	if err != nil {
-		return "(log unavailable)"
+		return logUnavailable
 	}
-	if len(content) > logTailBytes {
-		content = content[len(content)-logTailBytes:]
+	defer logFile.Close()
+	info, err := logFile.Stat()
+	if err != nil {
+		return logUnavailable
 	}
-	lines := strings.Split(strings.TrimSpace(ansiEscape.ReplaceAllString(string(bytes.ToValidUTF8(content, nil)), "")), "\n")
+	start := max(info.Size()-logTailBytes, 0)
+	tail, err := io.ReadAll(io.NewSectionReader(logFile, start, info.Size()-start))
+	if err != nil {
+		return logUnavailable
+	}
+	lines := strings.Split(strings.TrimSpace(ansiEscape.ReplaceAllString(string(bytes.ToValidUTF8(tail, nil)), "")), "\n")
 	return lines[len(lines)-1]
 }
