@@ -4,17 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"net/http"
 
 	"github.com/vukiman1/udemy-studio/internal/login"
 	"github.com/vukiman1/udemy-studio/internal/transport/httpapi/gen"
 )
-
-const downloadsUnavailableDetail = "downloads are not configured: start the server with --python and --python-repo"
-
-func downloadsUnavailable() gen.DownloadsUnavailableApplicationProblemPlusJSONResponse {
-	return gen.DownloadsUnavailableApplicationProblemPlusJSONResponse(problem(http.StatusServiceUnavailable, downloadsUnavailableDetail))
-}
 
 func (server apiServer) ListChromeProfiles(ctx context.Context, _ gen.ListChromeProfilesRequestObject) (gen.ListChromeProfilesResponseObject, error) {
 	if server.deps.Login == nil {
