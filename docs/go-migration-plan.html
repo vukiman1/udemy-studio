@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<title>Udemy Downloader — Phân tích kỹ thuật và kế hoạch migrate sang Go</title>
+<style>
+@page { size: A4; margin: 18mm 16mm 18mm 16mm; }
+:root {
+  --ink: #1d2433; --muted: #5b6478; --line: #d9dee8; --soft: #f4f6fa;
+  --accent: #2f5bd3; --accent-soft: #e8eefc; --warn: #b4541a; --warn-soft: #fdf0e6;
+  --ok: #1f7a4d; --ok-soft: #e6f4ec; --bad: #b42335; --bad-soft: #fbe9ec;
+}
+* { box-sizing: border-box; }
+html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+body { font-family: -apple-system, "SF Pro Text", "Helvetica Neue", Arial, sans-serif; color: var(--ink); font-size: 10.2pt; line-height: 1.55; margin: 0; }
+h1, h2, h3, h4 { font-family: -apple-system, "SF Pro Display", "Helvetica Neue", Arial, sans-serif; line-height: 1.25; }
+h2 { font-size: 17pt; margin: 0 0 10px; padding-bottom: 6px; border-bottom: 2px solid var(--accent); break-after: avoid; }
+h3 { font-size: 12.5pt; margin: 18px 0 6px; color: var(--accent); break-after: avoid; }
+h4 { font-size: 10.8pt; margin: 12px 0 4px; break-after: avoid; }
+p { margin: 5px 0 8px; }
+ul, ol { margin: 4px 0 8px; padding-left: 20px; }
+li { margin: 2px 0; }
+code, .mono { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 8.8pt; background: var(--soft); padding: 0 3px; border-radius: 3px; }
+pre { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 8.4pt; line-height: 1.45; background: var(--soft); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; white-space: pre-wrap; break-inside: avoid; margin: 6px 0 10px; }
+pre code { background: none; padding: 0; }
+table { width: 100%; border-collapse: collapse; margin: 6px 0 12px; font-size: 9.1pt; break-inside: auto; }
+th, td { border: 1px solid var(--line); padding: 4px 6px; vertical-align: top; text-align: left; }
+th { background: var(--soft); font-weight: 600; }
+tr { break-inside: avoid; }
+section { break-before: page; }
+.cover { height: 255mm; display: flex; flex-direction: column; justify-content: center; }
+.cover .kicker { color: var(--accent); font-weight: 600; letter-spacing: .08em; text-transform: uppercase; font-size: 9.5pt; }
+.cover h1 { font-size: 27pt; margin: 8px 0 12px; }
+.cover .sub { font-size: 12.5pt; color: var(--muted); max-width: 150mm; }
+.cover .meta { margin-top: 26px; font-size: 9.5pt; color: var(--muted); border-top: 1px solid var(--line); padding-top: 10px; }
+.callout { border-left: 4px solid var(--accent); background: var(--accent-soft); padding: 7px 11px; border-radius: 0 6px 6px 0; margin: 8px 0 12px; break-inside: avoid; }
+.callout.warn { border-color: var(--warn); background: var(--warn-soft); }
+.callout.ok { border-color: var(--ok); background: var(--ok-soft); }
+.callout.bad { border-color: var(--bad); background: var(--bad-soft); }
+.callout b:first-child { display: block; margin-bottom: 2px; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.card { border: 1px solid var(--line); border-radius: 8px; padding: 8px 11px; break-inside: avoid; }
+.card h4 { margin-top: 0; }
+.flow { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; margin: 8px 0 12px; }
+.flow .step { border: 1px solid var(--accent); background: var(--accent-soft); border-radius: 6px; padding: 4px 8px; font-size: 8.8pt; text-align: center; }
+.flow .arrow { color: var(--accent); font-weight: 700; }
+.tag { display: inline-block; font-size: 7.8pt; font-weight: 600; padding: 0 6px; border-radius: 8px; }
+.tag.high { background: var(--bad-soft); color: var(--bad); }
+.tag.med { background: var(--warn-soft); color: var(--warn); }
+.tag.low { background: var(--soft); color: var(--muted); }
+.tag.ok { background: var(--ok-soft); color: var(--ok); }
+.phase { border: 1px solid var(--line); border-radius: 8px; padding: 10px 13px; margin: 10px 0 14px; }
+.phase-head { display: flex; justify-content: space-between; align-items: baseline; border-bottom: 1px solid var(--line); padding-bottom: 5px; margin-bottom: 6px; break-after: avoid; }
+.phase-head h3 { margin: 0; }
+.phase-head .est { color: var(--muted); font-size: 9pt; }
+.label { font-weight: 600; color: var(--muted); font-size: 8.8pt; text-transform: uppercase; letter-spacing: .04em; margin-top: 8px; break-after: avoid; }
+.toc ol { padding-left: 18px; }
+.toc li { margin: 4px 0; }
+.small { font-size: 8.8pt; color: var(--muted); }
+.arch { display: grid; grid-template-columns: 1fr 1.3fr 1fr; gap: 8px; align-items: stretch; margin: 8px 0 12px; break-inside: avoid; }
+.arch .col { border: 1px dashed var(--line); border-radius: 8px; padding: 7px; }
+.arch .col > b { display: block; font-size: 8.6pt; color: var(--muted); text-transform: uppercase; margin-bottom: 4px; }
+.arch .box { border: 1px solid var(--accent); background: #fff; border-radius: 5px; padding: 3px 6px; margin: 4px 0; font-size: 8.6pt; }
+.arch .box.ext { border-color: var(--warn); }
+.arch .box.db { border-color: var(--ok); }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <div class="kicker">Tài liệu kỹ thuật</div>
+  <h1>Udemy Downloader<br>Phân tích kỹ thuật và kế hoạch migrate sang Go</h1>
+  <div class="sub">Bóc tách công nghệ, thuật toán, ý tưởng của tool Python hiện tại; kiến trúc đích Go web + React/TypeScript; lộ trình migrate chia phase có cổng kiểm chứng để tránh lỗi chồng lỗi.</div>
+  <div class="meta">
+    Ngày: 22/11/2026 · Phạm vi code: <code>udemy_downloader/</code> tại commit <code>bbbbbc1</code> (+ fix <code>--device</code> chưa commit) và các script phụ đề trong phiên làm việc.<br>
+    Quyết định đã chốt: ngôn ngữ đích <b>Go</b>, kiểu app <b>Go web</b> (xem qua trình duyệt, kể cả iPad/điện thoại trong LAN), auth bằng <b>đọc cookie trực tiếp từ Chrome profile</b>.
+  </div>
+</div>
+
+<section class="toc">
+  <h2>Mục lục</h2>
+  <ol>
+    <li>Tóm tắt</li>
+    <li>Tổng quan dự án: luồng chạy, module, cấu trúc output</li>
+    <li>Công nghệ đang dùng và bản thay thế trong Go</li>
+    <li>Thuật toán và ý tưởng chi tiết</li>
+    <li>Pipeline phụ đề tiếng Việt (đã làm trong phiên)</li>
+    <li>Nợ kỹ thuật và lỗi đang có</li>
+    <li>Kiến trúc đích: Go web + React/TypeScript</li>
+    <li>Kế hoạch migrate theo phase</li>
+    <li>Rủi ro và phương án dự phòng</li>
+    <li>Quyết định cần bạn chốt</li>
+    <li>Phụ lục: nguồn tham khảo đã kiểm chứng</li>
+    <li>Setup dự án và tổ chức code chuẩn production</li>
+  </ol>
+</section>
+
+<section>
+  <h2>1. Tóm tắt</h2>
+  <p>Tool hiện tại là một CLI Python (~2.800 dòng core, file chính <code>Udemy.py</code> 2.084 dòng) tải khoá học Udemy về máy: video, phụ đề, tài liệu đính kèm, bài viết, quiz. Nó không tự tải media: phần nặng được giao cho 3 tool ngoài là <b>yt-dlp</b>, <b>aria2c</b> và <b>ffmpeg</b>. Phần Python làm 4 việc: đăng nhập và vượt Cloudflare, gọi API Udemy để lấy curriculum, phân loại từng lecture và chọn nguồn, rồi điều phối tool ngoài và đặt tên file.</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>Hiện trạng dữ liệu của bạn</h4>
+      <ul>
+        <li>Khoá <i>Fundamentals of Backend Communications and Protocols</i>: 59 video (16 GB), 8 HEVC + 51 H.264.</li>
+        <li>58 cặp phụ đề <code>_en.srt</code> / <code>_vi.srt</code> đã kiểm chứng index, timing và drift.</li>
+        <li>1 lecture DRM không tải được (ngoài phạm vi).</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Hướng đi đã chốt</h4>
+      <ul>
+        <li>Backend Go (thư viện chuẩn là chính), frontend React + TypeScript strict, đóng gói 1 binary.</li>
+        <li>Giữ yt-dlp / aria2c / ffmpeg làm tool ngoài, không viết lại.</li>
+        <li>Migrate kiểu <i>strangler</i>: Python vẫn là chuẩn đối chiếu cho tới khi Go chứng minh cho ra kết quả giống hệt.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Lộ trình 8 phase (0 → 7)</h3>
+  <table>
+    <tr><th>Phase</th><th>Nội dung</th><th>Giá trị nhận được</th><th>Đụng tới Python?</th></tr>
+    <tr><td>0</td><td>Chụp fixture, 4 spike kiểm chứng (TLS, cookie Chrome, phát HEVC, FTS5)</td><td>Biết chắc hướng nào khả thi trước khi viết code thật</td><td>Không</td></tr>
+    <tr><td>1</td><td>Go web <b>player chỉ đọc</b> thư mục <code>downloads/</code></td><td>Học được ngay trên Mac và iPad, có nhớ vị trí, phụ đề song ngữ</td><td>Không</td></tr>
+    <tr><td>2</td><td>UI tải khoá học, Go điều khiển tool Python</td><td>Bỏ terminal, bỏ export cookie</td><td>Thêm 2 thay đổi nhỏ</td></tr>
+    <tr><td>3</td><td>Port API client + planner sang Go (chưa tải)</td><td>Logic Udemy nằm trong Go, đối chiếu 100% với Python</td><td>Dùng làm chuẩn</td></tr>
+    <tr><td>4</td><td>Port phần tải (non-DRM)</td><td>Go tự tải, Python thành dự phòng</td><td>Dùng làm chuẩn</td></tr>
+    <tr><td>5</td><td>Quiz, practice, role play, coding assignment</td><td>Đủ tính năng như bản Python</td><td>Dùng làm chuẩn</td></tr>
+    <tr><td>6</td><td>Nén H.265, dịch phụ đề bằng Claude API, tìm kiếm transcript</td><td>Các tính năng học tập nâng cao</td><td>Không</td></tr>
+    <tr><td>7</td><td>Gỡ Python khỏi luồng chạy</td><td>1 binary Go duy nhất</td><td>Lưu trữ</td></tr>
+  </table>
+
+  <div class="callout warn"><b>Ngoài phạm vi: DRM</b>Nhánh Widevine của tool (lecture có DRM) <b>không được port</b> và không có trong kế hoạch. App Go sẽ đánh dấu các lecture này là "DRM – không hỗ trợ" và bỏ qua. Tài liệu chỉ mô tả nhánh này ở mức đủ để hiểu luồng code.</div>
+</section>
+
+<section>
+  <h2>2. Tổng quan dự án</h2>
+
+  <h3>2.1 Luồng chạy end-to-end</h3>
+  <div class="flow">
+    <span class="step">Parse CLI args<br><span class="small">main.py</span></span><span class="arrow">→</span>
+    <span class="step">pre_check<br><span class="small">aria2c, ffmpeg ≥ 5</span></span><span class="arrow">→</span>
+    <span class="step">load_keys<br><span class="small">keyfile.json</span></span><span class="arrow">→</span>
+    <span class="step">visit<br><span class="small">lấy cookie Cloudflare</span></span><span class="arrow">→</span>
+    <span class="step">update_auth<br><span class="small">bearer hoặc cookie</span></span><span class="arrow">→</span>
+    <span class="step">get_course_info<br><span class="small">tìm course id</span></span><span class="arrow">→</span>
+    <span class="step">get_course_content<br><span class="small">curriculum, phân trang</span></span><span class="arrow">→</span>
+    <span class="step">parse_course_data<br><span class="small">dựng chapter/lecture</span></span><span class="arrow">→</span>
+    <span class="step">process_parsed_content<br><span class="small">tải từng lecture</span></span><span class="arrow">→</span>
+    <span class="step">log_summary</span>
+  </div>
+  <p>Có hai chế độ phụ: <code>--info</code> chỉ in thông tin khoá học, và cặp <code>--save-to-file</code> / <code>--load-from-file</code> lưu curriculum vào <code>saved/</code> để chạy lại nhanh (link media có hạn nên cache chỉ dùng được trong thời gian ngắn).</p>
+
+  <h3>2.2 Bản đồ module</h3>
+  <table>
+    <tr><th>File</th><th>Dòng</th><th>Trách nhiệm</th></tr>
+    <tr><td><code>main.py</code></td><td>267</td><td>Định nghĩa CLI (argparse), validate tham số (URL, khoảng số, chapter filter, preset H.265), gọi các bước theo thứ tự.</td></tr>
+    <tr><td><code>Udemy.py</code></td><td>2.084</td><td>"God class" <code>Udemy</code>: logger, auth, gọi API, parse curriculum, chọn nguồn, tải, mux, encode, phụ đề, quiz, role play, keyfile. Đây là phần chính cần tách khi port.</td></tr>
+    <tr><td><code>Session.py</code></td><td>69</td><td>HTTP session dùng <code>curl_cffi</code> giả TLS fingerprint Chrome 120; <code>visit</code>, retry 502/503, gắn header Bearer.</td></tr>
+    <tr><td><code>UdemyAuth.py</code></td><td>14</td><td>Tạo session và gắn bearer token nếu có.</td></tr>
+    <tr><td><code>utils.py</code></td><td>343</td><td>Parse box MP4 (PSSH, sửa <code>saiz</code> rỗng), parse payload Next.js của role play, gọi aria2c, kiểm tra tool ngoài, parse chapter filter, bỏ emoji.</td></tr>
+    <tr><td><code>vtt_to_srt.py</code></td><td>23</td><td>Chuyển WebVTT sang SRT, giữ mili-giây.</td></tr>
+    <tr><td><code>constants.py</code></td><td>69</td><td>URL template API, header giả lập app Android Udemy, preset x265/NVENC, field list của curriculum.</td></tr>
+    <tr><td><code>templates/*.html</code></td><td>~2.150</td><td>Trang HTML tự chứa để xem offline quiz, assignment, coding assignment, role play, article.</td></tr>
+  </table>
+
+  <h3>2.3 Cấu trúc output (lấy từ khoá bạn đã tải)</h3>
+<pre style="white-space:pre">downloads/
+└── fundamentals-of-backend-communications-and-protocols/   ← sanitize(tên khoá)
+    ├── 01 - Introduction/                                  ← "{index:02d} - {title}"
+    │   ├── 005 Download all slides, source code….html       ← article
+    │   └── ...
+    ├── 02 - Backend Communication Design Patterns/
+    │   ├── 001 Backend … Intro.mp4                          ← "{counter:03d} {title}.mp4"
+    │   ├── 001 Backend … Intro_en.srt                       ← "{lecture}_{lang}.srt"
+    │   ├── 001 Backend … Intro_vi.srt                       ← bản dịch (thêm sau)
+    │   └── ...
+    └── 07 - Extras/   08 - Bonus Content/   ...
+temp/     ← playlist m3u8 tạm (còn 348 file sót lại, xem mục 6)
+saved/  logs/  devices/  keyfile.json  cookies.txt</pre>
+  <div class="callout"><b>Vì sao tên file quan trọng</b>Cơ chế "chạy lại để resume" dựa hoàn toàn vào tên file: lecture nào đã có file đúng tên thì bỏ qua. Nếu bản Go đặt tên lệch một ký tự, nó sẽ tải lại cả khoá. Vì vậy quy tắc đặt tên là <b>hợp đồng</b> phải giữ nguyên tuyệt đối khi port (mục 4.10 và Phase 3).</div>
+</section>
+
+<section>
+  <h2>3. Công nghệ đang dùng và bản thay thế trong Go</h2>
+  <table>
+    <tr><th style="width:20%">Python (hiện tại)</th><th style="width:30%">Vai trò</th><th style="width:30%">Go (đề xuất)</th><th>Ghi chú</th></tr>
+    <tr><td><code>curl_cffi</code> (impersonate chrome120)</td><td>HTTP client giả TLS + HTTP/2 fingerprint của Chrome để không bị Cloudflare chặn</td><td><code>bogdanfinn/tls-client</code> (utls + fhttp, có profile Chrome 14x)</td><td>Rủi ro cao nhất của cả dự án, phải spike ở Phase 0</td></tr>
+    <tr><td><code>browser_cookie3</code></td><td>Đọc cookie từ trình duyệt</td><td><b>Tự viết</b> package nhỏ (~150 dòng) cho Chrome macOS</td><td><code>kooky</code> ghi "No Maintenance Intended" và không nói gì về schema cookie v24</td></tr>
+    <tr><td><code>http.cookiejar.MozillaCookieJar</code></td><td>Đọc <code>cookies.txt</code> (Netscape)</td><td>Parser tự viết (format 7 cột tab)</td><td>Chỉ còn là phương án dự phòng</td></tr>
+    <tr><td><code>m3u8</code></td><td>Parse HLS master playlist</td><td><code>Eyevinn/hls-m3u8</code></td><td><code>grafov/m3u8</code> đã archived 12/2024; Eyevinn là bản kế nhiệm</td></tr>
+    <tr><td><code>yt_dlp</code> (thư viện, cho DASH)</td><td>Liệt kê format DASH (chỉ nhánh DRM)</td><td>Không cần</td><td>Nhánh DRM ngoài phạm vi</td></tr>
+    <tr><td>yt-dlp, aria2c, ffmpeg (CLI)</td><td>Tải HLS theo fragment, tải file song song có resume, mux/encode</td><td>Giữ nguyên, gọi qua <code>os/exec</code></td><td>Không viết lại thứ đã được kiểm nghiệm</td></tr>
+    <tr><td><code>beautifulsoup4</code> + <code>lxml</code></td><td>Lấy course id từ HTML trang học (fallback)</td><td><code>golang.org/x/net/html</code></td><td></td></tr>
+    <tr><td><code>pathvalidate.sanitize_filename</code></td><td>Làm sạch tên file</td><td>Tự viết + golden test đối chiếu Python</td><td>Phải khớp từng ký tự (mục 4.10)</td></tr>
+    <tr><td><code>demoji</code></td><td>Bỏ emoji khỏi tên file video</td><td><code>forPelevin/gomoji</code> hoặc bảng Unicode emoji tự sinh</td><td>Golden test bắt buộc</td></tr>
+    <tr><td><code>webvtt-py</code> + <code>pysrt</code></td><td>VTT → SRT</td><td>Tự viết (format đơn giản)</td><td>Giữ mili-giây, <code>html.unescape</code></td></tr>
+    <tr><td><code>pywidevine</code>, <code>pymp4</code></td><td>DRM: PSSH, license, giải mã</td><td><b>Không port</b></td><td>Ngoài phạm vi</td></tr>
+    <tr><td><code>coloredlogs</code> + <code>logging</code></td><td>Log màu ra console + file</td><td><code>log/slog</code> (stdlib)</td><td>Log có cấu trúc, đẩy lên UI qua SSE</td></tr>
+    <tr><td>argparse</td><td>CLI</td><td><code>flag</code> (stdlib) cho lệnh phụ, còn lại là UI web</td><td></td></tr>
+    <tr><td>—</td><td>(mới) Web server, phát video có Range</td><td><code>net/http</code>, <code>http.ServeContent</code>, routing pattern của Go ≥ 1.22</td><td>Không cần framework</td></tr>
+    <tr><td>—</td><td>(mới) Lưu tiến độ học, ghi chú, chỉ mục tìm kiếm</td><td><code>modernc.org/sqlite</code> (pure Go, không cgo)</td><td>FTS5 cần spike xác nhận; dự phòng <code>ncruces/go-sqlite3</code></td></tr>
+    <tr><td>—</td><td>(mới) Frontend</td><td>React + TypeScript strict + Vite, TanStack Query, React Router; nhúng bằng <code>embed.FS</code></td><td>1 binary, không cần Node khi chạy</td></tr>
+  </table>
+</section>
+
+<section>
+  <h2>4. Thuật toán và ý tưởng chi tiết</h2>
+
+  <h3>4.1 Vượt Cloudflare và giả lập client</h3>
+  <ul>
+    <li><b>TLS fingerprint:</b> Cloudflare nhận diện client qua cách bắt tay TLS (JA3/JA4) và HTTP/2 settings. Thư viện HTTP thông thường của Python hay Go có fingerprint rất dễ nhận ra. <code>curl_cffi</code> dùng bản curl được vá để bắt tay giống hệt Chrome 120. Session còn bỏ User-Agent của app để header khớp với fingerprint trình duyệt.</li>
+    <li><b>Request "visit":</b> trước khi gọi API, tool gọi <code>/api-2.0/visits/current/</code> để nhận cookie Cloudflare. Nếu nội dung trả về chứa <code>challenge-platform</code> hoặc <code>&lt;title&gt;Just a moment...</code>, tức là fingerprint bị lộ, và tool dừng lại.</li>
+    <li><b>Header app Android:</b> các request mang client id/secret và version name của app Android Udemy (khai báo trong <code>constants.py</code>). Header <code>authorization: Basic …</code> của app bị gỡ sau khi đăng nhập, để bearer token hoặc cookie quyết định danh tính.</li>
+    <li><b>Retry:</b> <code>Session._get</code> thử lại tối đa 10 lần khi gặp 502/503, nghỉ cố định 0,8 giây giữa các lần; timeout 120 giây cho phản hồi chậm.</li>
+  </ul>
+
+  <h3>4.2 Đăng nhập: bearer token hoặc cookie</h3>
+  <ul>
+    <li>Hai cách loại trừ nhau (argparse mutually exclusive group): <code>--bearer</code>, hoặc <code>--browser &lt;tên&gt;</code> / <code>--browser file</code>.</li>
+    <li><b>Bearer:</b> gắn vào <code>Authorization</code> và <code>X-Udemy-Authorization</code>.</li>
+    <li><b>Cookie file:</b> đọc Netscape format bằng <code>ignore_discard=True, ignore_expires=True</code>. Lý do: các extension export cookie phiên với expiry = 0, Python coi là đã hết hạn và bỏ đi. Tool nạp tất cả rồi chỉ xoá cookie có expiry thật sự đã qua.</li>
+    <li><b>Cookie trình duyệt:</b> <code>browser_cookie3.&lt;browser&gt;(domain_name="udemy.com")</code>. Hạn chế: chỉ đọc profile mặc định (không truyền <code>cookie_file</code>).</li>
+  </ul>
+  <h4>Thuật toán đọc cookie Chrome trên macOS (sẽ viết trong Go)</h4>
+  <ol>
+    <li>Tìm profile: đọc <code>~/Library/Application Support/Google/Chrome/Local State</code> → <code>profile.info_cache</code> cho ra cặp (thư mục, tên hiển thị), ví dụ <code>Profile 2</code> → "Claude browser 2".</li>
+    <li>Copy <code>&lt;profile&gt;/Cookies</code> (kèm <code>-wal</code>, <code>-shm</code> nếu có) sang thư mục tạm, vì Chrome đang chạy sẽ khoá file.</li>
+    <li>Đọc <code>meta.version</code> và các dòng <code>cookies</code> có <code>host_key</code> kết thúc bằng <code>udemy.com</code>.</li>
+    <li>Lấy mật khẩu Keychain: <code>security find-generic-password -w -s "Chrome Safe Storage"</code>. Lần đầu macOS hỏi quyền, người dùng chọn <i>Always Allow</i>.</li>
+    <li>Dẫn xuất khoá: PBKDF2-HMAC-SHA1, salt <code>saltysalt</code>, 1003 vòng, 16 byte.</li>
+    <li>Giải mã <code>encrypted_value</code>: bỏ tiền tố 3 byte <code>v10</code>, AES-128-CBC với IV là 16 dấu cách (0x20), gỡ padding PKCS7.</li>
+    <li>Nếu <code>meta.version ≥ 24</code>: bỏ 32 byte đầu của plaintext (SHA-256 của <code>host_key</code> mà Chrome chèn vào trước giá trị).</li>
+    <li>Kiểm tra có cookie <code>access_token</code>; nếu không có thì báo "hãy đăng nhập Udemy trên profile X".</li>
+  </ol>
+  <p class="small">Bước 5–7 lấy từ mã nguồn của nhiều thư viện độc lập (rookie, HTTP::Cookies::Chrome, nab) và khớp nhau; Phase 0 sẽ xác nhận trên Chrome 158 của bạn bằng cách so sánh hash giá trị với <code>cookies.txt</code>, không in giá trị ra.</p>
+
+  <h3>4.3 Tìm course id: chuỗi fallback 6 bước</h3>
+  <p>Từ URL, regex <code>//(?P&lt;portal_name&gt;.+?).udemy.com/(course/)?(?P&lt;name_or_id&gt;…)</code> tách ra <i>portal</i> (ví dụ <code>nelisoftwares</code> cho Udemy Business, <code>www</code> cho bản thường) và slug. Sau đó tìm khoá theo thứ tự, dừng ở bước đầu tiên khớp <code>published_title</code> hoặc id:</p>
+  <ol>
+    <li>Tìm trong khoá đã đăng ký (<code>subscribed-courses?search=…</code>).</li>
+    <li>Toàn bộ khoá của tôi (page_size 10000).</li>
+    <li>Khoá thuộc gói subscription (Personal Plan).</li>
+    <li>Khoá trong các collection.</li>
+    <li>Khoá đã archive.</li>
+    <li>Fallback cuối, hoặc khi có cờ <code>-sc</code>: tải HTML trang học, tìm <code>div.ud-component--course-taking--app</code>, đọc JSON trong <code>data-module-args</code> để lấy <code>courseId</code>, rồi gọi API course.</li>
+  </ol>
+
+  <h3>4.4 Lấy curriculum và phân trang</h3>
+  <p><code>_get_all_pages</code> gọi trang đầu, rồi đi theo trường <code>next</code> cho tới hết, gộp <code>results</code>. Số trang ước tính = ⌈count / số phần tử trang đầu⌉, chỉ dùng để in tiến độ. Curriculum được xin kèm danh sách field rất cụ thể (<code>CURRICULUM_ITEMS_PARAMS</code>), page_size 200, để một lần gọi trả về đủ asset, caption, stream URL.</p>
+
+  <h3>4.5 Dựng cây chapter/lecture từ danh sách phẳng</h3>
+  <p>API trả về một danh sách phẳng, mỗi phần tử có <code>_class</code> là <code>chapter</code>, <code>lecture</code>, <code>quiz</code>, <code>practice</code> hoặc <code>role-play</code>. Thuật toán duyệt một lượt:</p>
+  <ul>
+    <li>Gặp <code>chapter</code>: tạo chapter mới với tên <code>"{object_index:02d} - {sanitize(title)}"</code>, reset bộ đếm lecture về 0 (trừ khi có <code>-n</code>: đánh số liên tục cả khoá).</li>
+    <li>Gặp lecture/quiz/practice/role-play: tăng bộ đếm, tên <code>"{counter:03d} {sanitize(title)}"</code>, gắn vào chapter hiện tại. Nếu chưa có chapter nào thì tạo chapter "giả" từ chính phần tử đó.</li>
+    <li>Ghi lại <code>lecture_count</code> từng chapter, tổng chapter và tổng lecture.</li>
+  </ul>
+  <div class="callout warn"><b>Hệ quả quan trọng</b>Số thứ tự trong tên file là bộ đếm theo chapter, không phải id của Udemy. Nếu tác giả khoá học chèn thêm một bài vào giữa chapter, các bài phía sau sẽ đổi tên và bị tải lại. Bản Go nên lưu thêm manifest có <code>lecture_id</code> (Phase 4) để nhận ra trường hợp này.</div>
+
+  <h3>4.6 Phân loại lecture</h3>
+  <table>
+    <tr><th>Điều kiện trên asset</th><th>Loại</th><th>Xử lý</th></tr>
+    <tr><td><code>stream_urls</code> có dữ liệu</td><td>Video không DRM</td><td>Lấy nguồn từ <code>stream_urls.Video</code> (mp4 trực tiếp hoặc HLS), lấy caption</td></tr>
+    <tr><td><code>stream_urls</code> tồn tại nhưng rỗng</td><td>Bài dạng HTML</td><td>Ghi <code>body</code> ra <code>.html</code></td></tr>
+    <tr><td>Không có <code>stream_urls</code>, có <code>media_sources</code></td><td>Video DRM (DASH)</td><td>Ngoài phạm vi</td></tr>
+    <tr><td><code>asset_type = article</code></td><td>Bài viết</td><td>Bọc vào <code>article_template.html</code></td></tr>
+    <tr><td><code>asset_type ∈ {e-book, file, presentation, audio}</code></td><td>Tài liệu tải được</td><td>Lấy <code>download_urls[&lt;Key&gt;][0].file</code></td></tr>
+    <tr><td><code>supplementary_assets</code></td><td>File đính kèm, source code, link ngoài</td><td>Tải bằng aria2c; link ngoài ghi ra <code>.url</code> và gộp vào <code>external-links.txt</code> (khử trùng lặp, không phân biệt hoa thường)</td></tr>
+  </table>
+
+  <h3>4.7 Chọn nguồn video và chất lượng</h3>
+  <ul>
+    <li><b>Nguồn mp4 trực tiếp:</b> label là chiều cao (ví dụ "720"); chiều rộng suy ra từ bảng <code>HEIGHT_TO_WIDTH</code>; bỏ nguồn "audio".</li>
+    <li><b>HLS:</b> tải master playlist, ghi ra <code>temp/index_{asset}.m3u8</code>. Với mỗi variant có cả <code>resolution</code> và <code>codecs</code>, khử trùng theo chiều cao, tải playlist con và ghi ra <code>temp/index_{asset}_{w}x{h}.m3u8</code>. Nguồn được trả về dạng <code>file://</code> để yt-dlp đọc từ đĩa (vì link gốc cần header/cookie).</li>
+    <li><b>Chọn chất lượng:</b> mặc định lấy cao nhất. Với <code>-q N</code>: chọn nguồn có <code>|height − N|</code> nhỏ nhất (tức là gần nhất, không bắt buộc ≤ N).</li>
+  </ul>
+
+  <h3>4.8 Tải và resume</h3>
+  <ul>
+    <li><b>HLS:</b> <code>yt-dlp --enable-file-urls --force-generic-extractor --concurrent-fragments N --downloader aria2c</code>. yt-dlp giữ file <code>.part</code> và <code>.ytdl</code> nên chạy lại sẽ tải tiếp.</li>
+    <li><b>File trực tiếp, caption, asset:</b> <code>aria2c -x16 -s20 -j16 -c --auto-file-renaming=false</code>: 16 kết nối mỗi server, chia 20 đoạn, <code>-c</code> để tải tiếp file dở. Mã thoát khác 0 thì ném exception, được bắt ở nơi gọi và ghi vào danh sách lỗi.</li>
+    <li><b>Idempotent theo tên file:</b> trước mỗi lecture/caption/quiz, nếu file đích đã tồn tại thì bỏ qua và tăng bộ đếm <code>already_present</code>. Cuối cùng in tổng kết: đã tải, đã có, thất bại (kèm danh sách để chạy lại).</li>
+    <li><b>Media URL có hạn:</b> link ký sẵn trong curriculum hết hạn sau một thời gian, nên resume luôn cần gọi lại API chứ không dùng lại cache cũ.</li>
+  </ul>
+
+  <h3>4.9 Phụ đề</h3>
+  <ul>
+    <li>Lấy ngôn ngữ theo thứ tự ưu tiên <code>language → srclang → label → locale_id</code>. Lọc theo <code>-l</code> (hoặc <code>all</code>).</li>
+    <li>VTT được tải về, chuyển sang SRT và xoá VTT (trừ <code>--keep-vtt</code>). Bản chuyển đổi chép từng trường giờ/phút/giây/mili-giây, vì các thuộc tính <code>*_in_seconds</code> của webvtt-py làm tròn mất phần mili-giây. Text được <code>html.unescape</code>.</li>
+    <li>Kiểm tra "đã có" chấp nhận cả file <code>.vtt</code> lẫn <code>.srt</code> tương ứng. Thử lại tối đa 3 lần (đệ quy).</li>
+  </ul>
+
+  <h3>4.10 Quy tắc đặt tên (hợp đồng phải giữ)</h3>
+  <table>
+    <tr><th>Đối tượng</th><th>Công thức</th></tr>
+    <tr><td>Thư mục khoá</td><td><code>sanitize(course_title)</code>, hoặc course id nếu <code>--id-as-course-name</code></td></tr>
+    <tr><td>Thư mục chapter</td><td><code>"%02d - " + sanitize(title)</code></td></tr>
+    <tr><td>File video</td><td><code>deEmojify(sanitize("%03d " + sanitize(title) + ".mp4"))</code></td></tr>
+    <tr><td>Phụ đề</td><td><code>sanitize(lecture_title) + "_" + lang + ".srt"</code> (<b>không</b> bỏ emoji)</td></tr>
+    <tr><td>Bài HTML, quiz</td><td><code>sanitize(lecture_title + ".html")</code></td></tr>
+  </table>
+  <p>Hành vi thực tế của <code>pathvalidate</code> đo trên venv của bạn:</p>
+<pre>'HTTP/2 vs HTTP/3: why?'  → 'HTTP2 vs HTTP3 why'     (xoá / : ?)
+'a&lt;b&gt;c|d"e*f'            → 'abcdef'
+'name. '                  → 'name'                   (cắt dấu chấm, khoảng trắng cuối)
+'  lead'                  → 'lead'                   (cắt khoảng trắng đầu)
+'CON'                     → 'CON_'                   (tên dành riêng của Windows)
+'emoji 🚀 test'            → 'emoji 🚀 test'           (giữ emoji, deEmojify mới bỏ)</pre>
+
+  <h3>4.11 Quiz, practice, role play</h3>
+  <ul>
+    <li><b>Quiz:</b> nếu quiz chỉ có 1 assessment loại <code>coding-problem</code> thì là coding assignment (instructions, test files, solution files); ngược lại là quiz thường. Dữ liệu được nhúng vào template HTML.</li>
+    <li><b>Nhúng JSON an toàn:</b> <code>json.dumps(data).replace("&lt;/", "&lt;\/")</code> để chuỗi chứa <code>&lt;/script&gt;</code> không đóng thẻ script sớm (chống XSS trong file offline).</li>
+    <li><b>Role play:</b> dữ liệu chỉ có trong trang Next.js. Thuật toán: (1) gom các chunk <code>self.__next_f.push([type, "chunk"])</code> thành một payload; (2) duyệt từng dòng <code>id:json</code>, tìm theo chiều sâu object có <code>scenario</code> cùng <code>aiCharacter</code>/<code>learnerRole</code>/<code>meeting</code>; (3) thay mọi tham chiếu <code>"$id"</code> bằng chunk tương ứng: chunk text dạng <code>id:T&lt;độ dài hex&gt;,&lt;text&gt;</code> được cắt theo <b>số byte UTF-8</b> chứ không theo số ký tự.</li>
+  </ul>
+
+  <h3>4.12 Hậu xử lý H.265</h3>
+  <ul>
+    <li><code>libx265 -crf 28 -preset medium</code>, hoặc <code>hevc_nvenc -rc vbr -cq N -b:v 0</code> với preset x265 được map sang p1–p7.</li>
+    <li>Gắn tag <code>hvc1</code> để QuickTime và Safari phát được.</li>
+    <li>Ghi ra <code>.tmp</code> rồi <code>os.replace</code> (thay thế nguyên tử); encode lỗi thì xoá <code>.tmp</code>, giữ bản gốc. Chạy với <code>nice -n 7</code>.</li>
+    <li>Thực đo trên M1 Pro: libx265 chỉ ~2–3x realtime, nên bạn đã tắt. Bản Go sẽ dùng <code>hevc_videotoolbox</code> (encoder phần cứng của Apple), chạy nền sau khi tải.</li>
+  </ul>
+
+  <h3>4.13 Nhánh DRM (chỉ mô tả, không port)</h3>
+  <p>Lecture DRM được tải dạng track mã hoá qua yt-dlp, sau đó tool cần khoá giải mã từ <code>keyfile.json</code> hoặc từ file thiết bị do người dùng tự cung cấp, rồi để ffmpeg giải mã và mux. Utils có một số xử lý box MP4 cho nhánh này. Toàn bộ nhánh này nằm ngoài kế hoạch.</p>
+</section>
+
+<section>
+  <h2>5. Pipeline phụ đề tiếng Việt (đã làm trong phiên)</h2>
+  <p>Phần này không nằm trong repo mà ở scratchpad của phiên làm việc, nhưng là ý tưởng nên đưa vào app (Phase 6).</p>
+
+  <h3>5.1 Ba lệnh của <code>srt_tool.py</code></h3>
+  <table>
+    <tr><th>Lệnh</th><th>Làm gì</th><th>Vì sao</th></tr>
+    <tr><td><code>extract</code></td><td>SRT → mỗi cue một dòng <code>&lt;index&gt;\t&lt;text&gt;</code></td><td>Người dịch (LLM) chỉ thấy text, không thể làm hỏng timing</td></tr>
+    <tr><td><code>merge</code></td><td>Ghép bản dịch vào timing gốc</td><td>Từ chối nếu thiếu, thừa, trùng hoặc rỗng index; không bao giờ ghi file sai một nửa</td></tr>
+    <tr><td><code>check</code></td><td>Mọi cặp <code>_en</code>/<code>_vi</code> phải có cùng danh sách (index, timing)</td><td>Kiểm tra toàn khoá sau khi dịch</td></tr>
+  </table>
+
+  <h3>5.2 Phát hiện lệch dòng (drift check)</h3>
+  <p><b>Vấn đề thực tế đã gặp:</b> index khớp hoàn toàn nhưng nội dung bị dịch lệch một cue (câu của cue 511 nằm ở cue 510…), vì LLM gộp hai cue ngắn. <code>merge</code> không thể phát hiện vì nó chỉ kiểm tra index.</p>
+  <p><b>Ý tưởng:</b> độ dài một câu dịch tương quan mạnh với độ dài câu gốc. Nếu một đoạn bị lệch, độ dài bản dịch sẽ tương quan với cue <i>bên cạnh</i> tốt hơn với chính cue của nó.</p>
+<pre>Với mỗi cửa sổ W = 30 cue, bước nhảy S = 10:
+  r0   = corr(len_en[i], len_vi[i])        i trong cửa sổ
+  r±1  = corr(len_en[i], len_vi[i ± 1])
+  Gắn cờ nếu max(r−1, r+1) − r0 &gt; 0,2
+Bỏ qua cửa sổ có &lt; 15 cặp hoặc độ dài hằng số (tương quan không xác định).</pre>
+  <p>Kết quả: phát hiện đúng đoạn WebRTC cue 510–538 mà các bước kiểm tra khác bỏ sót; sau khi sửa, toàn khoá có 0 cảnh báo.</p>
+
+  <h3>5.3 Style guide dịch</h3>
+  <ul>
+    <li>Người đọc là dev Việt hiểu sẵn thuật ngữ: giữ tiếng Anh cho request, response, latency, handshake…, và mọi tên giao thức/sản phẩm.</li>
+    <li>Xưng "mình"/"bạn"/"chúng ta", bỏ từ đệm, câu ngắn để kịp đọc.</li>
+    <li>Sửa lỗi nhận dạng giọng nói có hệ thống ("STB two" → HTTP/2, "Jason" → JSON, "SDB" → SDP trong ngữ cảnh WebRTC…).</li>
+    <li>Luật định dạng cứng: đúng một dòng mỗi cue, không gộp/tách/bỏ cue.</li>
+  </ul>
+  <div class="callout"><b>Bài học để đưa vào app</b>Phải có hai lớp kiểm tra độc lập: <b>cấu trúc</b> (index, timing: <code>merge</code> và <code>check</code>) và <b>nội dung</b> (drift check). Agent dịch tự báo "đã kiểm tra" không đủ tin cậy; chỉ chấp nhận kết quả khi cả hai lớp qua.</div>
+</section>
+
+<section>
+  <h2>6. Nợ kỹ thuật và lỗi đang có</h2>
+  <p>Tất cả mục dưới đây đã được kiểm lại bằng cách đọc code trong lần phân tích này.</p>
+  <table>
+    <tr><th style="width:9%">Mức</th><th style="width:22%">Vị trí</th><th>Vấn đề</th><th style="width:26%">Cách xử lý trong Go</th></tr>
+    <tr><td><span class="tag high">Cao</span></td><td><code>Udemy.py</code> <code>_extract_download</code></td><td><code>download_urls.get(key, [])[0]</code> ném <code>IndexError</code> khi thiếu key. Hàm được gọi qua <code>_parse_lecture</code> nằm ngoài try, nên một asset lỗi làm dừng cả lượt tải.</td><td>Trả về lỗi có ngữ cảnh, ghi lecture vào danh sách thất bại, tiếp tục</td></tr>
+    <tr><td><span class="tag med">TB</span></td><td><code>process_caption</code> và tên video</td><td>Video được <code>deEmojify</code> còn phụ đề và bài HTML thì không. Lecture có emoji trong tiêu đề sẽ có tên video và tên phụ đề lệch nhau, player không ghép được.</td><td>Port nguyên trạng ở Phase 3; Phase 1 scanner ghép theo tên sau khi bỏ emoji ở cả hai phía</td></tr>
+    <tr><td><span class="tag med">TB</span></td><td><code>_extract_m3u8</code></td><td>Playlist tạm ghi vào <code>temp/</code> theo thư mục hiện hành và không bao giờ dọn: repo của bạn đang có 348 file sót.</td><td>Thư mục tạm riêng cho từng job, xoá khi job kết thúc</td></tr>
+    <tr><td><span class="tag med">TB</span></td><td><code>log_subprocess_output</code></td><td><code>Popen</code> không truyền <code>stdout=PIPE</code>, nên hàm này không bao giờ đọc được gì. Output của yt-dlp/aria2c/ffmpeg chỉ ra console, file log không có khi cần điều tra.</td><td>Bắt cả stdout/stderr, ghi log và đẩy tiến độ lên UI</td></tr>
+    <tr><td><span class="tag med">TB</span></td><td><code>update_auth</code></td><td>Lỗi <code>BrowserCookieError</code> (không đọc được cookie) không được bắt, người dùng thấy traceback thô.</td><td>Lỗi có tên, thông báo hướng dẫn cụ thể</td></tr>
+    <tr><td><span class="tag low">Thấp</span></td><td><code>Session._get</code></td><td>Sau 10 lần 502/503 vẫn trả về response lỗi; nghỉ cố định 0,8 giây, không có backoff.</td><td>Exponential backoff có jitter, lỗi rõ ràng khi hết lượt</td></tr>
+    <tr><td><span class="tag low">Thấp</span></td><td><code>_get_quiz_with_info</code></td><td>Quiz rỗng gây <code>IndexError</code> (được bắt ở nơi gọi, nhưng thông báo khó hiểu).</td><td>Kiểm tra rỗng tại biên</td></tr>
+    <tr><td><span class="tag low">Thấp</span></td><td>Bài HTML rỗng</td><td><code>html_content</code> rỗng thì bỏ qua mà không tính là đã tải hay thất bại.</td><td>Tính là "bỏ qua có lý do", hiện trong tổng kết</td></tr>
+    <tr><td><span class="tag low">Thấp</span></td><td>Kiến trúc</td><td>Class <code>Udemy</code> gánh mọi việc; trạng thái toàn cục (<code>os.chdir</code> ở nhánh DRM); exception trống <code>raise Exception(...)</code>.</td><td>Tách package theo trách nhiệm, error type có tên</td></tr>
+  </table>
+  <div class="callout bad"><b>Đính chính một nhận định trước đó</b>Trước đây mình nói nhánh tải video trực tiếp "bỏ qua mã thoát của aria2c và luôn trả về thành công". Đọc lại kỹ thì <b>sai</b>: <code>download_aria</code> ném exception khi mã thoát khác 0, và <code>process_lecture</code> bắt exception đó rồi trả về <code>False</code>. Mục này đã được loại khỏi danh sách lỗi.</div>
+</section>
+
+<section>
+  <h2>7. Kiến trúc đích: Go web + React/TypeScript</h2>
+
+  <div class="arch">
+    <div class="col"><b>Trình duyệt (Mac, iPad, điện thoại)</b>
+      <div class="box">React + TS (Vite build)</div>
+      <div class="box">Player: &lt;video&gt; + overlay phụ đề song ngữ</div>
+      <div class="box">TanStack Query → REST</div>
+      <div class="box">EventSource → SSE (tiến độ tải)</div>
+    </div>
+    <div class="col"><b>1 binary Go</b>
+      <div class="box">httpapi: router net/http, middleware</div>
+      <div class="box">library: quét downloads/ → model khoá học</div>
+      <div class="box">media: http.ServeContent (Range)</div>
+      <div class="box">subtitle: parse SRT, xuất cue JSON / VTT</div>
+      <div class="box">progress, notes, search (SQLite)</div>
+      <div class="box">jobs: hàng đợi tải/nén, phát sự kiện</div>
+      <div class="box">udemy + chromecookie + naming (Phase 2–4)</div>
+    </div>
+    <div class="col"><b>Hệ thống</b>
+      <div class="box db">SQLite: app.db</div>
+      <div class="box db">downloads/ (file media, chỉ đọc ở Phase 1)</div>
+      <div class="box ext">yt-dlp · aria2c · ffmpeg · ffprobe</div>
+      <div class="box ext">Python CLI (chỉ Phase 2–4)</div>
+      <div class="box ext">Keychain · Chrome Cookies DB</div>
+      <div class="box ext">caffeinate</div>
+    </div>
+  </div>
+
+  <h3>7.1 Cấu trúc thư mục</h3>
+  <p>Cấu trúc đầy đủ, quy tắc phụ thuộc giữa các package và lý do chọn từng thư viện nằm ở <b>mục 12</b>. Tóm tắt: <code>cmd/</code> chỉ khởi động; <code>internal/</code> chia thành package nghiệp vụ (library, progress, subtitle, udemy, download, jobs…), <code>adapter/</code> (SQLite, Udemy HTTP, Chrome cookie, yt-dlp, aria2c, ffmpeg, Claude), <code>transport/http/</code> và <code>platform/</code> (khối kỹ thuật dùng chung); <code>api/openapi.yaml</code> là hợp đồng duy nhất giữa Go và frontend; <code>web/</code> là React.</p>
+
+  <h3>7.2 API</h3>
+  <p class="small">Mọi endpoint được khai báo trong <code>api/openapi.yaml</code>; handler Go và type TypeScript đều sinh ra từ file này (mục 12.4).</p>
+  <table>
+    <tr><th>Method + path</th><th>Phase</th><th>Mô tả</th></tr>
+    <tr><td><code>GET /api/courses</code></td><td>1</td><td>Danh sách khoá, % hoàn thành, bài đang học dở</td></tr>
+    <tr><td><code>GET /api/courses/{courseId}</code></td><td>1</td><td>Cây chapter → lecture kèm tiến độ, ngôn ngữ phụ đề có sẵn</td></tr>
+    <tr><td><code>GET /media/{lectureId}</code></td><td>1</td><td>Stream video, hỗ trợ <code>Range</code>/<code>206</code> để tua</td></tr>
+    <tr><td><code>GET /api/lectures/{lectureId}/cues?langs=vi,en</code></td><td>1</td><td>Cue JSON đã ghép theo timing cho overlay song ngữ</td></tr>
+    <tr><td><code>GET /api/lectures/{lectureId}/subtitles.vtt?langs=vi,en</code></td><td>1</td><td>VTT cho <code>&lt;track&gt;</code> (bắt buộc khi fullscreen trên iOS)</td></tr>
+    <tr><td><code>PUT /api/lectures/{lectureId}/progress</code></td><td>1</td><td>Lưu vị trí và trạng thái hoàn thành</td></tr>
+    <tr><td><code>GET /api/continue</code></td><td>1</td><td>Bài gần nhất đang học dở</td></tr>
+    <tr><td><code>GET /api/auth/status</code></td><td>2</td><td>Kiểm tra cookie Chrome profile đã chọn còn hạn không</td></tr>
+    <tr><td><code>POST /api/jobs</code>, <code>GET /api/jobs</code>, <code>DELETE /api/jobs/{id}</code></td><td>2</td><td>Tạo, xem, huỷ job tải/nén</td></tr>
+    <tr><td><code>GET /api/events</code></td><td>2</td><td>Server-Sent Events: tiến độ job, log</td></tr>
+    <tr><td><code>GET /api/search?q=…</code>, <code>/api/notes</code></td><td>6</td><td>Tìm trong transcript, ghi chú theo mốc thời gian</td></tr>
+  </table>
+
+  <h3>7.3 Mô hình dữ liệu SQLite</h3>
+<pre>lecture_progress(lecture_key TEXT PRIMARY KEY, position_seconds REAL, duration_seconds REAL,
+                 completed_at TEXT NULL, updated_at TEXT NOT NULL)
+notes(id INTEGER PRIMARY KEY, lecture_key TEXT, at_seconds REAL, body TEXT, created_at TEXT)
+jobs(id TEXT PRIMARY KEY, kind TEXT, course_url TEXT, status TEXT, started_at TEXT,
+     finished_at TEXT, summary_json TEXT)
+cue_index USING fts5(lecture_key UNINDEXED, lang UNINDEXED, start_ms UNINDEXED, text,
+                     tokenize = 'unicode61 remove_diacritics 2')        ← Phase 6</pre>
+  <p><b><code>lecture_key</code></b> ở Phase 1 là đường dẫn tương đối <code>khoá/chapter/file</code>. Từ Phase 4, downloader Go ghi thêm manifest <code>.course.json</code> chứa <code>lecture_id</code> của Udemy cho từng file. Khi đó key chuyển sang id, có migration một lần. Client chỉ thấy <code>lectureId</code> dạng hash ngắn; server tra ngược trong chỉ mục bộ nhớ, <b>không bao giờ</b> nhận đường dẫn file từ client (chống path traversal).</p>
+
+  <h3>7.4 Thuật toán phía player</h3>
+  <ul>
+    <li><b>Tìm cue hiện tại:</b> cue sắp theo thời gian bắt đầu; mỗi <code>timeupdate</code> tìm nhị phân O(log n) thay vì duyệt cả danh sách (bài dài nhất có 1.313 cue).</li>
+    <li><b>Song ngữ:</b> server ghép VI và EN theo timing (đã kiểm chứng trùng khít 100% ở mục 5), trả về một danh sách cue có hai trường text.</li>
+    <li><b>Fullscreen iOS:</b> Safari trên iPad dùng trình phát native khi fullscreen, overlay tự vẽ sẽ không hiện. Vì vậy luôn kèm <code>&lt;track&gt;</code> VTT (gộp 2 dòng VI/EN) làm phương án dự phòng.</li>
+    <li><b>Lưu tiến độ:</b> gửi tối đa 5 giây một lần trong lúc xem, và gửi ngay khi pause, kết thúc, hoặc chuyển tab (<code>visibilitychange</code> + <code>navigator.sendBeacon</code>). Hoàn thành khi xem tới ≥ 95% thời lượng hoặc sự kiện <code>ended</code>. Các ngưỡng là hằng số có tên.</li>
+    <li><b>Resume:</b> mở bài thì tua tới vị trí đã lưu, lùi lại 3 giây để nối mạch.</li>
+  </ul>
+
+  <h3>7.5 Bảo mật khi mở trong LAN</h3>
+  <ul>
+    <li>Mặc định chỉ nghe <code>127.0.0.1</code>. Chế độ LAN phải bật chủ động và có mã truy cập (hiện mã QR để quét bằng iPad).</li>
+    <li>Không có endpoint nào trả về cookie hay token Udemy. Token chỉ nằm trong bộ nhớ của job tải.</li>
+    <li>Media chỉ phục vụ file nằm trong chỉ mục thư viện; kiểm tra đường dẫn đã resolve vẫn nằm trong <code>downloads/</code>.</li>
+    <li>HTML article/quiz tải về từ Udemy được hiển thị trong <code>iframe sandbox</code>, không chạy chung origin với app.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>8. Kế hoạch migrate theo phase</h2>
+
+  <h3>8.1 Bảy nguyên tắc chống lỗi chồng lỗi</h3>
+  <ol>
+    <li><b>Cổng kiểm chứng:</b> mỗi phase có tiêu chí hoàn thành đo được. Chưa đạt thì không mở phase sau.</li>
+    <li><b>Python là chuẩn đối chiếu (oracle):</b> cho tới hết Phase 5, mọi output của Go được so tự động với output Python trên cùng dữ liệu đầu vào (differential testing).</li>
+    <li><b>Không vừa port vừa sửa:</b> commit port giữ nguyên hành vi, kể cả lỗi đã biết. Sửa lỗi là commit riêng, có test fail-trước-pass-sau, và được ghi vào bảng "khác biệt có chủ đích". Nhờ vậy khi kết quả lệch, luôn biết lệch do port sai hay do sửa có chủ đích.</li>
+    <li><b>Một nguồn sự thật cho tên file:</b> chỉ package <code>naming</code> được đặt tên; golden test trên toàn bộ tiêu đề thật và các ca biên.</li>
+    <li><b>Không ghi vào thư viện đang học khi phát triển:</b> mọi lần tải thử của Go ghi vào <code>downloads-shadow/</code>; Phase 1 mở <code>downloads/</code> ở chế độ chỉ đọc.</li>
+    <li><b>Phase nhỏ, merge được, rollback được:</b> mỗi phase chạy được độc lập. Phase 4–5 có công tắc cấu hình <code>downloader = python | go</code> để quay lại ngay; công tắc bị xoá ở Phase 7.</li>
+    <li><b>Fixture sạch:</b> fixture API được làm sạch token, signed URL và thông tin tài khoản trước khi lưu vào <code>testdata/</code>; có test kiểm tra không còn chuỗi nhạy cảm.</li>
+  </ol>
+  <p class="small">Ước lượng thời gian bên dưới là thô, giả định làm cùng Claude theo từng phiên và bạn review cuối mỗi phase.</p>
+
+  <div class="phase">
+    <div class="phase-head"><h3>Phase 0 — Chuẩn bị và spike kiểm chứng</h3><span class="est">~1–2 ngày</span></div>
+    <div class="label">Mục tiêu</div>
+    <p>Trả lời bằng số liệu thật các câu hỏi có thể làm đổ cả kế hoạch, trước khi viết code sản phẩm.</p>
+    <div class="label">Việc làm</div>
+    <ul>
+      <li><b>Khung dự án (mục 12):</b> <code>go mod init</code>, cấu trúc thư mục, <code>Taskfile.yml</code>, <code>.golangci.yml</code>, tool pin trong <code>go.mod</code>, khung OpenAPI + codegen, scaffold frontend, CI. Đạt khi <code>task check</code> (gen, lint, test, build) chạy xanh trên repo rỗng.</li>
+      <li>Chụp fixture: chạy Python với <code>--save-to-file --info</code> để có <code>course_content.json</code> và <code>_udemy.json</code>; ghi manifest thư viện hiện có (đường dẫn, kích thước, thời lượng ffprobe, codec).</li>
+      <li><b>S1 – TLS:</b> chương trình Go dùng <code>tls-client</code> gọi <code>visits/current</code> và curriculum với cookie thật. Đạt khi không gặp challenge trong 20 lần gọi liên tiếp.</li>
+      <li><b>S2 – Cookie Chrome:</b> đọc profile "Claude browser 2", so hash SHA-256 của <code>access_token</code> với hash từ <code>cookies.txt</code> (không in giá trị).</li>
+      <li><b>S3 – Phát video:</b> <code>http.ServeContent</code> phát 1 file HEVC và 1 file H.264 trên Chrome 158, Safari Mac và Safari iPad; tua tới giữa và cuối bài.</li>
+      <li><b>S4 – SQLite FTS5:</b> <code>CREATE VIRTUAL TABLE … USING fts5</code> trên <code>modernc.org/sqlite</code>; tìm "ket noi" ra được "kết nối".</li>
+    </ul>
+    <div class="label">Tiêu chí hoàn thành</div>
+    <p>Có kết quả ghi lại cho cả 4 spike. Nếu S1 thất bại: Phase 3–4 đổi thành "giữ Python làm worker tải lâu dài", các phase khác không đổi. Nếu S4 thất bại: chuyển sang <code>ncruces/go-sqlite3</code>.</p>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><h3>Phase 1 — Go web player chỉ đọc</h3><span class="est">~3–5 ngày</span></div>
+    <div class="label">Mục tiêu</div>
+    <p>Bạn học được ngay trên app mới với dữ liệu đã tải, không đụng tới logic tải.</p>
+    <div class="label">Việc làm</div>
+    <ul>
+      <li><code>library</code>: quét <code>downloads/</code>: chapter khớp <code>^\d{2} - </code>, lecture khớp <code>^\d{3} </code>, phụ đề <code>&lt;tên&gt;_&lt;lang&gt;.srt</code>, bài <code>.html</code>, asset còn lại. Video gắn vào article cùng số thứ tự (trường hợp <code>07 - Extras/003</code>).</li>
+      <li><code>media</code>, <code>subtitle</code>, <code>progress</code> và các API của Phase 1 ở mục 7.2.</li>
+      <li>Frontend: trang thư viện, trang học (sidebar, player, tốc độ, phím tắt, phụ đề song ngữ, chỉnh cỡ chữ), nút "Tiếp tục học".</li>
+    </ul>
+    <div class="label">Kiểm chứng</div>
+    <ul>
+      <li>Test scanner trên cây thư mục fixture tạo từ manifest thật (59 video, 116 phụ đề, article có video kèm).</li>
+      <li>Test SRT: parse cả 116 file thật, số cue và timing khớp parser Python.</li>
+      <li>Test bảo mật: <code>lectureId</code> lạ, <code>../</code>, symlink ra ngoài thư mục đều bị từ chối.</li>
+      <li>Thủ công: học trọn một bài trên Mac và iPad; tắt server, mở lại vẫn đúng vị trí.</li>
+    </ul>
+    <div class="label">Rủi ro</div>
+    <p>Thấp: chỉ đọc dữ liệu, xoá <code>app.db</code> là quay về trạng thái ban đầu.</p>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><h3>Phase 2 — UI tải khoá học, Go điều khiển Python</h3><span class="est">~2–3 ngày</span></div>
+    <div class="label">Mục tiêu</div>
+    <p>Bỏ terminal và bỏ bước export cookie, trong khi logic tải vẫn là bản Python đã chạy tốt.</p>
+    <div class="label">Việc làm</div>
+    <ul>
+      <li><code>chromecookie</code> (từ spike S2) và màn hình chọn profile; <code>GET /api/auth/status</code> kiểm tra trước mỗi job.</li>
+      <li>Hai thay đổi nhỏ trong Python, mỗi thay đổi một commit kèm test: (a) nhận bearer token qua biến môi trường thay vì tham số dòng lệnh (tham số lộ trong <code>ps</code>); (b) cờ <code>--events-json</code> in sự kiện JSON mỗi dòng: <code>lecture_started</code>, <code>lecture_done</code>, <code>lecture_failed</code>, <code>summary</code>.</li>
+      <li><code>jobs</code>: hàng đợi một job mỗi lần, chạy Python, đọc sự kiện, đẩy lên UI qua SSE; chống ngủ máy bằng <code>caffeinate -i -w &lt;pid&gt;</code>; huỷ job thì gửi SIGINT rồi chờ.</li>
+    </ul>
+    <div class="label">Kiểm chứng</div>
+    <ul>
+      <li>Tải một chapter (<code>--chapter</code>) từ UI vào <code>downloads-shadow/</code>; kết quả trùng khít bản chạy bằng CLI.</li>
+      <li>Huỷ giữa chừng rồi chạy lại: phần đã tải được bỏ qua, file dở được tải tiếp.</li>
+      <li>Cookie hết hạn: UI báo rõ cần đăng nhập lại profile nào, không có traceback.</li>
+    </ul>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><h3>Phase 3 — Port API client và planner sang Go (chưa tải)</h3><span class="est">~3–4 ngày</span></div>
+    <div class="label">Mục tiêu</div>
+    <p>Toàn bộ logic "biết phải tải gì và đặt tên gì" nằm trong Go, chứng minh khớp 100% với Python.</p>
+    <div class="label">Việc làm</div>
+    <ul>
+      <li><code>udemy/client</code>: tls-client, header, retry, phân trang. <code>udemy/resolve</code>: chuỗi 6 bước tìm khoá. <code>udemy/curriculum</code>: dựng cây (mục 4.5) thành kiểu dữ liệu chặt. <code>udemy/plan</code>: từ lecture ra danh sách việc cần làm (nguồn đã chọn, caption, asset, đường dẫn đích).</li>
+      <li><code>naming</code>: sanitize + bỏ emoji theo đúng mục 4.10.</li>
+      <li>Lệnh phụ <code>udemy-studio plan &lt;url&gt;</code> in plan dạng JSON.</li>
+    </ul>
+    <div class="label">Kiểm chứng</div>
+    <ul>
+      <li>Differential test: cùng fixture, plan của Go so với <code>_udemy.json</code> của Python: tên chapter, tên lecture, tên file, nguồn được chọn ở mọi mức <code>-q</code>.</li>
+      <li>Golden test <code>naming</code>: mọi tiêu đề thật + bộ ca biên (ký tự cấm, Unicode tiếng Việt, emoji, tên dành riêng, độ dài 255 byte) so với output Python sinh sẵn.</li>
+      <li>Tiêu chí: khớp 100%, hoặc lệch nằm trong bảng "khác biệt có chủ đích" đã được bạn duyệt.</li>
+    </ul>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><h3>Phase 4 — Port phần tải (non-DRM)</h3><span class="est">~4–6 ngày</span></div>
+    <div class="label">Mục tiêu</div>
+    <p>Go tự tải được khoá học, Python lùi về vai trò dự phòng.</p>
+    <div class="label">Việc làm</div>
+    <ul>
+      <li><code>downloader</code>: HLS qua yt-dlp + aria2c (playlist trong thư mục tạm riêng từng job), file trực tiếp qua aria2c, VTT→SRT bằng Go, asset, article, link ngoài. Bắt output tool ngoài để tính tiến độ.</li>
+      <li>Giữ nguyên ngữ nghĩa resume (bỏ qua file đã có, tải tiếp <code>.part</code>); ghi manifest <code>.course.json</code>.</li>
+      <li>Công tắc <code>downloader = python | go</code> trong config.</li>
+      <li>Sau khi đạt parity: sửa các lỗi ở mục 6, mỗi lỗi một commit kèm test.</li>
+    </ul>
+    <div class="label">Kiểm chứng</div>
+    <ul>
+      <li>Chạy song song Python và Go trên cùng chapter vào hai thư mục shadow: cùng danh sách file, SRT trùng từng byte, video lệch thời lượng ffprobe ≤ 0,1 giây.</li>
+      <li>Tải trọn 2 khoá bằng Go, có ngắt giữa chừng (tắt mạng, gập máy) rồi chạy tiếp.</li>
+    </ul>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><h3>Phase 5 — Quiz, practice, role play, coding assignment</h3><span class="est">~2–3 ngày</span></div>
+    <ul>
+      <li>Nhúng 5 template bằng <code>embed.FS</code>, giữ cách escape <code>&lt;/</code>; port parser Next.js flight (mục 4.11) với fixture HTML thật, có ca chunk tiếng Việt nhiều byte.</li>
+      <li>Kiểm chứng: file HTML do Go sinh trùng từng byte với bản Python trên cùng dữ liệu.</li>
+      <li>Có thể làm sau Phase 6 nếu các khoá bạn học ít quiz.</li>
+    </ul>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><h3>Phase 6 — Nén H.265, dịch phụ đề, tìm kiếm</h3><span class="est">~4–6 ngày</span></div>
+    <ul>
+      <li><b>Nén:</b> hàng đợi <code>hevc_videotoolbox</code>; bỏ qua file đã là HEVC (ffprobe); chạy thử 1 file và cho bạn xem chất lượng trước; chỉ thay file gốc khi thời lượng khớp ±0,5 giây; ghi <code>.tmp</code> rồi rename; hiện dung lượng tiết kiệm.</li>
+      <li><b>Dịch phụ đề:</b> port <code>srt_tool</code> và drift check sang Go; gọi Claude API theo từng khúc với style guide; chỉ ghi file khi qua cả kiểm tra cấu trúc lẫn drift; hiện ước tính chi phí trước khi chạy. API key đọc từ biến môi trường hoặc Keychain.</li>
+      <li><b>Tìm kiếm và ghi chú:</b> chỉ mục FTS5 trên cue, bấm kết quả nhảy đúng giây; ghi chú theo mốc thời gian, xuất Markdown.</li>
+    </ul>
+  </div>
+
+  <div class="phase">
+    <div class="phase-head"><h3>Phase 7 — Gỡ Python</h3><span class="est">~0,5–1 ngày</span></div>
+    <ul>
+      <li>Xoá runner Python và công tắc <code>downloader</code>; app chỉ còn phụ thuộc yt-dlp, aria2c, ffmpeg.</li>
+      <li>Điều kiện: Go đã là downloader mặc định ít nhất 2 khoá mà không cần quay lại Python.</li>
+      <li>Repo Python giữ nguyên để tham khảo; lecture DRM tiếp tục được đánh dấu "không hỗ trợ".</li>
+    </ul>
+  </div>
+</section>
+
+<section>
+  <h2>9. Rủi ro và phương án dự phòng</h2>
+  <table>
+    <tr><th style="width:26%">Rủi ro</th><th style="width:10%">Khả năng</th><th>Ảnh hưởng</th><th style="width:32%">Phương án</th></tr>
+    <tr><td>Cloudflare nhận ra fingerprint của Go</td><td>Trung bình</td><td>Go không gọi được API</td><td>Spike S1 trước; nếu fail thì giữ Python làm worker tải, chỉ app web là Go</td></tr>
+    <tr><td>Chrome đổi cách mã hoá cookie (schema mới, app-bound encryption mở rộng sang macOS)</td><td>Thấp–TB</td><td>Không đọc được cookie</td><td>Kiểm tra <code>meta.version</code>, báo lỗi rõ khi gặp version lạ; dự phòng dán bearer token hoặc <code>cookies.txt</code></td></tr>
+    <tr><td>Udemy đổi API hoặc field</td><td>Trung bình</td><td>Parse sai, thiếu bài</td><td>Validate response tại biên, lỗi có tên kèm URL; fixture giúp tái hiện nhanh</td></tr>
+    <tr><td>Tên file Go lệch Python</td><td>Trung bình</td><td>Tải lại cả khoá</td><td>Golden test <code>naming</code>, differential test plan, thư mục shadow</td></tr>
+    <tr><td>Video HEVC không phát được trên trình duyệt nào đó</td><td>Thấp trên Apple</td><td>Không xem được 8 bài</td><td>Spike S3; nếu cần thì remux hoặc encode lại H.264 riêng các file đó</td></tr>
+    <tr><td>Link media hết hạn khi tải lâu</td><td>Cao</td><td>Tải dở thất bại</td><td>Làm mới curriculum khi gặp 403 rồi thử lại từng lecture</td></tr>
+    <tr><td>Phạm vi phình to (thêm tính năng giữa chừng)</td><td>Cao</td><td>Không phase nào xong</td><td>Tính năng mới vào backlog, chỉ đưa vào phase chưa bắt đầu</td></tr>
+  </table>
+</section>
+
+<section>
+  <h2>10. Quyết định cần bạn chốt</h2>
+  <table>
+    <tr><th style="width:34%">Câu hỏi</th><th>Đề xuất của mình</th></tr>
+    <tr><td>App mới đặt trong repo này hay repo riêng?</td><td><b>Repo riêng</b> (ví dụ <code>udemy-studio</code>). Repo hiện tại là fork của dự án mã nguồn mở; tách ra giúp lịch sử sạch và không lẫn với upstream.</td></tr>
+    <tr><td>Phase 2: đọc cookie bằng Go rồi truyền token cho Python, hay thêm option profile trong Python?</td><td><b>Đọc bằng Go</b>: về sau Go cần đúng code đó, tránh viết hai lần.</td></tr>
+    <tr><td>Có làm Phase 5 (quiz…) không?</td><td>Làm sau Phase 6, chỉ khi khoá bạn học thật sự có quiz.</td></tr>
+    <tr><td>Chế độ LAN có cần ngay ở Phase 1 không?</td><td>Có, vì đây là lý do chọn Go web; bật bằng cấu hình, có mã truy cập.</td></tr>
+    <tr><td>Tên app</td><td><code>udemy-studio</code> (tạm), bạn có thể đổi.</td></tr>
+  </table>
+</section>
+
+<section>
+  <h2>11. Phụ lục: nguồn tham khảo đã kiểm chứng</h2>
+  <table>
+    <tr><th>Chủ đề</th><th>Kết luận dùng trong tài liệu</th><th>Nguồn</th></tr>
+    <tr><td>TLS fingerprint trong Go</td><td><code>bogdanfinn/tls-client</code> xây trên utls + fhttp, có profile Chrome 144+; Chrome 107+ cần xáo thứ tự extension; fingerprint của <code>crypto/tls</code> chuẩn rất dễ nhận ra</td><td>mintlify.com/bogdanfinn/tls-client</td></tr>
+    <tr><td>Đọc cookie Chrome macOS</td><td>Khoá trong Keychain "Chrome Safe Storage", PBKDF2-SHA1, AES-128-CBC, IV 16 dấu cách, tiền tố <code>v10</code>; schema ≥ 24 chèn SHA-256(host_key) 32 byte trước giá trị</td><td>docs.rs/rookie, metacpan HTTP::Cookies::Chrome, cyberark.com</td></tr>
+    <tr><td>Thư viện kooky</td><td>Badge "No Maintenance Intended", API chưa ổn định, không đề cập schema v24</td><td>github.com/browserutils/kooky</td></tr>
+    <tr><td>m3u8 trong Go</td><td><code>grafov/m3u8</code> archived 12/2024; <code>Eyevinn/hls-m3u8</code> là bản kế nhiệm</td><td>pkg.go.dev/github.com/Eyevinn/hls-m3u8</td></tr>
+    <tr><td>HEVC trên trình duyệt</td><td>Safari hỗ trợ <code>hvc1</code>; Firefox macOS hỗ trợ từ bản 136 qua VideoToolbox; Chrome cần kiểm tra thực tế (spike S3)</td><td>caniuse.com/hevc, bugzilla.mozilla.org #1924066</td></tr>
+    <tr><td>SQLite FTS5 pure Go</td><td>Có dấu hiệu modernc bật FTS5 nhưng chưa có xác nhận chính thức: cần spike S4</td><td>pkg.go.dev/modernc.org/sqlite, github.com/go-again/sqlite</td></tr>
+    <tr><td>Hành vi pathvalidate</td><td>Đo trực tiếp trên venv của dự án (mục 4.10)</td><td>Chạy thử cục bộ</td></tr>
+  </table>
+  <p class="small">Mọi chi tiết về code Python trong tài liệu được lấy từ việc đọc trực tiếp mã nguồn tại commit <code>bbbbbc1</code>; số liệu về thư viện của bạn lấy từ thư mục <code>downloads/</code> và các lần kiểm tra trong phiên.</p>
+</section>
+
+<section>
+  <h2>12. Setup dự án và tổ chức code chuẩn production</h2>
+
+  <h3>12.1 Nguyên tắc nền</h3>
+  <div class="callout warn"><b>Không có package <code>util</code>, <code>helper</code>, <code>common</code></b>Go Blog chính thức ("Package names") khuyên tránh các tên này: chúng không nói lên bên trong có gì, phình to vô hạn, kéo theo phụ thuộc lung tung và dễ trùng tên khi import. Thay vào đó, mỗi khối dùng chung là một package nhỏ <b>đặt tên theo việc nó làm</b>, ví dụ <code>retry</code>, <code>procexec</code>, <code>atomicfile</code>, <code>srt</code>, và chỉ tách ra khi có ít nhất 3 nơi dùng thật.</div>
+  <ol>
+    <li><b>Chia package theo nghiệp vụ, không theo tầng kỹ thuật.</b> Không có <code>models/</code>, <code>services/</code>, <code>repositories/</code> chung cho cả app. Mỗi nghiệp vụ (<code>library</code>, <code>progress</code>, <code>download</code>…) tự chứa model, service và interface nó cần.</li>
+    <li><b>Ports & adapters ở mức vừa đủ.</b> Package nghiệp vụ khai báo interface nhỏ cho thứ nó cần từ bên ngoài (đặt ở phía <i>dùng</i>, không phải phía cài đặt). Mọi thứ chạm tới thế giới bên ngoài (SQLite, Udemy, Chrome, yt-dlp, ffmpeg, Claude) nằm trong <code>adapter/</code>. Không tạo interface cho code nội bộ thuần tuý.</li>
+    <li><b>Phụ thuộc một chiều, được lint kiểm tra.</b> Nghiệp vụ không import <code>adapter/</code> hay <code>transport/</code>. Chỉ <code>app/</code> (composition root) biết tất cả và lắp ráp chúng. Quy tắc này được <code>depguard</code> trong golangci-lint cưỡng chế, không dựa vào trí nhớ.</li>
+    <li><b>Không trạng thái toàn cục.</b> Không biến global, không <code>init()</code> có tác dụng phụ (trừ đăng ký driver), mọi phụ thuộc truyền qua constructor.</li>
+    <li><b>Mọi I/O nhận <code>context.Context</code></b> làm tham số đầu; mọi goroutine có chủ sở hữu (<code>errgroup</code>) và dừng được khi tắt app.</li>
+    <li><b>Ưu tiên thư viện chuẩn, thêm thư viện ngoài khi nó xoá được boilerplate thật hoặc giảm rủi ro thật.</b> Mỗi thư viện ngoài ở bảng 12.3 đều có lý do và có phương án đã loại.</li>
+    <li><b>Hợp đồng sinh code:</b> API (OpenAPI), truy vấn SQL (sqlc) và migration (goose) là nguồn sự thật; code Go/TS sinh ra từ đó, không viết tay hai lần.</li>
+  </ol>
+
+  <h3>12.2 Cấu trúc thư mục</h3>
+<pre style="white-space:pre">udemy-studio/
+├── cmd/udemy-studio/main.go     ← ≤ 50 dòng: gọi cli.Execute(), không logic
+├── api/openapi.yaml             ← hợp đồng HTTP duy nhất (Go server + TS client sinh từ đây)
+├── internal/
+│   ├── app/                     ← composition root: đọc config, tạo adapter, lắp service,
+│   │                              chạy HTTP server + workers, graceful shutdown
+│   ├── cli/                     ← lệnh cobra: serve, scan, plan, migrate, version
+│   ├── config/                  ← struct Config, load (koanf), Validate(), kiểu Secret
+│   │
+│   ├── library/                 ← NGHIỆP VỤ: quét downloads/, model Course/Chapter/Lecture,
+│   │                              chỉ mục id ↔ file, watcher (fsnotify)
+│   ├── progress/                ← vị trí xem, hoàn thành; khai báo interface Store
+│   ├── subtitle/                ← cue, ghép song ngữ, tìm cue nhị phân (thuần, không I/O)
+│   ├── search/                  ← tìm transcript; khai báo interface Index
+│   ├── jobs/                    ← hàng đợi job, trạng thái, phát sự kiện
+│   ├── udemy/                   ← tìm khoá, dựng curriculum, lập DownloadPlan (thuần);
+│   │                              khai báo interface Client
+│   ├── download/                ← thực thi DownloadPlan; khai báo interface Fetcher, Muxer
+│   ├── transcode/               ← hàng đợi H.265; khai báo interface Encoder, Prober
+│   ├── translate/               ← dịch phụ đề + kiểm tra cấu trúc + drift check
+│   ├── naming/                  ← sanitize, bỏ emoji (golden test với pathvalidate)
+│   │
+│   ├── adapter/                 ← CÀI ĐẶT các interface ở trên, chạm thế giới ngoài
+│   │   ├── sqlite/              ← kết nối, migrations/*.sql (goose, embed),
+│   │   │                          queries/*.sql → gen/ (sqlc), repo cho progress/jobs/search
+│   │   ├── udemyapi/            ← udemy.Client qua tls-client: header, retry, phân trang
+│   │   ├── chromecookie/        ← Keychain + Cookies DB (mục 4.2)
+│   │   ├── ytdlp/  aria2/       ← download.Fetcher qua os/exec
+│   │   ├── ffmpeg/              ← Muxer, Encoder, Prober (ffprobe)
+│   │   └── claude/              ← translate.Translator qua anthropic-sdk-go
+│   │
+│   ├── transport/http/          ← router, middleware (request id, log, recover, auth LAN),
+│   │   ├── gen/                   handler sinh từ OpenAPI, SSE, phục vụ media + frontend
+│   │   └── ...
+│   └── platform/                ← khối kỹ thuật dùng chung, KHÔNG chứa nghiệp vụ
+│       ├── procexec/            ← chạy lệnh ngoài, stream từng dòng, huỷ theo ctx
+│       ├── retry/               ← cấu hình backoff dùng chung
+│       ├── atomicfile/          ← ghi .tmp rồi rename
+│       └── logging/             ← khởi tạo slog, redact Secret
+├── web/                         ← React + TS (Vite); src/features/*, src/api/ (sinh từ OpenAPI)
+├── testdata/                    ← fixture đã làm sạch, golden file
+├── Taskfile.yml   .golangci.yml   .editorconfig   .gitignore
+└── .github/workflows/ci.yml</pre>
+
+  <h4>Hướng phụ thuộc (mũi tên = "được phép import")</h4>
+  <div class="flow">
+    <span class="step">cmd → cli → app</span><span class="arrow">→</span>
+    <span class="step">transport/http<br>adapter/*</span><span class="arrow">→</span>
+    <span class="step">nghiệp vụ<br><span class="small">library, udemy, download…</span></span><span class="arrow">→</span>
+    <span class="step">platform/*<br><span class="small">+ stdlib, thư viện ngoài</span></span>
+  </div>
+  <p>Nghiệp vụ không bao giờ import <code>adapter/</code>, <code>transport/</code>, <code>app/</code>. Hai package nghiệp vụ được import nhau chỉ theo một chiều (ví dụ <code>download</code> dùng kiểu <code>udemy.DownloadPlan</code>), và golangci-lint chặn import vòng.</p>
+
+  <h3>12.3 Thư viện được chọn</h3>
+  <table>
+    <tr><th style="width:17%">Nhu cầu</th><th style="width:25%">Chọn</th><th>Lý do</th><th style="width:20%">Đã loại</th></tr>
+    <tr><td>Go</td><td>Go 1.27</td><td>Bản ổn định hiện tại (19/08/2026): có sẵn <code>uuid</code> trong stdlib, routing ServeMux theo method + wildcard</td><td></td></tr>
+    <tr><td>HTTP router</td><td><code>net/http</code> ServeMux</td><td>Đủ cho ~15 endpoint; middleware tự viết là các hàm nhỏ</td><td>gin, echo, fiber (thêm framework không cần thiết)</td></tr>
+    <tr><td>Hợp đồng API</td><td><code>oapi-codegen</code> v2 (std-http-server + strict-server)</td><td>Handler có kiểu chặt sinh từ OpenAPI; quên field hay sai kiểu là lỗi biên dịch</td><td>DTO viết tay ở cả Go và TS</td></tr>
+    <tr><td>Client TS</td><td><code>openapi-typescript</code> + <code>openapi-fetch</code></td><td>Type frontend sinh từ cùng file OpenAPI, không bao giờ lệch backend</td><td>axios + type viết tay</td></tr>
+    <tr><td>CLI</td><td><code>spf13/cobra</code></td><td>Chuẩn de facto: subcommand, help, flag nhất quán</td><td><code>flag</code> thuần (tự viết dispatch)</td></tr>
+    <tr><td>Config</td><td><code>knadh/koanf/v2</code></td><td>Gộp theo thứ tự defaults → file YAML → env → flag, nhẹ, module provider tách rời</td><td>viper (nặng, trạng thái global)</td></tr>
+    <tr><td>SQLite driver</td><td><code>modernc.org/sqlite</code></td><td>Pure Go, không cgo, build chéo dễ</td><td>mattn/go-sqlite3 (cần cgo)</td></tr>
+    <tr><td>Truy vấn</td><td><code>sqlc</code></td><td>Viết SQL thật, sinh hàm Go có kiểu; không ORM, không string concat</td><td>gorm, ent</td></tr>
+    <tr><td>Migration</td><td><code>pressly/goose</code> v3</td><td>File <code>.sql</code> nhúng bằng <code>embed.FS</code>, chạy tự động khi khởi động</td><td>golang-migrate (cũng dùng được; goose gọn hơn khi gọi từ code)</td></tr>
+    <tr><td>Log</td><td><code>log/slog</code> + <code>lmittmann/tint</code> (console dev)</td><td>Stdlib, có cấu trúc; tint chỉ để log màu khi dev</td><td>zap, logrus</td></tr>
+    <tr><td>Đồng thời</td><td><code>golang.org/x/sync/errgroup</code>, <code>semaphore</code></td><td>Goroutine có chủ, huỷ dây chuyền theo ctx, giới hạn song song</td><td>Tự quản WaitGroup + channel lỗi</td></tr>
+    <tr><td>Retry</td><td><code>cenkalti/backoff/v5</code></td><td>Exponential backoff + jitter, dừng theo ctx</td><td>Vòng lặp sleep cố định như bản Python</td></tr>
+    <tr><td>HTTP tới Udemy</td><td><code>bogdanfinn/tls-client</code></td><td>Giả TLS fingerprint Chrome (mục 4.1)</td><td><code>net/http</code> thuần (bị Cloudflare chặn)</td></tr>
+    <tr><td>HLS playlist</td><td><code>Eyevinn/hls-m3u8</code></td><td>Bản kế nhiệm còn bảo trì của grafov/m3u8</td><td>grafov/m3u8 (archived)</td></tr>
+    <tr><td>HTML</td><td><code>golang.org/x/net/html</code></td><td>Tìm <code>data-module-args</code> (fallback 4.3)</td><td>regex trên HTML</td></tr>
+    <tr><td>Emoji</td><td><code>forPelevin/gomoji</code></td><td>Bỏ emoji giống <code>demoji</code>; khoá bằng golden test</td><td>Bảng tự chép tay</td></tr>
+    <tr><td>Theo dõi thư mục</td><td><code>fsnotify/fsnotify</code></td><td>Tự cập nhật thư viện khi tải xong bài mới</td><td>Quét định kỳ</td></tr>
+    <tr><td>Claude API</td><td><code>anthropics/anthropic-sdk-go</code></td><td>SDK chính thức: retry, streaming, kiểu chặt</td><td>Tự gọi REST</td></tr>
+    <tr><td>Test</td><td><code>testing</code> + <code>google/go-cmp</code></td><td>Diff dễ đọc cho struct lớn; fake viết tay cho adapter</td><td>Mock tự sinh (gomock, mockery)</td></tr>
+    <tr><td>Lint/format</td><td><code>golangci-lint</code> v2, <code>gofumpt</code>, <code>goimports</code></td><td>Một lệnh chạy toàn bộ linter, cấu hình trong repo</td><td></td></tr>
+    <tr><td>Bảo mật phụ thuộc</td><td><code>govulncheck</code></td><td>Quét CVE theo code thực sự được gọi</td><td></td></tr>
+    <tr><td>Task runner</td><td>Taskfile (<code>go-task</code>)</td><td>YAML dễ đọc, chạy được trên mọi OS, có phụ thuộc giữa task</td><td>Makefile (cú pháp khó, tab)</td></tr>
+    <tr><td>Hot reload</td><td><code>air</code> (Go), Vite dev server (web)</td><td>Sửa code thấy ngay</td><td></td></tr>
+  </table>
+  <p class="small">Công cụ (sqlc, oapi-codegen, goose, golangci-lint, govulncheck, air) được ghim phiên bản bằng chỉ thị <code>tool</code> trong <code>go.mod</code> và chạy bằng <code>go tool &lt;tên&gt;</code>, nên mọi máy dùng đúng một phiên bản.</p>
+
+  <h3>12.4 Luồng sinh code</h3>
+  <table>
+    <tr><th>Nguồn sự thật</th><th>Sinh ra</th><th>Lệnh</th></tr>
+    <tr><td><code>api/openapi.yaml</code></td><td><code>internal/transport/http/gen/</code> (interface server có kiểu) và <code>web/src/api/schema.ts</code></td><td><code>task gen:api</code></td></tr>
+    <tr><td><code>adapter/sqlite/queries/*.sql</code> + migrations</td><td><code>adapter/sqlite/gen/</code> (hàm truy vấn có kiểu)</td><td><code>task gen:sql</code></td></tr>
+  </table>
+  <p>Code sinh ra được commit, không bao giờ sửa tay; CI chạy <code>task gen</code> rồi <code>git diff --exit-code</code> để bắt trường hợp quên sinh lại.</p>
+
+  <h3>12.5 Quy ước viết code</h3>
+  <div class="grid2">
+    <div class="card">
+      <h4>Lỗi</h4>
+      <ul>
+        <li>Package nghiệp vụ khai báo lỗi có tên: <code>var ErrLectureNotFound = errors.New(…)</code> hoặc kiểu lỗi mang dữ liệu.</li>
+        <li>Bọc lỗi kèm ngữ cảnh: <code>fmt.Errorf("scan chapter %q: %w", dir, err)</code>.</li>
+        <li>Chỉ <code>transport/http</code> đổi lỗi sang HTTP status, ở <b>một chỗ</b>, trả về <code>application/problem+json</code> (RFC 9457).</li>
+        <li>Không nuốt lỗi; lint <code>errcheck</code>, <code>errorlint</code>, <code>nilerr</code> bắt các trường hợp sót.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Bí mật</h4>
+      <ul>
+        <li>Kiểu <code>config.Secret</code> có <code>String()</code> và <code>LogValue()</code> trả về <code>[REDACTED]</code>: token Udemy, API key không thể lọt vào log dù vô tình in cả struct.</li>
+        <li>Token truyền cho tiến trình con qua biến môi trường, không qua tham số dòng lệnh.</li>
+        <li>Fixture test có test riêng quét chuỗi nhạy cảm.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>API của package</h4>
+      <ul>
+        <li>Constructor <code>New(deps Deps) *Service</code>; nhiều tham số thì dùng struct.</li>
+        <li>Nhận interface, trả về struct cụ thể. Interface 1–3 method.</li>
+        <li>Export tối thiểu; mọi thứ khác viết thường.</li>
+        <li>Hằng số có tên cho mọi ngưỡng (5 giây lưu tiến độ, 95% hoàn thành…).</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Vòng đời</h4>
+      <ul>
+        <li><code>signal.NotifyContext</code> bắt Ctrl-C/SIGTERM → <code>http.Server.Shutdown</code>, huỷ job, chờ tiến trình con thoát, đóng DB.</li>
+        <li>Mọi worker chạy trong một <code>errgroup</code>; một worker chết thì app tắt có trật tự, không treo.</li>
+        <li>Health: <code>GET /healthz</code>; phiên bản build gắn bằng <code>-ldflags</code>.</li>
+      </ul>
+    </div>
+  </div>
+  <p><b>Tên file:</b> Go dùng chữ thường, gạch dưới khi cần (<code>course_scanner.go</code>, <code>course_scanner_test.go</code>). Đây là lệch có chủ đích so với quy tắc kebab-case chung của bạn, vì kebab-case không phải quy ước Go. Frontend vẫn theo kebab-case, riêng file component theo tên component.</p>
+
+  <h3>12.6 Chiến lược test</h3>
+  <table>
+    <tr><th>Tầng</th><th>Cách làm</th><th>Ví dụ</th></tr>
+    <tr><td>Unit (thuần)</td><td>Table-driven, không I/O, chạy &lt; 1 giây</td><td><code>naming</code>, <code>subtitle</code>, <code>udemy</code> planner, drift check</td></tr>
+    <tr><td>Golden</td><td>So output với file trong <code>testdata/</code>; cờ <code>-update</code> để cập nhật có chủ đích</td><td>Tên file vs pathvalidate, plan vs <code>_udemy.json</code>, HTML quiz</td></tr>
+    <tr><td>Adapter</td><td>SQLite thật trong thư mục tạm; HTTP qua <code>httptest.Server</code> phát fixture</td><td>Repo progress, udemyapi phân trang và retry</td></tr>
+    <tr><td>Fake</td><td>Mỗi interface có một fake viết tay trong package <code>…test</code> (ví dụ <code>progresstest</code>)</td><td>Test service không cần DB</td></tr>
+    <tr><td>Tích hợp</td><td>Build tag <code>integration</code>: gọi yt-dlp/ffmpeg thật trên file mẫu nhỏ</td><td>Mux, probe, VTT→SRT end-to-end</td></tr>
+    <tr><td>Frontend</td><td>Vitest + Testing Library; Playwright cho luồng học (mở bài, tua, resume)</td><td>Player, sidebar, lưu tiến độ</td></tr>
+  </table>
+  <p>Mỗi nhánh kết quả mới (ví dụ job bị huỷ khác với job lỗi) có một test sẽ fail nếu nhánh đó bị xoá.</p>
+
+  <h3>12.7 Lint, task và CI</h3>
+  <ul>
+    <li><b>golangci-lint v2</b> bật: <code>govet</code>, <code>staticcheck</code>, <code>errcheck</code>, <code>errorlint</code>, <code>revive</code>, <code>gocritic</code>, <code>gosec</code>, <code>bodyclose</code>, <code>noctx</code>, <code>contextcheck</code>, <code>sloglint</code>, <code>nilerr</code>, <code>exhaustive</code>, <code>depguard</code> (cưỡng chế hướng phụ thuộc 12.2); formatter <code>gofumpt</code>, <code>goimports</code>.</li>
+    <li><b>Frontend:</b> TypeScript <code>strict</code> + <code>noUncheckedIndexedAccess</code>, <code>typescript-eslint</code> bộ <code>strictTypeChecked</code>, Prettier.</li>
+    <li><b>Taskfile:</b> <code>task dev</code> (air + Vite), <code>task gen</code>, <code>task lint</code>, <code>task test</code>, <code>task build</code> (frontend build → nhúng → <code>go build -trimpath</code>), <code>task check</code> = gen + lint + test + build.</li>
+    <li><b>CI (GitHub Actions):</b> chạy <code>task check</code>, kiểm tra code sinh không lệch, <code>govulncheck</code>, test với <code>-race</code>. Merge chỉ khi xanh.</li>
+  </ul>
+
+  <h3>12.8 Định nghĩa "xong" cho mỗi thay đổi</h3>
+  <ol>
+    <li><code>task check</code> xanh trên máy và trên CI.</li>
+    <li>Có test cho hành vi mới, gồm cả nhánh lỗi.</li>
+    <li>Không có <code>TODO</code>, code bị comment, hay <code>//nolint</code> thiếu <code>// reason: …</code>.</li>
+    <li>Log không chứa bí mật; lỗi có đủ ngữ cảnh để debug.</li>
+    <li>Commit nguyên tử theo <code>&lt;type&gt;(&lt;scope&gt;): …</code>; port và sửa lỗi không nằm chung commit.</li>
+  </ol>
+
+  <p class="small">Nguồn cho mục này: Go Blog "Package names" (go.dev/blog/package-names); Go 1.27 release (go.dev/blog/go1.27); oapi-codegen releases, std-http-server từ v2.2.0 (github.com/oapi-codegen/oapi-codegen/releases); goose embed migrations (pressly.github.io/goose/blog/2021/embed-sql-migrations); goose + sqlc trên SQLite (pressly.github.io/goose/blog/2024/goose-sqlc); koanf v2 (github.com/knadh/koanf); golangci-lint changelog (golangci-lint.run/docs/product/changelog).</p>
+</section>
+
+</body>
+</html>
