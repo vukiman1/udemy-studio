@@ -2,6 +2,8 @@ import { useEffect, useRef, type ReactElement } from 'react'
 import { NavLink, useParams } from 'react-router'
 import type { CourseDetail, LectureSummary } from '../../api/types'
 import { lecturePath } from '../../app/paths'
+import { lectureStatus } from './lecture-status'
+import { LectureStatusIcon } from './LectureStatusIcon'
 
 interface LectureSidebarProps {
   readonly course: CourseDetail
@@ -30,11 +32,9 @@ export function LectureSidebar({ course }: LectureSidebarProps): ReactElement {
                 <NavLink
                   ref={lecture.id === lectureId ? activeRef : undefined}
                   to={lecturePath(course.id, lecture.id)}
-                  className="grid grid-cols-[1.2em_2.4em_1fr_auto] items-baseline gap-1.5 px-4 py-2 text-[0.92rem] hover:bg-surface aria-[current=page]:bg-surface-strong aria-[current=page]:font-semibold"
+                  className="grid grid-cols-[1.2em_2.4em_1fr_auto] items-center gap-1.5 px-4 py-2 text-[0.92rem] hover:bg-surface aria-[current=page]:bg-surface-strong aria-[current=page]:font-semibold"
                 >
-                  <span className="text-accent" aria-label={statusLabel(lecture)}>
-                    {statusIcon(lecture)}
-                  </span>
+                  <LectureStatusIcon status={lectureStatus(lecture)} />
                   <span className="text-muted tabular-nums">
                     {String(lecture.number).padStart(LECTURE_NUMBER_DIGITS, '0')}
                   </span>
@@ -52,18 +52,6 @@ export function LectureSidebar({ course }: LectureSidebarProps): ReactElement {
       ))}
     </nav>
   )
-}
-
-function statusIcon(lecture: LectureSummary): string {
-  if (lecture.progress?.completed === true) return '✓'
-  if (lecture.progress !== undefined) return '◐'
-  return '○'
-}
-
-function statusLabel(lecture: LectureSummary): string {
-  if (lecture.progress?.completed === true) return 'Đã học'
-  if (lecture.progress !== undefined) return 'Đang học'
-  return 'Chưa học'
 }
 
 function kindLabel(lecture: LectureSummary): string {

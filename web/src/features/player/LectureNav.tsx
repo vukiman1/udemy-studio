@@ -2,6 +2,7 @@ import type { ReactElement } from 'react'
 import { Link } from 'react-router'
 import { lecturePath } from '../../app/paths'
 import type { LectureNeighbours } from '../course/course-navigation'
+import { ChevronIcon } from '@videojs/react/icons'
 
 interface LectureNavProps {
   readonly courseId: string
@@ -16,15 +17,23 @@ export function LectureNav({ courseId, neighbours }: LectureNavProps): ReactElem
       aria-label="Chuyển bài"
     >
       {previous !== undefined ? (
-        <Link className="wrap-anywhere" to={lecturePath(courseId, previous.id)}>
-          ← {previous.title}
+        <Link
+          className="inline-flex items-center gap-1 wrap-anywhere"
+          to={lecturePath(courseId, previous.id)}
+        >
+          <ChevronIcon className="size-4.5 -scale-x-100" />
+          {previous.title}
         </Link>
       ) : (
         <span />
       )}
       {next !== undefined && (
-        <Link className="text-right wrap-anywhere" to={lecturePath(courseId, next.id)}>
-          {next.title} →
+        <Link
+          className="inline-flex items-center gap-1 text-right wrap-anywhere"
+          to={lecturePath(courseId, next.id)}
+        >
+          {next.title}
+          <ChevronIcon className="size-4.5" />
         </Link>
       )}
     </nav>

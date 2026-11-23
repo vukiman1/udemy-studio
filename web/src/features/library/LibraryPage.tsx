@@ -6,6 +6,7 @@ import { PageStatus } from '../../app/PageStatus'
 import { StaleDataNotice } from '../../app/StaleDataNotice'
 import { lecturePath } from '../../app/paths'
 import { CourseCard } from './CourseCard'
+import { PlayIcon } from '@videojs/react/icons'
 
 export function LibraryPage(): ReactElement {
   const courses = useCourses()
@@ -29,10 +30,11 @@ export function LibraryPage(): ReactElement {
         <h1 className="text-2xl font-bold">Thư viện</h1>
         {target !== null && resumeCourse !== undefined && (
           <Link
-            className="rounded-lg bg-accent px-4 py-2.5 font-semibold text-on-accent"
+            className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2.5 font-semibold text-on-accent"
             to={lecturePath(target.courseId, target.lectureId)}
           >
-            ▶ Tiếp tục học · {resumeCourse.title}
+            <PlayIcon className="size-4.5" />
+            Tiếp tục học · {resumeCourse.title}
           </Link>
         )}
       </header>

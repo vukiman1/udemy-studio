@@ -1,13 +1,15 @@
 import type { ReactElement } from 'react'
 import { Link } from 'react-router'
 import { PageStatus } from './PageStatus'
+import { ChevronIcon } from '@videojs/react/icons'
 
 export function NotFoundPage(): ReactElement {
   return (
     <main>
       <PageStatus tone="error" message="Không có trang này." />
-      <Link className="px-6 text-accent underline" to="/">
-        ← Về thư viện
+      <Link className="inline-flex items-center gap-1 px-6 text-accent underline" to="/">
+        <ChevronIcon className="size-4.5 -scale-x-100" />
+        Về thư viện
       </Link>
     </main>
   )

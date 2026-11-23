@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { ReactElement } from 'react'
 import { QUERY_KEYS, saveProgress } from '../../api/queries'
 import type { LectureSummary } from '../../api/types'
+import { CheckIcon } from '@videojs/react/icons'
 
 interface MarkCompleteButtonProps {
   readonly lecture: LectureSummary
@@ -23,7 +24,14 @@ export function MarkCompleteButton({ lecture, courseId }: MarkCompleteButtonProp
     },
   })
 
-  if (lecture.progress?.completed === true) return <p>✓ Đã đọc xong bài này.</p>
+  if (lecture.progress?.completed === true) {
+    return (
+      <p className="inline-flex items-center gap-1 text-accent">
+        <CheckIcon className="size-4.5" />
+        Đã đọc xong bài này.
+      </p>
+    )
+  }
   return (
     <div>
       <button

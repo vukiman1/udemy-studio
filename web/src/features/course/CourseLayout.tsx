@@ -5,6 +5,7 @@ import { PageStatus } from '../../app/PageStatus'
 import { StaleDataNotice } from '../../app/StaleDataNotice'
 import { ProgressBar } from '../../app/ProgressBar'
 import { LectureSidebar } from './LectureSidebar'
+import { ChevronIcon } from '@videojs/react/icons'
 
 export function CourseLayout(): ReactElement {
   const { courseId = '' } = useParams()
@@ -21,8 +22,9 @@ export function CourseLayout(): ReactElement {
   return (
     <div className="grid h-dvh grid-cols-[minmax(0,1fr)_340px] grid-rows-[auto_1fr] max-lg:h-auto max-lg:grid-cols-1 max-lg:grid-rows-none">
       <header className="col-span-full flex items-center gap-4 border-b border-line px-4 py-2.5">
-        <Link to="/" className="whitespace-nowrap text-muted">
-          ← Thư viện
+        <Link to="/" className="inline-flex items-center gap-1 whitespace-nowrap text-muted">
+          <ChevronIcon className="size-4.5 -scale-x-100" />
+          Thư viện
         </Link>
         <h1 className="truncate text-base font-semibold">{course.data.title}</h1>
         <div className="ml-auto w-40 shrink-0 max-lg:hidden">
