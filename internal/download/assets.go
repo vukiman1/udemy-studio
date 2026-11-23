@@ -33,7 +33,7 @@ func (run *courseDownload) assets(ctx context.Context, chapterDir string, lectur
 	for _, asset := range lecture.Assets {
 		switch asset.Type {
 		case udemy.AssetArticle:
-			run.article(chapterDir, lecture, asset)
+			// Written as the lecture's page, once, instead of over it on every run like the Python downloader.
 		case udemy.AssetExternalLink:
 			if err := writeExternalLink(chapterDir, asset); err != nil {
 				return err
@@ -55,14 +55,11 @@ func (run *courseDownload) attachment(ctx context.Context, chapterDir string, le
 	return nil
 }
 
-// article rewrites the lecture's page from the template on every run, which replaces the page written from the body.
-func (run *courseDownload) article(chapterDir string, lecture udemy.LecturePlan, asset udemy.AssetPlan) {
+// articlePage fills the template the way the Python downloader does, title without its first four characters included.
+func articlePage(lecture udemy.LecturePlan) string {
 	title := string([]rune(lecture.Title)[min(lectureNumberPrefixRunes, len([]rune(lecture.Title))):])
 	page := strings.ReplaceAll(articleTemplate, titlePlaceholder, title)
-	page = strings.ReplaceAll(page, bodyPlaceholder, lecture.HTMLBody)
-	if err := os.WriteFile(filepath.Join(chapterDir, asset.File), []byte(page), fileMode); err != nil {
-		run.logger.Error("write article page", "lecture", lecture.Title, "err", err)
-	}
+	return strings.ReplaceAll(page, bodyPlaceholder, lecture.HTMLBody)
 }
 
 func writeExternalLink(chapterDir string, asset udemy.AssetPlan) error {

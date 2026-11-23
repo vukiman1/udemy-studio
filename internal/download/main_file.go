@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 
 	"github.com/vukiman1/udemy-studio/internal/udemy"
@@ -45,10 +46,14 @@ func (run *courseDownload) mainFile(ctx context.Context, chapterDir string, lect
 
 // An empty page is left unwritten and uncounted, as in the Python downloader.
 func (run *courseDownload) page(ctx context.Context, chapterDir string, lecture udemy.LecturePlan) error {
-	if lecture.HTMLBody == "" {
+	content := lecture.HTMLBody
+	if slices.ContainsFunc(lecture.Assets, func(asset udemy.AssetPlan) bool { return asset.Type == udemy.AssetArticle }) {
+		content = articlePage(lecture)
+	}
+	if content == "" {
 		return nil
 	}
-	if err := os.WriteFile(filepath.Join(chapterDir, lecture.File), []byte(lecture.HTMLBody), fileMode); err != nil {
+	if err := os.WriteFile(filepath.Join(chapterDir, lecture.File), []byte(content), fileMode); err != nil {
 		return run.recordFailure(ctx, lecture.Title, err)
 	}
 	run.summary.Downloaded++

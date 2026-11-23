@@ -300,3 +300,33 @@ func TestCaptionThatDoesNotConvertIsRetriedOnTheNextRun(t *testing.T) {
 		t.Errorf("rerun fetched %v, want the caption downloaded again", rerun.fetched)
 	}
 }
+
+func TestArticlePageIsWrittenOnceAndAFailedWriteIsReported(t *testing.T) {
+	outputDir := t.TempDir()
+	pagePath := filepath.Join(outputDir, "backend-basics", "01 - Intro", "003 Notes 🚀.html")
+	if _, _, err := runCourse(t, t.Context(), samplePlan(), &fakeTools{}, outputDir); err != nil {
+		t.Fatalf("Course: %v", err)
+	}
+	written, err := fs.ReadFile(os.DirFS(filepath.Dir(pagePath)), filepath.Base(pagePath))
+	if err != nil || !strings.Contains(string(written), "Notes 🚀") || !strings.Contains(string(written), "<p>body</p>") {
+		t.Fatalf("page = %q, %v; want the article template with title and body", written, err)
+	}
+	if err := os.WriteFile(pagePath, []byte("kept"), testFileMode); err != nil {
+		t.Fatalf("edit page: %v", err)
+	}
+	if _, _, err := runCourse(t, t.Context(), samplePlan(), &fakeTools{}, outputDir); err != nil {
+		t.Fatalf("rerun: %v", err)
+	}
+	if kept, _ := fs.ReadFile(os.DirFS(filepath.Dir(pagePath)), filepath.Base(pagePath)); string(kept) != "kept" {
+		t.Errorf("rerun rewrote the page: %q", kept)
+	}
+
+	blocked := t.TempDir()
+	if err := os.MkdirAll(filepath.Join(blocked, "backend-basics", "01 - Intro", "003 Notes 🚀.html", "in-the-way"), dirMode); err != nil {
+		t.Fatalf("block page path: %v", err)
+	}
+	summary, _, err := runCourse(t, t.Context(), samplePlan(), &fakeTools{}, blocked)
+	if err != nil || !slices.Contains(summary.Failed, "003 Notes 🚀") {
+		t.Errorf("failed = %v, %v; want the page that could not be written", summary.Failed, err)
+	}
+}
