@@ -52,7 +52,13 @@ func (tools *fakeTools) FetchFile(_ context.Context, fileURL, dir, name string) 
 	if strings.HasSuffix(name, vttExtension) {
 		content = vttBody
 	}
-	return os.WriteFile(filepath.Join(dir, name), []byte(content), testFileMode)
+	if err := os.WriteFile(filepath.Join(dir, name), []byte(content), testFileMode); err != nil {
+		return err
+	}
+	if err := os.Remove(filepath.Join(dir, name) + aria2ControlSuffix); err != nil && !errors.Is(err, fs.ErrNotExist) {
+		return err
+	}
+	return nil
 }
 
 func (tools *fakeTools) FetchHLS(_ context.Context, playlistURL, outputTemplate string) error {
@@ -251,5 +257,27 @@ func TestLibraryKeysDownloadedLecturesByTheirUdemyID(t *testing.T) {
 	renames := scanned.KeyRenames()
 	if renames["backend-basics/01 - Intro/001 Welcome"] != "udemy-lecture:101" {
 		t.Errorf("KeyRenames = %v, want the path key of Welcome moved to its id", renames)
+	}
+}
+
+func TestFileAria2cLeftPartialIsDownloadedAgain(t *testing.T) {
+	outputDir := t.TempDir()
+	chapterDir := filepath.Join(outputDir, "backend-basics", "01 - Intro")
+	if err := os.MkdirAll(chapterDir, dirMode); err != nil {
+		t.Fatalf("mkdir: %v", err)
+	}
+	for _, name := range []string{"001 Welcome.mp4", "001 Welcome.mp4.aria2", "001 Welcome_en.vtt", "001 Welcome_en.vtt.aria2"} {
+		if err := os.WriteFile(filepath.Join(chapterDir, name), []byte("partial"), testFileMode); err != nil {
+			t.Fatalf("write %s: %v", name, err)
+		}
+	}
+	tools := &fakeTools{}
+	if _, _, err := runCourse(t, t.Context(), samplePlan(), tools, outputDir); err != nil {
+		t.Fatalf("Course: %v", err)
+	}
+	for _, name := range []string{"001 Welcome.mp4", "001 Welcome_en.vtt"} {
+		if !slices.Contains(tools.fetched, name) {
+			t.Errorf("%s was left partial, fetched only %v", name, tools.fetched)
+		}
 	}
 }

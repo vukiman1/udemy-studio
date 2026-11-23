@@ -29,7 +29,7 @@ func (run *courseDownload) captions(ctx context.Context, chapterDir string, lect
 func (run *courseDownload) caption(ctx context.Context, chapterDir string, caption udemy.CaptionPlan) error {
 	isVTT := strings.HasSuffix(caption.File, vttExtension)
 	for attempt := 1; ; attempt++ {
-		if isFile(filepath.Join(chapterDir, caption.File)) || (isVTT && isFile(filepath.Join(chapterDir, caption.SRTFile))) {
+		if isDownloaded(filepath.Join(chapterDir, caption.File)) || (isVTT && isDownloaded(filepath.Join(chapterDir, caption.SRTFile))) {
 			return nil
 		}
 		err := run.tools.Files.FetchFile(ctx, caption.URL, chapterDir, caption.File)

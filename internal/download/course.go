@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io/fs"
 	"log/slog"
 	"os"
 	"path/filepath"
@@ -13,7 +14,10 @@ import (
 	"github.com/vukiman1/udemy-studio/internal/udemy"
 )
 
-const dirMode = 0o750
+const (
+	dirMode            = 0o750
+	aria2ControlSuffix = ".aria2"
+)
 
 var errUnsafeName = errors.New("name is not a single path element")
 
@@ -128,6 +132,12 @@ func makeDir(parent, name string) (string, error) {
 		return "", fmt.Errorf("create %s: %w", dir, err)
 	}
 	return dir, nil
+}
+
+// isDownloaded rejects a file aria2c left partial: it keeps a control file next to it until the download completes.
+func isDownloaded(path string) bool {
+	_, err := os.Stat(path + aria2ControlSuffix)
+	return isFile(path) && errors.Is(err, fs.ErrNotExist)
 }
 
 func isFile(path string) bool {
