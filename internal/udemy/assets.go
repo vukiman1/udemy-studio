@@ -52,14 +52,17 @@ type assetPlanner struct {
 func (planner assetPlanner) plan(asset Asset, supplementary []Asset) []AssetPlan {
 	var plans []AssetPlan
 	assetType := strings.ToLower(asset.AssetType)
-	switch download, isDownload := lectureDownloads[assetType]; {
-	case assetType == articleAssetType:
+	switch assetType {
+	case articleAssetType:
 		plans = append(plans, AssetPlan{Type: AssetArticle, File: htmlFileName(planner.lecture.Title)})
-	case assetType == videoAssetType:
-	case isDownload:
-		plans = planner.appendDownload(plans, asset, download)
+	case videoAssetType:
+		// The lecture's own video is planned with the lecture, not as an asset.
 	default:
-		planner.warn("unknown asset type %q in %s", asset.AssetType, planner.lecture.Title)
+		if download, ok := lectureDownloads[assetType]; ok {
+			plans = planner.appendDownload(plans, asset, download)
+		} else {
+			planner.warn("unknown asset type %q in %s", asset.AssetType, planner.lecture.Title)
+		}
 	}
 	for _, entry := range supplementary {
 		plans = planner.appendSupplementary(plans, entry)
