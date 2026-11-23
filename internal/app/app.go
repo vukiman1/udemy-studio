@@ -56,6 +56,10 @@ func Run(ctx context.Context, options Options, logger *slog.Logger) error {
 		return err
 	}
 	defer database.Close()
+	progressService := progress.NewService(sqlite.NewProgressStore(database), time.Now)
+	if err := progressService.AdoptKeys(ctx, catalog.Current().KeyRenames()); err != nil {
+		return err
+	}
 
 	frontend, err := web.Assets()
 	if errors.Is(err, web.ErrFrontendNotBuilt) {
@@ -65,7 +69,7 @@ func Run(ctx context.Context, options Options, logger *slog.Logger) error {
 		return fmt.Errorf("load embedded frontend: %w", err)
 	}
 
-	downloads, err := newDownloads(ctx, options.Downloads, options.DataDir, database, catalog, logger)
+	downloads, err := newDownloads(ctx, options.Downloads, options.DataDir, database, catalog, progressService, logger)
 	if err != nil {
 		return err
 	}
@@ -74,7 +78,7 @@ func Run(ctx context.Context, options Options, logger *slog.Logger) error {
 		Frontend: frontend,
 		Catalog:  catalog,
 		Media:    media.FS(),
-		Progress: progress.NewService(sqlite.NewProgressStore(database), time.Now),
+		Progress: progressService,
 		Login:    downloads.login,
 		Jobs:     downloads.jobs,
 		Logger:   logger,

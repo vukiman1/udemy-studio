@@ -13,6 +13,7 @@ import (
 	"github.com/vukiman1/udemy-studio/internal/jobs"
 	"github.com/vukiman1/udemy-studio/internal/library"
 	"github.com/vukiman1/udemy-studio/internal/login"
+	"github.com/vukiman1/udemy-studio/internal/progress"
 )
 
 const jobLogsDirName = "job-logs"
@@ -34,7 +35,7 @@ type downloads struct {
 	jobs  *jobs.Manager
 }
 
-func newDownloads(ctx context.Context, config DownloadOptions, dataDir string, database *sql.DB, catalog *library.Catalog, logger *slog.Logger) (downloads, error) {
+func newDownloads(ctx context.Context, config DownloadOptions, dataDir string, database *sql.DB, catalog *library.Catalog, progressService *progress.Service, logger *slog.Logger) (downloads, error) {
 	if !config.isConfigured() {
 		logger.Info("downloads disabled; pass --python and --python-repo to enable them")
 		return downloads{}, nil
@@ -54,9 +55,13 @@ func newDownloads(ctx context.Context, config DownloadOptions, dataDir string, d
 		Store:      sqlite.NewJobStore(database),
 		Logger:     logger,
 		Now:        time.Now,
-		OnSucceeded: func(_ context.Context, job jobs.Job) {
+		OnSucceeded: func(ctx context.Context, job jobs.Job) {
 			if err := catalog.Rescan(); err != nil {
 				logger.Error("rescan library after download", "job", job.ID, "err", err)
+				return
+			}
+			if err := progressService.AdoptKeys(ctx, catalog.Current().KeyRenames()); err != nil {
+				logger.Error("move progress to the lecture ids of the new download", "job", job.ID, "err", err)
 			}
 		},
 	})
