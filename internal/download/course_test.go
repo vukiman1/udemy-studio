@@ -16,6 +16,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 
 	"github.com/vukiman1/udemy-studio/internal/jobs"
+	"github.com/vukiman1/udemy-studio/internal/library"
 	"github.com/vukiman1/udemy-studio/internal/udemy"
 )
 
@@ -72,7 +73,7 @@ func (tools *fakeTools) FetchPlaylist(context.Context, string) (string, error) {
 
 func samplePlan() udemy.Plan {
 	videoLecture := udemy.LecturePlan{
-		Number: 1, Title: "001 Welcome", Kind: udemy.KindVideo, File: "001 Welcome.mp4", PresenceFile: "001 Welcome.mp4",
+		Number: 1, ID: 101, Title: "001 Welcome", Kind: udemy.KindVideo, File: "001 Welcome.mp4", PresenceFile: "001 Welcome.mp4",
 		Video:    &udemy.VideoChoice{Type: udemy.SourceMP4, URL: "https://cdn.example/welcome.mp4"},
 		Captions: []udemy.CaptionPlan{{Language: "en", URL: "https://cdn.example/en.vtt", File: "001 Welcome_en.vtt", SRTFile: "001 Welcome_en.srt"}},
 		Assets: []udemy.AssetPlan{
@@ -81,11 +82,11 @@ func samplePlan() udemy.Plan {
 		},
 	}
 	hlsLecture := udemy.LecturePlan{
-		Number: 2, Title: "002 Deep dive", Kind: udemy.KindVideo, File: "002 Deep dive.mp4", PresenceFile: "002 Deep dive.mp4",
+		Number: 2, ID: 102, Title: "002 Deep dive", Kind: udemy.KindVideo, File: "002 Deep dive.mp4", PresenceFile: "002 Deep dive.mp4",
 		Video: &udemy.VideoChoice{Type: udemy.SourceHLS, URL: hlsPlaylistURL, PlaylistFile: "index_77_1920x1080.m3u8"},
 	}
 	article := udemy.LecturePlan{
-		Number: 3, Title: "003 Notes 🚀", Kind: udemy.KindHTML, File: "003 Notes 🚀.html", PresenceFile: "003 Notes .html", HTMLBody: "<p>body</p>",
+		Number: 3, ID: 103, Title: "003 Notes 🚀", Kind: udemy.KindHTML, File: "003 Notes 🚀.html", PresenceFile: "003 Notes .html", HTMLBody: "<p>body</p>",
 		Assets: []udemy.AssetPlan{{Type: udemy.AssetArticle, File: "003 Notes 🚀.html"}},
 	}
 	drm := udemy.LecturePlan{Number: 4, Title: "004 Locked", Kind: udemy.KindDRM, File: "004 Locked.mp4", PresenceFile: "004 Locked.mp4"}
@@ -131,6 +132,7 @@ func TestCourseWritesThePythonLayoutAndSkipsItOnARerun(t *testing.T) {
 		t.Fatalf("Course: %v", err)
 	}
 	wantTree := []string{
+		"backend-basics/.course.json",
 		"backend-basics/01 - Intro/001 Docs.url",
 		"backend-basics/01 - Intro/001 Welcome.mp4",
 		"backend-basics/01 - Intro/001 Welcome_en.srt",
@@ -222,5 +224,32 @@ func TestChapterFilterReadsListsAndRanges(t *testing.T) {
 		if _, err := ParseChapterFilter(invalid); !errors.Is(err, ErrInvalidChapterFilter) {
 			t.Errorf("ParseChapterFilter(%q) error = %v", invalid, err)
 		}
+	}
+}
+
+func TestLibraryKeysDownloadedLecturesByTheirUdemyID(t *testing.T) {
+	outputDir := t.TempDir()
+	if _, _, err := runCourse(t, t.Context(), samplePlan(), &fakeTools{}, outputDir); err != nil {
+		t.Fatalf("Course: %v", err)
+	}
+	scanned, err := library.Scan(os.DirFS(outputDir))
+	if err != nil {
+		t.Fatalf("Scan: %v", err)
+	}
+	keys := map[string]string{}
+	for _, lecture := range scanned.Courses[0].Chapters[0].Lectures {
+		keys[lecture.Title] = lecture.Key
+	}
+	want := map[string]string{
+		"Welcome":   "udemy-lecture:101",
+		"Deep dive": "udemy-lecture:102",
+		"Notes 🚀":   "udemy-lecture:103",
+	}
+	if diff := cmp.Diff(want, keys); diff != "" {
+		t.Errorf("lecture keys (-want +got):\n%s", diff)
+	}
+	renames := scanned.KeyRenames()
+	if renames["backend-basics/01 - Intro/001 Welcome"] != "udemy-lecture:101" {
+		t.Errorf("KeyRenames = %v, want the path key of Welcome moved to its id", renames)
 	}
 }
