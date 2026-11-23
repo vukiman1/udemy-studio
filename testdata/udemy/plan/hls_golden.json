@@ -1,0 +1,1568 @@
+{
+ "https://example-portal.udemy.com/assets/44604756/files/2022-11-02_18-16-02-282d52077d6771335027abe2e561bfc7/2/aa0032e94a4a06a4590c28c3f4124658c3d0.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/44604756/files/2022-11-02_18-16-02-282d52077d6771335027abe2e561bfc7/2/hls/AVC_640x360_90k_AAC-HE_64k/aa0032e94a4a06a4590c28c3f4124658c3d0.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/44604756/files/2022-11-02_18-16-02-282d52077d6771335027abe2e561bfc7/2/hls/AVC_768x432_900k_AAC-HE_64k/aa0032e94a4a06a4590c28c3f4124658c3d0.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/44604756/files/2022-11-02_18-16-02-282d52077d6771335027abe2e561bfc7/2/hls/AVC_1024x576_1500k_AAC-HE_64k/aa0032e94a4a06a4590c28c3f4124658c3d0.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/44604756/files/2022-11-02_18-16-02-282d52077d6771335027abe2e561bfc7/2/hls/AVC_1280x720_2400k_AAC-HE_64k/aa0032e94a4a06a4590c28c3f4124658c3d0.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/44604756/files/2022-11-02_18-16-02-282d52077d6771335027abe2e561bfc7/2/hls/AVC_1920x1080_4800k_AAC-HE_64k/aa0032e94a4a06a4590c28c3f4124658c3d0.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/44605056/files/2022-11-02_18-34-17-a7aa43ae12cada23494bb698105df6dc/2/aa00c253f3a88a8e2093ef6a392f946dad6b.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/44605056/files/2022-11-02_18-34-17-a7aa43ae12cada23494bb698105df6dc/2/hls/AVC_640x360_90k_AAC-HE_64k/aa00c253f3a88a8e2093ef6a392f946dad6b.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/44605056/files/2022-11-02_18-34-17-a7aa43ae12cada23494bb698105df6dc/2/hls/AVC_768x432_900k_AAC-HE_64k/aa00c253f3a88a8e2093ef6a392f946dad6b.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/44605056/files/2022-11-02_18-34-17-a7aa43ae12cada23494bb698105df6dc/2/hls/AVC_1024x576_1500k_AAC-HE_64k/aa00c253f3a88a8e2093ef6a392f946dad6b.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/44605056/files/2022-11-02_18-34-17-a7aa43ae12cada23494bb698105df6dc/2/hls/AVC_1280x720_2400k_AAC-HE_64k/aa00c253f3a88a8e2093ef6a392f946dad6b.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/44605056/files/2022-11-02_18-34-17-a7aa43ae12cada23494bb698105df6dc/2/hls/AVC_1920x1080_4800k_AAC-HE_64k/aa00c253f3a88a8e2093ef6a392f946dad6b.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/44605306/files/2022-11-02_18-55-24-907da15db105d701aa35b3913f066049/2/aa002b88a8ef2d019546aed897551868cf54.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/44605306/files/2022-11-02_18-55-24-907da15db105d701aa35b3913f066049/2/hls/AVC_640x360_90k_AAC-HE_64k/aa002b88a8ef2d019546aed897551868cf54.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/44605306/files/2022-11-02_18-55-24-907da15db105d701aa35b3913f066049/2/hls/AVC_768x432_900k_AAC-HE_64k/aa002b88a8ef2d019546aed897551868cf54.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/44605306/files/2022-11-02_18-55-24-907da15db105d701aa35b3913f066049/2/hls/AVC_1024x576_1500k_AAC-HE_64k/aa002b88a8ef2d019546aed897551868cf54.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/44605306/files/2022-11-02_18-55-24-907da15db105d701aa35b3913f066049/2/hls/AVC_1280x720_2400k_AAC-HE_64k/aa002b88a8ef2d019546aed897551868cf54.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/44605306/files/2022-11-02_18-55-24-907da15db105d701aa35b3913f066049/2/hls/AVC_1920x1080_4800k_AAC-HE_64k/aa002b88a8ef2d019546aed897551868cf54.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/52361150/files/2023-10-29_20-12-24-b7fb5765db92f5487385f4e67df12edd/2/aa00b8c2c14d4021d06b28ea46f12c02fa54.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/52361150/files/2023-10-29_20-12-24-b7fb5765db92f5487385f4e67df12edd/2/hls/AVC_640x360_90k_AAC-HE_64k/aa00b8c2c14d4021d06b28ea46f12c02fa54.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/52361150/files/2023-10-29_20-12-24-b7fb5765db92f5487385f4e67df12edd/2/hls/AVC_768x432_600k_AAC-HE_64k/aa00b8c2c14d4021d06b28ea46f12c02fa54.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/52361150/files/2023-10-29_20-12-24-b7fb5765db92f5487385f4e67df12edd/2/hls/AVC_1024x576_1000k_AAC-HE_64k/aa00b8c2c14d4021d06b28ea46f12c02fa54.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/52361150/files/2023-10-29_20-12-24-b7fb5765db92f5487385f4e67df12edd/2/hls/AVC_1280x720_1600k_AAC-HE_64k/aa00b8c2c14d4021d06b28ea46f12c02fa54.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/52361150/files/2023-10-29_20-12-24-b7fb5765db92f5487385f4e67df12edd/2/hls/AVC_1920x1080_3200k_AAC-HE_64k/aa00b8c2c14d4021d06b28ea46f12c02fa54.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/44538780/files/2022-10-30_20-38-05-226053cf2f760a59031e7834b35a27ba/2/aa00257aa91e71149919e65099ad035fb577.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/44538780/files/2022-10-30_20-38-05-226053cf2f760a59031e7834b35a27ba/2/hls/AVC_640x360_90k_AAC-HE_64k/aa00257aa91e71149919e65099ad035fb577.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/44538780/files/2022-10-30_20-38-05-226053cf2f760a59031e7834b35a27ba/2/hls/AVC_768x432_900k_AAC-HE_64k/aa00257aa91e71149919e65099ad035fb577.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/44538780/files/2022-10-30_20-38-05-226053cf2f760a59031e7834b35a27ba/2/hls/AVC_1024x576_1500k_AAC-HE_64k/aa00257aa91e71149919e65099ad035fb577.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/44538780/files/2022-10-30_20-38-05-226053cf2f760a59031e7834b35a27ba/2/hls/AVC_1280x720_2400k_AAC-HE_64k/aa00257aa91e71149919e65099ad035fb577.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/44538780/files/2022-10-30_20-38-05-226053cf2f760a59031e7834b35a27ba/2/hls/AVC_1920x1080_4800k_AAC-HE_64k/aa00257aa91e71149919e65099ad035fb577.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/44538962/files/2022-10-30_20-52-35-aae59c6fb89c3f0045d65be5d7244a43/2/aa008369c592ca31166ea07b202a04aeed8d.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/44538962/files/2022-10-30_20-52-35-aae59c6fb89c3f0045d65be5d7244a43/2/hls/AVC_640x360_90k_AAC-HE_64k/aa008369c592ca31166ea07b202a04aeed8d.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/44538962/files/2022-10-30_20-52-35-aae59c6fb89c3f0045d65be5d7244a43/2/hls/AVC_768x432_900k_AAC-HE_64k/aa008369c592ca31166ea07b202a04aeed8d.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/44538962/files/2022-10-30_20-52-35-aae59c6fb89c3f0045d65be5d7244a43/2/hls/AVC_1024x576_1500k_AAC-HE_64k/aa008369c592ca31166ea07b202a04aeed8d.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/44538962/files/2022-10-30_20-52-35-aae59c6fb89c3f0045d65be5d7244a43/2/hls/AVC_1280x720_2400k_AAC-HE_64k/aa008369c592ca31166ea07b202a04aeed8d.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/44538962/files/2022-10-30_20-52-35-aae59c6fb89c3f0045d65be5d7244a43/2/hls/AVC_1920x1080_4800k_AAC-HE_64k/aa008369c592ca31166ea07b202a04aeed8d.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/44539812/files/2022-10-30_22-41-16-d72d18262bb05a4bdac2f902df22279d/2/aa008ae48699010231ba2a9b5ec00be6e1d9.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/44539812/files/2022-10-30_22-41-16-d72d18262bb05a4bdac2f902df22279d/2/hls/AVC_640x360_90k_AAC-HE_64k/aa008ae48699010231ba2a9b5ec00be6e1d9.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/44539812/files/2022-10-30_22-41-16-d72d18262bb05a4bdac2f902df22279d/2/hls/AVC_768x432_600k_AAC-HE_64k/aa008ae48699010231ba2a9b5ec00be6e1d9.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/44539812/files/2022-10-30_22-41-16-d72d18262bb05a4bdac2f902df22279d/2/hls/AVC_1024x576_1000k_AAC-HE_64k/aa008ae48699010231ba2a9b5ec00be6e1d9.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/44539812/files/2022-10-30_22-41-16-d72d18262bb05a4bdac2f902df22279d/2/hls/AVC_1280x720_1600k_AAC-HE_64k/aa008ae48699010231ba2a9b5ec00be6e1d9.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/44539812/files/2022-10-30_22-41-16-d72d18262bb05a4bdac2f902df22279d/2/hls/AVC_1920x1080_3200k_AAC-HE_64k/aa008ae48699010231ba2a9b5ec00be6e1d9.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/44539710/files/2022-10-30_22-27-39-9ac4969ec8cef03e71471f45b1b57d94/2/aa007193e0bf6164a93614b039af3d51496d.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/44539710/files/2022-10-30_22-27-39-9ac4969ec8cef03e71471f45b1b57d94/2/hls/AVC_640x360_90k_AAC-HE_64k/aa007193e0bf6164a93614b039af3d51496d.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/44539710/files/2022-10-30_22-27-39-9ac4969ec8cef03e71471f45b1b57d94/2/hls/AVC_768x432_600k_AAC-HE_64k/aa007193e0bf6164a93614b039af3d51496d.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/44539710/files/2022-10-30_22-27-39-9ac4969ec8cef03e71471f45b1b57d94/2/hls/AVC_1024x576_1000k_AAC-HE_64k/aa007193e0bf6164a93614b039af3d51496d.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/44539710/files/2022-10-30_22-27-39-9ac4969ec8cef03e71471f45b1b57d94/2/hls/AVC_1280x720_1600k_AAC-HE_64k/aa007193e0bf6164a93614b039af3d51496d.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/44539710/files/2022-10-30_22-27-39-9ac4969ec8cef03e71471f45b1b57d94/2/hls/AVC_1920x1080_3200k_AAC-HE_64k/aa007193e0bf6164a93614b039af3d51496d.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/44539920/files/2022-10-30_22-59-10-c1859a55df2b84c523a088fb91cd42d7/2/aa007edd2d680a8d6a3223169a534241879d.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/44539920/files/2022-10-30_22-59-10-c1859a55df2b84c523a088fb91cd42d7/2/hls/AVC_640x360_90k_AAC-HE_64k/aa007edd2d680a8d6a3223169a534241879d.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/44539920/files/2022-10-30_22-59-10-c1859a55df2b84c523a088fb91cd42d7/2/hls/AVC_768x432_225k_AAC-HE_64k/aa007edd2d680a8d6a3223169a534241879d.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/44539920/files/2022-10-30_22-59-10-c1859a55df2b84c523a088fb91cd42d7/2/hls/AVC_1024x576_375k_AAC-HE_64k/aa007edd2d680a8d6a3223169a534241879d.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/44539920/files/2022-10-30_22-59-10-c1859a55df2b84c523a088fb91cd42d7/2/hls/AVC_1280x720_600k_AAC-HE_64k/aa007edd2d680a8d6a3223169a534241879d.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/44539920/files/2022-10-30_22-59-10-c1859a55df2b84c523a088fb91cd42d7/2/hls/AVC_1920x1080_1200k_AAC-HE_64k/aa007edd2d680a8d6a3223169a534241879d.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/44540118/files/2022-10-30_23-16-16-425223bf4861e871932ef17be4918c61/2/aa00302e3bfd731982f688370c1ffd2adbd0.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/44540118/files/2022-10-30_23-16-16-425223bf4861e871932ef17be4918c61/2/hls/AVC_640x360_90k_AAC-HE_64k/aa00302e3bfd731982f688370c1ffd2adbd0.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/44540118/files/2022-10-30_23-16-16-425223bf4861e871932ef17be4918c61/2/hls/AVC_768x432_600k_AAC-HE_64k/aa00302e3bfd731982f688370c1ffd2adbd0.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/44540118/files/2022-10-30_23-16-16-425223bf4861e871932ef17be4918c61/2/hls/AVC_1024x576_1000k_AAC-HE_64k/aa00302e3bfd731982f688370c1ffd2adbd0.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/44540118/files/2022-10-30_23-16-16-425223bf4861e871932ef17be4918c61/2/hls/AVC_1280x720_1600k_AAC-HE_64k/aa00302e3bfd731982f688370c1ffd2adbd0.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/44540118/files/2022-10-30_23-16-16-425223bf4861e871932ef17be4918c61/2/hls/AVC_1920x1080_3200k_AAC-HE_64k/aa00302e3bfd731982f688370c1ffd2adbd0.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/44540744/files/2022-10-31_00-35-31-1bca2d1ccbd7f857879418ebed9653c3/2/aa00caee3688225139f24f350de4f2a173f7.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/44540744/files/2022-10-31_00-35-31-1bca2d1ccbd7f857879418ebed9653c3/2/hls/AVC_640x360_90k_AAC-HE_64k/aa00caee3688225139f24f350de4f2a173f7.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/44540744/files/2022-10-31_00-35-31-1bca2d1ccbd7f857879418ebed9653c3/2/hls/AVC_768x432_900k_AAC-HE_64k/aa00caee3688225139f24f350de4f2a173f7.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/44540744/files/2022-10-31_00-35-31-1bca2d1ccbd7f857879418ebed9653c3/2/hls/AVC_1024x576_1500k_AAC-HE_64k/aa00caee3688225139f24f350de4f2a173f7.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/44540744/files/2022-10-31_00-35-31-1bca2d1ccbd7f857879418ebed9653c3/2/hls/AVC_1280x720_2400k_AAC-HE_64k/aa00caee3688225139f24f350de4f2a173f7.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/44540744/files/2022-10-31_00-35-31-1bca2d1ccbd7f857879418ebed9653c3/2/hls/AVC_1920x1080_4800k_AAC-HE_64k/aa00caee3688225139f24f350de4f2a173f7.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/44540754/files/2022-10-31_00-36-48-24e85e905c10d23c8045b46abde77f01/2/aa00ef88c8eb775195ce1040bdd94b5fd877.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/44540754/files/2022-10-31_00-36-48-24e85e905c10d23c8045b46abde77f01/2/hls/AVC_640x360_90k_AAC-HE_64k/aa00ef88c8eb775195ce1040bdd94b5fd877.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/44540754/files/2022-10-31_00-36-48-24e85e905c10d23c8045b46abde77f01/2/hls/AVC_768x432_900k_AAC-HE_64k/aa00ef88c8eb775195ce1040bdd94b5fd877.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/44540754/files/2022-10-31_00-36-48-24e85e905c10d23c8045b46abde77f01/2/hls/AVC_1024x576_1500k_AAC-HE_64k/aa00ef88c8eb775195ce1040bdd94b5fd877.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/44540754/files/2022-10-31_00-36-48-24e85e905c10d23c8045b46abde77f01/2/hls/AVC_1280x720_2400k_AAC-HE_64k/aa00ef88c8eb775195ce1040bdd94b5fd877.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/44540754/files/2022-10-31_00-36-48-24e85e905c10d23c8045b46abde77f01/2/hls/AVC_1920x1080_4800k_AAC-HE_64k/aa00ef88c8eb775195ce1040bdd94b5fd877.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/44540910/files/2022-10-31_01-02-52-448ddc366aaf6ec4b97469592c400193/2/aa00fe081a3be085f2fa5101fe94afc5931b.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/44540910/files/2022-10-31_01-02-52-448ddc366aaf6ec4b97469592c400193/2/hls/AVC_640x360_90k_AAC-HE_64k/aa00fe081a3be085f2fa5101fe94afc5931b.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/44540910/files/2022-10-31_01-02-52-448ddc366aaf6ec4b97469592c400193/2/hls/AVC_768x432_600k_AAC-HE_64k/aa00fe081a3be085f2fa5101fe94afc5931b.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/44540910/files/2022-10-31_01-02-52-448ddc366aaf6ec4b97469592c400193/2/hls/AVC_1024x576_1000k_AAC-HE_64k/aa00fe081a3be085f2fa5101fe94afc5931b.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/44540910/files/2022-10-31_01-02-52-448ddc366aaf6ec4b97469592c400193/2/hls/AVC_1280x720_1600k_AAC-HE_64k/aa00fe081a3be085f2fa5101fe94afc5931b.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/44540910/files/2022-10-31_01-02-52-448ddc366aaf6ec4b97469592c400193/2/hls/AVC_1920x1080_3200k_AAC-HE_64k/aa00fe081a3be085f2fa5101fe94afc5931b.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/44556126/files/2022-10-31_18-22-49-1f9226eecd9926ed7cf5aaa443843f74/2/aa00975e8caea7d0cb3c449509663fd4176e.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/44556126/files/2022-10-31_18-22-49-1f9226eecd9926ed7cf5aaa443843f74/2/hls/AVC_640x360_90k_AAC-HE_64k/aa00975e8caea7d0cb3c449509663fd4176e.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/44556126/files/2022-10-31_18-22-49-1f9226eecd9926ed7cf5aaa443843f74/2/hls/AVC_768x432_150k_AAC-HE_64k/aa00975e8caea7d0cb3c449509663fd4176e.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/44556126/files/2022-10-31_18-22-49-1f9226eecd9926ed7cf5aaa443843f74/2/hls/AVC_1024x576_250k_AAC-HE_64k/aa00975e8caea7d0cb3c449509663fd4176e.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/44556126/files/2022-10-31_18-22-49-1f9226eecd9926ed7cf5aaa443843f74/2/hls/AVC_1280x720_400k_AAC-HE_64k/aa00975e8caea7d0cb3c449509663fd4176e.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/44556126/files/2022-10-31_18-22-49-1f9226eecd9926ed7cf5aaa443843f74/2/hls/AVC_1920x1080_800k_AAC-HE_64k/aa00975e8caea7d0cb3c449509663fd4176e.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/44557124/files/2022-10-31_19-11-35-fe3ac5e43e939c6cdf53e28c4021e2b0/2/aa00d9eded32e3f6d4c6b4e6c20f0d7b3a81.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/44557124/files/2022-10-31_19-11-35-fe3ac5e43e939c6cdf53e28c4021e2b0/2/hls/AVC_640x360_90k_AAC-HE_64k/aa00d9eded32e3f6d4c6b4e6c20f0d7b3a81.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/44557124/files/2022-10-31_19-11-35-fe3ac5e43e939c6cdf53e28c4021e2b0/2/hls/AVC_768x432_150k_AAC-HE_64k/aa00d9eded32e3f6d4c6b4e6c20f0d7b3a81.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/44557124/files/2022-10-31_19-11-35-fe3ac5e43e939c6cdf53e28c4021e2b0/2/hls/AVC_1024x576_250k_AAC-HE_64k/aa00d9eded32e3f6d4c6b4e6c20f0d7b3a81.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/44557124/files/2022-10-31_19-11-35-fe3ac5e43e939c6cdf53e28c4021e2b0/2/hls/AVC_1280x720_400k_AAC-HE_64k/aa00d9eded32e3f6d4c6b4e6c20f0d7b3a81.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/44557124/files/2022-10-31_19-11-35-fe3ac5e43e939c6cdf53e28c4021e2b0/2/hls/AVC_1920x1080_800k_AAC-HE_64k/aa00d9eded32e3f6d4c6b4e6c20f0d7b3a81.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/44557378/files/2022-10-31_19-22-29-bff15c3c2c0a920db7a89dcf63c98f12/2/aa00cafb78d48c4c5bcf84c9feaaf71c81d2.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/44557378/files/2022-10-31_19-22-29-bff15c3c2c0a920db7a89dcf63c98f12/2/hls/AVC_640x360_90k_AAC-HE_64k/aa00cafb78d48c4c5bcf84c9feaaf71c81d2.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/44557378/files/2022-10-31_19-22-29-bff15c3c2c0a920db7a89dcf63c98f12/2/hls/AVC_768x432_900k_AAC-HE_64k/aa00cafb78d48c4c5bcf84c9feaaf71c81d2.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/44557378/files/2022-10-31_19-22-29-bff15c3c2c0a920db7a89dcf63c98f12/2/hls/AVC_1024x576_1500k_AAC-HE_64k/aa00cafb78d48c4c5bcf84c9feaaf71c81d2.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/44557378/files/2022-10-31_19-22-29-bff15c3c2c0a920db7a89dcf63c98f12/2/hls/AVC_1280x720_2400k_AAC-HE_64k/aa00cafb78d48c4c5bcf84c9feaaf71c81d2.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/44557378/files/2022-10-31_19-22-29-bff15c3c2c0a920db7a89dcf63c98f12/2/hls/AVC_1920x1080_4800k_AAC-HE_64k/aa00cafb78d48c4c5bcf84c9feaaf71c81d2.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/44559726/files/2022-10-31_21-52-32-a5b5558972587697e2e1776834b99e31/2/aa00b39a786479f524056c8be826d4580127.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/44559726/files/2022-10-31_21-52-32-a5b5558972587697e2e1776834b99e31/2/hls/AVC_640x360_90k_AAC-HE_64k/aa00b39a786479f524056c8be826d4580127.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/44559726/files/2022-10-31_21-52-32-a5b5558972587697e2e1776834b99e31/2/hls/AVC_768x432_225k_AAC-HE_64k/aa00b39a786479f524056c8be826d4580127.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/44559726/files/2022-10-31_21-52-32-a5b5558972587697e2e1776834b99e31/2/hls/AVC_1024x576_375k_AAC-HE_64k/aa00b39a786479f524056c8be826d4580127.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/44559726/files/2022-10-31_21-52-32-a5b5558972587697e2e1776834b99e31/2/hls/AVC_1280x720_600k_AAC-HE_64k/aa00b39a786479f524056c8be826d4580127.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/44559726/files/2022-10-31_21-52-32-a5b5558972587697e2e1776834b99e31/2/hls/AVC_1920x1080_1200k_AAC-HE_64k/aa00b39a786479f524056c8be826d4580127.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/44560868/files/2022-10-31_23-40-47-a8b3eda211736e683e861390c82c2f1d/2/aa0008f39ea243258227953bc199bf4a0710.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/44560868/files/2022-10-31_23-40-47-a8b3eda211736e683e861390c82c2f1d/2/hls/AVC_640x360_90k_AAC-HE_64k/aa0008f39ea243258227953bc199bf4a0710.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/44560868/files/2022-10-31_23-40-47-a8b3eda211736e683e861390c82c2f1d/2/hls/AVC_768x432_900k_AAC-HE_64k/aa0008f39ea243258227953bc199bf4a0710.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/44560868/files/2022-10-31_23-40-47-a8b3eda211736e683e861390c82c2f1d/2/hls/AVC_1024x576_1500k_AAC-HE_64k/aa0008f39ea243258227953bc199bf4a0710.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/44560868/files/2022-10-31_23-40-47-a8b3eda211736e683e861390c82c2f1d/2/hls/AVC_1280x720_2400k_AAC-HE_64k/aa0008f39ea243258227953bc199bf4a0710.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/44560868/files/2022-10-31_23-40-47-a8b3eda211736e683e861390c82c2f1d/2/hls/AVC_1920x1080_4800k_AAC-HE_64k/aa0008f39ea243258227953bc199bf4a0710.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/44607992/files/2022-11-02_22-23-20-03f933ec9ba1d963f7132e5fb8766744/2/aa00cfb078878b8c3f0cae9b7f41dbffc5d2.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/44607992/files/2022-11-02_22-23-20-03f933ec9ba1d963f7132e5fb8766744/2/hls/AVC_640x360_90k_AAC-HE_64k/aa00cfb078878b8c3f0cae9b7f41dbffc5d2.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/44607992/files/2022-11-02_22-23-20-03f933ec9ba1d963f7132e5fb8766744/2/hls/AVC_768x432_900k_AAC-HE_64k/aa00cfb078878b8c3f0cae9b7f41dbffc5d2.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/44607992/files/2022-11-02_22-23-20-03f933ec9ba1d963f7132e5fb8766744/2/hls/AVC_1024x576_1500k_AAC-HE_64k/aa00cfb078878b8c3f0cae9b7f41dbffc5d2.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/44607992/files/2022-11-02_22-23-20-03f933ec9ba1d963f7132e5fb8766744/2/hls/AVC_1280x720_2400k_AAC-HE_64k/aa00cfb078878b8c3f0cae9b7f41dbffc5d2.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/44607992/files/2022-11-02_22-23-20-03f933ec9ba1d963f7132e5fb8766744/2/hls/AVC_1920x1080_4800k_AAC-HE_64k/aa00cfb078878b8c3f0cae9b7f41dbffc5d2.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/44607636/files/2022-11-02_21-48-21-995ecce51b05b66fb8cfdfe190a7183c/2/aa00c2bd30f9ef22b1fe7373843109637245.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/44607636/files/2022-11-02_21-48-21-995ecce51b05b66fb8cfdfe190a7183c/2/hls/AVC_640x360_90k_AAC-HE_64k/aa00c2bd30f9ef22b1fe7373843109637245.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/44607636/files/2022-11-02_21-48-21-995ecce51b05b66fb8cfdfe190a7183c/2/hls/AVC_768x432_900k_AAC-HE_64k/aa00c2bd30f9ef22b1fe7373843109637245.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/44607636/files/2022-11-02_21-48-21-995ecce51b05b66fb8cfdfe190a7183c/2/hls/AVC_1024x576_1500k_AAC-HE_64k/aa00c2bd30f9ef22b1fe7373843109637245.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/44607636/files/2022-11-02_21-48-21-995ecce51b05b66fb8cfdfe190a7183c/2/hls/AVC_1280x720_2400k_AAC-HE_64k/aa00c2bd30f9ef22b1fe7373843109637245.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/44607636/files/2022-11-02_21-48-21-995ecce51b05b66fb8cfdfe190a7183c/2/hls/AVC_1920x1080_4800k_AAC-HE_64k/aa00c2bd30f9ef22b1fe7373843109637245.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/44607950/files/2022-11-02_22-20-18-14bf96e58fa9cb2603b123b153c50de9/2/aa0077d472a025f0afcc6c571e9928be34bb.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/44607950/files/2022-11-02_22-20-18-14bf96e58fa9cb2603b123b153c50de9/2/hls/AVC_640x360_90k_AAC-HE_64k/aa0077d472a025f0afcc6c571e9928be34bb.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/44607950/files/2022-11-02_22-20-18-14bf96e58fa9cb2603b123b153c50de9/2/hls/AVC_768x432_900k_AAC-HE_64k/aa0077d472a025f0afcc6c571e9928be34bb.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/44607950/files/2022-11-02_22-20-18-14bf96e58fa9cb2603b123b153c50de9/2/hls/AVC_1024x576_1500k_AAC-HE_64k/aa0077d472a025f0afcc6c571e9928be34bb.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/44607950/files/2022-11-02_22-20-18-14bf96e58fa9cb2603b123b153c50de9/2/hls/AVC_1280x720_2400k_AAC-HE_64k/aa0077d472a025f0afcc6c571e9928be34bb.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/44607950/files/2022-11-02_22-20-18-14bf96e58fa9cb2603b123b153c50de9/2/hls/AVC_1920x1080_4800k_AAC-HE_64k/aa0077d472a025f0afcc6c571e9928be34bb.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/44606124/files/2022-11-02_19-59-00-5294819a360b61ce7c2f371ee191a805/2/aa00280940b8b38720be31526c35ba35ece3.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/44606124/files/2022-11-02_19-59-00-5294819a360b61ce7c2f371ee191a805/2/hls/AVC_640x360_90k_AAC-HE_64k/aa00280940b8b38720be31526c35ba35ece3.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/44606124/files/2022-11-02_19-59-00-5294819a360b61ce7c2f371ee191a805/2/hls/AVC_768x432_150k_AAC-HE_64k/aa00280940b8b38720be31526c35ba35ece3.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/44606124/files/2022-11-02_19-59-00-5294819a360b61ce7c2f371ee191a805/2/hls/AVC_1024x576_250k_AAC-HE_64k/aa00280940b8b38720be31526c35ba35ece3.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/44606124/files/2022-11-02_19-59-00-5294819a360b61ce7c2f371ee191a805/2/hls/AVC_1280x720_400k_AAC-HE_64k/aa00280940b8b38720be31526c35ba35ece3.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/44606124/files/2022-11-02_19-59-00-5294819a360b61ce7c2f371ee191a805/2/hls/AVC_1920x1080_800k_AAC-HE_64k/aa00280940b8b38720be31526c35ba35ece3.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/44560544/files/2022-10-31_23-06-30-e6f23146a58d74f87f60389282b8ab86/2/aa0074089bc8d30bc9cbcedc6345494553a6.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/44560544/files/2022-10-31_23-06-30-e6f23146a58d74f87f60389282b8ab86/2/hls/AVC_640x360_90k_AAC-HE_64k/aa0074089bc8d30bc9cbcedc6345494553a6.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/44560544/files/2022-10-31_23-06-30-e6f23146a58d74f87f60389282b8ab86/2/hls/AVC_768x432_1200k_AAC-HE_64k/aa0074089bc8d30bc9cbcedc6345494553a6.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/44560544/files/2022-10-31_23-06-30-e6f23146a58d74f87f60389282b8ab86/2/hls/AVC_1024x576_2000k_AAC-HE_64k/aa0074089bc8d30bc9cbcedc6345494553a6.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/44560544/files/2022-10-31_23-06-30-e6f23146a58d74f87f60389282b8ab86/2/hls/AVC_1280x720_3200k_AAC-HE_64k/aa0074089bc8d30bc9cbcedc6345494553a6.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/44560544/files/2022-10-31_23-06-30-e6f23146a58d74f87f60389282b8ab86/2/hls/AVC_1920x1080_6400k_AAC-HE_64k/aa0074089bc8d30bc9cbcedc6345494553a6.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/64295193/files/2025-04-11_01-15-23-98161803fd36006c75dd6d81e3d6dfb0/2/aa00966766459332fb9d1a24e7cfb904d60a.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/64295193/files/2025-04-11_01-15-23-98161803fd36006c75dd6d81e3d6dfb0/2/hls/AVC_640x360_90k_AAC-HE_64k/aa00966766459332fb9d1a24e7cfb904d60a.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/64295193/files/2025-04-11_01-15-23-98161803fd36006c75dd6d81e3d6dfb0/2/hls/AVC_768x432_1200k_AAC-HE_64k/aa00966766459332fb9d1a24e7cfb904d60a.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/64295193/files/2025-04-11_01-15-23-98161803fd36006c75dd6d81e3d6dfb0/2/hls/AVC_1024x576_2000k_AAC-HE_64k/aa00966766459332fb9d1a24e7cfb904d60a.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/64295193/files/2025-04-11_01-15-23-98161803fd36006c75dd6d81e3d6dfb0/2/hls/AVC_1280x720_3200k_AAC-HE_64k/aa00966766459332fb9d1a24e7cfb904d60a.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/64295193/files/2025-04-11_01-15-23-98161803fd36006c75dd6d81e3d6dfb0/2/hls/AVC_1920x1080_6400k_AAC-HE_64k/aa00966766459332fb9d1a24e7cfb904d60a.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/44562684/files/2022-11-01_02-40-22-19f83ccebd762f132b74455b3f3e71c3/2/aa009172d8419b7720487168fe5af86baeb8.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/44562684/files/2022-11-01_02-40-22-19f83ccebd762f132b74455b3f3e71c3/2/hls/AVC_640x360_90k_AAC-HE_64k/aa009172d8419b7720487168fe5af86baeb8.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/44562684/files/2022-11-01_02-40-22-19f83ccebd762f132b74455b3f3e71c3/2/hls/AVC_768x432_300k_AAC-HE_64k/aa009172d8419b7720487168fe5af86baeb8.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/44562684/files/2022-11-01_02-40-22-19f83ccebd762f132b74455b3f3e71c3/2/hls/AVC_1024x576_500k_AAC-HE_64k/aa009172d8419b7720487168fe5af86baeb8.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/44562684/files/2022-11-01_02-40-22-19f83ccebd762f132b74455b3f3e71c3/2/hls/AVC_1280x720_800k_AAC-HE_64k/aa009172d8419b7720487168fe5af86baeb8.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/44562684/files/2022-11-01_02-40-22-19f83ccebd762f132b74455b3f3e71c3/2/hls/AVC_1920x1080_1600k_AAC-HE_64k/aa009172d8419b7720487168fe5af86baeb8.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/44563074/files/2022-11-01_03-07-52-9886859dd8891cbeac3f5c7e465b75de/2/aa00bc18268138f6962eb8c1724945e7d36a.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/44563074/files/2022-11-01_03-07-52-9886859dd8891cbeac3f5c7e465b75de/2/hls/AVC_640x360_90k_AAC-HE_64k/aa00bc18268138f6962eb8c1724945e7d36a.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/44563074/files/2022-11-01_03-07-52-9886859dd8891cbeac3f5c7e465b75de/2/hls/AVC_768x432_225k_AAC-HE_64k/aa00bc18268138f6962eb8c1724945e7d36a.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/44563074/files/2022-11-01_03-07-52-9886859dd8891cbeac3f5c7e465b75de/2/hls/AVC_1024x576_375k_AAC-HE_64k/aa00bc18268138f6962eb8c1724945e7d36a.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/44563074/files/2022-11-01_03-07-52-9886859dd8891cbeac3f5c7e465b75de/2/hls/AVC_1280x720_600k_AAC-HE_64k/aa00bc18268138f6962eb8c1724945e7d36a.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/44563074/files/2022-11-01_03-07-52-9886859dd8891cbeac3f5c7e465b75de/2/hls/AVC_1920x1080_1200k_AAC-HE_64k/aa00bc18268138f6962eb8c1724945e7d36a.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/44563560/files/2022-11-01_04-00-18-c8afa75ff91570f58433c4548182df76/2/aa0064514d3d6cac2b0f7bbacd0eb44b4dbe.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/44563560/files/2022-11-01_04-00-18-c8afa75ff91570f58433c4548182df76/2/hls/AVC_640x360_90k_AAC-HE_64k/aa0064514d3d6cac2b0f7bbacd0eb44b4dbe.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/44563560/files/2022-11-01_04-00-18-c8afa75ff91570f58433c4548182df76/2/hls/AVC_768x432_300k_AAC-HE_64k/aa0064514d3d6cac2b0f7bbacd0eb44b4dbe.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/44563560/files/2022-11-01_04-00-18-c8afa75ff91570f58433c4548182df76/2/hls/AVC_1024x576_500k_AAC-HE_64k/aa0064514d3d6cac2b0f7bbacd0eb44b4dbe.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/44563560/files/2022-11-01_04-00-18-c8afa75ff91570f58433c4548182df76/2/hls/AVC_1280x720_800k_AAC-HE_64k/aa0064514d3d6cac2b0f7bbacd0eb44b4dbe.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/44563560/files/2022-11-01_04-00-18-c8afa75ff91570f58433c4548182df76/2/hls/AVC_1920x1080_1600k_AAC-HE_64k/aa0064514d3d6cac2b0f7bbacd0eb44b4dbe.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/44585236/files/2022-11-01_22-52-51-00c4fff17b99cf263ced1f9b1fb6e673/2/aa00e909e3401817c385b86b4f8b545a5143.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/44585236/files/2022-11-01_22-52-51-00c4fff17b99cf263ced1f9b1fb6e673/2/hls/AVC_640x360_90k_AAC-HE_64k/aa00e909e3401817c385b86b4f8b545a5143.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/44585236/files/2022-11-01_22-52-51-00c4fff17b99cf263ced1f9b1fb6e673/2/hls/AVC_768x432_600k_AAC-HE_64k/aa00e909e3401817c385b86b4f8b545a5143.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/44585236/files/2022-11-01_22-52-51-00c4fff17b99cf263ced1f9b1fb6e673/2/hls/AVC_1024x576_1000k_AAC-HE_64k/aa00e909e3401817c385b86b4f8b545a5143.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/44585236/files/2022-11-01_22-52-51-00c4fff17b99cf263ced1f9b1fb6e673/2/hls/AVC_1280x720_1600k_AAC-HE_64k/aa00e909e3401817c385b86b4f8b545a5143.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/44585236/files/2022-11-01_22-52-51-00c4fff17b99cf263ced1f9b1fb6e673/2/hls/AVC_1920x1080_3200k_AAC-HE_64k/aa00e909e3401817c385b86b4f8b545a5143.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/44608068/files/2022-11-02_22-31-07-7c858a334ad83374b00b248b72f0108a/2/aa00e7045d34a85065b4a7b11212f44dbaaf.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/44608068/files/2022-11-02_22-31-07-7c858a334ad83374b00b248b72f0108a/2/hls/AVC_640x360_90k_AAC-HE_64k/aa00e7045d34a85065b4a7b11212f44dbaaf.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/44608068/files/2022-11-02_22-31-07-7c858a334ad83374b00b248b72f0108a/2/hls/AVC_768x432_1200k_AAC-HE_64k/aa00e7045d34a85065b4a7b11212f44dbaaf.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/44608068/files/2022-11-02_22-31-07-7c858a334ad83374b00b248b72f0108a/2/hls/AVC_1024x576_2000k_AAC-HE_64k/aa00e7045d34a85065b4a7b11212f44dbaaf.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/44608068/files/2022-11-02_22-31-07-7c858a334ad83374b00b248b72f0108a/2/hls/AVC_1280x720_3200k_AAC-HE_64k/aa00e7045d34a85065b4a7b11212f44dbaaf.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/44608068/files/2022-11-02_22-31-07-7c858a334ad83374b00b248b72f0108a/2/hls/AVC_1920x1080_6400k_AAC-HE_64k/aa00e7045d34a85065b4a7b11212f44dbaaf.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/44585534/files/2022-11-01_23-11-15-df6931f4560fd86b997c94d4b76f71bb/2/aa00d70acd637002ca088525eed5708b83ee.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/44585534/files/2022-11-01_23-11-15-df6931f4560fd86b997c94d4b76f71bb/2/hls/AVC_640x360_90k_AAC-HE_64k/aa00d70acd637002ca088525eed5708b83ee.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/44585534/files/2022-11-01_23-11-15-df6931f4560fd86b997c94d4b76f71bb/2/hls/AVC_768x432_600k_AAC-HE_64k/aa00d70acd637002ca088525eed5708b83ee.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/44585534/files/2022-11-01_23-11-15-df6931f4560fd86b997c94d4b76f71bb/2/hls/AVC_1024x576_1000k_AAC-HE_64k/aa00d70acd637002ca088525eed5708b83ee.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/44585534/files/2022-11-01_23-11-15-df6931f4560fd86b997c94d4b76f71bb/2/hls/AVC_1280x720_1600k_AAC-HE_64k/aa00d70acd637002ca088525eed5708b83ee.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/44585534/files/2022-11-01_23-11-15-df6931f4560fd86b997c94d4b76f71bb/2/hls/AVC_1920x1080_3200k_AAC-HE_64k/aa00d70acd637002ca088525eed5708b83ee.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/44585744/files/2022-11-01_23-30-15-dd53fc575dbc9e7081b5033f991a2ca0/2/aa008756461bbae8435a3ae129cbd4972b49.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/44585744/files/2022-11-01_23-30-15-dd53fc575dbc9e7081b5033f991a2ca0/2/hls/AVC_640x360_90k_AAC-HE_64k/aa008756461bbae8435a3ae129cbd4972b49.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/44585744/files/2022-11-01_23-30-15-dd53fc575dbc9e7081b5033f991a2ca0/2/hls/AVC_768x432_150k_AAC-HE_64k/aa008756461bbae8435a3ae129cbd4972b49.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/44585744/files/2022-11-01_23-30-15-dd53fc575dbc9e7081b5033f991a2ca0/2/hls/AVC_1024x576_250k_AAC-HE_64k/aa008756461bbae8435a3ae129cbd4972b49.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/44585744/files/2022-11-01_23-30-15-dd53fc575dbc9e7081b5033f991a2ca0/2/hls/AVC_1280x720_400k_AAC-HE_64k/aa008756461bbae8435a3ae129cbd4972b49.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/44585744/files/2022-11-01_23-30-15-dd53fc575dbc9e7081b5033f991a2ca0/2/hls/AVC_1920x1080_800k_AAC-HE_64k/aa008756461bbae8435a3ae129cbd4972b49.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/44585912/files/2022-11-01_23-41-56-6e0f4b2d01d61cbab81ba0e26aacc7d1/2/aa00d0787c2f0ed6422d55285e99f4e3672e.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/44585912/files/2022-11-01_23-41-56-6e0f4b2d01d61cbab81ba0e26aacc7d1/2/hls/AVC_640x360_90k_AAC-HE_64k/aa00d0787c2f0ed6422d55285e99f4e3672e.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/44585912/files/2022-11-01_23-41-56-6e0f4b2d01d61cbab81ba0e26aacc7d1/2/hls/AVC_768x432_150k_AAC-HE_64k/aa00d0787c2f0ed6422d55285e99f4e3672e.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/44585912/files/2022-11-01_23-41-56-6e0f4b2d01d61cbab81ba0e26aacc7d1/2/hls/AVC_1024x576_250k_AAC-HE_64k/aa00d0787c2f0ed6422d55285e99f4e3672e.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/44585912/files/2022-11-01_23-41-56-6e0f4b2d01d61cbab81ba0e26aacc7d1/2/hls/AVC_1280x720_400k_AAC-HE_64k/aa00d0787c2f0ed6422d55285e99f4e3672e.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/44585912/files/2022-11-01_23-41-56-6e0f4b2d01d61cbab81ba0e26aacc7d1/2/hls/AVC_1920x1080_800k_AAC-HE_64k/aa00d0787c2f0ed6422d55285e99f4e3672e.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/44585906/files/2022-11-01_23-41-46-308278fe1ff931d1861987ccd46353b0/2/aa00a75b04b76b84da042b6f140e5b5aebb5.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/44585906/files/2022-11-01_23-41-46-308278fe1ff931d1861987ccd46353b0/2/hls/AVC_640x360_90k_AAC-HE_64k/aa00a75b04b76b84da042b6f140e5b5aebb5.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/44585906/files/2022-11-01_23-41-46-308278fe1ff931d1861987ccd46353b0/2/hls/AVC_768x432_150k_AAC-HE_64k/aa00a75b04b76b84da042b6f140e5b5aebb5.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/44585906/files/2022-11-01_23-41-46-308278fe1ff931d1861987ccd46353b0/2/hls/AVC_1024x576_250k_AAC-HE_64k/aa00a75b04b76b84da042b6f140e5b5aebb5.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/44585906/files/2022-11-01_23-41-46-308278fe1ff931d1861987ccd46353b0/2/hls/AVC_1280x720_400k_AAC-HE_64k/aa00a75b04b76b84da042b6f140e5b5aebb5.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/44585906/files/2022-11-01_23-41-46-308278fe1ff931d1861987ccd46353b0/2/hls/AVC_1920x1080_800k_AAC-HE_64k/aa00a75b04b76b84da042b6f140e5b5aebb5.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/44585972/files/2022-11-01_23-45-56-13df647acdc78b60f3d319f53b7958a8/2/aa0065f974ff2a07becdeebfa9d0058c8d5b.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/44585972/files/2022-11-01_23-45-56-13df647acdc78b60f3d319f53b7958a8/2/hls/AVC_640x360_90k_AAC-HE_64k/aa0065f974ff2a07becdeebfa9d0058c8d5b.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/44585972/files/2022-11-01_23-45-56-13df647acdc78b60f3d319f53b7958a8/2/hls/AVC_768x432_225k_AAC-HE_64k/aa0065f974ff2a07becdeebfa9d0058c8d5b.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/44585972/files/2022-11-01_23-45-56-13df647acdc78b60f3d319f53b7958a8/2/hls/AVC_1024x576_375k_AAC-HE_64k/aa0065f974ff2a07becdeebfa9d0058c8d5b.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/44585972/files/2022-11-01_23-45-56-13df647acdc78b60f3d319f53b7958a8/2/hls/AVC_1280x720_600k_AAC-HE_64k/aa0065f974ff2a07becdeebfa9d0058c8d5b.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/44585972/files/2022-11-01_23-45-56-13df647acdc78b60f3d319f53b7958a8/2/hls/AVC_1920x1080_1200k_AAC-HE_64k/aa0065f974ff2a07becdeebfa9d0058c8d5b.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/44586008/files/2022-11-01_23-50-17-dac599b35c21180ba9cdc4c24a30818d/2/aa00963591425fa5b8f2d90d2081bb387e92.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/44586008/files/2022-11-01_23-50-17-dac599b35c21180ba9cdc4c24a30818d/2/hls/AVC_640x360_90k_AAC-HE_64k/aa00963591425fa5b8f2d90d2081bb387e92.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/44586008/files/2022-11-01_23-50-17-dac599b35c21180ba9cdc4c24a30818d/2/hls/AVC_768x432_150k_AAC-HE_64k/aa00963591425fa5b8f2d90d2081bb387e92.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/44586008/files/2022-11-01_23-50-17-dac599b35c21180ba9cdc4c24a30818d/2/hls/AVC_1024x576_250k_AAC-HE_64k/aa00963591425fa5b8f2d90d2081bb387e92.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/44586008/files/2022-11-01_23-50-17-dac599b35c21180ba9cdc4c24a30818d/2/hls/AVC_1280x720_400k_AAC-HE_64k/aa00963591425fa5b8f2d90d2081bb387e92.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/44586008/files/2022-11-01_23-50-17-dac599b35c21180ba9cdc4c24a30818d/2/hls/AVC_1920x1080_800k_AAC-HE_64k/aa00963591425fa5b8f2d90d2081bb387e92.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/44586040/files/2022-11-01_23-54-04-85dc137a495889b067c28a09d5595e86/2/aa00a1d1118a2c2edae82f7b5c52d74de140.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/44586040/files/2022-11-01_23-54-04-85dc137a495889b067c28a09d5595e86/2/hls/AVC_640x360_90k_AAC-HE_64k/aa00a1d1118a2c2edae82f7b5c52d74de140.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/44586040/files/2022-11-01_23-54-04-85dc137a495889b067c28a09d5595e86/2/hls/AVC_768x432_150k_AAC-HE_64k/aa00a1d1118a2c2edae82f7b5c52d74de140.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/44586040/files/2022-11-01_23-54-04-85dc137a495889b067c28a09d5595e86/2/hls/AVC_1024x576_250k_AAC-HE_64k/aa00a1d1118a2c2edae82f7b5c52d74de140.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/44586040/files/2022-11-01_23-54-04-85dc137a495889b067c28a09d5595e86/2/hls/AVC_1280x720_400k_AAC-HE_64k/aa00a1d1118a2c2edae82f7b5c52d74de140.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/44586040/files/2022-11-01_23-54-04-85dc137a495889b067c28a09d5595e86/2/hls/AVC_1920x1080_800k_AAC-HE_64k/aa00a1d1118a2c2edae82f7b5c52d74de140.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/44586188/files/2022-11-02_00-07-32-5d9915f971b731946cd175187b01f6f5/2/aa003d0773f3d106c064d5d0779d1c41e8cd.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/44586188/files/2022-11-02_00-07-32-5d9915f971b731946cd175187b01f6f5/2/hls/AVC_640x360_90k_AAC-HE_64k/aa003d0773f3d106c064d5d0779d1c41e8cd.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/44586188/files/2022-11-02_00-07-32-5d9915f971b731946cd175187b01f6f5/2/hls/AVC_768x432_600k_AAC-HE_64k/aa003d0773f3d106c064d5d0779d1c41e8cd.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/44586188/files/2022-11-02_00-07-32-5d9915f971b731946cd175187b01f6f5/2/hls/AVC_1024x576_1000k_AAC-HE_64k/aa003d0773f3d106c064d5d0779d1c41e8cd.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/44586188/files/2022-11-02_00-07-32-5d9915f971b731946cd175187b01f6f5/2/hls/AVC_1280x720_1600k_AAC-HE_64k/aa003d0773f3d106c064d5d0779d1c41e8cd.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/44586188/files/2022-11-02_00-07-32-5d9915f971b731946cd175187b01f6f5/2/hls/AVC_1920x1080_3200k_AAC-HE_64k/aa003d0773f3d106c064d5d0779d1c41e8cd.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/44597198/files/2022-11-02_12-48-25-c19278296319c0370ffb584c48753d07/2/aa00ba63c0b917a54391433e9514fb7d4dac.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/44597198/files/2022-11-02_12-48-25-c19278296319c0370ffb584c48753d07/2/hls/AVC_640x360_90k_AAC-HE_64k/aa00ba63c0b917a54391433e9514fb7d4dac.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/44597198/files/2022-11-02_12-48-25-c19278296319c0370ffb584c48753d07/2/hls/AVC_768x432_300k_AAC-HE_64k/aa00ba63c0b917a54391433e9514fb7d4dac.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/44597198/files/2022-11-02_12-48-25-c19278296319c0370ffb584c48753d07/2/hls/AVC_1024x576_500k_AAC-HE_64k/aa00ba63c0b917a54391433e9514fb7d4dac.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/44597198/files/2022-11-02_12-48-25-c19278296319c0370ffb584c48753d07/2/hls/AVC_1280x720_800k_AAC-HE_64k/aa00ba63c0b917a54391433e9514fb7d4dac.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/44597198/files/2022-11-02_12-48-25-c19278296319c0370ffb584c48753d07/2/hls/AVC_1920x1080_1600k_AAC-HE_64k/aa00ba63c0b917a54391433e9514fb7d4dac.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/44601836/files/2022-11-02_16-10-30-8f7c6b5efeb79cceed76eb9e7ab65a46/2/aa00ee2a72ea8ac83ca3a3c5c6139b0cd7db.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/44601836/files/2022-11-02_16-10-30-8f7c6b5efeb79cceed76eb9e7ab65a46/2/hls/AVC_640x360_90k_AAC-HE_64k/aa00ee2a72ea8ac83ca3a3c5c6139b0cd7db.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/44601836/files/2022-11-02_16-10-30-8f7c6b5efeb79cceed76eb9e7ab65a46/2/hls/AVC_768x432_600k_AAC-HE_64k/aa00ee2a72ea8ac83ca3a3c5c6139b0cd7db.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/44601836/files/2022-11-02_16-10-30-8f7c6b5efeb79cceed76eb9e7ab65a46/2/hls/AVC_1024x576_1000k_AAC-HE_64k/aa00ee2a72ea8ac83ca3a3c5c6139b0cd7db.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/44601836/files/2022-11-02_16-10-30-8f7c6b5efeb79cceed76eb9e7ab65a46/2/hls/AVC_1280x720_1600k_AAC-HE_64k/aa00ee2a72ea8ac83ca3a3c5c6139b0cd7db.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/44601836/files/2022-11-02_16-10-30-8f7c6b5efeb79cceed76eb9e7ab65a46/2/hls/AVC_1920x1080_3200k_AAC-HE_64k/aa00ee2a72ea8ac83ca3a3c5c6139b0cd7db.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/44603444/files/2022-11-02_17-07-13-02faf13f552f7f95100ede2c6ff203a8/2/aa008d67e2717ab2286b693b6f3416ef6361.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/44603444/files/2022-11-02_17-07-13-02faf13f552f7f95100ede2c6ff203a8/2/hls/AVC_640x360_90k_AAC-HE_64k/aa008d67e2717ab2286b693b6f3416ef6361.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/44603444/files/2022-11-02_17-07-13-02faf13f552f7f95100ede2c6ff203a8/2/hls/AVC_768x432_225k_AAC-HE_64k/aa008d67e2717ab2286b693b6f3416ef6361.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/44603444/files/2022-11-02_17-07-13-02faf13f552f7f95100ede2c6ff203a8/2/hls/AVC_1024x576_375k_AAC-HE_64k/aa008d67e2717ab2286b693b6f3416ef6361.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/44603444/files/2022-11-02_17-07-13-02faf13f552f7f95100ede2c6ff203a8/2/hls/AVC_1280x720_600k_AAC-HE_64k/aa008d67e2717ab2286b693b6f3416ef6361.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/44603444/files/2022-11-02_17-07-13-02faf13f552f7f95100ede2c6ff203a8/2/hls/AVC_1920x1080_1200k_AAC-HE_64k/aa008d67e2717ab2286b693b6f3416ef6361.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/44603560/files/2022-11-02_17-12-36-68c4cc462fc45bf2fee5b76872df0326/2/aa00a6a0adc76a702ae0e3a9dc392aa05656.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/44603560/files/2022-11-02_17-12-36-68c4cc462fc45bf2fee5b76872df0326/2/hls/AVC_640x360_90k_AAC-HE_64k/aa00a6a0adc76a702ae0e3a9dc392aa05656.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/44603560/files/2022-11-02_17-12-36-68c4cc462fc45bf2fee5b76872df0326/2/hls/AVC_768x432_600k_AAC-HE_64k/aa00a6a0adc76a702ae0e3a9dc392aa05656.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/44603560/files/2022-11-02_17-12-36-68c4cc462fc45bf2fee5b76872df0326/2/hls/AVC_1024x576_1000k_AAC-HE_64k/aa00a6a0adc76a702ae0e3a9dc392aa05656.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/44603560/files/2022-11-02_17-12-36-68c4cc462fc45bf2fee5b76872df0326/2/hls/AVC_1280x720_1600k_AAC-HE_64k/aa00a6a0adc76a702ae0e3a9dc392aa05656.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/44603560/files/2022-11-02_17-12-36-68c4cc462fc45bf2fee5b76872df0326/2/hls/AVC_1920x1080_3200k_AAC-HE_64k/aa00a6a0adc76a702ae0e3a9dc392aa05656.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/44603620/files/2022-11-02_17-18-10-2312891194733f6cba14a25954a5dd60/2/aa00871ebbbe08c44cc15d0ab46aad8dfbd6.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/44603620/files/2022-11-02_17-18-10-2312891194733f6cba14a25954a5dd60/2/hls/AVC_640x360_90k_AAC-HE_64k/aa00871ebbbe08c44cc15d0ab46aad8dfbd6.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/44603620/files/2022-11-02_17-18-10-2312891194733f6cba14a25954a5dd60/2/hls/AVC_768x432_150k_AAC-HE_64k/aa00871ebbbe08c44cc15d0ab46aad8dfbd6.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/44603620/files/2022-11-02_17-18-10-2312891194733f6cba14a25954a5dd60/2/hls/AVC_1024x576_250k_AAC-HE_64k/aa00871ebbbe08c44cc15d0ab46aad8dfbd6.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/44603620/files/2022-11-02_17-18-10-2312891194733f6cba14a25954a5dd60/2/hls/AVC_1280x720_400k_AAC-HE_64k/aa00871ebbbe08c44cc15d0ab46aad8dfbd6.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/44603620/files/2022-11-02_17-18-10-2312891194733f6cba14a25954a5dd60/2/hls/AVC_1920x1080_800k_AAC-HE_64k/aa00871ebbbe08c44cc15d0ab46aad8dfbd6.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/44603784/files/2022-11-02_17-26-05-d5d1231e89e86d6d7416c92c582117ec/2/aa000f00b46e0589ce79134147d2dd8e213d.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/44603784/files/2022-11-02_17-26-05-d5d1231e89e86d6d7416c92c582117ec/2/hls/AVC_640x360_90k_AAC-HE_64k/aa000f00b46e0589ce79134147d2dd8e213d.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/44603784/files/2022-11-02_17-26-05-d5d1231e89e86d6d7416c92c582117ec/2/hls/AVC_768x432_150k_AAC-HE_64k/aa000f00b46e0589ce79134147d2dd8e213d.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/44603784/files/2022-11-02_17-26-05-d5d1231e89e86d6d7416c92c582117ec/2/hls/AVC_1024x576_250k_AAC-HE_64k/aa000f00b46e0589ce79134147d2dd8e213d.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/44603784/files/2022-11-02_17-26-05-d5d1231e89e86d6d7416c92c582117ec/2/hls/AVC_1280x720_400k_AAC-HE_64k/aa000f00b46e0589ce79134147d2dd8e213d.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/44603784/files/2022-11-02_17-26-05-d5d1231e89e86d6d7416c92c582117ec/2/hls/AVC_1920x1080_800k_AAC-HE_64k/aa000f00b46e0589ce79134147d2dd8e213d.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/44603894/files/2022-11-02_17-32-09-28d0366b50dd70827bdc0f3f325c5351/2/aa0083129e718b41a9ce259c00ffbc221074.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/44603894/files/2022-11-02_17-32-09-28d0366b50dd70827bdc0f3f325c5351/2/hls/AVC_640x360_90k_AAC-HE_64k/aa0083129e718b41a9ce259c00ffbc221074.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/44603894/files/2022-11-02_17-32-09-28d0366b50dd70827bdc0f3f325c5351/2/hls/AVC_768x432_225k_AAC-HE_64k/aa0083129e718b41a9ce259c00ffbc221074.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/44603894/files/2022-11-02_17-32-09-28d0366b50dd70827bdc0f3f325c5351/2/hls/AVC_1024x576_375k_AAC-HE_64k/aa0083129e718b41a9ce259c00ffbc221074.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/44603894/files/2022-11-02_17-32-09-28d0366b50dd70827bdc0f3f325c5351/2/hls/AVC_1280x720_600k_AAC-HE_64k/aa0083129e718b41a9ce259c00ffbc221074.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/44603894/files/2022-11-02_17-32-09-28d0366b50dd70827bdc0f3f325c5351/2/hls/AVC_1920x1080_1200k_AAC-HE_64k/aa0083129e718b41a9ce259c00ffbc221074.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/44603960/files/2022-11-02_17-36-36-eaa4ea147fc9973005f833d81249d2ee/2/aa005ecec2a39bbefd26032c8fd1af927d1a.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/44603960/files/2022-11-02_17-36-36-eaa4ea147fc9973005f833d81249d2ee/2/hls/AVC_640x360_90k_AAC-HE_64k/aa005ecec2a39bbefd26032c8fd1af927d1a.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/44603960/files/2022-11-02_17-36-36-eaa4ea147fc9973005f833d81249d2ee/2/hls/AVC_768x432_150k_AAC-HE_64k/aa005ecec2a39bbefd26032c8fd1af927d1a.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/44603960/files/2022-11-02_17-36-36-eaa4ea147fc9973005f833d81249d2ee/2/hls/AVC_1024x576_250k_AAC-HE_64k/aa005ecec2a39bbefd26032c8fd1af927d1a.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/44603960/files/2022-11-02_17-36-36-eaa4ea147fc9973005f833d81249d2ee/2/hls/AVC_1280x720_400k_AAC-HE_64k/aa005ecec2a39bbefd26032c8fd1af927d1a.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/44603960/files/2022-11-02_17-36-36-eaa4ea147fc9973005f833d81249d2ee/2/hls/AVC_1920x1080_800k_AAC-HE_64k/aa005ecec2a39bbefd26032c8fd1af927d1a.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/44604358/files/2022-11-02_17-51-43-4bf59245a20d5626e6ab49133bba4250/2/aa0045eb0d01a89640356b1c47b47201a8f3.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/44604358/files/2022-11-02_17-51-43-4bf59245a20d5626e6ab49133bba4250/2/hls/AVC_640x360_90k_AAC-HE_64k/aa0045eb0d01a89640356b1c47b47201a8f3.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/44604358/files/2022-11-02_17-51-43-4bf59245a20d5626e6ab49133bba4250/2/hls/AVC_768x432_150k_AAC-HE_64k/aa0045eb0d01a89640356b1c47b47201a8f3.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/44604358/files/2022-11-02_17-51-43-4bf59245a20d5626e6ab49133bba4250/2/hls/AVC_1024x576_250k_AAC-HE_64k/aa0045eb0d01a89640356b1c47b47201a8f3.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/44604358/files/2022-11-02_17-51-43-4bf59245a20d5626e6ab49133bba4250/2/hls/AVC_1280x720_400k_AAC-HE_64k/aa0045eb0d01a89640356b1c47b47201a8f3.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/44604358/files/2022-11-02_17-51-43-4bf59245a20d5626e6ab49133bba4250/2/hls/AVC_1920x1080_800k_AAC-HE_64k/aa0045eb0d01a89640356b1c47b47201a8f3.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/44604530/files/2022-11-02_18-01-35-e5f764da9fbe48104094bc77866cfdff/2/aa009a0504e8b8da8420a7964f4d829bee7a.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/44604530/files/2022-11-02_18-01-35-e5f764da9fbe48104094bc77866cfdff/2/hls/AVC_640x360_90k_AAC-HE_64k/aa009a0504e8b8da8420a7964f4d829bee7a.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/44604530/files/2022-11-02_18-01-35-e5f764da9fbe48104094bc77866cfdff/2/hls/AVC_768x432_150k_AAC-HE_64k/aa009a0504e8b8da8420a7964f4d829bee7a.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/44604530/files/2022-11-02_18-01-35-e5f764da9fbe48104094bc77866cfdff/2/hls/AVC_1024x576_250k_AAC-HE_64k/aa009a0504e8b8da8420a7964f4d829bee7a.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/44604530/files/2022-11-02_18-01-35-e5f764da9fbe48104094bc77866cfdff/2/hls/AVC_1280x720_400k_AAC-HE_64k/aa009a0504e8b8da8420a7964f4d829bee7a.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/44604530/files/2022-11-02_18-01-35-e5f764da9fbe48104094bc77866cfdff/2/hls/AVC_1920x1080_800k_AAC-HE_64k/aa009a0504e8b8da8420a7964f4d829bee7a.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/44603176/files/2022-11-02_16-57-42-ae07d9a3cba48419a9f83b3a8c1515c3/2/aa0019a28af74c529b970988f2f6c194e674.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/44603176/files/2022-11-02_16-57-42-ae07d9a3cba48419a9f83b3a8c1515c3/2/hls/AVC_640x360_90k_AAC-HE_64k/aa0019a28af74c529b970988f2f6c194e674.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/44603176/files/2022-11-02_16-57-42-ae07d9a3cba48419a9f83b3a8c1515c3/2/hls/AVC_768x432_1200k_AAC-HE_64k/aa0019a28af74c529b970988f2f6c194e674.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/44603176/files/2022-11-02_16-57-42-ae07d9a3cba48419a9f83b3a8c1515c3/2/hls/AVC_1024x576_2000k_AAC-HE_64k/aa0019a28af74c529b970988f2f6c194e674.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/44603176/files/2022-11-02_16-57-42-ae07d9a3cba48419a9f83b3a8c1515c3/2/hls/AVC_1280x720_3200k_AAC-HE_64k/aa0019a28af74c529b970988f2f6c194e674.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/44603176/files/2022-11-02_16-57-42-ae07d9a3cba48419a9f83b3a8c1515c3/2/hls/AVC_1920x1080_6400k_AAC-HE_64k/aa0019a28af74c529b970988f2f6c194e674.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/44563666/files/2022-11-01_04-12-46-26faf08fd6c050c678ec355f2112a7ef/2/aa00862f5c53884a7593af04e82e8b1e5f5d.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/44563666/files/2022-11-01_04-12-46-26faf08fd6c050c678ec355f2112a7ef/2/hls/AVC_640x360_90k_AAC-HE_64k/aa00862f5c53884a7593af04e82e8b1e5f5d.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/44563666/files/2022-11-01_04-12-46-26faf08fd6c050c678ec355f2112a7ef/2/hls/AVC_768x432_900k_AAC-HE_64k/aa00862f5c53884a7593af04e82e8b1e5f5d.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/44563666/files/2022-11-01_04-12-46-26faf08fd6c050c678ec355f2112a7ef/2/hls/AVC_1024x576_1500k_AAC-HE_64k/aa00862f5c53884a7593af04e82e8b1e5f5d.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/44563666/files/2022-11-01_04-12-46-26faf08fd6c050c678ec355f2112a7ef/2/hls/AVC_1280x720_2400k_AAC-HE_64k/aa00862f5c53884a7593af04e82e8b1e5f5d.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/44563666/files/2022-11-01_04-12-46-26faf08fd6c050c678ec355f2112a7ef/2/hls/AVC_1920x1080_4800k_AAC-HE_64k/aa00862f5c53884a7593af04e82e8b1e5f5d.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/44599180/files/2022-11-02_13-55-15-118600567acc46395f6d9b5b751e630c/2/aa00d40430eb1720621e01260e99f388dde6.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/44599180/files/2022-11-02_13-55-15-118600567acc46395f6d9b5b751e630c/2/hls/AVC_640x360_90k_AAC-HE_64k/aa00d40430eb1720621e01260e99f388dde6.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/44599180/files/2022-11-02_13-55-15-118600567acc46395f6d9b5b751e630c/2/hls/AVC_768x432_600k_AAC-HE_64k/aa00d40430eb1720621e01260e99f388dde6.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/44599180/files/2022-11-02_13-55-15-118600567acc46395f6d9b5b751e630c/2/hls/AVC_1024x576_1000k_AAC-HE_64k/aa00d40430eb1720621e01260e99f388dde6.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/44599180/files/2022-11-02_13-55-15-118600567acc46395f6d9b5b751e630c/2/hls/AVC_1280x720_1600k_AAC-HE_64k/aa00d40430eb1720621e01260e99f388dde6.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/44599180/files/2022-11-02_13-55-15-118600567acc46395f6d9b5b751e630c/2/hls/AVC_1920x1080_3200k_AAC-HE_64k/aa00d40430eb1720621e01260e99f388dde6.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/64017651/files/2025-03-30_09-41-27-ae1cc2781f470a3b481b064918371347/2/aa008f38e06a161346d4bdf921c219f6d7ec.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/64017651/files/2025-03-30_09-41-27-ae1cc2781f470a3b481b064918371347/2/hls/AVC_640x360_90k_AAC-HE_64k/aa008f38e06a161346d4bdf921c219f6d7ec.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/64017651/files/2025-03-30_09-41-27-ae1cc2781f470a3b481b064918371347/2/hls/AVC_768x432_150k_AAC-HE_64k/aa008f38e06a161346d4bdf921c219f6d7ec.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/64017651/files/2025-03-30_09-41-27-ae1cc2781f470a3b481b064918371347/2/hls/AVC_1024x576_250k_AAC-HE_64k/aa008f38e06a161346d4bdf921c219f6d7ec.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/64017651/files/2025-03-30_09-41-27-ae1cc2781f470a3b481b064918371347/2/hls/AVC_1280x720_400k_AAC-HE_64k/aa008f38e06a161346d4bdf921c219f6d7ec.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/64017651/files/2025-03-30_09-41-27-ae1cc2781f470a3b481b064918371347/2/hls/AVC_1920x1080_800k_AAC-HE_64k/aa008f38e06a161346d4bdf921c219f6d7ec.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/46283610/files/2023-01-23_18-22-16-ff805cf8e05d5d71cd24c9195085d45b/2/aa00e5fdeee6a8daff4d547c1aa06aa0c3d0.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/46283610/files/2023-01-23_18-22-16-ff805cf8e05d5d71cd24c9195085d45b/2/hls/AVC_640x360_90k_AAC-HE_64k/aa00e5fdeee6a8daff4d547c1aa06aa0c3d0.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/46283610/files/2023-01-23_18-22-16-ff805cf8e05d5d71cd24c9195085d45b/2/hls/AVC_768x432_900k_AAC-HE_64k/aa00e5fdeee6a8daff4d547c1aa06aa0c3d0.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/46283610/files/2023-01-23_18-22-16-ff805cf8e05d5d71cd24c9195085d45b/2/hls/AVC_1024x576_1500k_AAC-HE_64k/aa00e5fdeee6a8daff4d547c1aa06aa0c3d0.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/46283610/files/2023-01-23_18-22-16-ff805cf8e05d5d71cd24c9195085d45b/2/hls/AVC_1280x720_2400k_AAC-HE_64k/aa00e5fdeee6a8daff4d547c1aa06aa0c3d0.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/46283610/files/2023-01-23_18-22-16-ff805cf8e05d5d71cd24c9195085d45b/2/hls/AVC_1920x1080_4800k_AAC-HE_64k/aa00e5fdeee6a8daff4d547c1aa06aa0c3d0.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/54607818/files/2024-02-12_17-51-38-4d14bfbb50a84120978f1b3a4bf0f579/2/aa0063e539f0775b835bd4d14316f39c3dac.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/54607818/files/2024-02-12_17-51-38-4d14bfbb50a84120978f1b3a4bf0f579/2/hls/AVC_640x360_90k_AAC-HE_64k/aa0063e539f0775b835bd4d14316f39c3dac.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/54607818/files/2024-02-12_17-51-38-4d14bfbb50a84120978f1b3a4bf0f579/2/hls/AVC_768x432_900k_AAC-HE_64k/aa0063e539f0775b835bd4d14316f39c3dac.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/54607818/files/2024-02-12_17-51-38-4d14bfbb50a84120978f1b3a4bf0f579/2/hls/AVC_1024x576_1500k_AAC-HE_64k/aa0063e539f0775b835bd4d14316f39c3dac.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/54607818/files/2024-02-12_17-51-38-4d14bfbb50a84120978f1b3a4bf0f579/2/hls/AVC_1280x720_2400k_AAC-HE_64k/aa0063e539f0775b835bd4d14316f39c3dac.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/54607818/files/2024-02-12_17-51-38-4d14bfbb50a84120978f1b3a4bf0f579/2/hls/AVC_1920x1080_4800k_AAC-HE_64k/aa0063e539f0775b835bd4d14316f39c3dac.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/56561878/files/2024-05-13_19-07-18-06f2245e5058792f1283e42eb3182b13/2/aa00d7fb713ab40f2c075336bec10582ebfc.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/56561878/files/2024-05-13_19-07-18-06f2245e5058792f1283e42eb3182b13/2/hls/AVC_640x360_90k_AAC-HE_64k/aa00d7fb713ab40f2c075336bec10582ebfc.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/56561878/files/2024-05-13_19-07-18-06f2245e5058792f1283e42eb3182b13/2/hls/AVC_768x432_1200k_AAC-HE_64k/aa00d7fb713ab40f2c075336bec10582ebfc.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/56561878/files/2024-05-13_19-07-18-06f2245e5058792f1283e42eb3182b13/2/hls/AVC_1024x576_2000k_AAC-HE_64k/aa00d7fb713ab40f2c075336bec10582ebfc.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/56561878/files/2024-05-13_19-07-18-06f2245e5058792f1283e42eb3182b13/2/hls/AVC_1280x720_3200k_AAC-HE_64k/aa00d7fb713ab40f2c075336bec10582ebfc.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/56561878/files/2024-05-13_19-07-18-06f2245e5058792f1283e42eb3182b13/2/hls/AVC_1920x1080_6400k_AAC-HE_64k/aa00d7fb713ab40f2c075336bec10582ebfc.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/62618407/files/2025-02-03_04-26-10-b9239ebc97cfdda524e95e44894b1661/2/aa00aef3f3b04f28300f829ebb63787dae04.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/62618407/files/2025-02-03_04-26-10-b9239ebc97cfdda524e95e44894b1661/2/hls/AVC_640x360_90k_AAC-HE_64k/aa00aef3f3b04f28300f829ebb63787dae04.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/62618407/files/2025-02-03_04-26-10-b9239ebc97cfdda524e95e44894b1661/2/hls/AVC_768x432_900k_AAC-HE_64k/aa00aef3f3b04f28300f829ebb63787dae04.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/62618407/files/2025-02-03_04-26-10-b9239ebc97cfdda524e95e44894b1661/2/hls/AVC_1024x576_1500k_AAC-HE_64k/aa00aef3f3b04f28300f829ebb63787dae04.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/62618407/files/2025-02-03_04-26-10-b9239ebc97cfdda524e95e44894b1661/2/hls/AVC_1280x720_2400k_AAC-HE_64k/aa00aef3f3b04f28300f829ebb63787dae04.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/62618407/files/2025-02-03_04-26-10-b9239ebc97cfdda524e95e44894b1661/2/hls/AVC_1920x1080_4800k_AAC-HE_64k/aa00aef3f3b04f28300f829ebb63787dae04.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/50550672/files/2023-08-07_03-30-24-00b08d58f453009f7f885aff6c2de921/2/aa0083a02c57caca1ecc6992ee2d629d6fc4.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/50550672/files/2023-08-07_03-30-24-00b08d58f453009f7f885aff6c2de921/2/hls/AVC_640x360_90k_AAC-HE_64k/aa0083a02c57caca1ecc6992ee2d629d6fc4.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/50550672/files/2023-08-07_03-30-24-00b08d58f453009f7f885aff6c2de921/2/hls/AVC_768x432_600k_AAC-HE_64k/aa0083a02c57caca1ecc6992ee2d629d6fc4.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/50550672/files/2023-08-07_03-30-24-00b08d58f453009f7f885aff6c2de921/2/hls/AVC_1024x576_1000k_AAC-HE_64k/aa0083a02c57caca1ecc6992ee2d629d6fc4.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/50550672/files/2023-08-07_03-30-24-00b08d58f453009f7f885aff6c2de921/2/hls/AVC_1280x720_1600k_AAC-HE_64k/aa0083a02c57caca1ecc6992ee2d629d6fc4.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/50550672/files/2023-08-07_03-30-24-00b08d58f453009f7f885aff6c2de921/2/hls/AVC_1920x1080_3200k_AAC-HE_64k/aa0083a02c57caca1ecc6992ee2d629d6fc4.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/59419813/files/2024-09-23_02-56-23-1e4bf6114e5459a8121096647242daf6/2/aa00fde9deececddb4195c1e16994daa5aa2.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/59419813/files/2024-09-23_02-56-23-1e4bf6114e5459a8121096647242daf6/2/hls/AVC_640x360_90k_AAC-HE_64k/aa00fde9deececddb4195c1e16994daa5aa2.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/59419813/files/2024-09-23_02-56-23-1e4bf6114e5459a8121096647242daf6/2/hls/AVC_768x432_600k_AAC-HE_64k/aa00fde9deececddb4195c1e16994daa5aa2.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/59419813/files/2024-09-23_02-56-23-1e4bf6114e5459a8121096647242daf6/2/hls/AVC_1024x576_1000k_AAC-HE_64k/aa00fde9deececddb4195c1e16994daa5aa2.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/59419813/files/2024-09-23_02-56-23-1e4bf6114e5459a8121096647242daf6/2/hls/AVC_1280x720_1600k_AAC-HE_64k/aa00fde9deececddb4195c1e16994daa5aa2.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/59419813/files/2024-09-23_02-56-23-1e4bf6114e5459a8121096647242daf6/2/hls/AVC_1920x1080_3200k_AAC-HE_64k/aa00fde9deececddb4195c1e16994daa5aa2.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ],
+ "https://example-portal.udemy.com/assets/65369637/files/2025-05-23_17-38-00-f80f034e6701ab4c23993e280adfb66a/2/aa0041495b136e60fe666259afc53e84a51d.m3u8?token=REDACTED&provider=cloudfront&v=1": [
+  {
+   "width": 640,
+   "height": 360,
+   "uri": "https://example-portal.udemy.com/assets/65369637/files/2025-05-23_17-38-00-f80f034e6701ab4c23993e280adfb66a/2/hls/AVC_640x360_90k_AAC-HE_64k/aa0041495b136e60fe666259afc53e84a51d.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 768,
+   "height": 432,
+   "uri": "https://example-portal.udemy.com/assets/65369637/files/2025-05-23_17-38-00-f80f034e6701ab4c23993e280adfb66a/2/hls/AVC_768x432_1200k_AAC-HE_64k/aa0041495b136e60fe666259afc53e84a51d.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1024,
+   "height": 576,
+   "uri": "https://example-portal.udemy.com/assets/65369637/files/2025-05-23_17-38-00-f80f034e6701ab4c23993e280adfb66a/2/hls/AVC_1024x576_2000k_AAC-HE_64k/aa0041495b136e60fe666259afc53e84a51d.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1280,
+   "height": 720,
+   "uri": "https://example-portal.udemy.com/assets/65369637/files/2025-05-23_17-38-00-f80f034e6701ab4c23993e280adfb66a/2/hls/AVC_1280x720_3200k_AAC-HE_64k/aa0041495b136e60fe666259afc53e84a51d.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  },
+  {
+   "width": 1920,
+   "height": 1080,
+   "uri": "https://example-portal.udemy.com/assets/65369637/files/2025-05-23_17-38-00-f80f034e6701ab4c23993e280adfb66a/2/hls/AVC_1920x1080_6400k_AAC-HE_64k/aa0041495b136e60fe666259afc53e84a51d.m3u8?provider=cloudfront&token=REDACTED&v=1"
+  }
+ ]
+}
