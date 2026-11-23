@@ -63,3 +63,14 @@ func (scanned *Library) Attachment(id string) (Attachment, bool) {
 	attachment, ok := scanned.attachments[id]
 	return attachment, ok
 }
+
+// KeyRenames maps the path keys of lectures that now have a Udemy id to that id key.
+func (scanned *Library) KeyRenames() map[string]string {
+	renames := map[string]string{}
+	for _, lecture := range scanned.lectures {
+		if lecture.PathKey != "" {
+			renames[lecture.PathKey] = lecture.Key
+		}
+	}
+	return renames
+}
