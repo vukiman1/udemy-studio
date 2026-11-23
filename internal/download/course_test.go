@@ -345,3 +345,24 @@ func TestYTDLPOutputKeepsAChapterNamedAfterMP4Files(t *testing.T) {
 		t.Errorf("yt-dlp output = %v, want %s", tools.hlsOutputs, want)
 	}
 }
+
+func TestCaptionLeftWithoutItsSRTIsConvertedWithoutDownloading(t *testing.T) {
+	plan := samplePlan()
+	plan.Chapters[0].Lectures = plan.Chapters[0].Lectures[:1]
+	plan.Chapters[0].Lectures[0].Assets = nil
+	outputDir := t.TempDir()
+	chapterDir := filepath.Join(outputDir, "backend-basics", "01 - Intro")
+	if err := os.MkdirAll(chapterDir, dirMode); err != nil {
+		t.Fatalf("mkdir: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(chapterDir, "001 Welcome_en.vtt"), []byte(vttBody), testFileMode); err != nil {
+		t.Fatalf("write vtt: %v", err)
+	}
+	tools := &fakeTools{}
+	if _, _, err := runCourse(t, t.Context(), plan, tools, outputDir); err != nil {
+		t.Fatalf("Course: %v", err)
+	}
+	if slices.Contains(tools.fetched, "001 Welcome_en.vtt") || !isFile(filepath.Join(chapterDir, "001 Welcome_en.srt")) {
+		t.Errorf("fetched %v; want the existing VTT converted to SRT without a download", tools.fetched)
+	}
+}
