@@ -1,0 +1,9 @@
+.info,
+.error {
+  padding: 24px;
+  margin: 0;
+}
+
+.error {
+  color: var(--danger);
+}

@@ -1,0 +1,93 @@
+.trigger {
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.trigger:hover,
+.trigger[data-open] {
+  background: rgb(255 255 255 / 15%);
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+}
+
+.popup {
+  display: grid;
+  min-width: 230px;
+  outline: none;
+  padding: 6px;
+  border-radius: 10px;
+  background: rgb(28 28 32 / 96%);
+  color: #fff;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 40%);
+  font-size: 0.9rem;
+}
+
+.content {
+  grid-area: 1 / 1;
+  display: grid;
+  align-content: start;
+  outline: none;
+}
+
+.content[data-child-open] {
+  visibility: hidden;
+}
+
+.item,
+.back {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  outline: none;
+}
+
+.item[data-highlighted],
+.back[data-highlighted] {
+  background: rgb(255 255 255 / 12%);
+}
+
+.back {
+  justify-content: flex-start;
+  gap: 6px;
+  font-weight: 600;
+  border-bottom: 1px solid rgb(255 255 255 / 12%);
+  border-radius: 6px 6px 0 0;
+  margin-bottom: 4px;
+}
+
+.value {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: rgb(255 255 255 / 70%);
+}
+
+.chevron {
+  width: 14px;
+  height: 14px;
+}
+
+.backChevron {
+  width: 14px;
+  height: 14px;
+  transform: scaleX(-1);
+}
+
+.indicator {
+  display: inline-grid;
+}

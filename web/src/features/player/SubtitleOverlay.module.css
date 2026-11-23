@@ -1,0 +1,29 @@
+.overlay {
+  position: absolute;
+  left: 50%;
+  bottom: var(--subtitle-offset, 8%);
+  transition: bottom 0.25s;
+  transform: translateX(-50%);
+  width: min(92%, 60em);
+  display: grid;
+  gap: 0.2em;
+  justify-items: center;
+  text-align: center;
+  pointer-events: none;
+  font-size: calc(clamp(14px, 2.4cqw, 30px) * var(--font-scale));
+}
+
+.primary,
+.secondary {
+  margin: 0;
+  padding: 0.1em 0.45em;
+  border-radius: 0.25em;
+  background: rgb(0 0 0 / 72%);
+  color: #fff;
+  line-height: 1.35;
+}
+
+.secondary {
+  font-size: 0.82em;
+  color: #e6e6e6;
+}
