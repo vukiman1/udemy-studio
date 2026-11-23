@@ -106,11 +106,11 @@ tasks:
       - pnpm dev
 
   fixtures:udemy:
-    desc: Sanitize the Python oracle's saved/ output into testdata/
+    desc: Sanitize the Python oracle's saved/ curriculum and temp/ HLS masters into testdata/
     requires:
-      vars: [PYTHON_SAVED_DIR, PORTAL]
+      vars: [PYTHON_REPO, PORTAL]
     cmds:
-      - go run ./tools/sanitizefixture -in "{{.PYTHON_SAVED_DIR}}" -portal "{{.PORTAL}}"
+      - go run ./tools/sanitizefixture -in "{{.PYTHON_REPO}}/saved" -hls-in "{{.PYTHON_REPO}}/temp" -portal "{{.PORTAL}}"
 
   fixtures:subtitles:
     desc: Record pysrt digests of every SRT in a downloads/ tree

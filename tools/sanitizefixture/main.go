@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 )
 
 const (
@@ -15,21 +16,44 @@ const (
 
 var errPortalRequired = errors.New("-portal is required")
 
-var pythonOracleFiles = []string{"course_content.json", "_udemy.json"}
+var (
+	pythonOracleFiles = []string{"course_content.json", "_udemy.json"}
+	hlsMasterPlaylist = regexp.MustCompile(`^index_\d+\.m3u8$`)
+)
 
 func main() {
 	sourceDir := flag.String("in", "", "Python saved/ directory holding the raw fixtures")
 	targetDir := flag.String("out", "testdata/udemy/python", "directory for sanitized fixtures")
+	hlsSourceDir := flag.String("hls-in", "", "Python temp/ directory holding the HLS master playlists")
+	hlsTargetDir := flag.String("hls-out", "testdata/udemy/hls", "directory for sanitized HLS master playlists")
 	portal := flag.String("portal", "", "real portal subdomain to replace with "+fixturePortal)
 	flag.Parse()
 
-	if err := run(*sourceDir, *targetDir, *portal); err != nil {
+	err := run(*sourceDir, *targetDir, *portal, pythonOracleFiles)
+	if err == nil && *hlsSourceDir != "" {
+		err = runHLS(*hlsSourceDir, *hlsTargetDir, *portal)
+	}
+	if err != nil {
 		fmt.Fprintln(os.Stderr, "sanitizefixture:", err)
 		os.Exit(1)
 	}
 }
 
-func run(sourceDir, targetDir, portal string) error {
+func runHLS(sourceDir, targetDir, portal string) error {
+	entries, err := os.ReadDir(sourceDir)
+	if err != nil {
+		return fmt.Errorf("list hls dir: %w", err)
+	}
+	var masters []string
+	for _, entry := range entries {
+		if hlsMasterPlaylist.MatchString(entry.Name()) {
+			masters = append(masters, entry.Name())
+		}
+	}
+	return run(sourceDir, targetDir, portal, masters)
+}
+
+func run(sourceDir, targetDir, portal string, names []string) error {
 	if portal == "" {
 		return errPortalRequired
 	}
@@ -47,7 +71,7 @@ func run(sourceDir, targetDir, portal string) error {
 	}
 	defer target.Close()
 
-	for _, name := range pythonOracleFiles {
+	for _, name := range names {
 		raw, err := source.ReadFile(name)
 		if err != nil {
 			return fmt.Errorf("read fixture %s: %w", name, err)
