@@ -2,6 +2,7 @@ package download
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -47,18 +48,15 @@ func (run *courseDownload) caption(ctx context.Context, chapterDir string, capti
 	return convertCaption(filepath.Join(chapterDir, caption.File), filepath.Join(chapterDir, caption.SRTFile))
 }
 
-// The Python downloader creates the SRT before converting, so a failed conversion leaves it empty and the VTT in place.
+// A VTT that does not convert is removed, so the next run downloads it again instead of finding it present.
 func convertCaption(vttPath, srtPath string) error {
-	if err := os.WriteFile(srtPath, nil, fileMode); err != nil {
-		return fmt.Errorf("create %s: %w", filepath.Base(srtPath), err)
-	}
 	vtt, err := os.ReadFile(vttPath) //nolint:gosec // reason: the path is the caption this download just wrote
 	if err != nil {
 		return fmt.Errorf("read %s: %w", filepath.Base(vttPath), err)
 	}
 	srt, err := subtitle.ConvertVTTToSRT(vtt)
 	if err != nil {
-		return fmt.Errorf("convert %s: %w", filepath.Base(vttPath), err)
+		return errors.Join(fmt.Errorf("convert %s: %w", filepath.Base(vttPath), err), os.Remove(vttPath))
 	}
 	if err := os.WriteFile(srtPath, srt, fileMode); err != nil { //nolint:gosec // reason: the path is built from the plan's single-element names under the chapter directory
 		return fmt.Errorf("write %s: %w", filepath.Base(srtPath), err)

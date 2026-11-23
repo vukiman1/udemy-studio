@@ -21,11 +21,12 @@ import (
 )
 
 const (
-	vttBody        = "WEBVTT\n\n00:00:01.000 --> 00:00:02.000\nHello\n"
-	childPlaylist  = "#EXTM3U\n#EXT-X-ENDLIST\n"
-	failingURL     = "https://cdn.example/fails"
-	testFileMode   = 0o600
-	hlsPlaylistURL = "https://example-portal.udemy.com/assets/77/files/hls/1080.m3u8"
+	vttBody          = "WEBVTT\n\n00:00:01.000 --> 00:00:02.000\nHello\n"
+	childPlaylist    = "#EXTM3U\n#EXT-X-ENDLIST\n"
+	failingURL       = "https://cdn.example/fails"
+	brokenCaptionURL = "https://cdn.example/broken.vtt"
+	testFileMode     = 0o600
+	hlsPlaylistURL   = "https://example-portal.udemy.com/assets/77/files/hls/1080.m3u8"
 )
 
 var errFetchFailed = errors.New("aria2c exited with 1")
@@ -49,7 +50,7 @@ func (tools *fakeTools) FetchFile(_ context.Context, fileURL, dir, name string) 
 		return errFetchFailed
 	}
 	content := "fetched " + fileURL
-	if strings.HasSuffix(name, vttExtension) {
+	if strings.HasSuffix(name, vttExtension) && fileURL != brokenCaptionURL {
 		content = vttBody
 	}
 	if err := os.WriteFile(filepath.Join(dir, name), []byte(content), testFileMode); err != nil {
@@ -279,5 +280,23 @@ func TestFileAria2cLeftPartialIsDownloadedAgain(t *testing.T) {
 		if !slices.Contains(tools.fetched, name) {
 			t.Errorf("%s was left partial, fetched only %v", name, tools.fetched)
 		}
+	}
+}
+
+func TestCaptionThatDoesNotConvertIsRetriedOnTheNextRun(t *testing.T) {
+	plan := samplePlan()
+	plan.Chapters[0].Lectures = plan.Chapters[0].Lectures[:1]
+	plan.Chapters[0].Lectures[0].Captions[0].URL = brokenCaptionURL
+	outputDir := t.TempDir()
+	summary, _, err := runCourse(t, t.Context(), plan, &fakeTools{}, outputDir)
+	if err != nil || !slices.Equal(summary.Failed, []string{"001 Welcome (caption: en)"}) {
+		t.Fatalf("summary = %+v, %v; want the caption failed", summary, err)
+	}
+	rerun := &fakeTools{}
+	if _, _, err := runCourse(t, t.Context(), plan, rerun, outputDir); err != nil {
+		t.Fatalf("rerun: %v", err)
+	}
+	if !slices.Contains(rerun.fetched, "001 Welcome_en.vtt") {
+		t.Errorf("rerun fetched %v, want the caption downloaded again", rerun.fetched)
 	}
 }
