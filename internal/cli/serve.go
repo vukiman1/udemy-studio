@@ -16,7 +16,6 @@ const (
 	libraryDirEnv        = "UDEMY_STUDIO_LIBRARY"
 	pythonEnv            = "UDEMY_STUDIO_PYTHON"
 	pythonRepoEnv        = "UDEMY_STUDIO_PYTHON_REPO"
-	defaultCaptionLang   = "en"
 )
 
 func newServeCommand(version string) *cobra.Command {

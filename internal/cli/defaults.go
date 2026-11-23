@@ -10,6 +10,7 @@ const (
 	appDataDirName      = "udemy-studio"
 	databaseFileName    = "app.db"
 	chromeDataDirSuffix = "Library/Application Support/Google/Chrome"
+	defaultCaptionLang  = "en"
 )
 
 func applyDataDefaults(databasePath, chromeDataDir *string) error {
