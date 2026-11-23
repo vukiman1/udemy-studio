@@ -112,6 +112,15 @@ tasks:
     cmds:
       - go run ./tools/sanitizefixture -in "{{.PYTHON_REPO}}/saved" -hls-in "{{.PYTHON_REPO}}/temp" -portal "{{.PORTAL}}"
 
+  fixtures:naming:
+    desc: Record pathvalidate and demoji output for every real title plus edge cases
+    requires:
+      vars: [PYTHON_REPO]
+    cmds:
+      - >-
+        "{{.PYTHON_REPO}}/.venv/bin/python" tools/pynaminggolden/naming_golden.py
+        testdata/udemy/python/course_content.json internal/naming/emoji_codes.json testdata/naming/naming_golden.json
+
   fixtures:subtitles:
     desc: Record pysrt digests of every SRT in a downloads/ tree
     requires:

@@ -1,0 +1,1132 @@
+[
+ {
+  "input": "Introduction",
+  "sanitized": "Introduction",
+  "deemojified": "Introduction"
+ },
+ {
+  "input": "Welcome",
+  "sanitized": "Welcome",
+  "deemojified": "Welcome"
+ },
+ {
+  "input": "Welcome.mp4",
+  "sanitized": "Welcome.mp4",
+  "deemojified": "Welcome.mp4"
+ },
+ {
+  "input": "Who is this course for?",
+  "sanitized": "Who is this course for",
+  "deemojified": "Who is this course for?"
+ },
+ {
+  "input": "Who-is-this-for.mp4",
+  "sanitized": "Who-is-this-for.mp4",
+  "deemojified": "Who-is-this-for.mp4"
+ },
+ {
+  "input": "Course Outline",
+  "sanitized": "Course Outline",
+  "deemojified": "Course Outline"
+ },
+ {
+  "input": "Outline.mp4",
+  "sanitized": "Outline.mp4",
+  "deemojified": "Outline.mp4"
+ },
+ {
+  "input": "Course Notes",
+  "sanitized": "Course Notes",
+  "deemojified": "Course Notes"
+ },
+ {
+  "input": "udemy-backend-1-year.mp4",
+  "sanitized": "udemy-backend-1-year.mp4",
+  "deemojified": "udemy-backend-1-year.mp4"
+ },
+ {
+  "input": "Download all slides, source code and references",
+  "sanitized": "Download all slides, source code and references",
+  "deemojified": "Download all slides, source code and references"
+ },
+ {
+  "input": "Apache-kafka-long-polling.pdf",
+  "sanitized": "Apache-kafka-long-polling.pdf",
+  "deemojified": "Apache-kafka-long-polling.pdf"
+ },
+ {
+  "input": "asynchronous-commits-postgres.pdf",
+  "sanitized": "asynchronous-commits-postgres.pdf",
+  "deemojified": "asynchronous-commits-postgres.pdf"
+ },
+ {
+  "input": "asynchronous-io-linux-thread.pdf",
+  "sanitized": "asynchronous-io-linux-thread.pdf",
+  "deemojified": "asynchronous-io-linux-thread.pdf"
+ },
+ {
+  "input": "asynchronous-replication-postgres.pdf",
+  "sanitized": "asynchronous-replication-postgres.pdf",
+  "deemojified": "asynchronous-replication-postgres.pdf"
+ },
+ {
+  "input": "Chrome-6-Connections-Limit.pdf",
+  "sanitized": "Chrome-6-Connections-Limit.pdf",
+  "deemojified": "Chrome-6-Connections-Limit.pdf"
+ },
+ {
+  "input": "Postgres-Pipelining.pdf",
+  "sanitized": "Postgres-Pipelining.pdf",
+  "deemojified": "Postgres-Pipelining.pdf"
+ },
+ {
+  "input": "rabbitMQ-pushAPI.pdf",
+  "sanitized": "rabbitMQ-pushAPI.pdf",
+  "deemojified": "rabbitMQ-pushAPI.pdf"
+ },
+ {
+  "input": "backendcourse-sourcecode.zip",
+  "sanitized": "backendcourse-sourcecode.zip",
+  "deemojified": "backendcourse-sourcecode.zip"
+ },
+ {
+  "input": "resources.txt",
+  "sanitized": "resources.txt",
+  "deemojified": "resources.txt"
+ },
+ {
+  "input": "IP-TCP-UDP-TLS Slides.pptx",
+  "sanitized": "IP-TCP-UDP-TLS Slides.pptx",
+  "deemojified": "IP-TCP-UDP-TLS Slides.pptx"
+ },
+ {
+  "input": "IP-TCP-UDP-TLS-Slides.pptx",
+  "sanitized": "IP-TCP-UDP-TLS-Slides.pptx",
+  "deemojified": "IP-TCP-UDP-TLS-Slides.pptx"
+ },
+ {
+  "input": "IP-TCP-UDP-TLS Slides.odp",
+  "sanitized": "IP-TCP-UDP-TLS Slides.odp",
+  "deemojified": "IP-TCP-UDP-TLS Slides.odp"
+ },
+ {
+  "input": "IP-TCP-UDP-TLS-Slides.odp",
+  "sanitized": "IP-TCP-UDP-TLS-Slides.odp",
+  "deemojified": "IP-TCP-UDP-TLS-Slides.odp"
+ },
+ {
+  "input": "IP-TCP-UDP-TLS Slides.pdf",
+  "sanitized": "IP-TCP-UDP-TLS Slides.pdf",
+  "deemojified": "IP-TCP-UDP-TLS Slides.pdf"
+ },
+ {
+  "input": "IP-TCP-UDP-TLS-Slides.pdf",
+  "sanitized": "IP-TCP-UDP-TLS-Slides.pdf",
+  "deemojified": "IP-TCP-UDP-TLS-Slides.pdf"
+ },
+ {
+  "input": "kernel queues.pdf",
+  "sanitized": "kernel queues.pdf",
+  "deemojified": "kernel queues.pdf"
+ },
+ {
+  "input": "kernel-queues.pdf",
+  "sanitized": "kernel-queues.pdf",
+  "deemojified": "kernel-queues.pdf"
+ },
+ {
+  "input": "jwt-course.zip",
+  "sanitized": "jwt-course.zip",
+  "deemojified": "jwt-course.zip"
+ },
+ {
+  "input": "DNS-Slides.pdf",
+  "sanitized": "DNS-Slides.pdf",
+  "deemojified": "DNS-Slides.pdf"
+ },
+ {
+  "input": "DNS-Slides.pptx",
+  "sanitized": "DNS-Slides.pptx",
+  "deemojified": "DNS-Slides.pptx"
+ },
+ {
+  "input": "DNS-Slides.odp",
+  "sanitized": "DNS-Slides.odp",
+  "deemojified": "DNS-Slides.odp"
+ },
+ {
+  "input": "HTTPS-TLS-And-Certificates.pptx",
+  "sanitized": "HTTPS-TLS-And-Certificates.pptx",
+  "deemojified": "HTTPS-TLS-And-Certificates.pptx"
+ },
+ {
+  "input": "HTTPS-TLS-And-Certificates.pdf",
+  "sanitized": "HTTPS-TLS-And-Certificates.pdf",
+  "deemojified": "HTTPS-TLS-And-Certificates.pdf"
+ },
+ {
+  "input": "proxy vs reverse proxy.pdf",
+  "sanitized": "proxy vs reverse proxy.pdf",
+  "deemojified": "proxy vs reverse proxy.pdf"
+ },
+ {
+  "input": "proxy-vs-reverse-proxy.pdf",
+  "sanitized": "proxy-vs-reverse-proxy.pdf",
+  "deemojified": "proxy-vs-reverse-proxy.pdf"
+ },
+ {
+  "input": "proxy vs reverse proxy.pptx",
+  "sanitized": "proxy vs reverse proxy.pptx",
+  "deemojified": "proxy vs reverse proxy.pptx"
+ },
+ {
+  "input": "proxy-vs-reverse-proxy.pptx",
+  "sanitized": "proxy-vs-reverse-proxy.pptx",
+  "deemojified": "proxy-vs-reverse-proxy.pptx"
+ },
+ {
+  "input": "WebSocket Proxying.pptx",
+  "sanitized": "WebSocket Proxying.pptx",
+  "deemojified": "WebSocket Proxying.pptx"
+ },
+ {
+  "input": "WebSocket-Proxying.pptx",
+  "sanitized": "WebSocket-Proxying.pptx",
+  "deemojified": "WebSocket-Proxying.pptx"
+ },
+ {
+  "input": "Fundamentals of Backend Engineering.pdf",
+  "sanitized": "Fundamentals of Backend Engineering.pdf",
+  "deemojified": "Fundamentals of Backend Engineering.pdf"
+ },
+ {
+  "input": "Fundamentals-of-Backend-Engineering.pdf",
+  "sanitized": "Fundamentals-of-Backend-Engineering.pdf",
+  "deemojified": "Fundamentals-of-Backend-Engineering.pdf"
+ },
+ {
+  "input": "Fundamentals of Backend Engineering.pptx",
+  "sanitized": "Fundamentals of Backend Engineering.pptx",
+  "deemojified": "Fundamentals of Backend Engineering.pptx"
+ },
+ {
+  "input": "Fundamentals-of-Backend-Engineering.pptx",
+  "sanitized": "Fundamentals-of-Backend-Engineering.pptx",
+  "deemojified": "Fundamentals-of-Backend-Engineering.pptx"
+ },
+ {
+  "input": "Fundamentals of Backend Engineering.odp",
+  "sanitized": "Fundamentals of Backend Engineering.odp",
+  "deemojified": "Fundamentals of Backend Engineering.odp"
+ },
+ {
+  "input": "Fundamentals-of-Backend-Engineering.odp",
+  "sanitized": "Fundamentals-of-Backend-Engineering.odp",
+  "deemojified": "Fundamentals-of-Backend-Engineering.odp"
+ },
+ {
+  "input": "Nagle's algorithm.pdf",
+  "sanitized": "Nagle's algorithm.pdf",
+  "deemojified": "Nagle's algorithm.pdf"
+ },
+ {
+  "input": "Nagles-algorithm.pdf",
+  "sanitized": "Nagles-algorithm.pdf",
+  "deemojified": "Nagles-algorithm.pdf"
+ },
+ {
+  "input": "Nagle's algorithm.pptx",
+  "sanitized": "Nagle's algorithm.pptx",
+  "deemojified": "Nagle's algorithm.pptx"
+ },
+ {
+  "input": "Nagles-algorithm.pptx",
+  "sanitized": "Nagles-algorithm.pptx",
+  "deemojified": "Nagles-algorithm.pptx"
+ },
+ {
+  "input": "Backend Communication Design Patterns",
+  "sanitized": "Backend Communication Design Patterns",
+  "deemojified": "Backend Communication Design Patterns"
+ },
+ {
+  "input": "Backend Communication Design Patterns Intro",
+  "sanitized": "Backend Communication Design Patterns Intro",
+  "deemojified": "Backend Communication Design Patterns Intro"
+ },
+ {
+  "input": "S1-Intro.mp4",
+  "sanitized": "S1-Intro.mp4",
+  "deemojified": "S1-Intro.mp4"
+ },
+ {
+  "input": "Request Response",
+  "sanitized": "Request Response",
+  "deemojified": "Request Response"
+ },
+ {
+  "input": "S1-RequestResponse.mp4",
+  "sanitized": "S1-RequestResponse.mp4",
+  "deemojified": "S1-RequestResponse.mp4"
+ },
+ {
+  "input": "Push",
+  "sanitized": "Push",
+  "deemojified": "Push"
+ },
+ {
+  "input": "S1-Push.mp4",
+  "sanitized": "S1-Push.mp4",
+  "deemojified": "S1-Push.mp4"
+ },
+ {
+  "input": "Synchronous vs Asynchronous workloads",
+  "sanitized": "Synchronous vs Asynchronous workloads",
+  "deemojified": "Synchronous vs Asynchronous workloads"
+ },
+ {
+  "input": "S1-Async-vs-Sync.mp4",
+  "sanitized": "S1-Async-vs-Sync.mp4",
+  "deemojified": "S1-Async-vs-Sync.mp4"
+ },
+ {
+  "input": "Polling",
+  "sanitized": "Polling",
+  "deemojified": "Polling"
+ },
+ {
+  "input": "S1-Polling.mp4",
+  "sanitized": "S1-Polling.mp4",
+  "deemojified": "S1-Polling.mp4"
+ },
+ {
+  "input": "Long Polling",
+  "sanitized": "Long Polling",
+  "deemojified": "Long Polling"
+ },
+ {
+  "input": "S1-LongPolling.mp4",
+  "sanitized": "S1-LongPolling.mp4",
+  "deemojified": "S1-LongPolling.mp4"
+ },
+ {
+  "input": "Server Sent Events",
+  "sanitized": "Server Sent Events",
+  "deemojified": "Server Sent Events"
+ },
+ {
+  "input": "S1-SSE.mp4",
+  "sanitized": "S1-SSE.mp4",
+  "deemojified": "S1-SSE.mp4"
+ },
+ {
+  "input": "Publish Subscribe (Pub/Sub)",
+  "sanitized": "Publish Subscribe (PubSub)",
+  "deemojified": "Publish Subscribe (Pub/Sub)"
+ },
+ {
+  "input": "S1-PubSUb.mp4",
+  "sanitized": "S1-PubSUb.mp4",
+  "deemojified": "S1-PubSUb.mp4"
+ },
+ {
+  "input": "Multiplexing vs Demultiplexing (h2 proxying vs Connection Pooling)",
+  "sanitized": "Multiplexing vs Demultiplexing (h2 proxying vs Connection Pooling)",
+  "deemojified": "Multiplexing vs Demultiplexing (h2 proxying vs Connection Pooling)"
+ },
+ {
+  "input": "S1-Multiplexing-Demultiplexing.mp4",
+  "sanitized": "S1-Multiplexing-Demultiplexing.mp4",
+  "deemojified": "S1-Multiplexing-Demultiplexing.mp4"
+ },
+ {
+  "input": "Stateful vs Stateless",
+  "sanitized": "Stateful vs Stateless",
+  "deemojified": "Stateful vs Stateless"
+ },
+ {
+  "input": "S1-Stateful-vs-Stateless.mp4",
+  "sanitized": "S1-Stateful-vs-Stateless.mp4",
+  "deemojified": "S1-Stateful-vs-Stateless.mp4"
+ },
+ {
+  "input": "Sidecar Pattern",
+  "sanitized": "Sidecar Pattern",
+  "deemojified": "Sidecar Pattern"
+ },
+ {
+  "input": "S1-Sidecar.mp4",
+  "sanitized": "S1-Sidecar.mp4",
+  "deemojified": "S1-Sidecar.mp4"
+ },
+ {
+  "input": "Protocols",
+  "sanitized": "Protocols",
+  "deemojified": "Protocols"
+ },
+ {
+  "input": "Protocols Intro",
+  "sanitized": "Protocols Intro",
+  "deemojified": "Protocols Intro"
+ },
+ {
+  "input": "S2-Intro.mp4",
+  "sanitized": "S2-Intro.mp4",
+  "deemojified": "S2-Intro.mp4"
+ },
+ {
+  "input": "Protocol Properties",
+  "sanitized": "Protocol Properties",
+  "deemojified": "Protocol Properties"
+ },
+ {
+  "input": "S2-Protocol-props.mp4",
+  "sanitized": "S2-Protocol-props.mp4",
+  "deemojified": "S2-Protocol-props.mp4"
+ },
+ {
+  "input": "OSI Model",
+  "sanitized": "OSI Model",
+  "deemojified": "OSI Model"
+ },
+ {
+  "input": "5-osimodel.mp4",
+  "sanitized": "5-osimodel.mp4",
+  "deemojified": "5-osimodel.mp4"
+ },
+ {
+  "input": "Internet Protocol",
+  "sanitized": "Internet Protocol",
+  "deemojified": "Internet Protocol"
+ },
+ {
+  "input": "S3-IP-m4v.m4v",
+  "sanitized": "S3-IP-m4v.m4v",
+  "deemojified": "S3-IP-m4v.m4v"
+ },
+ {
+  "input": "UDP",
+  "sanitized": "UDP",
+  "deemojified": "UDP"
+ },
+ {
+  "input": "S3-UDP-m4v.m4v",
+  "sanitized": "S3-UDP-m4v.m4v",
+  "deemojified": "S3-UDP-m4v.m4v"
+ },
+ {
+  "input": "TCP",
+  "sanitized": "TCP",
+  "deemojified": "TCP"
+ },
+ {
+  "input": "S3-TCP-m4v.m4v",
+  "sanitized": "S3-TCP-m4v.m4v",
+  "deemojified": "S3-TCP-m4v.m4v"
+ },
+ {
+  "input": "TLS",
+  "sanitized": "TLS",
+  "deemojified": "TLS"
+ },
+ {
+  "input": "tls.mp4",
+  "sanitized": "tls.mp4",
+  "deemojified": "tls.mp4"
+ },
+ {
+  "input": "HTTP/1.1",
+  "sanitized": "HTTP1.1",
+  "deemojified": "HTTP/1.1"
+ },
+ {
+  "input": "S2-HTTP11.mp4",
+  "sanitized": "S2-HTTP11.mp4",
+  "deemojified": "S2-HTTP11.mp4"
+ },
+ {
+  "input": "HTTPS, TLS, Keys and Certificates",
+  "sanitized": "HTTPS, TLS, Keys and Certificates",
+  "deemojified": "HTTPS, TLS, Keys and Certificates"
+ },
+ {
+  "input": "TLS-For-Backend-New-Node.m4v",
+  "sanitized": "TLS-For-Backend-New-Node.m4v",
+  "deemojified": "TLS-For-Backend-New-Node.m4v"
+ },
+ {
+  "input": "WebSockets",
+  "sanitized": "WebSockets",
+  "deemojified": "WebSockets"
+ },
+ {
+  "input": "S2-WebSockets.mp4",
+  "sanitized": "S2-WebSockets.mp4",
+  "deemojified": "S2-WebSockets.mp4"
+ },
+ {
+  "input": "HTTP/2",
+  "sanitized": "HTTP2",
+  "deemojified": "HTTP/2"
+ },
+ {
+  "input": "S2-HTTP2.mp4",
+  "sanitized": "S2-HTTP2.mp4",
+  "deemojified": "S2-HTTP2.mp4"
+ },
+ {
+  "input": "HTTP/3",
+  "sanitized": "HTTP3",
+  "deemojified": "HTTP/3"
+ },
+ {
+  "input": "S2-HTTP3.mp4",
+  "sanitized": "S2-HTTP3.mp4",
+  "deemojified": "S2-HTTP3.mp4"
+ },
+ {
+  "input": "gRPC",
+  "sanitized": "gRPC",
+  "deemojified": "gRPC"
+ },
+ {
+  "input": "S2-grpc.mp4",
+  "sanitized": "S2-grpc.mp4",
+  "deemojified": "S2-grpc.mp4"
+ },
+ {
+  "input": "WebRTC",
+  "sanitized": "WebRTC",
+  "deemojified": "WebRTC"
+ },
+ {
+  "input": "S3-webrtc-backend.m4v",
+  "sanitized": "S3-webrtc-backend.m4v",
+  "deemojified": "S3-webrtc-backend.m4v"
+ },
+ {
+  "input": "Many ways to HTTPS",
+  "sanitized": "Many ways to HTTPS",
+  "deemojified": "Many ways to HTTPS"
+ },
+ {
+  "input": "HTTPS Communication Basics Intro",
+  "sanitized": "HTTPS Communication Basics Intro",
+  "deemojified": "HTTPS Communication Basics Intro"
+ },
+ {
+  "input": "S3-Intro.mp4",
+  "sanitized": "S3-Intro.mp4",
+  "deemojified": "S3-Intro.mp4"
+ },
+ {
+  "input": "HTTPS over TCP with TLS 1.2",
+  "sanitized": "HTTPS over TCP with TLS 1.2",
+  "deemojified": "HTTPS over TCP with TLS 1.2"
+ },
+ {
+  "input": "S3-HTTPS-TLS1-2.mp4",
+  "sanitized": "S3-HTTPS-TLS1-2.mp4",
+  "deemojified": "S3-HTTPS-TLS1-2.mp4"
+ },
+ {
+  "input": "HTTPS over TCP with TLS 1.3",
+  "sanitized": "HTTPS over TCP with TLS 1.3",
+  "deemojified": "HTTPS over TCP with TLS 1.3"
+ },
+ {
+  "input": "S3-HTTPS-TLS1-3.mp4",
+  "sanitized": "S3-HTTPS-TLS1-3.mp4",
+  "deemojified": "S3-HTTPS-TLS1-3.mp4"
+ },
+ {
+  "input": "HTTPS over QUIC (HTTP/3)",
+  "sanitized": "HTTPS over QUIC (HTTP3)",
+  "deemojified": "HTTPS over QUIC (HTTP/3)"
+ },
+ {
+  "input": "S3-HTTPS-QUIC.mp4",
+  "sanitized": "S3-HTTPS-QUIC.mp4",
+  "deemojified": "S3-HTTPS-QUIC.mp4"
+ },
+ {
+  "input": "HTTPS over TFO with TLS 1.3",
+  "sanitized": "HTTPS over TFO with TLS 1.3",
+  "deemojified": "HTTPS over TFO with TLS 1.3"
+ },
+ {
+  "input": "S3-HTTPS-TFO-TLS1-3.mp4",
+  "sanitized": "S3-HTTPS-TFO-TLS1-3.mp4",
+  "deemojified": "S3-HTTPS-TFO-TLS1-3.mp4"
+ },
+ {
+  "input": "HTTPS over TCP with TLS 1.3 and 0RTT",
+  "sanitized": "HTTPS over TCP with TLS 1.3 and 0RTT",
+  "deemojified": "HTTPS over TCP with TLS 1.3 and 0RTT"
+ },
+ {
+  "input": "S3-HTTPS-TLS1-3-0RTT.mp4",
+  "sanitized": "S3-HTTPS-TLS1-3-0RTT.mp4",
+  "deemojified": "S3-HTTPS-TLS1-3-0RTT.mp4"
+ },
+ {
+  "input": "HTTPS over QUIC with 0RTT",
+  "sanitized": "HTTPS over QUIC with 0RTT",
+  "deemojified": "HTTPS over QUIC with 0RTT"
+ },
+ {
+  "input": "S3-HTTPS-QUIC-0RTT.mp4",
+  "sanitized": "S3-HTTPS-QUIC-0RTT.mp4",
+  "deemojified": "S3-HTTPS-QUIC-0RTT.mp4"
+ },
+ {
+  "input": "Backend Execution Patterns",
+  "sanitized": "Backend Execution Patterns",
+  "deemojified": "Backend Execution Patterns"
+ },
+ {
+  "input": "Backend Execution Patterns Intro",
+  "sanitized": "Backend Execution Patterns Intro",
+  "deemojified": "Backend Execution Patterns Intro"
+ },
+ {
+  "input": "S4-Backend-Execution-Intro.mp4",
+  "sanitized": "S4-Backend-Execution-Intro.mp4",
+  "deemojified": "S4-Backend-Execution-Intro.mp4"
+ },
+ {
+  "input": "The Process and The Thread and how they compete for CPU time",
+  "sanitized": "The Process and The Thread and how they compete for CPU time",
+  "deemojified": "The Process and The Thread and how they compete for CPU time"
+ },
+ {
+  "input": "S4-TheProcess-Thread.mp4",
+  "sanitized": "S4-TheProcess-Thread.mp4",
+  "deemojified": "S4-TheProcess-Thread.mp4"
+ },
+ {
+  "input": "How The Backend Accepts Connections",
+  "sanitized": "How The Backend Accepts Connections",
+  "deemojified": "How The Backend Accepts Connections"
+ },
+ {
+  "input": "S4-Connection-Establishement-Backend.mp4",
+  "sanitized": "S4-Connection-Establishement-Backend.mp4",
+  "deemojified": "S4-Connection-Establishement-Backend.mp4"
+ },
+ {
+  "input": "Reading and Sending Socket Data",
+  "sanitized": "Reading and Sending Socket Data",
+  "deemojified": "Reading and Sending Socket Data"
+ },
+ {
+  "input": "S4-Reading-Sending-Socket.mp4",
+  "sanitized": "S4-Reading-Sending-Socket.mp4",
+  "deemojified": "S4-Reading-Sending-Socket.mp4"
+ },
+ {
+  "input": "The Listener, The Acceptor and the Reader",
+  "sanitized": "The Listener, The Acceptor and the Reader",
+  "deemojified": "The Listener, The Acceptor and the Reader"
+ },
+ {
+  "input": "S4-Listener-Acceptor-Reader.mp4",
+  "sanitized": "S4-Listener-Acceptor-Reader.mp4",
+  "deemojified": "S4-Listener-Acceptor-Reader.mp4"
+ },
+ {
+  "input": "Single Listener, Acceptor and Reader Thread Execution Pattern",
+  "sanitized": "Single Listener, Acceptor and Reader Thread Execution Pattern",
+  "deemojified": "Single Listener, Acceptor and Reader Thread Execution Pattern"
+ },
+ {
+  "input": "S4-SingleThread-Node.mp4",
+  "sanitized": "S4-SingleThread-Node.mp4",
+  "deemojified": "S4-SingleThread-Node.mp4"
+ },
+ {
+  "input": "Single Listener, Acceptor and Multiple Readers Thread Execution Pattern",
+  "sanitized": "Single Listener, Acceptor and Multiple Readers Thread Execution Pattern",
+  "deemojified": "Single Listener, Acceptor and Multiple Readers Thread Execution Pattern"
+ },
+ {
+  "input": "S4-SingleListener-MultipleReader.mp4",
+  "sanitized": "S4-SingleListener-MultipleReader.mp4",
+  "deemojified": "S4-SingleListener-MultipleReader.mp4"
+ },
+ {
+  "input": "Single Listener, Acceptor, Reader with Message Load Balancing Execution Pattern",
+  "sanitized": "Single Listener, Acceptor, Reader with Message Load Balancing Execution Pattern",
+  "deemojified": "Single Listener, Acceptor, Reader with Message Load Balancing Execution Pattern"
+ },
+ {
+  "input": "S4-SingleEverything-WithLB.mp4",
+  "sanitized": "S4-SingleEverything-WithLB.mp4",
+  "deemojified": "S4-SingleEverything-WithLB.mp4"
+ },
+ {
+  "input": "Multiple Accepter Threads on a Single Socket Execution Pattern",
+  "sanitized": "Multiple Accepter Threads on a Single Socket Execution Pattern",
+  "deemojified": "Multiple Accepter Threads on a Single Socket Execution Pattern"
+ },
+ {
+  "input": "S4-MultipleAcceptors.mp4",
+  "sanitized": "S4-MultipleAcceptors.mp4",
+  "deemojified": "S4-MultipleAcceptors.mp4"
+ },
+ {
+  "input": "Multiple Listeners, Acceptors and Readers with Socket Sharding Execution Pattern",
+  "sanitized": "Multiple Listeners, Acceptors and Readers with Socket Sharding Execution Pattern",
+  "deemojified": "Multiple Listeners, Acceptors and Readers with Socket Sharding Execution Pattern"
+ },
+ {
+  "input": "S4-SO-REUSEPORT-ALL.mp4",
+  "sanitized": "S4-SO-REUSEPORT-ALL.mp4",
+  "deemojified": "S4-SO-REUSEPORT-ALL.mp4"
+ },
+ {
+  "input": "Backend Idempotency",
+  "sanitized": "Backend Idempotency",
+  "deemojified": "Backend Idempotency"
+ },
+ {
+  "input": "S4-idempotency.mp4",
+  "sanitized": "S4-idempotency.mp4",
+  "deemojified": "S4-idempotency.mp4"
+ },
+ {
+  "input": "Nagle's Algorithm",
+  "sanitized": "Nagle's Algorithm",
+  "deemojified": "Nagle's Algorithm"
+ },
+ {
+  "input": "27-NigelAlgo.mp4",
+  "sanitized": "27-NigelAlgo.mp4",
+  "deemojified": "27-NigelAlgo.mp4"
+ },
+ {
+  "input": "When do you use threads?",
+  "sanitized": "When do you use threads",
+  "deemojified": "When do you use threads?"
+ },
+ {
+  "input": "Proxying and Load Balancing",
+  "sanitized": "Proxying and Load Balancing",
+  "deemojified": "Proxying and Load Balancing"
+ },
+ {
+  "input": "Proxy vs Reverse Proxy",
+  "sanitized": "Proxy vs Reverse Proxy",
+  "deemojified": "Proxy vs Reverse Proxy"
+ },
+ {
+  "input": "proxy-vs-reverse-proxy-udemynetwork.mp4",
+  "sanitized": "proxy-vs-reverse-proxy-udemynetwork.mp4",
+  "deemojified": "proxy-vs-reverse-proxy-udemynetwork.mp4"
+ },
+ {
+  "input": "Layer 4 vs Layer 7 Load Balancers",
+  "sanitized": "Layer 4 vs Layer 7 Load Balancers",
+  "deemojified": "Layer 4 vs Layer 7 Load Balancers"
+ },
+ {
+  "input": "layer4-vs-layer7-loadbalancers.mp4",
+  "sanitized": "layer4-vs-layer7-loadbalancers.mp4",
+  "deemojified": "layer4-vs-layer7-loadbalancers.mp4"
+ },
+ {
+  "input": "WebSocket Proxying",
+  "sanitized": "WebSocket Proxying",
+  "deemojified": "WebSocket Proxying"
+ },
+ {
+  "input": "L3-Layer4Layer7WSProxy.mp4",
+  "sanitized": "L3-Layer4Layer7WSProxy.mp4",
+  "deemojified": "L3-Layer4Layer7WSProxy.mp4"
+ },
+ {
+  "input": "Extras",
+  "sanitized": "Extras",
+  "deemojified": "Extras"
+ },
+ {
+  "input": "How ChatGPT uses Server Sent Events",
+  "sanitized": "How ChatGPT uses Server Sent Events",
+  "deemojified": "How ChatGPT uses Server Sent Events"
+ },
+ {
+  "input": "chatgpt.mp4",
+  "sanitized": "chatgpt.mp4",
+  "deemojified": "chatgpt.mp4"
+ },
+ {
+  "input": "How I design software",
+  "sanitized": "How I design software",
+  "deemojified": "How I design software"
+ },
+ {
+  "input": "The Journey of a Request to the Backend",
+  "sanitized": "The Journey of a Request to the Backend",
+  "deemojified": "The Journey of a Request to the Backend"
+ },
+ {
+  "input": "The Journey of a Request to the Backend.pdf",
+  "sanitized": "The Journey of a Request to the Backend.pdf",
+  "deemojified": "The Journey of a Request to the Backend.pdf"
+ },
+ {
+  "input": "The-Journey-of-a-Request-to-the-Backend.pdf",
+  "sanitized": "The-Journey-of-a-Request-to-the-Backend.pdf",
+  "deemojified": "The-Journey-of-a-Request-to-the-Backend.pdf"
+ },
+ {
+  "input": "journey-request.mp4",
+  "sanitized": "journey-request.mp4",
+  "deemojified": "journey-request.mp4"
+ },
+ {
+  "input": "The Journey of a Request to the Backend (Video)",
+  "sanitized": "The Journey of a Request to the Backend (Video)",
+  "deemojified": "The Journey of a Request to the Backend (Video)"
+ },
+ {
+  "input": "JSON Web Token (JWT), its Pros and Cons",
+  "sanitized": "JSON Web Token (JWT), its Pros and Cons",
+  "deemojified": "JSON Web Token (JWT), its Pros and Cons"
+ },
+ {
+  "input": "JWT.m4v",
+  "sanitized": "JWT.m4v",
+  "deemojified": "JWT.m4v"
+ },
+ {
+  "input": "JWT.odp",
+  "sanitized": "JWT.odp",
+  "deemojified": "JWT.odp"
+ },
+ {
+  "input": "JWT.pdf",
+  "sanitized": "JWT.pdf",
+  "deemojified": "JWT.pdf"
+ },
+ {
+  "input": "JWT.pptx",
+  "sanitized": "JWT.pptx",
+  "deemojified": "JWT.pptx"
+ },
+ {
+  "input": "SELECT COUNT (*) can impact your Backend Application performance, here is why",
+  "sanitized": "SELECT COUNT () can impact your Backend Application performance, here is why",
+  "deemojified": "SELECT COUNT (*) can impact your Backend Application performance, here is why"
+ },
+ {
+  "input": "count-star-backend.mp4",
+  "sanitized": "count-star-backend.mp4",
+  "deemojified": "count-star-backend.mp4"
+ },
+ {
+  "input": "Bonus Content",
+  "sanitized": "Bonus Content",
+  "deemojified": "Bonus Content"
+ },
+ {
+  "input": "How does the Kernel manage backend connections?",
+  "sanitized": "How does the Kernel manage backend connections",
+  "deemojified": "How does the Kernel manage backend connections?"
+ },
+ {
+  "input": "kernel-manage-queues.mp4",
+  "sanitized": "kernel-manage-queues.mp4",
+  "deemojified": "kernel-manage-queues.mp4"
+ },
+ {
+  "input": "Running out of TCP Ports",
+  "sanitized": "Running out of TCP Ports",
+  "deemojified": "Running out of TCP Ports"
+ },
+ {
+  "input": "ephermal-ports.mp4",
+  "sanitized": "ephermal-ports.mp4",
+  "deemojified": "ephermal-ports.mp4"
+ },
+ {
+  "input": "Postgres failure caused by a Cisco router (TCP issue)",
+  "sanitized": "Postgres failure caused by a Cisco router (TCP issue)",
+  "deemojified": "Postgres failure caused by a Cisco router (TCP issue)"
+ },
+ {
+  "input": "Building Secure Backend Applications (OWASP recommendations)",
+  "sanitized": "Building Secure Backend Applications (OWASP recommendations)",
+  "deemojified": "Building Secure Backend Applications (OWASP recommendations)"
+ },
+ {
+  "input": "Securing-Backend-Applications-OWASP-recommendations.mp4",
+  "sanitized": "Securing-Backend-Applications-OWASP-recommendations.mp4",
+  "deemojified": "Securing-Backend-Applications-OWASP-recommendations.mp4"
+ },
+ {
+  "input": "HTTP Graceful Connection Shutdown",
+  "sanitized": "HTTP Graceful Connection Shutdown",
+  "deemojified": "HTTP Graceful Connection Shutdown"
+ },
+ {
+  "input": "graceful-shutdown-edited.m4v",
+  "sanitized": "graceful-shutdown-edited.m4v",
+  "deemojified": "graceful-shutdown-edited.m4v"
+ },
+ {
+  "input": "Fundamentals of Backend Engineering",
+  "sanitized": "Fundamentals of Backend Engineering",
+  "deemojified": "Fundamentals of Backend Engineering"
+ },
+ {
+  "input": "HTTP/2 vs HTTP/3: why?",
+  "sanitized": "HTTP2 vs HTTP3 why",
+  "deemojified": "HTTP/2 vs HTTP/3: why?"
+ },
+ {
+  "input": "a<b>c|d\"e*f",
+  "sanitized": "abcdef",
+  "deemojified": "a<b>c|d\"e*f"
+ },
+ {
+  "input": "back\\slash and\ttab\nnewline\rreturn\u000bvt\fff\u0000nul\u001fusdel",
+  "sanitized": "backslash andtabnewlinereturnvtffnulusdel",
+  "deemojified": "back\\slash and\ttab\nnewline\rreturn\u000bvt\fff\u0000nul\u001fusdel"
+ },
+ {
+  "input": "name. ",
+  "sanitized": "name",
+  "deemojified": "name. "
+ },
+ {
+  "input": "name...",
+  "sanitized": "name",
+  "deemojified": "name..."
+ },
+ {
+  "input": "  lead",
+  "sanitized": "lead",
+  "deemojified": "  lead"
+ },
+ {
+  "input": "   ",
+  "sanitized": "",
+  "deemojified": "   "
+ },
+ {
+  "input": "",
+  "sanitized": "",
+  "deemojified": ""
+ },
+ {
+  "input": "\u001c",
+  "sanitized": "",
+  "deemojified": "\u001c"
+ },
+ {
+  "input": "a\u001cb",
+  "sanitized": "ab",
+  "deemojified": "a\u001cb"
+ },
+ {
+  "input": ".",
+  "sanitized": ".",
+  "deemojified": "."
+ },
+ {
+  "input": "..",
+  "sanitized": "..",
+  "deemojified": ".."
+ },
+ {
+  "input": "...",
+  "sanitized": "",
+  "deemojified": "..."
+ },
+ {
+  "input": "....",
+  "sanitized": "",
+  "deemojified": "...."
+ },
+ {
+  "input": ".hidden",
+  "sanitized": ".hidden",
+  "deemojified": ".hidden"
+ },
+ {
+  "input": "  .hidden",
+  "sanitized": ".hidden",
+  "deemojified": "  .hidden"
+ },
+ {
+  "input": "file.",
+  "sanitized": "file",
+  "deemojified": "file."
+ },
+ {
+  "input": " . ",
+  "sanitized": ".",
+  "deemojified": " . "
+ },
+ {
+  "input": "CON",
+  "sanitized": "CON_",
+  "deemojified": "CON"
+ },
+ {
+  "input": "con",
+  "sanitized": "con_",
+  "deemojified": "con"
+ },
+ {
+  "input": "con.txt",
+  "sanitized": "con_.txt",
+  "deemojified": "con.txt"
+ },
+ {
+  "input": "CON.tar.gz",
+  "sanitized": "CON_.tar.gz",
+  "deemojified": "CON.tar.gz"
+ },
+ {
+  "input": "aux.aux",
+  "sanitized": "aux_.aux_",
+  "deemojified": "aux.aux"
+ },
+ {
+  "input": "CON ",
+  "sanitized": "CON",
+  "deemojified": "CON "
+ },
+ {
+  "input": " CON",
+  "sanitized": "CON",
+  "deemojified": " CON"
+ },
+ {
+  "input": "NUL.",
+  "sanitized": "NUL_.",
+  "deemojified": "NUL."
+ },
+ {
+  "input": "COM1",
+  "sanitized": "COM1_",
+  "deemojified": "COM1"
+ },
+ {
+  "input": "com9.log",
+  "sanitized": "com9_.log",
+  "deemojified": "com9.log"
+ },
+ {
+  "input": "LPT¹",
+  "sanitized": "LPT¹_",
+  "deemojified": "LPT¹"
+ },
+ {
+  "input": "COM³x",
+  "sanitized": "COM³x",
+  "deemojified": "COM³x"
+ },
+ {
+  "input": "CLOCK$",
+  "sanitized": "CLOCK$_",
+  "deemojified": "CLOCK$"
+ },
+ {
+  "input": "clock$.txt",
+  "sanitized": "clock$_.txt",
+  "deemojified": "clock$.txt"
+ },
+ {
+  "input": "PRN-1",
+  "sanitized": "PRN-1",
+  "deemojified": "PRN-1"
+ },
+ {
+  "input": "Kết nối TCP và độ trễ: Đầu tiên?",
+  "sanitized": "Kết nối TCP và độ trễ Đầu tiên",
+  "deemojified": "Kết nối TCP và độ trễ: Đầu tiên?"
+ },
+ {
+  "input": "Tiếng Việt có dấu – en dash — em dash",
+  "sanitized": "Tiếng Việt có dấu – en dash — em dash",
+  "deemojified": "Tiếng Việt có dấu – en dash — em dash"
+ },
+ {
+  "input": "emoji 🚀 test",
+  "sanitized": "emoji 🚀 test",
+  "deemojified": "emoji  test"
+ },
+ {
+  "input": "family 👨‍👩‍👧 zwj",
+  "sanitized": "family 👨‍👩‍👧 zwj",
+  "deemojified": "family  zwj"
+ },
+ {
+  "input": "flag 🇻🇳 vn",
+  "sanitized": "flag 🇻🇳 vn",
+  "deemojified": "flag  vn"
+ },
+ {
+  "input": "keycap 1️⃣ one",
+  "sanitized": "keycap 1️⃣ one",
+  "deemojified": "keycap  one"
+ },
+ {
+  "input": "thumbs 👍🏽 skin",
+  "sanitized": "thumbs 👍🏽 skin",
+  "deemojified": "thumbs  skin"
+ },
+ {
+  "input": "heart ❤️ red",
+  "sanitized": "heart ❤️ red",
+  "deemojified": "heart  red"
+ },
+ {
+  "input": "copyright © trademark ™ symbols",
+  "sanitized": "copyright © trademark ™ symbols",
+  "deemojified": "copyright  trademark  symbols"
+ },
+ {
+  "input": "only 😀😁",
+  "sanitized": "only 😀😁",
+  "deemojified": "only "
+ },
+ {
+  "input": "😀",
+  "sanitized": "😀",
+  "deemojified": ""
+ },
+ {
+  "input": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  "sanitized": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  "deemojified": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+ },
+ {
+  "input": "éééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé",
+  "sanitized": "ééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé",
+  "deemojified": "éééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé"
+ },
+ {
+  "input": "🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀",
+  "sanitized": "🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀",
+  "deemojified": ""
+ },
+ {
+  "input": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaé",
+  "sanitized": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaé",
+  "deemojified": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaé"
+ },
+ {
+  "input": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaé",
+  "sanitized": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "deemojified": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaé"
+ },
+ {
+  "input": "001 Long lecture title Long lecture title Long lecture title Long lecture title Long lecture title Long lecture title Long lecture title Long lecture title Long lecture title Long lecture title Long lecture title Long lecture title Long lecture title Long lecture title Long lecture title Long lecture title Long lecture title Long lecture title Long lecture title Long lecture title .mp4",
+  "sanitized": "001 Long lecture title Long lecture title Long lecture title Long lecture title Long lecture title Long lecture title Long lecture title Long lecture title Long lecture title Long lecture title Long lecture title Long lecture title Long lecture title Long",
+  "deemojified": "001 Long lecture title Long lecture title Long lecture title Long lecture title Long lecture title Long lecture title Long lecture title Long lecture title Long lecture title Long lecture title Long lecture title Long lecture title Long lecture title Long lecture title Long lecture title Long lecture title Long lecture title Long lecture title Long lecture title Long lecture title .mp4"
+ }
+]
