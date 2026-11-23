@@ -15,15 +15,23 @@ const (
 	urlExtension   = ".url"
 )
 
-func courseDirName(course Course, idAsCourseName bool) string {
+func courseName(course Course, idAsCourseName bool) string {
 	if idAsCourseName {
-		return naming.SanitizeFilename(strconv.FormatInt(course.ID, 10))
+		return strconv.FormatInt(course.ID, 10)
 	}
-	return naming.SanitizeFilename(course.Slug)
+	return course.Slug
+}
+
+func courseDirName(course Course, idAsCourseName bool) string {
+	return naming.SanitizeFilename(courseName(course, idAsCourseName))
 }
 
 func videoFileName(lectureTitle string) string {
-	return naming.RemoveEmoji(naming.SanitizeFilename(lectureTitle + videoExtension))
+	return downloadedFileName(lectureTitle, videoExtension)
+}
+
+func downloadedFileName(lectureTitle, extension string) string {
+	return naming.RemoveEmoji(naming.SanitizeFilename(lectureTitle + extension))
 }
 
 func htmlFileName(lectureTitle string) string {

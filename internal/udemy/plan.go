@@ -28,9 +28,10 @@ type PlanOptions struct {
 }
 
 type Plan struct {
-	CourseDir string        `json:"course_dir"`
-	Chapters  []ChapterPlan `json:"chapters"`
-	Warnings  []string      `json:"warnings,omitempty"`
+	CourseName string        `json:"course_name"`
+	CourseDir  string        `json:"course_dir"`
+	Chapters   []ChapterPlan `json:"chapters"`
+	Warnings   []string      `json:"warnings,omitempty"`
 }
 
 type ChapterPlan struct {
@@ -41,21 +42,23 @@ type ChapterPlan struct {
 }
 
 type LecturePlan struct {
-	Number   int           `json:"number"`
-	ID       int64         `json:"id"`
-	Class    string        `json:"class"`
-	Title    string        `json:"title"`
-	Kind     LectureKind   `json:"kind"`
-	File     string        `json:"file"`
-	HTMLBody string        `json:"-"`
-	Video    *VideoChoice  `json:"video,omitempty"`
-	Captions []CaptionPlan `json:"captions,omitempty"`
-	Assets   []AssetPlan   `json:"assets,omitempty"`
+	Number int         `json:"number"`
+	ID     int64       `json:"id"`
+	Class  string      `json:"class"`
+	Title  string      `json:"title"`
+	Kind   LectureKind `json:"kind"`
+	File   string      `json:"file"`
+	// PresenceFile is the file whose existence makes the Python downloader skip the lecture; for HTML it lost its emoji.
+	PresenceFile string        `json:"-"`
+	HTMLBody     string        `json:"-"`
+	Video        *VideoChoice  `json:"video,omitempty"`
+	Captions     []CaptionPlan `json:"captions,omitempty"`
+	Assets       []AssetPlan   `json:"assets,omitempty"`
 }
 
 // BuildPlan decides, without downloading anything, which files a course becomes and where each one comes from.
 func BuildPlan(ctx context.Context, course Course, items []CurriculumItem, options PlanOptions, playlists PlaylistFetcher) (Plan, error) {
-	plan := Plan{CourseDir: courseDirName(course, options.IDAsCourseName), Chapters: []ChapterPlan{}}
+	plan := Plan{CourseName: courseName(course, options.IDAsCourseName), CourseDir: courseDirName(course, options.IDAsCourseName), Chapters: []ChapterPlan{}}
 	planner := lecturePlanner{
 		options: options,
 		sources: sourceCollector{playlists: playlists, skipHLS: options.SkipHLS, warn: plan.warn},
@@ -89,16 +92,22 @@ func (planner lecturePlanner) plan(ctx context.Context, lecture Lecture) (Lectur
 	plan := LecturePlan{Number: lecture.Number, ID: lecture.Item.ID, Class: lecture.Item.Class, Title: lecture.Title}
 	if slices.Contains(quizLikeClasses, lecture.Item.Class) {
 		plan.Kind, plan.File = KindQuiz, quizFileName(lecture.Title)
+		plan.PresenceFile = plan.File
 		return plan, nil
 	}
 	asset := lecture.Item.Asset
 	if asset == nil {
 		plan.Kind, plan.File = KindUnavailable, videoFileName(lecture.Title)
+		plan.PresenceFile = plan.File
 		planner.warn("lecture %s has no asset", lecture.Title)
 		return plan, nil
 	}
 	if err := planner.planContent(ctx, &plan, *asset); err != nil {
 		return LecturePlan{}, err
+	}
+	plan.PresenceFile = plan.File
+	if plan.Kind == KindHTML {
+		plan.PresenceFile = downloadedFileName(plan.Title, htmlExtension)
 	}
 	if plan.Kind == KindVideo || plan.Kind == KindDRM {
 		plan.Captions = planner.planCaptions(lecture.Title, asset.Captions)
