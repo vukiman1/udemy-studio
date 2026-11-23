@@ -11,11 +11,7 @@ import (
 	"github.com/vukiman1/udemy-studio/internal/jobs"
 )
 
-const (
-	outputFlag    = "output"
-	defaultAria2c = "aria2c"
-	defaultYTDLP  = "yt-dlp"
-)
+const outputFlag = "output"
 
 func newDownloadCommand() *cobra.Command {
 	var options app.DownloadCourseOptions
@@ -55,8 +51,7 @@ func newDownloadCommand() *cobra.Command {
 	flags.StringVarP(&options.CaptionLanguage, "caption-language", "l", defaultCaptionLang, `caption language, "all", or "" for none`)
 	flags.StringVar(&options.DataDir, "data-dir", "", dataDirUsage)
 	flags.StringVar(&options.ChromeDataDir, "chrome-data-dir", "", chromeDataDirUsage)
-	flags.StringVar(&options.Tools.Aria2c, "aria2c", defaultAria2c, "aria2c binary")
-	flags.StringVar(&options.Tools.YTDLP, "yt-dlp", defaultYTDLP, "yt-dlp binary")
+	addToolFlags(command, &options.Tools)
 	_ = command.MarkFlagRequired(outputFlag)
 	return command
 }

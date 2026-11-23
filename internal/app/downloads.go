@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"log/slog"
 	"path/filepath"
@@ -16,18 +17,45 @@ import (
 	"github.com/vukiman1/udemy-studio/internal/progress"
 )
 
-const jobLogsDirName = "job-logs"
+const (
+	jobLogsDirName   = "job-logs"
+	DownloaderPython = "python"
+	DownloaderGo     = "go"
+)
+
+var ErrUnknownDownloader = errors.New("unknown downloader: use " + DownloaderPython + " or " + DownloaderGo)
 
 type DownloadOptions struct {
+	Downloader      string
 	Python          string
 	PythonRepo      string
+	Tools           ToolPaths
 	OutputDir       string
 	ChromeDataDir   string
 	CaptionLanguage string
 }
 
+// isConfigured is false only for the Python downloader without its checkout; any other value reaches newDownloader.
 func (options DownloadOptions) isConfigured() bool {
-	return options.Python != "" && options.PythonRepo != ""
+	return options.Downloader != DownloaderPython || (options.Python != "" && options.PythonRepo != "")
+}
+
+func (options DownloadOptions) newDownloader(logDir string, logger *slog.Logger) (jobs.Downloader, error) {
+	switch options.Downloader {
+	case DownloaderGo:
+		return goDownloader{outputDir: options.OutputDir, logDir: logDir, captionLanguage: options.CaptionLanguage, tools: options.Tools}, nil
+	case DownloaderPython:
+		return pythondownloader.New(pythondownloader.Config{
+			Python:          options.Python,
+			RepoDir:         options.PythonRepo,
+			OutputDir:       options.OutputDir,
+			LogDir:          logDir,
+			CaptionLanguage: options.CaptionLanguage,
+			KeepAwake:       true,
+		}, logger), nil
+	default:
+		return nil, fmt.Errorf("%w: %q", ErrUnknownDownloader, options.Downloader)
+	}
 }
 
 type downloads struct {
@@ -37,18 +65,14 @@ type downloads struct {
 
 func newDownloads(ctx context.Context, config DownloadOptions, dataDir string, database *sql.DB, catalog *library.Catalog, progressService *progress.Service, logger *slog.Logger) (downloads, error) {
 	if !config.isConfigured() {
-		logger.Info("downloads disabled; pass --python and --python-repo to enable them")
+		logger.Info("downloads disabled; pass --downloader go, or --python and --python-repo, to enable them")
 		return downloads{}, nil
 	}
+	downloader, err := config.newDownloader(filepath.Join(dataDir, jobLogsDirName), logger)
+	if err != nil {
+		return downloads{}, err
+	}
 	loginService := newLoginService(config.ChromeDataDir, database)
-	downloader := pythondownloader.New(pythondownloader.Config{
-		Python:          config.Python,
-		RepoDir:         config.PythonRepo,
-		OutputDir:       config.OutputDir,
-		LogDir:          filepath.Join(dataDir, jobLogsDirName),
-		CaptionLanguage: config.CaptionLanguage,
-		KeepAwake:       true,
-	}, logger)
 	manager := jobs.NewManager(jobs.Deps{
 		Downloader: downloader,
 		Tokens:     loginService,
@@ -68,7 +92,7 @@ func newDownloads(ctx context.Context, config DownloadOptions, dataDir string, d
 	if err := manager.Restore(ctx); err != nil {
 		return downloads{}, fmt.Errorf("restore download jobs: %w", err)
 	}
-	logger.Info("downloads enabled", "python", config.Python, "output", config.OutputDir)
+	logger.Info("downloads enabled", "downloader", config.Downloader, "output", config.OutputDir)
 	return downloads{login: loginService, jobs: manager}, nil
 }
 

@@ -4,12 +4,18 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+
+	"github.com/spf13/cobra"
+
+	"github.com/vukiman1/udemy-studio/internal/app"
 )
 
 const (
 	appDataDirName      = "udemy-studio"
 	chromeDataDirSuffix = "Library/Application Support/Google/Chrome"
 	defaultCaptionLang  = "en"
+	defaultAria2c       = "aria2c"
+	defaultYTDLP        = "yt-dlp"
 	dataDirUsage        = "directory for the progress database, LAN access code and download logs (default: user config dir)"
 	chromeDataDirUsage  = "Chrome user data dir (default: ~/" + chromeDataDirSuffix + ")"
 )
@@ -44,4 +50,9 @@ func withDataDefaults(dataDir, chromeDataDir string) (string, string, error) {
 		}
 	}
 	return dataDir, chromeDataDir, nil
+}
+
+func addToolFlags(command *cobra.Command, tools *app.ToolPaths) {
+	command.Flags().StringVar(&tools.Aria2c, "aria2c", defaultAria2c, "aria2c binary the Go downloader runs")
+	command.Flags().StringVar(&tools.YTDLP, "yt-dlp", defaultYTDLP, "yt-dlp binary the Go downloader runs")
 }
