@@ -29,6 +29,7 @@ func Render(text string) (string, error) {
 	return output.String(), nil
 }
 
+// Blocks are drawn in the terminal's light text colour, so a dark module is the empty half of a cell.
 func halfBlock(top, bottom bool) string {
 	switch {
 	case top && bottom:
