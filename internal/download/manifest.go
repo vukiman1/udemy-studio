@@ -3,16 +3,13 @@ package download
 import (
 	"encoding/json"
 	"fmt"
-	"os"
 	"path/filepath"
 
 	"github.com/vukiman1/udemy-studio/internal/library"
 	"github.com/vukiman1/udemy-studio/internal/udemy"
 )
 
-const manifestTempSuffix = ".tmp"
-
-// writeManifest records every planned lecture's Udemy id, replacing the old manifest only once the new one is complete.
+// writeManifest records every planned lecture's Udemy id.
 func writeManifest(courseDir string, plan udemy.Plan) error {
 	manifest := library.Manifest{Format: library.ManifestFormat, Lectures: []library.ManifestLecture{}}
 	for _, chapter := range plan.Chapters {
@@ -24,11 +21,7 @@ func writeManifest(courseDir string, plan udemy.Plan) error {
 	if err != nil {
 		return fmt.Errorf("encode course manifest: %w", err)
 	}
-	manifestPath := filepath.Join(courseDir, library.ManifestFile)
-	if err := writeLibraryFile(manifestPath+manifestTempSuffix, encoded); err != nil {
-		return fmt.Errorf("write course manifest: %w", err)
-	}
-	if err := os.Rename(manifestPath+manifestTempSuffix, manifestPath); err != nil {
+	if err := writeLibraryFile(filepath.Join(courseDir, library.ManifestFile), encoded); err != nil {
 		return fmt.Errorf("save course manifest: %w", err)
 	}
 	return nil

@@ -14,9 +14,7 @@ import (
 )
 
 const (
-	playlistFileMode = 0o600
-	// Library files are readable like the ones aria2c and yt-dlp write, as in the Python downloader.
-	libraryFileMode        = 0o644
+	playlistFileMode       = 0o600
 	videoExtension         = ".mp4"
 	ytDLPExtensionTemplate = ".%(ext)s"
 	fileURLScheme          = "file"
@@ -91,8 +89,4 @@ func (run *courseDownload) hls(ctx context.Context, chapterDir string, lecture u
 	playlistURL := url.URL{Scheme: fileURLScheme, Path: playlistPath}
 	output := filepath.Join(chapterDir, strings.TrimSuffix(lecture.File, videoExtension)+ytDLPExtensionTemplate)
 	return run.tools.Streams.FetchHLS(ctx, playlistURL.String(), output)
-}
-
-func writeLibraryFile(path string, data []byte) error {
-	return os.WriteFile(path, data, libraryFileMode) //nolint:gosec // reason: media library files are meant to be readable, like the tools' downloads
 }
