@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"regexp"
 	"strconv"
 	"strings"
@@ -31,6 +32,15 @@ func (parseErr *ParseError) Unwrap() error { return ErrMalformedSRT }
 type numberedLine struct {
 	number int
 	text   string
+}
+
+func ParseSRTFile(files fs.FS, path string) ([]Cue, error) {
+	file, err := files.Open(path)
+	if err != nil {
+		return nil, fmt.Errorf("open subtitle: %w", err)
+	}
+	defer file.Close()
+	return ParseSRT(file)
 }
 
 func ParseSRT(reader io.Reader) ([]Cue, error) {
