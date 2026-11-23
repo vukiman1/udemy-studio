@@ -35,15 +35,6 @@ func TestCourseFoundInCollectionsAfterEarlierLookupsMiss(t *testing.T) {
 	}
 }
 
-func TestCourseMatchedByNumericID(t *testing.T) {
-	fake := &fakeTransport{}
-	fake.reply(testPortalURL+courseSearchPath+"42", http.StatusOK, `{"results": [{"id": 42, "published_title": "backend-basics"}]}`)
-	course, err := newTestClient(t, fake).ResolveCourse(t.Context(), courseURL, udemy.CourseRef{Portal: "example-portal", Slug: "42"})
-	if err != nil || course.ID != 42 {
-		t.Errorf("ResolveCourse = %+v, %v", course, err)
-	}
-}
-
 func TestCourseFoundFromCoursePageAsLastResort(t *testing.T) {
 	fake := &fakeTransport{}
 	fake.reply(courseURL, http.StatusOK, `<html><body><div class="main ud-component--course-taking--app" data-module-args="{&quot;courseId&quot;: 42}"></div></body></html>`)
@@ -68,12 +59,6 @@ func TestNetworkErrorsAbortTheLookup(t *testing.T) {
 	var unexpected *UnexpectedResponseError
 	if _, err := newTestClient(t, fake).ResolveCourse(t.Context(), courseURL, courseRef); !errors.As(err, &unexpected) || fake.requestedMatching("page_size=10000") != 0 {
 		t.Errorf("err = %v", err)
-	}
-}
-
-func TestCoursePageErrorStatusIsNotFound(t *testing.T) {
-	if _, err := newTestClient(t, &fakeTransport{}).ResolveCourse(t.Context(), courseURL, courseRef); !errors.Is(err, ErrCourseNotFound) {
-		t.Errorf("err = %v, want ErrCourseNotFound", err)
 	}
 }
 

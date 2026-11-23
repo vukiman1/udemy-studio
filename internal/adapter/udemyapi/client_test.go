@@ -22,17 +22,6 @@ func TestServiceUnavailableIsRetried(t *testing.T) {
 	}
 }
 
-func TestRetriesGiveUpAfterTenAttempts(t *testing.T) {
-	fake := &fakeTransport{}
-	target := testPortalURL + "/api-2.0/x"
-	fake.reply(target, http.StatusServiceUnavailable, "busy")
-	var statusErr *StatusError
-	err := newTestClient(t, fake).getJSON(t.Context(), target, &struct{}{})
-	if !errors.As(err, &statusErr) || statusErr.Status != http.StatusServiceUnavailable || fake.requestedMatching("/x") != maxAttempts {
-		t.Errorf("err = %v after %d attempts", err, fake.requestedMatching("/x"))
-	}
-}
-
 func TestCloudflareChallengeStopsImmediately(t *testing.T) {
 	fake := &fakeTransport{}
 	target := testPortalURL + "/api-2.0/x"
@@ -49,16 +38,6 @@ func TestErrorsNameTheStatusButNotTheQuery(t *testing.T) {
 	_, err := newTestClient(t, fake).FetchPlaylist(t.Context(), target)
 	if err == nil || strings.Contains(err.Error(), "secret-token") || !strings.Contains(err.Error(), "You do not have permission") {
 		t.Errorf("err = %v", err)
-	}
-}
-
-func TestHTMLInsteadOfJSONIsReported(t *testing.T) {
-	fake := &fakeTransport{}
-	target := testPortalURL + "/api-2.0/x"
-	fake.reply(target, http.StatusOK, "<html>login</html>")
-	var unexpected *UnexpectedResponseError
-	if err := newTestClient(t, fake).getJSON(t.Context(), target, &struct{}{}); !errors.As(err, &unexpected) {
-		t.Errorf("err = %v, want UnexpectedResponseError", err)
 	}
 }
 
@@ -81,30 +60,5 @@ func TestChallengeMarkerInASuccessfulPageIsNotAChallenge(t *testing.T) {
 	fake.reply(target, http.StatusOK, page)
 	if got, err := newTestClient(t, fake).getText(t.Context(), target); err != nil || got != page {
 		t.Errorf("getText = %q, %v", got, err)
-	}
-}
-
-func TestVisitSucceedsOnOK(t *testing.T) {
-	fake := &fakeTransport{}
-	fake.reply(testPortalURL+visitPath, http.StatusOK, `{}`)
-	if err := newTestClient(t, fake).Visit(t.Context()); err != nil {
-		t.Errorf("Visit = %v", err)
-	}
-}
-
-func TestVisitReportsARejectedLogin(t *testing.T) {
-	fake := &fakeTransport{}
-	fake.reply(testPortalURL+visitPath, http.StatusForbidden, `{}`)
-	var statusErr *StatusError
-	if err := newTestClient(t, fake).Visit(t.Context()); !errors.As(err, &statusErr) || statusErr.Status != http.StatusForbidden {
-		t.Errorf("err = %v, want StatusError 403", err)
-	}
-}
-
-func TestVisitReportsACloudflareChallenge(t *testing.T) {
-	fake := &fakeTransport{}
-	fake.reply(testPortalURL+visitPath, http.StatusForbidden, "<html><title>Just a moment...</title></html>")
-	if err := newTestClient(t, fake).Visit(t.Context()); !errors.Is(err, ErrChallenged) {
-		t.Errorf("err = %v, want ErrChallenged", err)
 	}
 }

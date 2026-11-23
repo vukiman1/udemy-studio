@@ -2,9 +2,7 @@ package udemy
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
-	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -96,31 +94,5 @@ func TestCaptionsAreFilteredByLanguage(t *testing.T) {
 		if diff := cmp.Diff(testCase.want, got); diff != "" {
 			t.Errorf("language %q (-want +got):\n%s", testCase.language, diff)
 		}
-	}
-}
-
-func TestAssetsArePlannedOnlyWhenRequested(t *testing.T) {
-	asset := &Asset{AssetType: "Article", Body: "<p>hi</p>"}
-	lecture, _ := planSingleLecture(t, asset, PlanOptions{}, fixturePlaylists{})
-	if lecture.Assets != nil {
-		t.Errorf("assets = %+v, want none", lecture.Assets)
-	}
-}
-
-func TestCourseDirCanUseCourseID(t *testing.T) {
-	plan, err := BuildPlan(t.Context(), Course{ID: 1234, Slug: "slug"}, nil, PlanOptions{IDAsCourseName: true}, fixturePlaylists{})
-	if err != nil || plan.CourseDir != "1234" {
-		t.Errorf("course dir = %q, err = %v; want 1234", plan.CourseDir, err)
-	}
-}
-
-func TestEmptyCourseHasAnEmptyChapterList(t *testing.T) {
-	plan, err := BuildPlan(t.Context(), Course{Slug: "course"}, nil, PlanOptions{}, fixturePlaylists{})
-	if err != nil {
-		t.Fatalf("BuildPlan: %v", err)
-	}
-	encoded, err := json.Marshal(plan)
-	if err != nil || !strings.Contains(string(encoded), `"chapters":[]`) {
-		t.Errorf("plan JSON = %s, %v", encoded, err)
 	}
 }

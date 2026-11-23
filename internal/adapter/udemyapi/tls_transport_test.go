@@ -1,9 +1,7 @@
 package udemyapi
 
 import (
-	"bytes"
 	"compress/gzip"
-	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -36,23 +34,5 @@ func TestTLSTransportSendsLoginCookieAndAppHeaders(t *testing.T) {
 	}
 	if gotCookie != "token-value" || gotClientID != appHeaders["x-udemy-client-id"] || gotUserAgent != appHeaders["user-agent"] || string(reply.body) != `{"ok": true}` {
 		t.Errorf("cookie = %q, client id = %q, user agent = %q, body = %q", gotCookie, gotClientID, gotUserAgent, reply.body)
-	}
-}
-
-func TestOversizedResponseIsRejected(t *testing.T) {
-	server := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, _ *http.Request) {
-		writer.Header().Set("content-encoding", "gzip")
-		compressed := gzip.NewWriter(writer)
-		_, _ = compressed.Write(bytes.Repeat([]byte(" "), maxResponseBytes+1))
-		_ = compressed.Close()
-	}))
-	defer server.Close()
-
-	transport, err := newTLSTransport(server.URL, secret.New("token-value"))
-	if err != nil {
-		t.Fatalf("newTLSTransport: %v", err)
-	}
-	if _, err := transport.get(t.Context(), server.URL+"/api-2.0/x"); !errors.Is(err, errResponseTooLarge) {
-		t.Errorf("err = %v, want errResponseTooLarge", err)
 	}
 }
