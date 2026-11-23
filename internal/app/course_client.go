@@ -5,6 +5,7 @@ import (
 	"log/slog"
 
 	"github.com/vukiman1/udemy-studio/internal/adapter/udemyapi"
+	"github.com/vukiman1/udemy-studio/internal/platform/secret"
 	"github.com/vukiman1/udemy-studio/internal/udemy"
 )
 
@@ -19,6 +20,10 @@ func courseClient(ctx context.Context, dataDir, chromeDataDir string, ref udemy.
 	if err != nil {
 		return nil, err
 	}
+	return visitedClient(ctx, ref, token, logger)
+}
+
+func visitedClient(ctx context.Context, ref udemy.CourseRef, token secret.Secret, logger *slog.Logger) (*udemyapi.Client, error) {
 	client, err := udemyapi.New(ref.Portal, token, logger)
 	if err != nil {
 		return nil, err
