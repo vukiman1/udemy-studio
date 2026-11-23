@@ -92,6 +92,9 @@ func (collector sourceCollector) hlsChoices(ctx context.Context, masterURL strin
 		return nil, nil
 	}
 	playlist, err := collector.playlists.FetchPlaylist(ctx, masterURL)
+	if ctx.Err() != nil {
+		return nil, ctx.Err()
+	}
 	if errors.Is(err, ErrPlaylistUnavailable) {
 		collector.warn("skipping HLS streams of asset %s: %v", assetID[masterAssetGroup], err)
 		return nil, nil

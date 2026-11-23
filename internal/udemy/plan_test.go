@@ -63,6 +63,17 @@ func TestAudioOnlySourcesLeaveVideoMissingWithoutWarnings(t *testing.T) {
 	}
 }
 
+// The transport's error need not wrap the cancel, so the plan checks the context itself.
+func TestCancelledPlanStopsAtHLSFetch(t *testing.T) {
+	ctx, cancel := context.WithCancel(t.Context())
+	cancel()
+	asset := &Asset{AssetType: "Video", StreamURLs: map[string][]VideoSource{videoStreamKey: {{Type: hlsMimeType, Label: "Auto", File: masterURL}}}}
+	_, err := BuildPlan(ctx, Course{Slug: "course"}, singleLectureCourse(asset), PlanOptions{}, failingPlaylists{err: errNetworkDown})
+	if !errors.Is(err, context.Canceled) {
+		t.Errorf("err = %v, want context.Canceled", err)
+	}
+}
+
 func TestHLSFetchFailureOtherThanUnavailableAbortsThePlan(t *testing.T) {
 	asset := &Asset{AssetType: "Video", StreamURLs: map[string][]VideoSource{videoStreamKey: {{Type: hlsMimeType, Label: "Auto", File: masterURL}}}}
 	_, err := BuildPlan(t.Context(), Course{Slug: "course"}, singleLectureCourse(asset), PlanOptions{}, failingPlaylists{err: errNetworkDown})
