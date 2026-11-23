@@ -1,0 +1,582 @@
+{
+  "fundamentals-of-backend-communications-and-protocols/01 - Introduction/001 Welcome_en.srt": {
+    "cue_count": 74,
+    "timing_sha256": "6b764a2717a4f3f5369cb626b07b0f38927fd0f6ab2de95fe626956b2e96a529",
+    "text_sha256": "4f033b1abd0756971b5e0a51465df8ea4f958cc81f3904f337c4143bcb53be2e"
+  },
+  "fundamentals-of-backend-communications-and-protocols/01 - Introduction/001 Welcome_vi.srt": {
+    "cue_count": 74,
+    "timing_sha256": "6b764a2717a4f3f5369cb626b07b0f38927fd0f6ab2de95fe626956b2e96a529",
+    "text_sha256": "11d396d09685c9743aac367dfa2b6e461c91402ec50e573e91cc0e58b085ad64"
+  },
+  "fundamentals-of-backend-communications-and-protocols/01 - Introduction/002 Who is this course for_en.srt": {
+    "cue_count": 40,
+    "timing_sha256": "4ee392e5f3d217777d9750b73a91cb7be253e675f7adf8afb62ccb7dbe8598c2",
+    "text_sha256": "8ed813b9e94a7468428418092238b7cf4146b1870be059f4525c456ce1a5f9fe"
+  },
+  "fundamentals-of-backend-communications-and-protocols/01 - Introduction/002 Who is this course for_vi.srt": {
+    "cue_count": 40,
+    "timing_sha256": "4ee392e5f3d217777d9750b73a91cb7be253e675f7adf8afb62ccb7dbe8598c2",
+    "text_sha256": "f72996b127a4abecfebb7cd15444efb526617732289e647b67170ce609023049"
+  },
+  "fundamentals-of-backend-communications-and-protocols/01 - Introduction/003 Course Outline_en.srt": {
+    "cue_count": 161,
+    "timing_sha256": "6acb5210fe2200600a5c446e08f7d2920e3e6518aff214d3e321ea6188305263",
+    "text_sha256": "224bcf64e927859f52fe710077dd77321fd13c2c0ac822ae31a4235ccffd7dc4"
+  },
+  "fundamentals-of-backend-communications-and-protocols/01 - Introduction/003 Course Outline_vi.srt": {
+    "cue_count": 161,
+    "timing_sha256": "6acb5210fe2200600a5c446e08f7d2920e3e6518aff214d3e321ea6188305263",
+    "text_sha256": "d1f0233eabb146d1f1f5384fe5c8a0ed7cd65341afb70de436be454fd921ce07"
+  },
+  "fundamentals-of-backend-communications-and-protocols/01 - Introduction/004 Course Notes_en.srt": {
+    "cue_count": 51,
+    "timing_sha256": "7ee3b529fb6ad9d1c8bf0b316b0ba7f15f9f9b335149018a951020e153169e7f",
+    "text_sha256": "379f6c29f6c2e1a06ee45e0bf867b5a2da7363f90097709dffc2fcdcdd48a4a9"
+  },
+  "fundamentals-of-backend-communications-and-protocols/01 - Introduction/004 Course Notes_vi.srt": {
+    "cue_count": 51,
+    "timing_sha256": "7ee3b529fb6ad9d1c8bf0b316b0ba7f15f9f9b335149018a951020e153169e7f",
+    "text_sha256": "a94d3606683a81535869179dd3f5296c40509a5eabfb6b2cc48404ab7c8588d1"
+  },
+  "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/001 Backend Communication Design Patterns Intro_en.srt": {
+    "cue_count": 26,
+    "timing_sha256": "b44e3a42b9484889adbc3754634c59c0a13be4f2fb36aac99e437b890ba52f66",
+    "text_sha256": "dc80d4c5dd2d540857fad5bba18f46c37f499866beb27f980af8be760f286b87"
+  },
+  "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/001 Backend Communication Design Patterns Intro_vi.srt": {
+    "cue_count": 26,
+    "timing_sha256": "b44e3a42b9484889adbc3754634c59c0a13be4f2fb36aac99e437b890ba52f66",
+    "text_sha256": "6d931b1e1a2364ac9a9457e40c558bd9e36d0286d9ce1ed7e412f57f05dd1cf9"
+  },
+  "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/002 Request Response_en.srt": {
+    "cue_count": 465,
+    "timing_sha256": "5f6a51983b3997344a81d3b8bd03a00844b599d29ce35d4f44bf6e961fa7b547",
+    "text_sha256": "4424a2afa57a494f0141155d0a2c0704286271f24a6e54320ff82f4f91f0f963"
+  },
+  "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/002 Request Response_vi.srt": {
+    "cue_count": 465,
+    "timing_sha256": "5f6a51983b3997344a81d3b8bd03a00844b599d29ce35d4f44bf6e961fa7b547",
+    "text_sha256": "06ceb3bea35ba6c2d9728ab5a753fac4b9cf19acac5e0e2d52c0c9250827d01a"
+  },
+  "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/003 Push_en.srt": {
+    "cue_count": 371,
+    "timing_sha256": "7efa831b4d76a35dbfdf6da59c1c8070b1c3eaac03a4e737d6e9de9058de4f72",
+    "text_sha256": "94626f2f3d446b686d006600274b0c8837a9cc3216bf3c5f841e8b84b5fc642c"
+  },
+  "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/003 Push_vi.srt": {
+    "cue_count": 371,
+    "timing_sha256": "7efa831b4d76a35dbfdf6da59c1c8070b1c3eaac03a4e737d6e9de9058de4f72",
+    "text_sha256": "7d32efa2e572021663b248005de7c6d073639ef154b9d29eab6b1b392994781b"
+  },
+  "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/004 Synchronous vs Asynchronous workloads_en.srt": {
+    "cue_count": 728,
+    "timing_sha256": "5eb5516973946d663814c4bd0427c21760b8ffd77d0cbbceff7f639320d97126",
+    "text_sha256": "3821866d1d22ff40737aa977d2a419e1359e6b4b12320ec63b34c633d9e32fc5"
+  },
+  "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/004 Synchronous vs Asynchronous workloads_vi.srt": {
+    "cue_count": 728,
+    "timing_sha256": "5eb5516973946d663814c4bd0427c21760b8ffd77d0cbbceff7f639320d97126",
+    "text_sha256": "749f919e512c9e079c62560a96be75142376a98119c70a09d6aa12a9a9de3372"
+  },
+  "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/005 Polling_en.srt": {
+    "cue_count": 244,
+    "timing_sha256": "bb67ade65a2c2701f903f3e06a5679f9a7b92175716f8c4a8741d690da0ebcdc",
+    "text_sha256": "9d94e58a52f1f52dc3d61ab12821e7d188ae61506fd33b9f13ca1ac4c1b28aaa"
+  },
+  "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/005 Polling_vi.srt": {
+    "cue_count": 244,
+    "timing_sha256": "bb67ade65a2c2701f903f3e06a5679f9a7b92175716f8c4a8741d690da0ebcdc",
+    "text_sha256": "7af1b90142255c0cb09315fdf6a213e63f8b0dcbab74704381ff6ab2728ecfa7"
+  },
+  "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/006 Long Polling_en.srt": {
+    "cue_count": 192,
+    "timing_sha256": "1a9767568c15c24315de33169433302fba23a7755f443eb2224b77ed7bc1f6a6",
+    "text_sha256": "0bcbf51d476a296abca4f3ad7239acf5e4d709557fe7610ec26f3024a3d8f330"
+  },
+  "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/006 Long Polling_vi.srt": {
+    "cue_count": 192,
+    "timing_sha256": "1a9767568c15c24315de33169433302fba23a7755f443eb2224b77ed7bc1f6a6",
+    "text_sha256": "01af4e32085c2e26c0382d3cb4ead24f88c3a38a916fa50afadcdb1cd3067ffb"
+  },
+  "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/007 Server Sent Events_en.srt": {
+    "cue_count": 239,
+    "timing_sha256": "c968e35d836700d466304f0e5378f35da4052618f295dd16fd27c6a26d70d409",
+    "text_sha256": "68804b93ebb9f2c67bcc979602bc3fa1751d8bb6a0e2ab2ae95cce864f658caa"
+  },
+  "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/007 Server Sent Events_vi.srt": {
+    "cue_count": 239,
+    "timing_sha256": "c968e35d836700d466304f0e5378f35da4052618f295dd16fd27c6a26d70d409",
+    "text_sha256": "1e4975f5ebe0ac2fead10f74235af95dd97480e42968397a9f34103f7707d670"
+  },
+  "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/008 Publish Subscribe (PubSub)_en.srt": {
+    "cue_count": 311,
+    "timing_sha256": "ba152bf453c005c8d3866dc81682c46aca11886821b2dd3405240056e1ba6967",
+    "text_sha256": "cdd767f783553cd6c435866bd8f1ec5875188472ff4da919645dc9e4479a509a"
+  },
+  "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/008 Publish Subscribe (PubSub)_vi.srt": {
+    "cue_count": 311,
+    "timing_sha256": "ba152bf453c005c8d3866dc81682c46aca11886821b2dd3405240056e1ba6967",
+    "text_sha256": "aff8737bca46366689e6ff6a4ae4bafb378ec8b6afb54b0e219b68da48e75b43"
+  },
+  "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/009 Multiplexing vs Demultiplexing (h2 proxying vs Connection Pooling)_en.srt": {
+    "cue_count": 253,
+    "timing_sha256": "86b7c6becf3c686a057279d47972a41fc40fc9a667edac1d01690f35744e1fc0",
+    "text_sha256": "cd3892f0dc5450af25e475227d96624ae87ca4d9376a487ee3f86c763d4f20ca"
+  },
+  "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/009 Multiplexing vs Demultiplexing (h2 proxying vs Connection Pooling)_vi.srt": {
+    "cue_count": 253,
+    "timing_sha256": "86b7c6becf3c686a057279d47972a41fc40fc9a667edac1d01690f35744e1fc0",
+    "text_sha256": "6bf196a98bba3b4a4e1354cea1d8004efe8408d0afd145f58ee1cd3f59a27862"
+  },
+  "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/010 Stateful vs Stateless_en.srt": {
+    "cue_count": 398,
+    "timing_sha256": "45038dc55c05f65dc2ecfc67e2db21eecd169d549c78f9cdf6dd33e6350e7a02",
+    "text_sha256": "8ab3f9d7a11c573e14c2cd39343e46da4f49dedcc6476ea1a0c967634957783a"
+  },
+  "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/010 Stateful vs Stateless_vi.srt": {
+    "cue_count": 398,
+    "timing_sha256": "45038dc55c05f65dc2ecfc67e2db21eecd169d549c78f9cdf6dd33e6350e7a02",
+    "text_sha256": "5cad5477f0bf0564bd0a32fde049cf8763d85b49e9ce17eda116f6fcca4d4d82"
+  },
+  "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/011 Sidecar Pattern_en.srt": {
+    "cue_count": 374,
+    "timing_sha256": "9e6cba0311fa064ad37733d9c8099b023f6398e9bbc35c13c7afe1f442f896fa",
+    "text_sha256": "4bc908d2f013380d1afdbd63e78d723ba4d493cbfd8376e220f5d4a56578c745"
+  },
+  "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/011 Sidecar Pattern_vi.srt": {
+    "cue_count": 374,
+    "timing_sha256": "9e6cba0311fa064ad37733d9c8099b023f6398e9bbc35c13c7afe1f442f896fa",
+    "text_sha256": "840f090ded6b8be503a0fffe8e50472e7b59dca101c025cba073387328842a38"
+  },
+  "fundamentals-of-backend-communications-and-protocols/03 - Protocols/001 Protocols Intro_en.srt": {
+    "cue_count": 14,
+    "timing_sha256": "6abba1d5081bc48e826a734858b70b304f28a1570468a2cec91db61160702351",
+    "text_sha256": "a89dd99b510a04f048bd2153f65c1224266d9f606df7b63de2f7f7486de76357"
+  },
+  "fundamentals-of-backend-communications-and-protocols/03 - Protocols/001 Protocols Intro_vi.srt": {
+    "cue_count": 14,
+    "timing_sha256": "6abba1d5081bc48e826a734858b70b304f28a1570468a2cec91db61160702351",
+    "text_sha256": "2527bbf7c699a98f2cff4bebc8f1d73d86b22e6f8d24663e8c6b5e4e3b56d7ab"
+  },
+  "fundamentals-of-backend-communications-and-protocols/03 - Protocols/002 Protocol Properties_en.srt": {
+    "cue_count": 202,
+    "timing_sha256": "dfe4e50650fcb2cbc92dafd6f3a4b798b8c61845c89809898467c30ce39a4a93",
+    "text_sha256": "67550f1391f3b24ece1dca3d43ba7d2da592b2e6066f9c733d012d4ed2b7bc69"
+  },
+  "fundamentals-of-backend-communications-and-protocols/03 - Protocols/002 Protocol Properties_vi.srt": {
+    "cue_count": 202,
+    "timing_sha256": "dfe4e50650fcb2cbc92dafd6f3a4b798b8c61845c89809898467c30ce39a4a93",
+    "text_sha256": "96648000ab2fbe41d739d7f567f0a3f83731ae4314df26b9dfac3612fd8d3781"
+  },
+  "fundamentals-of-backend-communications-and-protocols/03 - Protocols/003 OSI Model_en.srt": {
+    "cue_count": 828,
+    "timing_sha256": "e7cccd3cd35dcbb12bee95a619c3a4909c0d956a514c3e10526c14b87f0d1db3",
+    "text_sha256": "b8c30d20dc8f6d04d4c7168f9077da39c6dc07af2e869f17e9de15bfb7eb2d84"
+  },
+  "fundamentals-of-backend-communications-and-protocols/03 - Protocols/003 OSI Model_vi.srt": {
+    "cue_count": 828,
+    "timing_sha256": "e7cccd3cd35dcbb12bee95a619c3a4909c0d956a514c3e10526c14b87f0d1db3",
+    "text_sha256": "2bf07aabbbe578ee9adc424a632e2fcb46e5b4979e39405b585cff80cc683bd5"
+  },
+  "fundamentals-of-backend-communications-and-protocols/03 - Protocols/004 Internet Protocol_en.srt": {
+    "cue_count": 1174,
+    "timing_sha256": "f746b7b7c724341f9b4d7b26f2514e0af0460fd125ac266c2c5d731498594b07",
+    "text_sha256": "6ab2c658894c8f21bf0680d6ed93a256346fe3f8bb113e940872faa1b696d8d3"
+  },
+  "fundamentals-of-backend-communications-and-protocols/03 - Protocols/004 Internet Protocol_vi.srt": {
+    "cue_count": 1174,
+    "timing_sha256": "f746b7b7c724341f9b4d7b26f2514e0af0460fd125ac266c2c5d731498594b07",
+    "text_sha256": "48d0cdf7f492cdf707e284da8f42acc60b14f10cbab3552d4d4d4a71589db6f9"
+  },
+  "fundamentals-of-backend-communications-and-protocols/03 - Protocols/005 UDP_en.srt": {
+    "cue_count": 837,
+    "timing_sha256": "8f5c60e3808bb8a1b43ae5b27201d908f63aa231d1630616cca2090f453d4ca9",
+    "text_sha256": "9b54c2b94c18333b8b015fca6ea5e158337c90581ffd23ed15f269f5123eb758"
+  },
+  "fundamentals-of-backend-communications-and-protocols/03 - Protocols/005 UDP_vi.srt": {
+    "cue_count": 837,
+    "timing_sha256": "8f5c60e3808bb8a1b43ae5b27201d908f63aa231d1630616cca2090f453d4ca9",
+    "text_sha256": "87709db2c6f756b86b1011ef873a9b0634b2cf2e110161b25e508be98c789595"
+  },
+  "fundamentals-of-backend-communications-and-protocols/03 - Protocols/006 TCP_en.srt": {
+    "cue_count": 952,
+    "timing_sha256": "bc5cbb8ec1005085d1d761b339855785b3179c5c93720947743e3642d66ce35a",
+    "text_sha256": "1b02e7e7ea552687dd58a64e36865cbe3f474556dab4a7c9b082cd405759e39d"
+  },
+  "fundamentals-of-backend-communications-and-protocols/03 - Protocols/006 TCP_vi.srt": {
+    "cue_count": 952,
+    "timing_sha256": "bc5cbb8ec1005085d1d761b339855785b3179c5c93720947743e3642d66ce35a",
+    "text_sha256": "e8d82639243c582ca7cefadacc850c894ae542bb8a085795b5c9389b99260d84"
+  },
+  "fundamentals-of-backend-communications-and-protocols/03 - Protocols/007 TLS_en.srt": {
+    "cue_count": 467,
+    "timing_sha256": "1a886da5dd2d9cdb1d9774c06abbb34c06bb2fc293328554366667ac5eca9d73",
+    "text_sha256": "27c395cf35ee862a41cd98c7f50f9882462212a6d4a31408a8b525b9f730e687"
+  },
+  "fundamentals-of-backend-communications-and-protocols/03 - Protocols/007 TLS_vi.srt": {
+    "cue_count": 467,
+    "timing_sha256": "1a886da5dd2d9cdb1d9774c06abbb34c06bb2fc293328554366667ac5eca9d73",
+    "text_sha256": "8f8d8131d2e353a873eee384609a1bde614fa33becb95e75209fd5ecf80176d2"
+  },
+  "fundamentals-of-backend-communications-and-protocols/03 - Protocols/008 HTTP1.1_en.srt": {
+    "cue_count": 544,
+    "timing_sha256": "ad603bdb614805adbf561d82ab74e40e34dbcec4b6c537e49fbd1e773f1e42b8",
+    "text_sha256": "8864a519d3a7456cabb3b00cd3b5c3db64b2991471ff1f432f7404c9fcb4ba85"
+  },
+  "fundamentals-of-backend-communications-and-protocols/03 - Protocols/008 HTTP1.1_vi.srt": {
+    "cue_count": 544,
+    "timing_sha256": "ad603bdb614805adbf561d82ab74e40e34dbcec4b6c537e49fbd1e773f1e42b8",
+    "text_sha256": "f1baf5ab154e9b1764dd5d38ee54df74bcdacd69942a00efb74acac907688471"
+  },
+  "fundamentals-of-backend-communications-and-protocols/03 - Protocols/010 WebSockets_en.srt": {
+    "cue_count": 423,
+    "timing_sha256": "d2f9d8863b4c1e772667f21d9c4b8f07d56b15552fe62956afd66b81e9703979",
+    "text_sha256": "4e732b684e2de789a655d214dae4a1c7780451640260ee869393130aa51f5c3c"
+  },
+  "fundamentals-of-backend-communications-and-protocols/03 - Protocols/010 WebSockets_vi.srt": {
+    "cue_count": 423,
+    "timing_sha256": "d2f9d8863b4c1e772667f21d9c4b8f07d56b15552fe62956afd66b81e9703979",
+    "text_sha256": "5c53128ef39905c038c1a05c52e1ef7adefecd0159be3a40be4f85650450262b"
+  },
+  "fundamentals-of-backend-communications-and-protocols/03 - Protocols/011 HTTP2_en.srt": {
+    "cue_count": 303,
+    "timing_sha256": "609c02a6ef8e4ee01780f02d8d484f90295f410d6ff86dcef0c4fc3b9739c534",
+    "text_sha256": "0daec37d4d464ccc28bcb70c519396685f4aa679ca8d5ae50c54bfc99b2ce412"
+  },
+  "fundamentals-of-backend-communications-and-protocols/03 - Protocols/011 HTTP2_vi.srt": {
+    "cue_count": 303,
+    "timing_sha256": "609c02a6ef8e4ee01780f02d8d484f90295f410d6ff86dcef0c4fc3b9739c534",
+    "text_sha256": "ec5a66d291ea65e5af21a01e132abd9ef99508ec9bf76d7b8be78c8aaa33c8af"
+  },
+  "fundamentals-of-backend-communications-and-protocols/03 - Protocols/012 HTTP3_en.srt": {
+    "cue_count": 514,
+    "timing_sha256": "986accb6fac3074efd7eb9943f86955f8aa1bbd153c0a1a83bf0718af70aa142",
+    "text_sha256": "7f029678e942d61010b433cfbce74bec35c295e16a9624d5d1fe626eac185835"
+  },
+  "fundamentals-of-backend-communications-and-protocols/03 - Protocols/012 HTTP3_vi.srt": {
+    "cue_count": 514,
+    "timing_sha256": "986accb6fac3074efd7eb9943f86955f8aa1bbd153c0a1a83bf0718af70aa142",
+    "text_sha256": "8e36aaeb75390f3df0b6c134e3bb90c81e5167265be94751c0ebe8c4ba655c26"
+  },
+  "fundamentals-of-backend-communications-and-protocols/03 - Protocols/013 gRPC_en.srt": {
+    "cue_count": 873,
+    "timing_sha256": "5983b78c05d38e991a32330452b340b6549d61ea9b2a562c3a311350e2cc13f8",
+    "text_sha256": "926263285fdd0c7deb972db28a9ca08241b19f88a777b1d009a21eef13593795"
+  },
+  "fundamentals-of-backend-communications-and-protocols/03 - Protocols/013 gRPC_vi.srt": {
+    "cue_count": 873,
+    "timing_sha256": "5983b78c05d38e991a32330452b340b6549d61ea9b2a562c3a311350e2cc13f8",
+    "text_sha256": "f18b529476732ba031fe1b83a440a5d8ad17bb0960dba51d3cfe2021a53e5afa"
+  },
+  "fundamentals-of-backend-communications-and-protocols/03 - Protocols/014 WebRTC_en.srt": {
+    "cue_count": 1313,
+    "timing_sha256": "cbff5ca4230f609299e8df38cee4956a51e3e490748a7379ce610082c4d7b53c",
+    "text_sha256": "702979dac2ed730989a465212795531c2742d68f6006e1dc7458bffb7b702bc8"
+  },
+  "fundamentals-of-backend-communications-and-protocols/03 - Protocols/014 WebRTC_vi.srt": {
+    "cue_count": 1313,
+    "timing_sha256": "cbff5ca4230f609299e8df38cee4956a51e3e490748a7379ce610082c4d7b53c",
+    "text_sha256": "7d5e76b332656cdd254c2f049af666980168d9fe57975d05ad2e9b137a0c0940"
+  },
+  "fundamentals-of-backend-communications-and-protocols/04 - Many ways to HTTPS/001 HTTPS Communication Basics Intro_en.srt": {
+    "cue_count": 55,
+    "timing_sha256": "d74fe3d755d4973169435b9986c29252b74b450e46e7adee91264c066454664e",
+    "text_sha256": "fd7a3fb60f1e410913316d30559be9a9331d06fdf0ab978541357727b77e252d"
+  },
+  "fundamentals-of-backend-communications-and-protocols/04 - Many ways to HTTPS/001 HTTPS Communication Basics Intro_vi.srt": {
+    "cue_count": 55,
+    "timing_sha256": "d74fe3d755d4973169435b9986c29252b74b450e46e7adee91264c066454664e",
+    "text_sha256": "c453de55c0b23d30d8920c05f1b30ac712be6dd401ae31a1ade931b58f5b54f2"
+  },
+  "fundamentals-of-backend-communications-and-protocols/04 - Many ways to HTTPS/002 HTTPS over TCP with TLS 1.2_en.srt": {
+    "cue_count": 112,
+    "timing_sha256": "e399222c16420b0c685081980dc058ea50a501eb0ef64206a51ecd172652b95d",
+    "text_sha256": "0a75de0d330044baae1cee3d2d48b77b8f96a2ba088b85be9c34275d04c1fafc"
+  },
+  "fundamentals-of-backend-communications-and-protocols/04 - Many ways to HTTPS/002 HTTPS over TCP with TLS 1.2_vi.srt": {
+    "cue_count": 112,
+    "timing_sha256": "e399222c16420b0c685081980dc058ea50a501eb0ef64206a51ecd172652b95d",
+    "text_sha256": "f538e87b73d8190820bead9c27a04a3922c050628fc43c7c11244695d1663dc7"
+  },
+  "fundamentals-of-backend-communications-and-protocols/04 - Many ways to HTTPS/003 HTTPS over TCP with TLS 1.3_en.srt": {
+    "cue_count": 74,
+    "timing_sha256": "3f03e137429bc807b9bd3e105b2d33f5d08353612d178647458a06db8d1fd2dc",
+    "text_sha256": "ae65a7b5d59aee27476090b4e8848ba20458cbbd30326c3acdb5b2f1698fef48"
+  },
+  "fundamentals-of-backend-communications-and-protocols/04 - Many ways to HTTPS/003 HTTPS over TCP with TLS 1.3_vi.srt": {
+    "cue_count": 74,
+    "timing_sha256": "3f03e137429bc807b9bd3e105b2d33f5d08353612d178647458a06db8d1fd2dc",
+    "text_sha256": "58584bde908f31d146b3250c892061d066fe1a5bb503f104f573fa08302db735"
+  },
+  "fundamentals-of-backend-communications-and-protocols/04 - Many ways to HTTPS/004 HTTPS over QUIC (HTTP3)_en.srt": {
+    "cue_count": 40,
+    "timing_sha256": "3b26fde49a4bd98b3eb759c5ad5854abf99c036a2b482af440fd26e2827b19ab",
+    "text_sha256": "5da31fe96fb195a2315e452c0a1e4197c6c2e643e3f9180b8bc6badd09f1327f"
+  },
+  "fundamentals-of-backend-communications-and-protocols/04 - Many ways to HTTPS/004 HTTPS over QUIC (HTTP3)_vi.srt": {
+    "cue_count": 40,
+    "timing_sha256": "3b26fde49a4bd98b3eb759c5ad5854abf99c036a2b482af440fd26e2827b19ab",
+    "text_sha256": "b4efe5c6cab62c06ba4dccfc6403e1bcf38626c018911ce3c99f11e463c613d7"
+  },
+  "fundamentals-of-backend-communications-and-protocols/04 - Many ways to HTTPS/005 HTTPS over TFO with TLS 1.3_en.srt": {
+    "cue_count": 38,
+    "timing_sha256": "5113fe2481f6227aa18fdac425d9e9c380364bd8d00a229a3c395701228dcaa5",
+    "text_sha256": "2f16c99bbb2443b75e185826bcb6e9f644d7f54680c44332f9da8b6ee812cb94"
+  },
+  "fundamentals-of-backend-communications-and-protocols/04 - Many ways to HTTPS/005 HTTPS over TFO with TLS 1.3_vi.srt": {
+    "cue_count": 38,
+    "timing_sha256": "5113fe2481f6227aa18fdac425d9e9c380364bd8d00a229a3c395701228dcaa5",
+    "text_sha256": "6cd3d1bbc3fbcdc0744a3699a4219339c4745f660bb4f51b9f6d458e2d120ab0"
+  },
+  "fundamentals-of-backend-communications-and-protocols/04 - Many ways to HTTPS/006 HTTPS over TCP with TLS 1.3 and 0RTT_en.srt": {
+    "cue_count": 39,
+    "timing_sha256": "e7d10895f5337ac57fbb74a0bc3b41d9b81ac100908d26de102c8b59c328895b",
+    "text_sha256": "4479645a6f4315769aedee94877445bec72f33ce2e4c323c7b03af7101a5fd4b"
+  },
+  "fundamentals-of-backend-communications-and-protocols/04 - Many ways to HTTPS/006 HTTPS over TCP with TLS 1.3 and 0RTT_vi.srt": {
+    "cue_count": 39,
+    "timing_sha256": "e7d10895f5337ac57fbb74a0bc3b41d9b81ac100908d26de102c8b59c328895b",
+    "text_sha256": "4f292e94079fda8ef24d318313a819346bdb1087bcab539f25b7b237e27ee2e5"
+  },
+  "fundamentals-of-backend-communications-and-protocols/04 - Many ways to HTTPS/007 HTTPS over QUIC with 0RTT_en.srt": {
+    "cue_count": 28,
+    "timing_sha256": "65f39ede965f7b922d41cead1a9639471a1c0db397aeadc1c1d2a808b4c9d6a6",
+    "text_sha256": "3edbf67f4e20b345e9d1ee8117d75c644ac0dd08f5d3156703ea7b02088bf50f"
+  },
+  "fundamentals-of-backend-communications-and-protocols/04 - Many ways to HTTPS/007 HTTPS over QUIC with 0RTT_vi.srt": {
+    "cue_count": 28,
+    "timing_sha256": "65f39ede965f7b922d41cead1a9639471a1c0db397aeadc1c1d2a808b4c9d6a6",
+    "text_sha256": "c16f029df20007571e6ca8137714341573197aad412d6ea45b26605d73b97a67"
+  },
+  "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/001 Backend Execution Patterns Intro_en.srt": {
+    "cue_count": 69,
+    "timing_sha256": "c57a82db4503a6202c58dfd37cfd90c483bf800279f5d0a5eab10ddd1fdf9bca",
+    "text_sha256": "7ae0593805c11ca032ee72d9957787d4f08dd3ee32813a7b99f829d54fadf902"
+  },
+  "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/001 Backend Execution Patterns Intro_vi.srt": {
+    "cue_count": 69,
+    "timing_sha256": "c57a82db4503a6202c58dfd37cfd90c483bf800279f5d0a5eab10ddd1fdf9bca",
+    "text_sha256": "78ad8f0562f83ce20bcba3f902d127c23cad590ab0560aa4371766c1ebad4672"
+  },
+  "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/002 The Process and The Thread and how they compete for CPU time_en.srt": {
+    "cue_count": 430,
+    "timing_sha256": "a286ce5c6ee815b3e21e001e7353017967b2786b75350b0463e867aff215668f",
+    "text_sha256": "dfee5d2aaf86e83f399eb81a659f475a1ff7a57298254f8bb0abe7361c4a5024"
+  },
+  "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/002 The Process and The Thread and how they compete for CPU time_vi.srt": {
+    "cue_count": 430,
+    "timing_sha256": "a286ce5c6ee815b3e21e001e7353017967b2786b75350b0463e867aff215668f",
+    "text_sha256": "77b8205b04d831a2d12f4ed0a28518f16ecc31855077715075caa1b216927b42"
+  },
+  "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/003 How The Backend Accepts Connections_en.srt": {
+    "cue_count": 479,
+    "timing_sha256": "bf1297e41eaaf6fdb5aab97ef262aa9ae08b453415f33c15ea1cbf090fa82ad0",
+    "text_sha256": "2e968d7cd7433fa613a2a1000fb2c7f8edc31b6131418c518d118f1b7e3aeab5"
+  },
+  "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/003 How The Backend Accepts Connections_vi.srt": {
+    "cue_count": 479,
+    "timing_sha256": "bf1297e41eaaf6fdb5aab97ef262aa9ae08b453415f33c15ea1cbf090fa82ad0",
+    "text_sha256": "e42bb798e4aa207d5797018c807343e67573c00ef3a0e2bbba656daf87ba7d17"
+  },
+  "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/004 Reading and Sending Socket Data_en.srt": {
+    "cue_count": 398,
+    "timing_sha256": "4dbcc65fc1859bacce4c4a5d4ee50077ec43eabc439fe1b1ec90825b15f88a6c",
+    "text_sha256": "c63d8f8cff20121f491834da9be302a6da11298cd6cee77f2d2901e63e58bb9b"
+  },
+  "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/004 Reading and Sending Socket Data_vi.srt": {
+    "cue_count": 398,
+    "timing_sha256": "4dbcc65fc1859bacce4c4a5d4ee50077ec43eabc439fe1b1ec90825b15f88a6c",
+    "text_sha256": "6b1def986e936d8643ba6755d7d259881c64d3f332f4de864b312a1837f90205"
+  },
+  "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/005 The Listener, The Acceptor and the Reader_en.srt": {
+    "cue_count": 33,
+    "timing_sha256": "ccb0033a11955c1bcd8551c4a7a8e4d04454c0a974741d942211c4b13f30acba",
+    "text_sha256": "537d17e66599083762195c5555b80978bdeaa42982f0eeb47ed2bd827691eb99"
+  },
+  "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/005 The Listener, The Acceptor and the Reader_vi.srt": {
+    "cue_count": 33,
+    "timing_sha256": "ccb0033a11955c1bcd8551c4a7a8e4d04454c0a974741d942211c4b13f30acba",
+    "text_sha256": "d47cdc8acb76ea41edee198a45beb2acb83139c998740278c021fc4e08e49eca"
+  },
+  "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/006 Single Listener, Acceptor and Reader Thread Execution Pattern_en.srt": {
+    "cue_count": 54,
+    "timing_sha256": "3e08e182ee503b912b490dbb5f8227b88613969ae72c457d2f81c0447be5ab3c",
+    "text_sha256": "8246cae60169ba9a8a9f71564db80c3c8f04d1a7f3c0fe83a00c227a77467230"
+  },
+  "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/006 Single Listener, Acceptor and Reader Thread Execution Pattern_vi.srt": {
+    "cue_count": 54,
+    "timing_sha256": "3e08e182ee503b912b490dbb5f8227b88613969ae72c457d2f81c0447be5ab3c",
+    "text_sha256": "71c6bd7cd4ee912023a578c4d98ce4c2f279edede63745e4eb678928ba979aee"
+  },
+  "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/007 Single Listener, Acceptor and Multiple Readers Thread Execution Pattern_en.srt": {
+    "cue_count": 89,
+    "timing_sha256": "87ac4231d685a766296afa6998c4bd61138ee5fa41df4abfc60ec0141f33bacd",
+    "text_sha256": "3f57f383e9533b8208152ff74b9f2cbe48b313436ca0c82eb0c8086916ec68ca"
+  },
+  "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/007 Single Listener, Acceptor and Multiple Readers Thread Execution Pattern_vi.srt": {
+    "cue_count": 89,
+    "timing_sha256": "87ac4231d685a766296afa6998c4bd61138ee5fa41df4abfc60ec0141f33bacd",
+    "text_sha256": "5c677dcb2a86e77fc1fc47291b09501332ab74cc84ce52cf341659ac15838cca"
+  },
+  "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/008 Single Listener, Acceptor, Reader with Message Load Balancing Execution Pattern_en.srt": {
+    "cue_count": 56,
+    "timing_sha256": "af697c1dbf2cba80a1ef9caa1f518f1dc5a6f8b3f18e66385209557c4658ac71",
+    "text_sha256": "4167cd24a376ca327e817106c9f8c2df4c6be4d71a7f68c228cd0e868ac79727"
+  },
+  "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/008 Single Listener, Acceptor, Reader with Message Load Balancing Execution Pattern_vi.srt": {
+    "cue_count": 56,
+    "timing_sha256": "af697c1dbf2cba80a1ef9caa1f518f1dc5a6f8b3f18e66385209557c4658ac71",
+    "text_sha256": "e45c2f5dfce1be2bd0863f323bf91aa02b2b591ef160f5c53e6235bde2677cac"
+  },
+  "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/009 Multiple Accepter Threads on a Single Socket Execution Pattern_en.srt": {
+    "cue_count": 36,
+    "timing_sha256": "d5ca4243c8e84001da73016e803843102b0d8fca53fe6550f9871adfd2f9f2a8",
+    "text_sha256": "8f637f7c3d2ca50d2132dc68b6fc0347a6ca4722527e3a90751528c10e63b65b"
+  },
+  "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/009 Multiple Accepter Threads on a Single Socket Execution Pattern_vi.srt": {
+    "cue_count": 36,
+    "timing_sha256": "d5ca4243c8e84001da73016e803843102b0d8fca53fe6550f9871adfd2f9f2a8",
+    "text_sha256": "8b1f720e09c5947021d201c709c696f81b1da84f1922a67577d8a2303d28b081"
+  },
+  "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/010 Multiple Listeners, Acceptors and Readers with Socket Sharding Execution Pattern_en.srt": {
+    "cue_count": 110,
+    "timing_sha256": "a6a540d8c73c7d627720204dfd4796cb288fa4e3fa5561635de991b7d1a94ebf",
+    "text_sha256": "9899a57165e36e6aaa09e9dbeea154081d2da1f7eff7193235c5be9e905c6466"
+  },
+  "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/010 Multiple Listeners, Acceptors and Readers with Socket Sharding Execution Pattern_vi.srt": {
+    "cue_count": 110,
+    "timing_sha256": "a6a540d8c73c7d627720204dfd4796cb288fa4e3fa5561635de991b7d1a94ebf",
+    "text_sha256": "9461911855196dc92160d5c22bdbe2dd1fc3a91cd3645e01af46ed7d4c552437"
+  },
+  "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/011 Backend Idempotency_en.srt": {
+    "cue_count": 100,
+    "timing_sha256": "b8886566c945b79a6de180ae07846cf8246b876fd6b976b30d8d42962c9c3e06",
+    "text_sha256": "bcf7a2f2c82391212e51a4d45391a7575bd69674fbd761d69ea5af1864bfbad4"
+  },
+  "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/011 Backend Idempotency_vi.srt": {
+    "cue_count": 100,
+    "timing_sha256": "b8886566c945b79a6de180ae07846cf8246b876fd6b976b30d8d42962c9c3e06",
+    "text_sha256": "ba689bab47211f130d1f374f38561b949758319044609b2c561806c2eb0530bc"
+  },
+  "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/012 Nagle's Algorithm_en.srt": {
+    "cue_count": 214,
+    "timing_sha256": "b2b7448b07511d18432864fd9f68a037265be56ec22c2957c7c25a66cd8bbaa6",
+    "text_sha256": "e673c616e473bcbc6e2e093ed948f363648f91ca3124029ca93f0c3c1ab65ab5"
+  },
+  "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/012 Nagle's Algorithm_vi.srt": {
+    "cue_count": 214,
+    "timing_sha256": "b2b7448b07511d18432864fd9f68a037265be56ec22c2957c7c25a66cd8bbaa6",
+    "text_sha256": "1d4743800640ede6cbdc92b8a94c0aa0ecfa01214332b25c2585514e315361d8"
+  },
+  "fundamentals-of-backend-communications-and-protocols/06 - Proxying and Load Balancing/001 Proxy vs Reverse Proxy_en.srt": {
+    "cue_count": 317,
+    "timing_sha256": "96f1935f786cd743ee69114434c37d94672f57f207e5dca5c402694c1dbfbc96",
+    "text_sha256": "3dd2b238c8b1abee4e5ec32d3c4899d2d35dffa9c664151e79f8a979a5fee7bd"
+  },
+  "fundamentals-of-backend-communications-and-protocols/06 - Proxying and Load Balancing/001 Proxy vs Reverse Proxy_vi.srt": {
+    "cue_count": 317,
+    "timing_sha256": "96f1935f786cd743ee69114434c37d94672f57f207e5dca5c402694c1dbfbc96",
+    "text_sha256": "79242b2b73445824227ae0d3ca0d9d0ae0fb08bbec44fe1e049c02b9db73931f"
+  },
+  "fundamentals-of-backend-communications-and-protocols/06 - Proxying and Load Balancing/002 Layer 4 vs Layer 7 Load Balancers_en.srt": {
+    "cue_count": 471,
+    "timing_sha256": "8c10db342d02c053add727a1332c9ffb5efb509ee55bfbeddc8ede1052676734",
+    "text_sha256": "663bfb1e56c3ac622aad7a13ee1b6d8c9ed672fa8e426bab09338ced3058d4ff"
+  },
+  "fundamentals-of-backend-communications-and-protocols/06 - Proxying and Load Balancing/002 Layer 4 vs Layer 7 Load Balancers_vi.srt": {
+    "cue_count": 471,
+    "timing_sha256": "8c10db342d02c053add727a1332c9ffb5efb509ee55bfbeddc8ede1052676734",
+    "text_sha256": "b33352dabbc43a5faa8379b9e579c690040eba4907db52be7ab9d0c014562e0c"
+  },
+  "fundamentals-of-backend-communications-and-protocols/06 - Proxying and Load Balancing/003 WebSocket Proxying_en.srt": {
+    "cue_count": 437,
+    "timing_sha256": "7a979d0eba7327329838e521fbd2e0b274c1541595bc8d0c34cd8192272befd0",
+    "text_sha256": "d25268196360132c6edfc42acf84b4c7777575c90cd91a3a6786ff254189db6c"
+  },
+  "fundamentals-of-backend-communications-and-protocols/06 - Proxying and Load Balancing/003 WebSocket Proxying_vi.srt": {
+    "cue_count": 437,
+    "timing_sha256": "7a979d0eba7327329838e521fbd2e0b274c1541595bc8d0c34cd8192272befd0",
+    "text_sha256": "e1c18cd59f10ac64df5bc85cfce0cfb9667fb026d0db21524d96e48a950dfe0f"
+  },
+  "fundamentals-of-backend-communications-and-protocols/07 - Extras/001 How ChatGPT uses Server Sent Events_en.srt": {
+    "cue_count": 778,
+    "timing_sha256": "c3a0db9ed8a5615b2f076e83c42137d155037ec35026a7e003ddfc65e265df52",
+    "text_sha256": "43a4e6d9b2ce04e66b96dbff4d6fbb932f8bb378f3401806e4eed09a799cc3bc"
+  },
+  "fundamentals-of-backend-communications-and-protocols/07 - Extras/001 How ChatGPT uses Server Sent Events_vi.srt": {
+    "cue_count": 778,
+    "timing_sha256": "c3a0db9ed8a5615b2f076e83c42137d155037ec35026a7e003ddfc65e265df52",
+    "text_sha256": "2b2c0c3caf8b3282ae4a0b9fa9571f1c7ac8498af7e6ced044811d96036c14f2"
+  },
+  "fundamentals-of-backend-communications-and-protocols/07 - Extras/004 The Journey of a Request to the Backend (Video)_en.srt": {
+    "cue_count": 200,
+    "timing_sha256": "2fb3ee07fd54608728daeb2bc4ffb69adeeed2b8416ec410f9e3e99089bdf2e3",
+    "text_sha256": "f80adf6adde7ee15c47a035b513ef197369b3aab215b312cc1a478f17039f7b5"
+  },
+  "fundamentals-of-backend-communications-and-protocols/07 - Extras/004 The Journey of a Request to the Backend (Video)_vi.srt": {
+    "cue_count": 200,
+    "timing_sha256": "2fb3ee07fd54608728daeb2bc4ffb69adeeed2b8416ec410f9e3e99089bdf2e3",
+    "text_sha256": "9e541b0c5d9e9d5ba71e2f2461a9ec311eccd085c427207f0952ddf0e9321a71"
+  },
+  "fundamentals-of-backend-communications-and-protocols/07 - Extras/005 JSON Web Token (JWT), its Pros and Cons_en.srt": {
+    "cue_count": 1242,
+    "timing_sha256": "1f48363aa3bf875306a025cea34403ccf52b8a1c774076a2ccfd9eb615781cc8",
+    "text_sha256": "dab436acfa0b978e1d360f0a6ade68ab9727096394b1c15ffe18b69f4064b405"
+  },
+  "fundamentals-of-backend-communications-and-protocols/07 - Extras/005 JSON Web Token (JWT), its Pros and Cons_vi.srt": {
+    "cue_count": 1242,
+    "timing_sha256": "1f48363aa3bf875306a025cea34403ccf52b8a1c774076a2ccfd9eb615781cc8",
+    "text_sha256": "0d786123ef1379198e076baa6f475a9c7e629934923b528f1d4f96ad01c3563a"
+  },
+  "fundamentals-of-backend-communications-and-protocols/07 - Extras/006 SELECT COUNT () can impact your Backend Application performance, here is why_en.srt": {
+    "cue_count": 390,
+    "timing_sha256": "a25512e2f4369d04877ce4ab71aac87c5e10b72e00dc5a9958a2ce35c90e27d0",
+    "text_sha256": "8dca301db7c889ccf7ee254a0ca1e14b890b976cc937aeaaf0a28ed5b358fd76"
+  },
+  "fundamentals-of-backend-communications-and-protocols/07 - Extras/006 SELECT COUNT () can impact your Backend Application performance, here is why_vi.srt": {
+    "cue_count": 390,
+    "timing_sha256": "a25512e2f4369d04877ce4ab71aac87c5e10b72e00dc5a9958a2ce35c90e27d0",
+    "text_sha256": "34898284d4464ca35600f8d91fbc8f77f977cf84284fbd6012586d3efe2e8f65"
+  },
+  "fundamentals-of-backend-communications-and-protocols/08 - Bonus Content/001 How does the Kernel manage backend connections_en.srt": {
+    "cue_count": 72,
+    "timing_sha256": "8a58169981969c234bbaacd9c96ae345ab64a78e31af2ba981543822d1375435",
+    "text_sha256": "bd2bd4fa8ea5a5a24c0dac6362896c9162f8ab4d851e5847ad16378081318ac4"
+  },
+  "fundamentals-of-backend-communications-and-protocols/08 - Bonus Content/001 How does the Kernel manage backend connections_vi.srt": {
+    "cue_count": 72,
+    "timing_sha256": "8a58169981969c234bbaacd9c96ae345ab64a78e31af2ba981543822d1375435",
+    "text_sha256": "7aa311862cead994d096de66c2ef0c7d19863129704a8957920e861376fa4e94"
+  },
+  "fundamentals-of-backend-communications-and-protocols/08 - Bonus Content/002 Running out of TCP Ports_en.srt": {
+    "cue_count": 308,
+    "timing_sha256": "d4477784dbf94567e940ac9a0a8c8be2819240e090392861ba17098ceecb36dd",
+    "text_sha256": "c884280282045e48fc651d78bc12bc0bd3f4be4b4ffeb10cd9f1e18cd6e2107e"
+  },
+  "fundamentals-of-backend-communications-and-protocols/08 - Bonus Content/002 Running out of TCP Ports_vi.srt": {
+    "cue_count": 308,
+    "timing_sha256": "d4477784dbf94567e940ac9a0a8c8be2819240e090392861ba17098ceecb36dd",
+    "text_sha256": "0f573d8feddf141081efd61f0ce94f764a1b7ef9fa7d8f87d77577535e48c14e"
+  },
+  "fundamentals-of-backend-communications-and-protocols/08 - Bonus Content/004 Building Secure Backend Applications (OWASP recommendations)_en.srt": {
+    "cue_count": 491,
+    "timing_sha256": "b02e7be8f19e9a8e532ea19bc921ab089f1a74fe4ef586df95776c02f08a0022",
+    "text_sha256": "7d8aba8ef990d69e927c62448d125c58fd9bfea86b7e2d64893f3310f95a8ee3"
+  },
+  "fundamentals-of-backend-communications-and-protocols/08 - Bonus Content/004 Building Secure Backend Applications (OWASP recommendations)_vi.srt": {
+    "cue_count": 491,
+    "timing_sha256": "b02e7be8f19e9a8e532ea19bc921ab089f1a74fe4ef586df95776c02f08a0022",
+    "text_sha256": "6fd360462a9517d40a0e40b482dd1a37ba0a1b8a9fbfbec876df78f8b377ca67"
+  },
+  "fundamentals-of-backend-communications-and-protocols/08 - Bonus Content/005 HTTP Graceful Connection Shutdown_en.srt": {
+    "cue_count": 199,
+    "timing_sha256": "82aecca4a6a9210471c0ca74f4348a5ef97359cd978c7963fb43ab2f68557b6e",
+    "text_sha256": "b919fc947bb6b9305e97b390803b84b71168650b292a5d8eeb688f6f45c1c177"
+  },
+  "fundamentals-of-backend-communications-and-protocols/08 - Bonus Content/005 HTTP Graceful Connection Shutdown_vi.srt": {
+    "cue_count": 199,
+    "timing_sha256": "82aecca4a6a9210471c0ca74f4348a5ef97359cd978c7963fb43ab2f68557b6e",
+    "text_sha256": "81f31d3e9357e73db92197ff92189914e88c1b11d9a8735f42fc413cfc003dae"
+  }
+}

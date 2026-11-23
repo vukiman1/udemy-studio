@@ -1,0 +1,10 @@
+root = "."
+tmp_dir = "tmp"
+
+[build]
+cmd = "go build -o ./tmp/udemy-studio ./cmd/udemy-studio"
+entrypoint = ["./tmp/udemy-studio", "serve"]
+include_ext = ["go", "yaml"]
+exclude_dir = ["web/node_modules", "tmp", "bin", "spikes", "testdata"]
+send_interrupt = true
+kill_delay = "4s"

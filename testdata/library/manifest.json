@@ -1,0 +1,1164 @@
+{
+  "schema_version": 1,
+  "files": [
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/01 - Introduction/001 Welcome.mp4",
+      "size_bytes": 62852320,
+      "duration_seconds": 347.264,
+      "video_codec": "hevc",
+      "video_codec_tag": "hvc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/01 - Introduction/001 Welcome_en.srt",
+      "size_bytes": 7688
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/01 - Introduction/001 Welcome_vi.srt",
+      "size_bytes": 8306
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/01 - Introduction/002 Who is this course for.mp4",
+      "size_bytes": 33296844,
+      "duration_seconds": 182.016,
+      "video_codec": "hevc",
+      "video_codec_tag": "hvc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/01 - Introduction/002 Who is this course for_en.srt",
+      "size_bytes": 4063
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/01 - Introduction/002 Who is this course for_vi.srt",
+      "size_bytes": 4326
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/01 - Introduction/003 Course Outline.mp4",
+      "size_bytes": 124116324,
+      "duration_seconds": 647.211,
+      "video_codec": "hevc",
+      "video_codec_tag": "hvc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/01 - Introduction/003 Course Outline_en.srt",
+      "size_bytes": 15608
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/01 - Introduction/003 Course Outline_vi.srt",
+      "size_bytes": 16201
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/01 - Introduction/004 Course Notes.mp4",
+      "size_bytes": 32830150,
+      "duration_seconds": 210.944,
+      "video_codec": "hevc",
+      "video_codec_tag": "hvc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/01 - Introduction/004 Course Notes_en.srt",
+      "size_bytes": 4728
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/01 - Introduction/004 Course Notes_vi.srt",
+      "size_bytes": 4910
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/01 - Introduction/005 Apache-kafka-long-polling.pdf",
+      "size_bytes": 2405225
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/01 - Introduction/005 Chrome-6-Connections-Limit.pdf",
+      "size_bytes": 876636
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/01 - Introduction/005 DNS-Slides.odp",
+      "size_bytes": 390977
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/01 - Introduction/005 DNS-Slides.pdf",
+      "size_bytes": 212642
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/01 - Introduction/005 DNS-Slides.pptx",
+      "size_bytes": 445711
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/01 - Introduction/005 Download all slides, source code and references.html",
+      "size_bytes": 2343
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/01 - Introduction/005 Fundamentals-of-Backend-Engineering.odp",
+      "size_bytes": 5639978
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/01 - Introduction/005 Fundamentals-of-Backend-Engineering.pdf",
+      "size_bytes": 3743096
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/01 - Introduction/005 Fundamentals-of-Backend-Engineering.pptx",
+      "size_bytes": 6350110
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/01 - Introduction/005 HTTPS-TLS-And-Certificates.pdf",
+      "size_bytes": 1108317
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/01 - Introduction/005 HTTPS-TLS-And-Certificates.pptx",
+      "size_bytes": 729391
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/01 - Introduction/005 IP-TCP-UDP-TLS-Slides.odp",
+      "size_bytes": 255647
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/01 - Introduction/005 IP-TCP-UDP-TLS-Slides.pdf",
+      "size_bytes": 524613
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/01 - Introduction/005 IP-TCP-UDP-TLS-Slides.pptx",
+      "size_bytes": 472508
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/01 - Introduction/005 Nagles-algorithm.pdf",
+      "size_bytes": 170747
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/01 - Introduction/005 Nagles-algorithm.pptx",
+      "size_bytes": 189628
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/01 - Introduction/005 Postgres-Pipelining.pdf",
+      "size_bytes": 133183
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/01 - Introduction/005 WebSocket-Proxying.pptx",
+      "size_bytes": 349159
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/01 - Introduction/005 asynchronous-commits-postgres.pdf",
+      "size_bytes": 137839
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/01 - Introduction/005 asynchronous-io-linux-thread.pdf",
+      "size_bytes": 112184
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/01 - Introduction/005 asynchronous-replication-postgres.pdf",
+      "size_bytes": 195060
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/01 - Introduction/005 backendcourse-sourcecode.zip",
+      "size_bytes": 5863870
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/01 - Introduction/005 jwt-course.zip",
+      "size_bytes": 27137
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/01 - Introduction/005 kernel-queues.pdf",
+      "size_bytes": 331890
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/01 - Introduction/005 proxy-vs-reverse-proxy.pdf",
+      "size_bytes": 2553597
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/01 - Introduction/005 proxy-vs-reverse-proxy.pptx",
+      "size_bytes": 3204292
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/01 - Introduction/005 rabbitMQ-pushAPI.pdf",
+      "size_bytes": 156397
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/01 - Introduction/005 resources.txt",
+      "size_bytes": 2437
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/001 Backend Communication Design Patterns Intro.mp4",
+      "size_bytes": 21857631,
+      "duration_seconds": 122.283,
+      "video_codec": "hevc",
+      "video_codec_tag": "hvc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/001 Backend Communication Design Patterns Intro_en.srt",
+      "size_bytes": 2568
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/001 Backend Communication Design Patterns Intro_vi.srt",
+      "size_bytes": 2794
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/002 Request Response.mp4",
+      "size_bytes": 110736707,
+      "duration_seconds": 1657.941,
+      "video_codec": "hevc",
+      "video_codec_tag": "hvc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/002 Request Response_en.srt",
+      "size_bytes": 39786
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/002 Request Response_vi.srt",
+      "size_bytes": 40892
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/003 Push.mp4",
+      "size_bytes": 69143071,
+      "duration_seconds": 1199.829,
+      "video_codec": "hevc",
+      "video_codec_tag": "hvc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/003 Push_en.srt",
+      "size_bytes": 30408
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/003 Push_vi.srt",
+      "size_bytes": 31359
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/004 Synchronous vs Asynchronous workloads.mp4",
+      "size_bytes": 161133096,
+      "duration_seconds": 2550.528,
+      "video_codec": "hevc",
+      "video_codec_tag": "hvc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/004 Synchronous vs Asynchronous workloads_en.srt",
+      "size_bytes": 62593
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/004 Synchronous vs Asynchronous workloads_vi.srt",
+      "size_bytes": 64816
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/005 Polling.mp4",
+      "size_bytes": 97640489,
+      "duration_seconds": 853.632,
+      "video_codec": "h264",
+      "video_codec_tag": "avc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/005 Polling_en.srt",
+      "size_bytes": 20421
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/005 Polling_vi.srt",
+      "size_bytes": 21141
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/006 Long Polling.mp4",
+      "size_bytes": 205938013,
+      "duration_seconds": 611.157,
+      "video_codec": "h264",
+      "video_codec_tag": "avc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/006 Long Polling_en.srt",
+      "size_bytes": 15318
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/006 Long Polling_vi.srt",
+      "size_bytes": 16011
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/007 Server Sent Events.mp4",
+      "size_bytes": 325543183,
+      "duration_seconds": 798.336,
+      "video_codec": "h264",
+      "video_codec_tag": "avc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/007 Server Sent Events_en.srt",
+      "size_bytes": 19508
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/007 Server Sent Events_vi.srt",
+      "size_bytes": 20759
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/008 Publish Subscribe (PubSub).mp4",
+      "size_bytes": 251643827,
+      "duration_seconds": 997.973,
+      "video_codec": "h264",
+      "video_codec_tag": "avc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/008 Publish Subscribe (PubSub)_en.srt",
+      "size_bytes": 25788
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/008 Publish Subscribe (PubSub)_vi.srt",
+      "size_bytes": 26283
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/009 Multiplexing vs Demultiplexing (h2 proxying vs Connection Pooling).mp4",
+      "size_bytes": 232392117,
+      "duration_seconds": 892.288,
+      "video_codec": "h264",
+      "video_codec_tag": "avc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/009 Multiplexing vs Demultiplexing (h2 proxying vs Connection Pooling)_en.srt",
+      "size_bytes": 21664
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/009 Multiplexing vs Demultiplexing (h2 proxying vs Connection Pooling)_vi.srt",
+      "size_bytes": 22428
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/010 Stateful vs Stateless.mp4",
+      "size_bytes": 121791887,
+      "duration_seconds": 1362.731,
+      "video_codec": "h264",
+      "video_codec_tag": "avc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/010 Stateful vs Stateless_en.srt",
+      "size_bytes": 33877
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/010 Stateful vs Stateless_vi.srt",
+      "size_bytes": 35948
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/011 Sidecar Pattern.mp4",
+      "size_bytes": 118592630,
+      "duration_seconds": 1293.739,
+      "video_codec": "h264",
+      "video_codec_tag": "avc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/011 Sidecar Pattern_en.srt",
+      "size_bytes": 32268
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/02 - Backend Communication Design Patterns/011 Sidecar Pattern_vi.srt",
+      "size_bytes": 34221
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/03 - Protocols/001 Protocols Intro.mp4",
+      "size_bytes": 40556083,
+      "duration_seconds": 68.395,
+      "video_codec": "h264",
+      "video_codec_tag": "avc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/03 - Protocols/001 Protocols Intro_en.srt",
+      "size_bytes": 1507
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/03 - Protocols/001 Protocols Intro_vi.srt",
+      "size_bytes": 1525
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/03 - Protocols/002 Protocol Properties.mp4",
+      "size_bytes": 84517302,
+      "duration_seconds": 647.381,
+      "video_codec": "h264",
+      "video_codec_tag": "avc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/03 - Protocols/002 Protocol Properties_en.srt",
+      "size_bytes": 16296
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/03 - Protocols/002 Protocol Properties_vi.srt",
+      "size_bytes": 17890
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/03 - Protocols/003 OSI Model.mp4",
+      "size_bytes": 595179541,
+      "duration_seconds": 2849.109,
+      "video_codec": "h264",
+      "video_codec_tag": "avc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/03 - Protocols/003 OSI Model_en.srt",
+      "size_bytes": 72214
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/03 - Protocols/003 OSI Model_vi.srt",
+      "size_bytes": 75343
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/03 - Protocols/004 Internet Protocol.mp4",
+      "size_bytes": 1568578134,
+      "duration_seconds": 4032.768,
+      "video_codec": "h264",
+      "video_codec_tag": "avc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/03 - Protocols/004 Internet Protocol_en.srt",
+      "size_bytes": 99017
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/03 - Protocols/004 Internet Protocol_vi.srt",
+      "size_bytes": 101870
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/03 - Protocols/005 UDP.mp4",
+      "size_bytes": 920318020,
+      "duration_seconds": 2902.827,
+      "video_codec": "h264",
+      "video_codec_tag": "avc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/03 - Protocols/005 UDP_en.srt",
+      "size_bytes": 70096
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/03 - Protocols/005 UDP_vi.srt",
+      "size_bytes": 72739
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/03 - Protocols/006 TCP.mp4",
+      "size_bytes": 1250348715,
+      "duration_seconds": 3311.659,
+      "video_codec": "h264",
+      "video_codec_tag": "avc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/03 - Protocols/006 TCP_en.srt",
+      "size_bytes": 80812
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/03 - Protocols/006 TCP_vi.srt",
+      "size_bytes": 83085
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/03 - Protocols/007 TLS.mp4",
+      "size_bytes": 138461633,
+      "duration_seconds": 1619.712,
+      "video_codec": "h264",
+      "video_codec_tag": "avc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/03 - Protocols/007 TLS_en.srt",
+      "size_bytes": 39604
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/03 - Protocols/007 TLS_vi.srt",
+      "size_bytes": 41021
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/03 - Protocols/008 HTTP1.1.mp4",
+      "size_bytes": 650016583,
+      "duration_seconds": 1871.616,
+      "video_codec": "h264",
+      "video_codec_tag": "avc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/03 - Protocols/008 HTTP1.1_en.srt",
+      "size_bytes": 46319
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/03 - Protocols/008 HTTP1.1_vi.srt",
+      "size_bytes": 47551
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/03 - Protocols/009 HTTPS, TLS, Keys and Certificates.mp4",
+      "size_bytes": 1283216044,
+      "duration_seconds": 3698.816,
+      "video_codec": "h264",
+      "video_codec_tag": "avc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/03 - Protocols/010 WebSockets.mp4",
+      "size_bytes": 133372222,
+      "duration_seconds": 1281.237,
+      "video_codec": "h264",
+      "video_codec_tag": "avc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/03 - Protocols/010 WebSockets_en.srt",
+      "size_bytes": 34276
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/03 - Protocols/010 WebSockets_vi.srt",
+      "size_bytes": 35130
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/03 - Protocols/011 HTTP2.mp4",
+      "size_bytes": 136645525,
+      "duration_seconds": 1023.701,
+      "video_codec": "h264",
+      "video_codec_tag": "avc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/03 - Protocols/011 HTTP2_en.srt",
+      "size_bytes": 24873
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/03 - Protocols/011 HTTP2_vi.srt",
+      "size_bytes": 26647
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/03 - Protocols/012 HTTP3.mp4",
+      "size_bytes": 214431722,
+      "duration_seconds": 1678.677,
+      "video_codec": "h264",
+      "video_codec_tag": "avc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/03 - Protocols/012 HTTP3_en.srt",
+      "size_bytes": 41705
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/03 - Protocols/012 HTTP3_vi.srt",
+      "size_bytes": 44014
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/03 - Protocols/013 gRPC.mp4",
+      "size_bytes": 341366916,
+      "duration_seconds": 2950.784,
+      "video_codec": "h264",
+      "video_codec_tag": "avc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/03 - Protocols/013 gRPC_en.srt",
+      "size_bytes": 70835
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/03 - Protocols/013 gRPC_vi.srt",
+      "size_bytes": 74870
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/03 - Protocols/014 WebRTC.mp4",
+      "size_bytes": 937842769,
+      "duration_seconds": 4064.683,
+      "video_codec": "h264",
+      "video_codec_tag": "avc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/03 - Protocols/014 WebRTC_en.srt",
+      "size_bytes": 106859
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/03 - Protocols/014 WebRTC_vi.srt",
+      "size_bytes": 113847
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/04 - Many ways to HTTPS/001 HTTPS Communication Basics Intro.mp4",
+      "size_bytes": 67807907,
+      "duration_seconds": 194.901,
+      "video_codec": "h264",
+      "video_codec_tag": "avc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/04 - Many ways to HTTPS/001 HTTPS Communication Basics Intro_en.srt",
+      "size_bytes": 4698
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/04 - Many ways to HTTPS/001 HTTPS Communication Basics Intro_vi.srt",
+      "size_bytes": 4789
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/04 - Many ways to HTTPS/002 HTTPS over TCP with TLS 1.2.mp4",
+      "size_bytes": 31130654,
+      "duration_seconds": 347.349,
+      "video_codec": "h264",
+      "video_codec_tag": "avc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/04 - Many ways to HTTPS/002 HTTPS over TCP with TLS 1.2_en.srt",
+      "size_bytes": 8750
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/04 - Many ways to HTTPS/002 HTTPS over TCP with TLS 1.2_vi.srt",
+      "size_bytes": 8940
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/04 - Many ways to HTTPS/003 HTTPS over TCP with TLS 1.3.mp4",
+      "size_bytes": 21025225,
+      "duration_seconds": 234.795,
+      "video_codec": "h264",
+      "video_codec_tag": "avc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/04 - Many ways to HTTPS/003 HTTPS over TCP with TLS 1.3_en.srt",
+      "size_bytes": 5971
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/04 - Many ways to HTTPS/003 HTTPS over TCP with TLS 1.3_vi.srt",
+      "size_bytes": 6004
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/04 - Many ways to HTTPS/004 HTTPS over QUIC (HTTP3).mp4",
+      "size_bytes": 12954607,
+      "duration_seconds": 143.445,
+      "video_codec": "h264",
+      "video_codec_tag": "avc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/04 - Many ways to HTTPS/004 HTTPS over QUIC (HTTP3)_en.srt",
+      "size_bytes": 3343
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/04 - Many ways to HTTPS/004 HTTPS over QUIC (HTTP3)_vi.srt",
+      "size_bytes": 3442
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/04 - Many ways to HTTPS/005 HTTPS over TFO with TLS 1.3.mp4",
+      "size_bytes": 13423804,
+      "duration_seconds": 115.712,
+      "video_codec": "h264",
+      "video_codec_tag": "avc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/04 - Many ways to HTTPS/005 HTTPS over TFO with TLS 1.3_en.srt",
+      "size_bytes": 3006
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/04 - Many ways to HTTPS/005 HTTPS over TFO with TLS 1.3_vi.srt",
+      "size_bytes": 3218
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/04 - Many ways to HTTPS/006 HTTPS over TCP with TLS 1.3 and 0RTT.mp4",
+      "size_bytes": 11044151,
+      "duration_seconds": 126.251,
+      "video_codec": "h264",
+      "video_codec_tag": "avc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/04 - Many ways to HTTPS/006 HTTPS over TCP with TLS 1.3 and 0RTT_en.srt",
+      "size_bytes": 3216
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/04 - Many ways to HTTPS/006 HTTPS over TCP with TLS 1.3 and 0RTT_vi.srt",
+      "size_bytes": 3395
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/04 - Many ways to HTTPS/007 HTTPS over QUIC with 0RTT.mp4",
+      "size_bytes": 9512782,
+      "duration_seconds": 106.581,
+      "video_codec": "h264",
+      "video_codec_tag": "avc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/04 - Many ways to HTTPS/007 HTTPS over QUIC with 0RTT_en.srt",
+      "size_bytes": 2416
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/04 - Many ways to HTTPS/007 HTTPS over QUIC with 0RTT_vi.srt",
+      "size_bytes": 2502
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/001 Backend Execution Patterns Intro.mp4",
+      "size_bytes": 113352120,
+      "duration_seconds": 288.768,
+      "video_codec": "h264",
+      "video_codec_tag": "avc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/001 Backend Execution Patterns Intro_en.srt",
+      "size_bytes": 6045
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/001 Backend Execution Patterns Intro_vi.srt",
+      "size_bytes": 6506
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/002 The Process and The Thread and how they compete for CPU time.mp4",
+      "size_bytes": 274494811,
+      "duration_seconds": 1666.261,
+      "video_codec": "h264",
+      "video_codec_tag": "avc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/002 The Process and The Thread and how they compete for CPU time_en.srt",
+      "size_bytes": 38168
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/002 The Process and The Thread and how they compete for CPU time_vi.srt",
+      "size_bytes": 38831
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/003 How The Backend Accepts Connections.mp4",
+      "size_bytes": 603523808,
+      "duration_seconds": 1770.069,
+      "video_codec": "h264",
+      "video_codec_tag": "avc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/003 How The Backend Accepts Connections_en.srt",
+      "size_bytes": 41896
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/003 How The Backend Accepts Connections_vi.srt",
+      "size_bytes": 42768
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/004 Reading and Sending Socket Data.mp4",
+      "size_bytes": 169010314,
+      "duration_seconds": 1283.115,
+      "video_codec": "h264",
+      "video_codec_tag": "avc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/004 Reading and Sending Socket Data_en.srt",
+      "size_bytes": 31732
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/004 Reading and Sending Socket Data_vi.srt",
+      "size_bytes": 32213
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/005 The Listener, The Acceptor and the Reader.mp4",
+      "size_bytes": 51292782,
+      "duration_seconds": 126.507,
+      "video_codec": "h264",
+      "video_codec_tag": "avc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/005 The Listener, The Acceptor and the Reader_en.srt",
+      "size_bytes": 3144
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/005 The Listener, The Acceptor and the Reader_vi.srt",
+      "size_bytes": 3161
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/006 Single Listener, Acceptor and Reader Thread Execution Pattern.mp4",
+      "size_bytes": 16517784,
+      "duration_seconds": 187.477,
+      "video_codec": "h264",
+      "video_codec_tag": "avc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/006 Single Listener, Acceptor and Reader Thread Execution Pattern_en.srt",
+      "size_bytes": 4645
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/006 Single Listener, Acceptor and Reader Thread Execution Pattern_vi.srt",
+      "size_bytes": 4714
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/007 Single Listener, Acceptor and Multiple Readers Thread Execution Pattern.mp4",
+      "size_bytes": 28993752,
+      "duration_seconds": 331.733,
+      "video_codec": "h264",
+      "video_codec_tag": "avc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/007 Single Listener, Acceptor and Multiple Readers Thread Execution Pattern_en.srt",
+      "size_bytes": 7802
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/007 Single Listener, Acceptor and Multiple Readers Thread Execution Pattern_vi.srt",
+      "size_bytes": 7880
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/008 Single Listener, Acceptor, Reader with Message Load Balancing Execution Pattern.mp4",
+      "size_bytes": 24649933,
+      "duration_seconds": 207.531,
+      "video_codec": "h264",
+      "video_codec_tag": "avc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/008 Single Listener, Acceptor, Reader with Message Load Balancing Execution Pattern_en.srt",
+      "size_bytes": 4717
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/008 Single Listener, Acceptor, Reader with Message Load Balancing Execution Pattern_vi.srt",
+      "size_bytes": 4879
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/009 Multiple Accepter Threads on a Single Socket Execution Pattern.mp4",
+      "size_bytes": 10911146,
+      "duration_seconds": 118.101,
+      "video_codec": "h264",
+      "video_codec_tag": "avc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/009 Multiple Accepter Threads on a Single Socket Execution Pattern_en.srt",
+      "size_bytes": 2817
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/009 Multiple Accepter Threads on a Single Socket Execution Pattern_vi.srt",
+      "size_bytes": 2807
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/010 Multiple Listeners, Acceptors and Readers with Socket Sharding Execution Pattern.mp4",
+      "size_bytes": 36656232,
+      "duration_seconds": 408.96,
+      "video_codec": "h264",
+      "video_codec_tag": "avc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/010 Multiple Listeners, Acceptors and Readers with Socket Sharding Execution Pattern_en.srt",
+      "size_bytes": 9558
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/010 Multiple Listeners, Acceptors and Readers with Socket Sharding Execution Pattern_vi.srt",
+      "size_bytes": 10011
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/011 Backend Idempotency.mp4",
+      "size_bytes": 35110244,
+      "duration_seconds": 384.981,
+      "video_codec": "h264",
+      "video_codec_tag": "avc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/011 Backend Idempotency_en.srt",
+      "size_bytes": 8901
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/011 Backend Idempotency_vi.srt",
+      "size_bytes": 9149
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/012 Nagle's Algorithm.mp4",
+      "size_bytes": 264667771,
+      "duration_seconds": 728.021,
+      "video_codec": "h264",
+      "video_codec_tag": "avc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/012 Nagle's Algorithm_en.srt",
+      "size_bytes": 17480
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/012 Nagle's Algorithm_vi.srt",
+      "size_bytes": 18064
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/012 Nagles-algorithm.pdf",
+      "size_bytes": 170747
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/012 Nagles-algorithm.pptx",
+      "size_bytes": 189628
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/05 - Backend Execution Patterns/013 When do you use threads.html",
+      "size_bytes": 4610
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/06 - Proxying and Load Balancing/001 Proxy vs Reverse Proxy.mp4",
+      "size_bytes": 354735287,
+      "duration_seconds": 1205.461,
+      "video_codec": "h264",
+      "video_codec_tag": "avc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/06 - Proxying and Load Balancing/001 Proxy vs Reverse Proxy_en.srt",
+      "size_bytes": 28512
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/06 - Proxying and Load Balancing/001 Proxy vs Reverse Proxy_vi.srt",
+      "size_bytes": 29393
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/06 - Proxying and Load Balancing/001 proxy-vs-reverse-proxy.pdf",
+      "size_bytes": 2553597
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/06 - Proxying and Load Balancing/002 Layer 4 vs Layer 7 Load Balancers.mp4",
+      "size_bytes": 153036351,
+      "duration_seconds": 1671.552,
+      "video_codec": "h264",
+      "video_codec_tag": "avc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/06 - Proxying and Load Balancing/002 Layer 4 vs Layer 7 Load Balancers_en.srt",
+      "size_bytes": 40781
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/06 - Proxying and Load Balancing/002 Layer 4 vs Layer 7 Load Balancers_vi.srt",
+      "size_bytes": 42170
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/06 - Proxying and Load Balancing/003 WebSocket Proxying.mp4",
+      "size_bytes": 48984775,
+      "duration_seconds": 1401.344,
+      "video_codec": "h264",
+      "video_codec_tag": "avc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/06 - Proxying and Load Balancing/003 WebSocket Proxying_en.srt",
+      "size_bytes": 35616
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/06 - Proxying and Load Balancing/003 WebSocket Proxying_vi.srt",
+      "size_bytes": 36651
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/06 - Proxying and Load Balancing/003 WebSocket-Proxying.pptx",
+      "size_bytes": 349159
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/07 - Extras/001 How ChatGPT uses Server Sent Events.mp4",
+      "size_bytes": 483970123,
+      "duration_seconds": 2647.851,
+      "video_codec": "h264",
+      "video_codec_tag": "avc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/07 - Extras/001 How ChatGPT uses Server Sent Events_en.srt",
+      "size_bytes": 62843
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/07 - Extras/001 How ChatGPT uses Server Sent Events_vi.srt",
+      "size_bytes": 65351
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/07 - Extras/002 How I design software.html",
+      "size_bytes": 10291
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/07 - Extras/003 The Journey of a Request to the Backend.html",
+      "size_bytes": 9528
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/07 - Extras/003 The-Journey-of-a-Request-to-the-Backend.pdf",
+      "size_bytes": 186211
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/07 - Extras/003 journey-request.mp4",
+      "size_bytes": 644600389,
+      "duration_seconds": 740.067,
+      "video_codec": "h264",
+      "video_codec_tag": "avc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/07 - Extras/004 The Journey of a Request to the Backend (Video).mp4",
+      "size_bytes": 305381032,
+      "duration_seconds": 740.181,
+      "video_codec": "h264",
+      "video_codec_tag": "avc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/07 - Extras/004 The Journey of a Request to the Backend (Video)_en.srt",
+      "size_bytes": 16846
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/07 - Extras/004 The Journey of a Request to the Backend (Video)_vi.srt",
+      "size_bytes": 17899
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/07 - Extras/005 JSON Web Token (JWT), its Pros and Cons.mp4",
+      "size_bytes": 1358571302,
+      "duration_seconds": 3397.803,
+      "video_codec": "h264",
+      "video_codec_tag": "avc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/07 - Extras/005 JSON Web Token (JWT), its Pros and Cons_en.srt",
+      "size_bytes": 95774
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/07 - Extras/005 JSON Web Token (JWT), its Pros and Cons_vi.srt",
+      "size_bytes": 96856
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/07 - Extras/005 JWT.odp",
+      "size_bytes": 385391
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/07 - Extras/005 JWT.pdf",
+      "size_bytes": 503201
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/07 - Extras/005 JWT.pptx",
+      "size_bytes": 414547
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/07 - Extras/005 jwt-course.zip",
+      "size_bytes": 27137
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/07 - Extras/006 SELECT COUNT () can impact your Backend Application performance, here is why.mp4",
+      "size_bytes": 252152164,
+      "duration_seconds": 1215.872,
+      "video_codec": "h264",
+      "video_codec_tag": "avc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/07 - Extras/006 SELECT COUNT () can impact your Backend Application performance, here is why_en.srt",
+      "size_bytes": 31346
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/07 - Extras/006 SELECT COUNT () can impact your Backend Application performance, here is why_vi.srt",
+      "size_bytes": 31820
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/08 - Bonus Content/001 How does the Kernel manage backend connections.mp4",
+      "size_bytes": 110919859,
+      "duration_seconds": 295.424,
+      "video_codec": "h264",
+      "video_codec_tag": "avc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/08 - Bonus Content/001 How does the Kernel manage backend connections_en.srt",
+      "size_bytes": 6586
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/08 - Bonus Content/001 How does the Kernel manage backend connections_vi.srt",
+      "size_bytes": 6793
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/08 - Bonus Content/002 Running out of TCP Ports.mp4",
+      "size_bytes": 442389260,
+      "duration_seconds": 1113.003,
+      "video_codec": "h264",
+      "video_codec_tag": "avc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/08 - Bonus Content/002 Running out of TCP Ports_en.srt",
+      "size_bytes": 25609
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/08 - Bonus Content/002 Running out of TCP Ports_vi.srt",
+      "size_bytes": 25744
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/08 - Bonus Content/003 Postgres failure caused by a Cisco router (TCP issue).html",
+      "size_bytes": 4994
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/08 - Bonus Content/004 Building Secure Backend Applications (OWASP recommendations).mp4",
+      "size_bytes": 825771433,
+      "duration_seconds": 1667.379,
+      "video_codec": "h264",
+      "video_codec_tag": "avc1",
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/08 - Bonus Content/004 Building Secure Backend Applications (OWASP recommendations)_en.srt",
+      "size_bytes": 42097
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/08 - Bonus Content/004 Building Secure Backend Applications (OWASP recommendations)_vi.srt",
+      "size_bytes": 43347
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/08 - Bonus Content/005 HTTP Graceful Connection Shutdown_en.srt",
+      "size_bytes": 24751
+    },
+    {
+      "path": "fundamentals-of-backend-communications-and-protocols/08 - Bonus Content/005 HTTP Graceful Connection Shutdown_vi.srt",
+      "size_bytes": 25630
+    }
+  ]
+}

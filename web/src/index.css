@@ -1,0 +1,52 @@
+@import 'tailwindcss';
+
+@theme inline {
+  --color-page: var(--page);
+  --color-ink: var(--ink);
+  --color-surface: var(--surface);
+  --color-surface-strong: var(--surface-strong);
+  --color-line: var(--line);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-on-accent: var(--on-accent);
+  --color-danger: var(--danger);
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+:root {
+  color-scheme: light dark;
+  --page: #fff;
+  --ink: #16161a;
+  --surface: #f6f6f8;
+  --surface-strong: #e9e9ee;
+  --line: #dcdce3;
+  --muted: #62626e;
+  --accent: #3b5bdb;
+  --on-accent: #fff;
+  --danger: #c92a2a;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --page: #121317;
+    --ink: #e8e8ec;
+    --surface: #1c1d22;
+    --surface-strong: #2a2c33;
+    --line: #33353d;
+    --muted: #a0a1ab;
+    --accent: #748ffc;
+    --on-accent: #0b0c10;
+    --danger: #ff8787;
+  }
+}
+
+@layer base {
+  body {
+    @apply bg-page font-sans text-ink antialiased;
+  }
+
+  button,
+  select {
+    @apply cursor-pointer rounded-md border border-line bg-surface px-2.5 py-1;
+  }
+}

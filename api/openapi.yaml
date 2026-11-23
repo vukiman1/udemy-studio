@@ -1,0 +1,389 @@
+openapi: 3.0.3
+info:
+  title: udemy-studio
+  version: 0.1.0
+tags:
+  - name: raw
+    description: Byte-serving routes written by hand around http.ServeContent; excluded from Go codegen.
+paths:
+  /healthz:
+    get:
+      operationId: getHealth
+      summary: Liveness probe and build version
+      responses:
+        "200":
+          description: Server is up
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Health"
+
+  /api/courses:
+    get:
+      operationId: listCourses
+      summary: Courses in the library with completion and where to resume
+      responses:
+        "200":
+          description: Courses ordered by folder name
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CourseSummary"
+
+  /api/courses/{courseId}:
+    get:
+      operationId: getCourse
+      summary: Chapter and lecture tree with per-lecture progress
+      parameters:
+        - $ref: "#/components/parameters/CourseId"
+      responses:
+        "200":
+          description: The course
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CourseDetail"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/continue:
+    get:
+      operationId: getContinue
+      summary: The lecture to open for "continue learning"
+      responses:
+        "200":
+          description: Most recently watched unfinished lecture, or the one after a finished lecture
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContinueTarget"
+        "204":
+          description: Nothing to continue yet
+
+  /api/lectures/{lectureId}/cues:
+    get:
+      operationId: getLectureCues
+      summary: Subtitle cues merged by timing for the bilingual overlay
+      parameters:
+        - $ref: "#/components/parameters/LectureId"
+        - $ref: "#/components/parameters/Languages"
+      responses:
+        "200":
+          description: Cues ordered by start time
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Cue"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/lectures/{lectureId}/subtitles.vtt:
+    get:
+      operationId: getLectureSubtitlesVtt
+      summary: WebVTT with one line per language, for the native iOS fullscreen player
+      parameters:
+        - $ref: "#/components/parameters/LectureId"
+        - $ref: "#/components/parameters/Languages"
+      responses:
+        "200":
+          description: WebVTT document
+          content:
+            text/vtt:
+              schema:
+                type: string
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/lectures/{lectureId}/progress:
+    put:
+      operationId: putLectureProgress
+      summary: Save the playback position and completion of a lecture
+      parameters:
+        - $ref: "#/components/parameters/LectureId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProgressReport"
+      responses:
+        "200":
+          description: Stored progress
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LectureProgress"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /media/{lectureId}:
+    get:
+      tags: [raw]
+      operationId: getLectureVideo
+      summary: Lecture video with Range support for seeking
+      parameters:
+        - $ref: "#/components/parameters/LectureId"
+      responses:
+        "200":
+          description: Whole file
+          content:
+            video/mp4:
+              schema:
+                type: string
+                format: binary
+        "206":
+          description: Requested byte range
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /articles/{lectureId}:
+    get:
+      tags: [raw]
+      operationId: getLectureArticle
+      summary: Downloaded article HTML, served with a sandbox CSP for iframe display
+      parameters:
+        - $ref: "#/components/parameters/LectureId"
+      responses:
+        "200":
+          description: Article document
+          content:
+            text/html:
+              schema:
+                type: string
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /attachments/{attachmentId}:
+    get:
+      tags: [raw]
+      operationId: getAttachment
+      summary: Lecture attachment download (slides, source code, PDFs)
+      parameters:
+        - name: attachmentId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: File bytes
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+components:
+  parameters:
+    CourseId:
+      name: courseId
+      in: path
+      required: true
+      schema:
+        type: string
+    LectureId:
+      name: lectureId
+      in: path
+      required: true
+      schema:
+        type: string
+    Languages:
+      name: langs
+      in: query
+      required: false
+      description: Subtitle languages in display order; all available languages when omitted
+      style: form
+      explode: false
+      schema:
+        type: array
+        items:
+          type: string
+
+  responses:
+    NotFound:
+      description: No such course, lecture or attachment
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+    BadRequest:
+      description: The request failed validation
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+
+  schemas:
+    Health:
+      type: object
+      required: [status, version]
+      properties:
+        status:
+          type: string
+          enum: [ok]
+        version:
+          type: string
+
+    Problem:
+      description: RFC 9457 problem details
+      type: object
+      required: [title, status]
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+
+    CourseSummary:
+      type: object
+      required: [id, title, playableLectures, completedLectures]
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        playableLectures:
+          type: integer
+        completedLectures:
+          type: integer
+        resume:
+          $ref: "#/components/schemas/ContinueTarget"
+
+    CourseDetail:
+      allOf:
+        - $ref: "#/components/schemas/CourseSummary"
+        - type: object
+          required: [chapters]
+          properties:
+            chapters:
+              type: array
+              items:
+                $ref: "#/components/schemas/Chapter"
+
+    Chapter:
+      type: object
+      required: [index, title, lectures]
+      properties:
+        index:
+          type: integer
+        title:
+          type: string
+        lectures:
+          type: array
+          items:
+            $ref: "#/components/schemas/LectureSummary"
+
+    LectureKind:
+      type: string
+      enum: [video, article, unavailable]
+
+    LectureSummary:
+      type: object
+      required: [id, number, title, kind, hasVideo, hasArticle, subtitleLanguages, attachments]
+      properties:
+        id:
+          type: string
+        number:
+          type: integer
+        title:
+          type: string
+        kind:
+          $ref: "#/components/schemas/LectureKind"
+        hasVideo:
+          type: boolean
+        hasArticle:
+          type: boolean
+        subtitleLanguages:
+          type: array
+          items:
+            type: string
+        attachments:
+          type: array
+          items:
+            $ref: "#/components/schemas/Attachment"
+        progress:
+          $ref: "#/components/schemas/LectureProgress"
+
+    Attachment:
+      type: object
+      required: [id, name]
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+
+    LectureProgress:
+      type: object
+      required: [positionSeconds, durationSeconds, completed, updatedAt]
+      properties:
+        positionSeconds:
+          type: number
+          format: double
+        durationSeconds:
+          type: number
+          format: double
+        completed:
+          type: boolean
+        updatedAt:
+          type: string
+          format: date-time
+
+    ProgressReport:
+      type: object
+      required: [positionSeconds, durationSeconds, completed]
+      properties:
+        positionSeconds:
+          type: number
+          format: double
+        durationSeconds:
+          type: number
+          format: double
+        completed:
+          type: boolean
+
+    ContinueTarget:
+      type: object
+      required: [courseId, lectureId, positionSeconds]
+      properties:
+        courseId:
+          type: string
+        lectureId:
+          type: string
+        positionSeconds:
+          type: number
+          format: double
+
+    Cue:
+      type: object
+      required: [startMs, endMs, lines]
+      properties:
+        startMs:
+          type: integer
+        endMs:
+          type: integer
+        lines:
+          type: array
+          items:
+            $ref: "#/components/schemas/CueLine"
+
+    CueLine:
+      type: object
+      required: [language, text]
+      properties:
+        language:
+          type: string
+        text:
+          type: string
