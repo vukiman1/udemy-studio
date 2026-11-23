@@ -301,7 +301,7 @@ func TestCaptionThatDoesNotConvertIsRetriedOnTheNextRun(t *testing.T) {
 	}
 }
 
-func TestArticlePageIsWrittenOnceAndAFailedWriteIsReported(t *testing.T) {
+func TestArticlePageIsNotRewrittenOnARerun(t *testing.T) {
 	outputDir := t.TempDir()
 	pagePath := filepath.Join(outputDir, "backend-basics", "01 - Intro", "003 Notes 🚀.html")
 	if _, _, err := runCourse(t, t.Context(), samplePlan(), &fakeTools{}, outputDir); err != nil {
@@ -320,7 +320,9 @@ func TestArticlePageIsWrittenOnceAndAFailedWriteIsReported(t *testing.T) {
 	if kept, _ := fs.ReadFile(os.DirFS(filepath.Dir(pagePath)), filepath.Base(pagePath)); string(kept) != "kept" {
 		t.Errorf("rerun rewrote the page: %q", kept)
 	}
+}
 
+func TestPageThatCannotBeWrittenIsReported(t *testing.T) {
 	blocked := t.TempDir()
 	if err := os.MkdirAll(filepath.Join(blocked, "backend-basics", "01 - Intro", "003 Notes 🚀.html", "in-the-way"), dirMode); err != nil {
 		t.Fatalf("block page path: %v", err)

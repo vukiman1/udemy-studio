@@ -44,7 +44,7 @@ func (run *courseDownload) mainFile(ctx context.Context, chapterDir string, lect
 	return nil
 }
 
-// An empty page is left unwritten and uncounted, as in the Python downloader.
+// A page with an empty body is left unwritten and uncounted, as in the Python downloader; an article always has its template.
 func (run *courseDownload) page(ctx context.Context, chapterDir string, lecture udemy.LecturePlan) error {
 	content := lecture.HTMLBody
 	if slices.ContainsFunc(lecture.Assets, func(asset udemy.AssetPlan) bool { return asset.Type == udemy.AssetArticle }) {
