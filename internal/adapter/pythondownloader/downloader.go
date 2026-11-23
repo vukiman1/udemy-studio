@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"log/slog"
@@ -28,6 +27,7 @@ const (
 	logFileMode        = 0o600
 	logDirMode         = 0o750
 	logTailBytes       = 2048
+	maxEventLineBytes  = 1 << 20
 )
 
 var ansiEscape = regexp.MustCompile(`\x1b\[[0-9;]*m`)
@@ -127,6 +127,7 @@ func (downloader *Downloader) command(ctx context.Context, job jobs.Job, token s
 
 func (downloader *Downloader) forwardEvents(events io.Reader, onEvent func(jobs.Event)) {
 	scanner := bufio.NewScanner(events)
+	scanner.Buffer(nil, maxEventLineBytes)
 	for scanner.Scan() {
 		var decoded pythonEvent
 		if err := json.Unmarshal(scanner.Bytes(), &decoded); err != nil {
@@ -141,9 +142,11 @@ func (downloader *Downloader) forwardEvents(events io.Reader, onEvent func(jobs.
 			Failures:      decoded.Failures,
 		})
 	}
-	if err := scanner.Err(); err != nil && !errors.Is(err, os.ErrClosed) {
+	if err := scanner.Err(); err != nil {
 		downloader.logger.Warn("reading downloader events stopped", "err", err)
 	}
+	// Python blocks writing to a pipe nobody reads, so the rest is drained even when it cannot be parsed.
+	_, _ = io.Copy(io.Discard, events)
 }
 
 func (downloader *Downloader) keepAwake(pid int) {

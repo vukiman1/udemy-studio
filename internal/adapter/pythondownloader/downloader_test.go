@@ -1,12 +1,14 @@
 package pythondownloader
 
 import (
+	"context"
 	"log/slog"
 	"os"
 	"path/filepath"
 	"strings"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/google/go-cmp/cmp"
 
@@ -15,8 +17,9 @@ import (
 )
 
 const (
-	fakeModeEnv = "FAKE_PYTHON_MODE"
-	tokenValue  = "token-that-must-not-reach-argv" //nolint:gosec // reason: fixture value checked for leaks
+	fakeModeEnv     = "FAKE_PYTHON_MODE"
+	tokenValue      = "token-that-must-not-reach-argv" //nolint:gosec // reason: fixture value checked for leaks
+	downloadTimeout = 10 * time.Second
 )
 
 type recorder struct {
@@ -103,5 +106,14 @@ func TestDownloadReportsTheLastLogLineWhenPythonFails(t *testing.T) {
 	err := downloader.Download(t.Context(), testJob(), secret.New(tokenValue), (&recorder{}).record)
 	if err == nil || !strings.Contains(err.Error(), "login rejected") {
 		t.Errorf("error = %v, want it to quote the failure", err)
+	}
+}
+
+func TestOversizedEventLineDoesNotHangTheDownload(t *testing.T) {
+	downloader, _ := newDownloader(t, "oversized-event")
+	ctx, cancel := context.WithTimeout(t.Context(), downloadTimeout)
+	defer cancel()
+	if err := downloader.Download(ctx, testJob(), secret.New(tokenValue), (&recorder{}).record); err != nil {
+		t.Errorf("Download = %v, want it to finish", err)
 	}
 }

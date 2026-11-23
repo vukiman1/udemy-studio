@@ -28,4 +28,9 @@ case "$FAKE_PYTHON_MODE" in
     printf '%s\n' '{"event": "course_started", "course_title": "Backend", "total_lectures": 9}' >&4
     while :; do sleep 0.05; done
     ;;
+  oversized-event)
+    head -c 2097152 /dev/zero | tr '\0' x >&4
+    printf '\n' >&4
+    printf '%s\n' '{"event": "summary", "downloaded": 0, "already_present": 0, "failed": []}' >&4
+    ;;
 esac
