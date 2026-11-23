@@ -34,6 +34,7 @@ type Options struct {
 	LibraryDir    string
 	DatabasePath  string
 	LANMode       bool
+	Downloads     DownloadOptions
 }
 
 const lanAccessCodeFileName = "lan-access-code"
@@ -47,11 +48,11 @@ func Run(ctx context.Context, options Options, logger *slog.Logger) error {
 		return fmt.Errorf("open library %s: %w", options.LibraryDir, err)
 	}
 	defer media.Close()
-	scanned, err := library.Scan(media.FS())
+	catalog, err := library.NewCatalog(media.FS())
 	if err != nil {
 		return fmt.Errorf("scan library %s: %w", options.LibraryDir, err)
 	}
-	logger.Info("library scanned", "dir", options.LibraryDir, "courses", len(scanned.Courses))
+	logger.Info("library scanned", "dir", options.LibraryDir, "courses", len(catalog.Current().Courses))
 
 	if err := os.MkdirAll(filepath.Dir(options.DatabasePath), dataDirMode); err != nil {
 		return fmt.Errorf("create data dir for %s: %w", options.DatabasePath, err)
@@ -70,12 +71,18 @@ func Run(ctx context.Context, options Options, logger *slog.Logger) error {
 		return fmt.Errorf("load embedded frontend: %w", err)
 	}
 
+	downloads, err := newDownloads(ctx, options, database, catalog, logger)
+	if err != nil {
+		return err
+	}
 	handler := httpapi.NewHandler(httpapi.Deps{
 		Version:  options.Version,
 		Frontend: frontend,
-		Library:  scanned,
+		Catalog:  catalog,
 		Media:    media.FS(),
 		Progress: progress.NewService(sqlite.NewProgressStore(database), time.Now),
+		Login:    downloads.login,
+		Jobs:     downloads.jobs,
 		Logger:   logger,
 	})
 	address := options.ListenAddress
@@ -90,7 +97,7 @@ func Run(ctx context.Context, options Options, logger *slog.Logger) error {
 		return fmt.Errorf("listen on %s: %w", address, err)
 	}
 	logger.Info("http server listening", "addr", listener.Addr().String(), "version", options.Version)
-	return serve(ctx, listener, handler, logger, shutdownGracePeriod)
+	return serve(ctx, listener, handler, logger, shutdownGracePeriod, downloads.workers()...)
 }
 
 func enableLANMode(address string, handler http.Handler, accessCodePath string) (string, http.Handler, error) {
@@ -113,10 +120,20 @@ func enableLANMode(address string, handler http.Handler, accessCodePath string) 
 	return lanAddress, httpapi.RequireLANAccess(accessCode, handler), nil
 }
 
-func serve(ctx context.Context, listener net.Listener, handler http.Handler, logger *slog.Logger, gracePeriod time.Duration) error {
+func serve(
+	ctx context.Context,
+	listener net.Listener,
+	handler http.Handler,
+	logger *slog.Logger,
+	gracePeriod time.Duration,
+	workers ...func(context.Context) error,
+) error {
 	server := &http.Server{Handler: handler, ReadHeaderTimeout: readHeaderTimeout}
 
 	group, groupCtx := errgroup.WithContext(ctx)
+	for _, worker := range workers {
+		group.Go(func() error { return worker(groupCtx) })
+	}
 	group.Go(func() error {
 		if err := server.Serve(listener); !errors.Is(err, http.ErrServerClosed) {
 			return fmt.Errorf("serve http on %s: %w", listener.Addr(), err)

@@ -5,7 +5,9 @@ import (
 	"log/slog"
 	"net/http"
 
+	"github.com/vukiman1/udemy-studio/internal/jobs"
 	"github.com/vukiman1/udemy-studio/internal/library"
+	"github.com/vukiman1/udemy-studio/internal/login"
 	"github.com/vukiman1/udemy-studio/internal/progress"
 	"github.com/vukiman1/udemy-studio/internal/transport/httpapi/gen"
 )
@@ -13,9 +15,11 @@ import (
 type Deps struct {
 	Version  string
 	Frontend fs.FS
-	Library  *library.Library
+	Catalog  *library.Catalog
 	Media    fs.FS
 	Progress *progress.Service
+	Login    *login.Service
+	Jobs     *jobs.Manager
 	Logger   *slog.Logger
 }
 
@@ -27,15 +31,16 @@ func NewHandler(deps Deps) http.Handler {
 		ErrorHandlerFunc: writeBadRequestProblem,
 	})
 
-	files := libraryFiles{library: deps.Library, media: deps.Media, logger: deps.Logger}
+	files := libraryFiles{catalog: deps.Catalog, media: deps.Media, logger: deps.Logger}
 	mux.HandleFunc("GET /media/{lectureId}", files.serveVideo)
 	mux.HandleFunc("GET /articles/{lectureId}", files.serveArticle)
 	mux.HandleFunc("GET /attachments/{attachmentId}", files.serveAttachment)
+	mux.HandleFunc("GET /api/events", jobEventStream{jobs: deps.Jobs}.serve)
 
 	if deps.Frontend != nil {
 		mux.Handle("GET /", spaHandler(deps.Frontend))
 	}
-	return RejectForeignHosts(mux)
+	return RejectForeignHosts(RejectCrossSiteWrites(mux))
 }
 
 type apiServer struct {

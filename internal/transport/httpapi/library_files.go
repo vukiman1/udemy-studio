@@ -20,13 +20,13 @@ const (
 )
 
 type libraryFiles struct {
-	library *library.Library
+	catalog *library.Catalog
 	media   fs.FS
 	logger  *slog.Logger
 }
 
 func (files libraryFiles) serveVideo(writer http.ResponseWriter, request *http.Request) {
-	lecture, ok := files.library.Lecture(request.PathValue("lectureId"))
+	lecture, ok := files.catalog.Current().Lecture(request.PathValue("lectureId"))
 	if !ok || lecture.VideoPath == "" {
 		writeProblem(writer, http.StatusNotFound, "no video for lecture "+request.PathValue("lectureId"))
 		return
@@ -35,7 +35,7 @@ func (files libraryFiles) serveVideo(writer http.ResponseWriter, request *http.R
 }
 
 func (files libraryFiles) serveArticle(writer http.ResponseWriter, request *http.Request) {
-	lecture, ok := files.library.Lecture(request.PathValue("lectureId"))
+	lecture, ok := files.catalog.Current().Lecture(request.PathValue("lectureId"))
 	if !ok || lecture.ArticlePath == "" {
 		writeProblem(writer, http.StatusNotFound, "no article for lecture "+request.PathValue("lectureId"))
 		return
@@ -47,7 +47,7 @@ func (files libraryFiles) serveArticle(writer http.ResponseWriter, request *http
 }
 
 func (files libraryFiles) serveAttachment(writer http.ResponseWriter, request *http.Request) {
-	attachment, ok := files.library.Attachment(request.PathValue("attachmentId"))
+	attachment, ok := files.catalog.Current().Attachment(request.PathValue("attachmentId"))
 	if !ok {
 		writeProblem(writer, http.StatusNotFound, "no attachment "+request.PathValue("attachmentId"))
 		return

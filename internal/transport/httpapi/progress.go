@@ -11,7 +11,7 @@ import (
 )
 
 func (server apiServer) PutLectureProgress(ctx context.Context, request gen.PutLectureProgressRequestObject) (gen.PutLectureProgressResponseObject, error) {
-	lecture, ok := server.deps.Library.Lecture(request.LectureId)
+	lecture, ok := server.deps.Catalog.Current().Lecture(request.LectureId)
 	if !ok {
 		return gen.PutLectureProgress404ApplicationProblemPlusJSONResponse{NotFoundApplicationProblemPlusJSONResponse: notFound("no lecture " + request.LectureId)}, nil
 	}

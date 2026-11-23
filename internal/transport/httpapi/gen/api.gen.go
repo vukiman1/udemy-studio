@@ -32,6 +32,33 @@ func (e HealthStatus) Valid() bool {
 	}
 }
 
+// Defines values for JobStatus.
+const (
+	Cancelled JobStatus = "cancelled"
+	Failed    JobStatus = "failed"
+	Queued    JobStatus = "queued"
+	Running   JobStatus = "running"
+	Succeeded JobStatus = "succeeded"
+)
+
+// Valid indicates whether the value is a known member of the JobStatus enum.
+func (e JobStatus) Valid() bool {
+	switch e {
+	case Cancelled:
+		return true
+	case Failed:
+		return true
+	case Queued:
+		return true
+	case Running:
+		return true
+	case Succeeded:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for LectureKind.
 const (
 	Article     LectureKind = "article"
@@ -64,6 +91,14 @@ type Chapter struct {
 	Index    int              `json:"index"`
 	Lectures []LectureSummary `json:"lectures"`
 	Title    string           `json:"title"`
+}
+
+// ChromeProfile defines model for ChromeProfile.
+type ChromeProfile struct {
+	Dir        string   `json:"dir"`
+	Name       string   `json:"name"`
+	Selected   bool     `json:"selected"`
+	UdemyHosts []string `json:"udemyHosts"`
 }
 
 // ContinueTarget defines model for ContinueTarget.
@@ -114,6 +149,44 @@ type Health struct {
 // HealthStatus defines model for Health.Status.
 type HealthStatus string
 
+// HostLogin defines model for HostLogin.
+type HostLogin struct {
+	ExpiresAt *time.Time `json:"expiresAt,omitempty"`
+	Host      string     `json:"host"`
+	IsExpired bool       `json:"isExpired"`
+}
+
+// Job defines model for Job.
+type Job struct {
+	Chapters   *string     `json:"chapters,omitempty"`
+	CourseUrl  string      `json:"courseUrl"`
+	CreatedAt  time.Time   `json:"createdAt"`
+	Error      *string     `json:"error,omitempty"`
+	Failures   []string    `json:"failures"`
+	FinishedAt *time.Time  `json:"finishedAt,omitempty"`
+	Id         string      `json:"id"`
+	Progress   JobProgress `json:"progress"`
+	StartedAt  *time.Time  `json:"startedAt,omitempty"`
+	Status     JobStatus   `json:"status"`
+}
+
+// JobProgress defines model for JobProgress.
+type JobProgress struct {
+	CourseTitle    string  `json:"courseTitle"`
+	CurrentLecture *string `json:"currentLecture,omitempty"`
+	FinishedCount  int     `json:"finishedCount"`
+	TotalLectures  int     `json:"totalLectures"`
+}
+
+// JobRequest defines model for JobRequest.
+type JobRequest struct {
+	Chapters  *string `json:"chapters,omitempty"`
+	CourseUrl string  `json:"courseUrl"`
+}
+
+// JobStatus defines model for JobStatus.
+type JobStatus string
+
 // LectureKind defines model for LectureKind.
 type LectureKind string
 
@@ -138,12 +211,24 @@ type LectureSummary struct {
 	Title             string           `json:"title"`
 }
 
+// LoginStatus defines model for LoginStatus.
+type LoginStatus struct {
+	Hosts   []HostLogin    `json:"hosts"`
+	Problem *string        `json:"problem,omitempty"`
+	Profile *ChromeProfile `json:"profile,omitempty"`
+}
+
 // Problem RFC 9457 problem details
 type Problem struct {
 	Detail *string `json:"detail,omitempty"`
 	Status int     `json:"status"`
 	Title  string  `json:"title"`
 	Type   *string `json:"type,omitempty"`
+}
+
+// ProfileSelection defines model for ProfileSelection.
+type ProfileSelection struct {
+	Dir string `json:"dir"`
 }
 
 // ProgressReport defines model for ProgressReport.
@@ -165,6 +250,12 @@ type LectureId = string
 // BadRequest RFC 9457 problem details
 type BadRequest = Problem
 
+// Conflict RFC 9457 problem details
+type Conflict = Problem
+
+// DownloadsUnavailable RFC 9457 problem details
+type DownloadsUnavailable = Problem
+
 // NotFound RFC 9457 problem details
 type NotFound = Problem
 
@@ -180,6 +271,12 @@ type GetLectureSubtitlesVttParams struct {
 	Langs *Languages `form:"langs,omitempty" json:"langs,omitempty"`
 }
 
+// SelectChromeProfileJSONRequestBody defines body for SelectChromeProfile for application/json ContentType.
+type SelectChromeProfileJSONRequestBody = ProfileSelection
+
+// CreateJobJSONRequestBody defines body for CreateJob for application/json ContentType.
+type CreateJobJSONRequestBody = JobRequest
+
 // PutLectureProgressJSONRequestBody defines body for PutLectureProgress for application/json ContentType.
 type PutLectureProgressJSONRequestBody = ProgressReport
 
@@ -194,6 +291,24 @@ type ServerInterface interface {
 	// GetCourse Chapter and lecture tree with per-lecture progress
 	// (GET /api/courses/{courseId})
 	GetCourse(w http.ResponseWriter, r *http.Request, courseId CourseId)
+	// SelectChromeProfile Choose the Chrome profile whose Udemy login downloads use
+	// (PUT /api/downloads/profile)
+	SelectChromeProfile(w http.ResponseWriter, r *http.Request)
+	// ListChromeProfiles Chrome profiles and the Udemy portals each one is logged in to
+	// (GET /api/downloads/profiles)
+	ListChromeProfiles(w http.ResponseWriter, r *http.Request)
+	// GetLoginStatus Selected profile and whether its Udemy logins are still valid
+	// (GET /api/downloads/status)
+	GetLoginStatus(w http.ResponseWriter, r *http.Request)
+	// ListJobs Download jobs, newest first
+	// (GET /api/jobs)
+	ListJobs(w http.ResponseWriter, r *http.Request)
+	// CreateJob Queue a course download
+	// (POST /api/jobs)
+	CreateJob(w http.ResponseWriter, r *http.Request)
+	// CancelJob Cancel a queued or running job
+	// (DELETE /api/jobs/{jobId})
+	CancelJob(w http.ResponseWriter, r *http.Request, jobId string)
 	// GetLectureCues Subtitle cues merged by timing for the bilingual overlay
 	// (GET /api/lectures/{lectureId}/cues)
 	GetLectureCues(w http.ResponseWriter, r *http.Request, lectureId LectureId, params GetLectureCuesParams)
@@ -262,6 +377,102 @@ func (siw *ServerInterfaceWrapper) GetCourse(w http.ResponseWriter, r *http.Requ
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.GetCourse(w, r, courseId)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// SelectChromeProfile operation middleware
+func (siw *ServerInterfaceWrapper) SelectChromeProfile(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.SelectChromeProfile(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ListChromeProfiles operation middleware
+func (siw *ServerInterfaceWrapper) ListChromeProfiles(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListChromeProfiles(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetLoginStatus operation middleware
+func (siw *ServerInterfaceWrapper) GetLoginStatus(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetLoginStatus(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ListJobs operation middleware
+func (siw *ServerInterfaceWrapper) ListJobs(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListJobs(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// CreateJob operation middleware
+func (siw *ServerInterfaceWrapper) CreateJob(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CreateJob(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// CancelJob operation middleware
+func (siw *ServerInterfaceWrapper) CancelJob(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "jobId" -------------
+	var jobId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "jobId", r.PathValue("jobId"), &jobId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "jobId", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CancelJob(w, r, jobId)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -522,11 +733,21 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/lectures/{lectureId}/cues", wrapper.GetLectureCues)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/lectures/{lectureId}/subtitles.vtt", wrapper.GetLectureSubtitlesVtt)
 	m.HandleFunc(http.MethodPut+" "+options.BaseURL+"/api/lectures/{lectureId}/progress", wrapper.PutLectureProgress)
+	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/downloads/profiles", wrapper.ListChromeProfiles)
+	m.HandleFunc(http.MethodPut+" "+options.BaseURL+"/api/downloads/profile", wrapper.SelectChromeProfile)
+	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/downloads/status", wrapper.GetLoginStatus)
+	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/jobs", wrapper.ListJobs)
+	m.HandleFunc(http.MethodPost+" "+options.BaseURL+"/api/jobs", wrapper.CreateJob)
+	m.HandleFunc(http.MethodDelete+" "+options.BaseURL+"/api/jobs/{jobId}", wrapper.CancelJob)
 
 	return m
 }
 
 type BadRequestApplicationProblemPlusJSONResponse Problem
+
+type ConflictApplicationProblemPlusJSONResponse Problem
+
+type DownloadsUnavailableApplicationProblemPlusJSONResponse Problem
 
 type NotFoundApplicationProblemPlusJSONResponse Problem
 
@@ -614,6 +835,283 @@ func (response GetCourse404ApplicationProblemPlusJSONResponse) VisitGetCourseRes
 	}
 	w.Header().Set("Content-Type", "application/problem+json")
 	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SelectChromeProfileRequestObject struct {
+	Body *SelectChromeProfileJSONRequestBody
+}
+
+type SelectChromeProfileResponseObject interface {
+	VisitSelectChromeProfileResponse(w http.ResponseWriter) error
+}
+
+type SelectChromeProfile204Response struct {
+}
+
+func (response SelectChromeProfile204Response) VisitSelectChromeProfileResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type SelectChromeProfile404ApplicationProblemPlusJSONResponse struct {
+	NotFoundApplicationProblemPlusJSONResponse
+}
+
+func (response SelectChromeProfile404ApplicationProblemPlusJSONResponse) VisitSelectChromeProfileResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.NotFoundApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SelectChromeProfile503ApplicationProblemPlusJSONResponse struct {
+	DownloadsUnavailableApplicationProblemPlusJSONResponse
+}
+
+func (response SelectChromeProfile503ApplicationProblemPlusJSONResponse) VisitSelectChromeProfileResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.DownloadsUnavailableApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(503)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListChromeProfilesRequestObject struct {
+}
+
+type ListChromeProfilesResponseObject interface {
+	VisitListChromeProfilesResponse(w http.ResponseWriter) error
+}
+
+type ListChromeProfiles200JSONResponse []ChromeProfile
+
+func (response ListChromeProfiles200JSONResponse) VisitListChromeProfilesResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListChromeProfiles503ApplicationProblemPlusJSONResponse struct {
+	DownloadsUnavailableApplicationProblemPlusJSONResponse
+}
+
+func (response ListChromeProfiles503ApplicationProblemPlusJSONResponse) VisitListChromeProfilesResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.DownloadsUnavailableApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(503)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetLoginStatusRequestObject struct {
+}
+
+type GetLoginStatusResponseObject interface {
+	VisitGetLoginStatusResponse(w http.ResponseWriter) error
+}
+
+type GetLoginStatus200JSONResponse LoginStatus
+
+func (response GetLoginStatus200JSONResponse) VisitGetLoginStatusResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetLoginStatus503ApplicationProblemPlusJSONResponse struct {
+	DownloadsUnavailableApplicationProblemPlusJSONResponse
+}
+
+func (response GetLoginStatus503ApplicationProblemPlusJSONResponse) VisitGetLoginStatusResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.DownloadsUnavailableApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(503)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListJobsRequestObject struct {
+}
+
+type ListJobsResponseObject interface {
+	VisitListJobsResponse(w http.ResponseWriter) error
+}
+
+type ListJobs200JSONResponse []Job
+
+func (response ListJobs200JSONResponse) VisitListJobsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListJobs503ApplicationProblemPlusJSONResponse struct {
+	DownloadsUnavailableApplicationProblemPlusJSONResponse
+}
+
+func (response ListJobs503ApplicationProblemPlusJSONResponse) VisitListJobsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.DownloadsUnavailableApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(503)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateJobRequestObject struct {
+	Body *CreateJobJSONRequestBody
+}
+
+type CreateJobResponseObject interface {
+	VisitCreateJobResponse(w http.ResponseWriter) error
+}
+
+type CreateJob202JSONResponse Job
+
+func (response CreateJob202JSONResponse) VisitCreateJobResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(202)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateJob400ApplicationProblemPlusJSONResponse struct {
+	BadRequestApplicationProblemPlusJSONResponse
+}
+
+func (response CreateJob400ApplicationProblemPlusJSONResponse) VisitCreateJobResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.BadRequestApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CreateJob503ApplicationProblemPlusJSONResponse struct {
+	DownloadsUnavailableApplicationProblemPlusJSONResponse
+}
+
+func (response CreateJob503ApplicationProblemPlusJSONResponse) VisitCreateJobResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.DownloadsUnavailableApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(503)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CancelJobRequestObject struct {
+	JobId string `json:"jobId"`
+}
+
+type CancelJobResponseObject interface {
+	VisitCancelJobResponse(w http.ResponseWriter) error
+}
+
+type CancelJob204Response struct {
+}
+
+func (response CancelJob204Response) VisitCancelJobResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type CancelJob404ApplicationProblemPlusJSONResponse struct {
+	NotFoundApplicationProblemPlusJSONResponse
+}
+
+func (response CancelJob404ApplicationProblemPlusJSONResponse) VisitCancelJobResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.NotFoundApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CancelJob409ApplicationProblemPlusJSONResponse struct {
+	ConflictApplicationProblemPlusJSONResponse
+}
+
+func (response CancelJob409ApplicationProblemPlusJSONResponse) VisitCancelJobResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.ConflictApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(409)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CancelJob503ApplicationProblemPlusJSONResponse struct {
+	DownloadsUnavailableApplicationProblemPlusJSONResponse
+}
+
+func (response CancelJob503ApplicationProblemPlusJSONResponse) VisitCancelJobResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.DownloadsUnavailableApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(503)
 	_, err := buf.WriteTo(w)
 	return err
 }
@@ -789,6 +1287,24 @@ type StrictServerInterface interface {
 	// GetCourse Chapter and lecture tree with per-lecture progress
 	// (GET /api/courses/{courseId})
 	GetCourse(ctx context.Context, request GetCourseRequestObject) (GetCourseResponseObject, error)
+	// SelectChromeProfile Choose the Chrome profile whose Udemy login downloads use
+	// (PUT /api/downloads/profile)
+	SelectChromeProfile(ctx context.Context, request SelectChromeProfileRequestObject) (SelectChromeProfileResponseObject, error)
+	// ListChromeProfiles Chrome profiles and the Udemy portals each one is logged in to
+	// (GET /api/downloads/profiles)
+	ListChromeProfiles(ctx context.Context, request ListChromeProfilesRequestObject) (ListChromeProfilesResponseObject, error)
+	// GetLoginStatus Selected profile and whether its Udemy logins are still valid
+	// (GET /api/downloads/status)
+	GetLoginStatus(ctx context.Context, request GetLoginStatusRequestObject) (GetLoginStatusResponseObject, error)
+	// ListJobs Download jobs, newest first
+	// (GET /api/jobs)
+	ListJobs(ctx context.Context, request ListJobsRequestObject) (ListJobsResponseObject, error)
+	// CreateJob Queue a course download
+	// (POST /api/jobs)
+	CreateJob(ctx context.Context, request CreateJobRequestObject) (CreateJobResponseObject, error)
+	// CancelJob Cancel a queued or running job
+	// (DELETE /api/jobs/{jobId})
+	CancelJob(ctx context.Context, request CancelJobRequestObject) (CancelJobResponseObject, error)
 	// GetLectureCues Subtitle cues merged by timing for the bilingual overlay
 	// (GET /api/lectures/{lectureId}/cues)
 	GetLectureCues(ctx context.Context, request GetLectureCuesRequestObject) (GetLectureCuesResponseObject, error)
@@ -912,6 +1428,166 @@ func (sh *strictHandler) GetCourse(w http.ResponseWriter, r *http.Request, cours
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(GetCourseResponseObject); ok {
 		if err := validResponse.VisitGetCourseResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// SelectChromeProfile operation middleware
+func (sh *strictHandler) SelectChromeProfile(w http.ResponseWriter, r *http.Request) {
+	var request SelectChromeProfileRequestObject
+
+	var body SelectChromeProfileJSONRequestBody
+	if err := runtime.BindJSONBody(r, &body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error) {
+		return sh.ssi.SelectChromeProfile(ctx, request.(SelectChromeProfileRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "SelectChromeProfile")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(SelectChromeProfileResponseObject); ok {
+		if err := validResponse.VisitSelectChromeProfileResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ListChromeProfiles operation middleware
+func (sh *strictHandler) ListChromeProfiles(w http.ResponseWriter, r *http.Request) {
+	var request ListChromeProfilesRequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error) {
+		return sh.ssi.ListChromeProfiles(ctx, request.(ListChromeProfilesRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListChromeProfiles")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListChromeProfilesResponseObject); ok {
+		if err := validResponse.VisitListChromeProfilesResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetLoginStatus operation middleware
+func (sh *strictHandler) GetLoginStatus(w http.ResponseWriter, r *http.Request) {
+	var request GetLoginStatusRequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error) {
+		return sh.ssi.GetLoginStatus(ctx, request.(GetLoginStatusRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetLoginStatus")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetLoginStatusResponseObject); ok {
+		if err := validResponse.VisitGetLoginStatusResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ListJobs operation middleware
+func (sh *strictHandler) ListJobs(w http.ResponseWriter, r *http.Request) {
+	var request ListJobsRequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error) {
+		return sh.ssi.ListJobs(ctx, request.(ListJobsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListJobs")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListJobsResponseObject); ok {
+		if err := validResponse.VisitListJobsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// CreateJob operation middleware
+func (sh *strictHandler) CreateJob(w http.ResponseWriter, r *http.Request) {
+	var request CreateJobRequestObject
+
+	var body CreateJobJSONRequestBody
+	if err := runtime.BindJSONBody(r, &body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error) {
+		return sh.ssi.CreateJob(ctx, request.(CreateJobRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CreateJob")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(CreateJobResponseObject); ok {
+		if err := validResponse.VisitCreateJobResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// CancelJob operation middleware
+func (sh *strictHandler) CancelJob(w http.ResponseWriter, r *http.Request, jobId string) {
+	var request CancelJobRequestObject
+
+	request.JobId = jobId
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error) {
+		return sh.ssi.CancelJob(ctx, request.(CancelJobRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CancelJob")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(CancelJobResponseObject); ok {
+		if err := validResponse.VisitCancelJobResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {
