@@ -20,8 +20,9 @@ var (
 )
 
 type CourseRef struct {
-	Portal string
-	Slug   string
+	Portal  string
+	Slug    string
+	IsDraft bool
 }
 
 func (ref CourseRef) Host() string {
@@ -39,14 +40,15 @@ func ParseCourseURL(raw string) (CourseRef, error) {
 		return CourseRef{}, fmt.Errorf("%w: host %q is not <portal>%s", ErrInvalidCourseURL, parsed.Hostname(), udemyHostSuffix)
 	}
 	parts := strings.FieldsFunc(parsed.Path, func(r rune) bool { return r == '/' })
+	isDraft := false
 	if len(parts) > 0 && parts[0] == coursePathPart {
 		parts = parts[1:]
 		for len(parts) > 0 && parts[0] == draftPathPart {
-			parts = parts[1:]
+			parts, isDraft = parts[1:], true
 		}
 	}
 	if len(parts) == 0 || !courseSlugPattern.MatchString(parts[0]) {
 		return CourseRef{}, fmt.Errorf("%w: no course slug in %q", ErrInvalidCourseURL, parsed.Path)
 	}
-	return CourseRef{Portal: portal, Slug: parts[0]}, nil
+	return CourseRef{Portal: portal, Slug: parts[0], IsDraft: isDraft}, nil
 }

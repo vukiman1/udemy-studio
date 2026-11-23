@@ -47,11 +47,18 @@ func (err *StatusError) Error() string {
 type UnexpectedResponseError struct {
 	URL    string
 	Status int
+	Err    error
 }
 
 func (err *UnexpectedResponseError) Error() string {
-	return fmt.Sprintf("udemy returned a non-JSON response (HTTP %d) for %s: likely a login, captcha or block page", err.Status, err.URL)
+	var syntaxErr *json.SyntaxError
+	if errors.As(err.Err, &syntaxErr) {
+		return fmt.Sprintf("udemy returned a non-JSON response (HTTP %d) for %s: likely a login, captcha or block page", err.Status, err.URL)
+	}
+	return fmt.Sprintf("udemy returned JSON of an unexpected shape (HTTP %d) for %s: %v", err.Status, err.URL, err.Err)
 }
+
+func (err *UnexpectedResponseError) Unwrap() error { return err.Err }
 
 type Client struct {
 	transport  transport
@@ -90,7 +97,7 @@ func (client *Client) getJSON(ctx context.Context, target string, value any) err
 		return statusError(target, reply)
 	}
 	if err := json.Unmarshal(reply.body, value); err != nil {
-		return &UnexpectedResponseError{URL: redactQuery(target), Status: reply.status}
+		return &UnexpectedResponseError{URL: redactQuery(target), Status: reply.status, Err: err}
 	}
 	return nil
 }

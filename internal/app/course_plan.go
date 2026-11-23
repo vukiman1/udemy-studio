@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
 
 	"github.com/vukiman1/udemy-studio/internal/adapter/udemyapi"
@@ -39,18 +38,5 @@ func PlanCourse(ctx context.Context, options PlanCourseOptions, logger *slog.Log
 	if err := client.Visit(ctx); err != nil {
 		return udemy.Plan{}, err
 	}
-	course, err := client.ResolveCourse(ctx, options.CourseURL, ref)
-	if err != nil {
-		return udemy.Plan{}, err
-	}
-	logger.Info("course found", "id", course.ID, "title", course.Title)
-	items, err := client.Curriculum(ctx, course.ID)
-	if err != nil {
-		return udemy.Plan{}, err
-	}
-	plan, err := udemy.BuildPlan(ctx, course, items, options.Plan, client)
-	if err != nil {
-		return udemy.Plan{}, fmt.Errorf("plan course %d: %w", course.ID, err)
-	}
-	return plan, nil
+	return udemy.PlanCourse(ctx, client, ref, options.Plan)
 }

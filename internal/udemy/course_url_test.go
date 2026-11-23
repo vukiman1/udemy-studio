@@ -11,9 +11,9 @@ func TestParseCourseURL(t *testing.T) {
 		raw  string
 		want CourseRef
 	}{
-		{"https://example-portal.udemy.com/course/backend-basics/learn/lecture/1#overview", CourseRef{"example-portal", "backend-basics"}},
-		{"https://www.udemy.com/course/draft/123456/", CourseRef{"www", "123456"}},
-		{"https://WWW.Udemy.com/backend-basics", CourseRef{"www", "backend-basics"}},
+		{"https://example-portal.udemy.com/course/backend-basics/learn/lecture/1#overview", CourseRef{Portal: "example-portal", Slug: "backend-basics"}},
+		{"https://www.udemy.com/course/draft/123456/", CourseRef{Portal: "www", Slug: "123456", IsDraft: true}},
+		{"https://WWW.Udemy.com/backend-basics", CourseRef{Portal: "www", Slug: "backend-basics"}},
 		{"https://udemy.com/course/x", invalid},
 		{"https://evil.example/course/x", invalid},
 		{"https://a.b.udemy.com/course/x", invalid},

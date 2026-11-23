@@ -13,7 +13,7 @@ import (
 
 var (
 	chapterDirName  = regexp.MustCompile(`^(\d{2,}) - (.+)$`)
-	lectureFileName = regexp.MustCompile(`^(\d{3}) `)
+	lectureFileName = regexp.MustCompile(`^(\d{3,}) `)
 )
 
 func Scan(downloads fs.FS) (*Library, error) {
