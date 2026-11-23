@@ -1,0 +1,127 @@
+version: "3"
+
+vars:
+  VERSION:
+    sh: git describe --tags --always --dirty 2>/dev/null || echo dev
+  BINARY: bin/udemy-studio
+
+tasks:
+  default:
+    cmds:
+      - task --list
+
+  install:
+    desc: Install frontend dependencies
+    dir: web
+    cmds:
+      - pnpm install --frozen-lockfile
+
+  gen:
+    desc: Regenerate code from api/openapi.yaml
+    cmds:
+      - task: gen:api
+
+  gen:api:
+    cmds:
+      - go generate ./internal/transport/httpapi/gen
+      - pnpm --dir web gen:api
+
+  lint:
+    desc: Lint Go and web
+    cmds:
+      - task: lint:go
+      - task: lint:web
+
+  lint:go:
+    cmds:
+      - go tool golangci-lint run ./...
+
+  lint:web:
+    dir: web
+    cmds:
+      - pnpm lint
+
+  test:
+    desc: Run Go and web tests
+    cmds:
+      - task: test:go
+      - task: test:web
+
+  test:go:
+    cmds:
+      - go test -race ./...
+
+  test:web:
+    dir: web
+    cmds:
+      - pnpm test
+
+  test:oracle:
+    desc: Compare Go parsers against the Python oracle on the real library
+    requires:
+      vars: [LIBRARY_DIR]
+    cmds:
+      - LIBRARY_DIR="{{.LIBRARY_DIR}}" go test ./internal/subtitle/ -run Pysrt -count=1
+
+  build:web:
+    dir: web
+    cmds:
+      - pnpm build
+      - touch dist/.gitkeep
+
+  build:
+    desc: Build the single binary with the embedded frontend
+    deps: [build:web]
+    cmds:
+      - go build -trimpath -ldflags "-s -w -X main.version={{.VERSION}}" -o {{.BINARY}} ./cmd/udemy-studio
+
+  check:
+    desc: gen + lint + test + build, the gate every change passes
+    cmds:
+      - task: gen
+      - task: lint
+      - task: test
+      - task: build
+
+  vuln:
+    desc: Scan dependencies for reachable vulnerabilities
+    cmds:
+      - go tool govulncheck ./...
+
+  dev:
+    desc: Go server with hot reload plus the Vite dev server (LIBRARY_DIR=<downloads dir>)
+    deps: [dev:go, dev:web]
+
+  dev:go:
+    requires:
+      vars: [LIBRARY_DIR]
+    env:
+      UDEMY_STUDIO_LIBRARY: "{{.LIBRARY_DIR}}"
+    cmds:
+      - go tool air
+
+  dev:web:
+    dir: web
+    cmds:
+      - pnpm dev
+
+  fixtures:udemy:
+    desc: Sanitize the Python oracle's saved/ output into testdata/
+    requires:
+      vars: [PYTHON_SAVED_DIR, PORTAL]
+    cmds:
+      - go run ./tools/sanitizefixture -in "{{.PYTHON_SAVED_DIR}}" -portal "{{.PORTAL}}"
+
+  fixtures:subtitles:
+    desc: Record pysrt digests of every SRT in a downloads/ tree
+    requires:
+      vars: [LIBRARY_DIR, PYTHON]
+    cmds:
+      - '"{{.PYTHON}}" tools/pysrtgolden/pysrt_golden.py "{{.LIBRARY_DIR}}" testdata/subtitle/pysrt_golden.json'
+
+  fixtures:library:
+    desc: Describe a downloads/ tree into testdata/library/manifest.json
+    requires:
+      vars: [LIBRARY_DIR]
+    cmds:
+      - go run ./tools/librarymanifest -root "{{.LIBRARY_DIR}}"

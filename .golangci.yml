@@ -1,0 +1,83 @@
+version: "2"
+
+run:
+  tests: true
+
+linters:
+  default: standard
+  enable:
+    - bodyclose
+    - contextcheck
+    - depguard
+    - errorlint
+    - exhaustive
+    - gocritic
+    - gosec
+    - nilerr
+    - noctx
+    - revive
+    - sloglint
+  settings:
+    depguard:
+      rules:
+        domain-stays-pure:
+          files:
+            - "**/internal/library/**"
+            - "**/internal/learning/**"
+            - "**/internal/progress/**"
+            - "**/internal/subtitle/**"
+            - "**/internal/search/**"
+            - "**/internal/jobs/**"
+            - "**/internal/udemy/**"
+            - "**/internal/download/**"
+            - "**/internal/transcode/**"
+            - "**/internal/translate/**"
+            - "**/internal/naming/**"
+          deny:
+            - pkg: github.com/vukiman1/udemy-studio/internal/adapter
+              desc: domain packages declare interfaces; adapters implement them
+            - pkg: github.com/vukiman1/udemy-studio/internal/transport
+              desc: domain packages must not know about HTTP
+            - pkg: github.com/vukiman1/udemy-studio/internal/app
+              desc: only the composition root wires packages together
+            - pkg: github.com/vukiman1/udemy-studio/internal/cli
+              desc: only the composition root wires packages together
+        platform-is-a-leaf:
+          list-mode: lax
+          files:
+            - "**/internal/platform/**"
+          deny:
+            - pkg: github.com/vukiman1/udemy-studio/internal/
+              desc: platform holds technical building blocks with no business imports
+          allow:
+            - github.com/vukiman1/udemy-studio/internal/platform
+        adapters-skip-transport:
+          files:
+            - "**/internal/adapter/**"
+          deny:
+            - pkg: github.com/vukiman1/udemy-studio/internal/transport
+              desc: adapters talk to the outside world, not to HTTP handlers
+            - pkg: github.com/vukiman1/udemy-studio/internal/app
+              desc: only the composition root wires packages together
+    revive:
+      rules:
+        - name: exported
+          disabled: true
+  exclusions:
+    generated: strict
+    presets:
+      - std-error-handling
+    paths:
+      - spikes/
+
+formatters:
+  enable:
+    - gofumpt
+    - goimports
+  settings:
+    goimports:
+      local-prefixes:
+        - github.com/vukiman1/udemy-studio
+  exclusions:
+    paths:
+      - spikes/
