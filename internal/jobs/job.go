@@ -113,3 +113,8 @@ func (job *Job) apply(event Event) {
 		job.Progress.CurrentLecture = ""
 	}
 }
+
+func (job *Job) finish(status Status, errMessage string, at *time.Time) {
+	job.Status, job.Error, job.FinishedAt = status, errMessage, at
+	job.Progress.CurrentLecture = ""
+}
