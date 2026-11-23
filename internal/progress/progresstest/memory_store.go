@@ -31,3 +31,14 @@ func (store *MemoryStore) All(_ context.Context) ([]progress.Record, error) {
 	}
 	return records, nil
 }
+
+func (store *MemoryStore) RenameKey(_ context.Context, from, to string) error {
+	record, ok := store.records[from]
+	if _, taken := store.records[to]; !ok || taken {
+		return nil
+	}
+	delete(store.records, from)
+	record.LectureKey = to
+	store.records[to] = record
+	return nil
+}

@@ -4,7 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"maps"
 	"math"
+	"slices"
 	"time"
 )
 
@@ -33,6 +35,8 @@ type Store interface {
 	Find(ctx context.Context, lectureKey string) (Record, bool, error)
 	Upsert(ctx context.Context, record Record) error
 	All(ctx context.Context) ([]Record, error)
+	// RenameKey moves from's record to to, and keeps it under from if to already has one.
+	RenameKey(ctx context.Context, from, to string) error
 }
 
 type Service struct {
@@ -81,6 +85,16 @@ func (service *Service) All(ctx context.Context) (map[string]Record, error) {
 		byKey[record.LectureKey] = record
 	}
 	return byKey, nil
+}
+
+// AdoptKeys moves progress saved under old lecture keys to their new keys; running it again changes nothing.
+func (service *Service) AdoptKeys(ctx context.Context, renames map[string]string) error {
+	for _, from := range slices.Sorted(maps.Keys(renames)) {
+		if err := service.store.RenameKey(ctx, from, renames[from]); err != nil {
+			return fmt.Errorf("move progress of %q to %q: %w", from, renames[from], err)
+		}
+	}
+	return nil
 }
 
 func validate(report Report) error {
