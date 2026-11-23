@@ -27,7 +27,9 @@ func newServeCommand(version string) *cobra.Command {
 			if options.Downloads.OutputDir == "" {
 				options.Downloads.OutputDir = options.LibraryDir
 			}
-			if err := applyDataDefaults(&options.DataDir, &options.Downloads.ChromeDataDir); err != nil {
+			var err error
+			options.DataDir, options.Downloads.ChromeDataDir, err = withDataDefaults(options.DataDir, options.Downloads.ChromeDataDir)
+			if err != nil {
 				return err
 			}
 			if err := resolvePaths(&options); err != nil {
