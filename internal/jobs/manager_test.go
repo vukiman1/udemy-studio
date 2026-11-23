@@ -370,6 +370,17 @@ func TestShutdownLeavesWaitingJobsQueued(t *testing.T) {
 	}
 }
 
+var errSaveFailed = errors.New("disk full")
+
+type cancelFailingStore struct{ *memoryStore }
+
+func (store cancelFailingStore) Save(ctx context.Context, job Job) error {
+	if job.Status == StatusCancelled {
+		return errSaveFailed
+	}
+	return store.memoryStore.Save(ctx, job)
+}
+
 func idleManager(store Store) *Manager {
 	return NewManager(Deps{Downloader: &scriptedDownloader{}, Tokens: tokens{}, Store: store, Logger: slog.New(slog.DiscardHandler), Now: time.Now})
 }
@@ -393,5 +404,19 @@ func TestSubscriberThatFallsBehindIsClosedSoItReloads(t *testing.T) {
 		}
 	case <-time.After(waitTimeout):
 		t.Fatal("subscriber that fell behind was neither closed nor updated")
+	}
+}
+
+func TestQueuedJobStaysQueuedWhenSavingItsCancellationFails(t *testing.T) {
+	manager := idleManager(cancelFailingStore{&memoryStore{jobs: map[string]Job{}}})
+	job, err := manager.Submit(t.Context(), Request{CourseURL: validCourseURL})
+	if err != nil {
+		t.Fatalf("Submit: %v", err)
+	}
+	if err := manager.Cancel(t.Context(), job.ID); !errors.Is(err, errSaveFailed) {
+		t.Errorf("Cancel = %v, want errSaveFailed", err)
+	}
+	if listed := manager.List(); listed[0].Status != StatusQueued || listed[0].FinishedAt != nil {
+		t.Errorf("job = %+v, want it still queued", listed[0])
 	}
 }
