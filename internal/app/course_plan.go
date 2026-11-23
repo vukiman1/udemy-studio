@@ -39,7 +39,7 @@ func PlanCourse(ctx context.Context, options PlanCourseOptions, logger *slog.Log
 	if err := client.Visit(ctx); err != nil {
 		return udemy.Plan{}, err
 	}
-	course, err := client.ResolveCourse(ctx, options.CourseURL, ref)
+	course, err := client.ResolveCourse(ctx, ref)
 	if err != nil {
 		return udemy.Plan{}, err
 	}

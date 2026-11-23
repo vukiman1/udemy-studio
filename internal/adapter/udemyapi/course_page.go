@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/url"
 	"slices"
 	"strings"
 
@@ -16,12 +17,14 @@ import (
 const (
 	courseTakingAppClass = "ud-component--course-taking--app"
 	moduleArgsAttribute  = "data-module-args"
+	coursePagePath       = "/course/%s/learn/"
 )
 
 var errNoCourseData = errors.New("the course page has no course data: the URL should be the course's /learn page and the profile must be logged in")
 
-func (client *Client) courseFromPage(ctx context.Context, courseURL string) (udemy.Course, error) {
-	page, err := client.getText(ctx, courseURL)
+// The page URL is rebuilt on the portal so the login cookie never follows a user-typed http:// URL.
+func (client *Client) courseFromPage(ctx context.Context, slug string) (udemy.Course, error) {
+	page, err := client.getText(ctx, client.portalURL+fmt.Sprintf(coursePagePath, url.PathEscape(slug)))
 	if err != nil {
 		return udemy.Course{}, fmt.Errorf("fetch course page: %w", err)
 	}

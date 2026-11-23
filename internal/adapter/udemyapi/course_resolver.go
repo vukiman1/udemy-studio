@@ -27,7 +27,7 @@ type courseLookup struct {
 }
 
 // ResolveCourse finds the enrolled course a URL points to, trying each place Udemy lists courses before the course page itself.
-func (client *Client) ResolveCourse(ctx context.Context, courseURL string, ref udemy.CourseRef) (udemy.Course, error) {
+func (client *Client) ResolveCourse(ctx context.Context, ref udemy.CourseRef) (udemy.Course, error) {
 	for _, lookup := range client.courseLookups(ref.Slug) {
 		courses, err := lookup.list(ctx)
 		var statusErr *StatusError
@@ -43,7 +43,7 @@ func (client *Client) ResolveCourse(ctx context.Context, courseURL string, ref u
 			return course, nil
 		}
 	}
-	course, err := client.courseFromPage(ctx, courseURL)
+	course, err := client.courseFromPage(ctx, ref.Slug)
 	var statusErr *StatusError
 	if errors.Is(err, errNoCourseData) || errors.As(err, &statusErr) {
 		return udemy.Course{}, fmt.Errorf("%w (%q): %w", ErrCourseNotFound, ref.Slug, err)
