@@ -10,7 +10,7 @@ import (
 
 const (
 	problemContentType         = "application/problem+json"
-	downloadsUnavailableDetail = "downloads are not configured: start the server with --python and --python-repo"
+	downloadsUnavailableDetail = "downloads are not configured: start the server with --downloader go, or with --python and --python-repo"
 )
 
 func problem(status int, detail string) gen.Problem {
