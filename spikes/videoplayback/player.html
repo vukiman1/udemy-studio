@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S3 playback spike</title>
+<style>
+  body { font: 14px/1.4 -apple-system, system-ui, sans-serif; margin: 16px; }
+  video { width: 480px; max-width: 100%; background: #000; display: block; margin: 8px 0; }
+  pre { background: #f4f4f4; padding: 8px; white-space: pre-wrap; }
+  .pass { color: #0a7d22; } .fail { color: #b00020; }
+</style>
+</head>
+<body>
+<h1>S3 playback spike</h1>
+<button id="start">Start test</button>
+<div id="out"></div>
+<script>
+const SAMPLES = [
+  { name: "hevc", codec: 'video/mp4; codecs="hvc1.1.6.L93.B0"' },
+  { name: "h264", codec: 'video/mp4; codecs="avc1.64001F"' },
+];
+const STEP_TIMEOUT_MS = 20000;
+const PLAY_ADVANCE_SECONDS = 0.5;
+const END_OFFSET_SECONDS = 3;
+
+class StepTimeoutError extends Error {}
+
+function waitFor(video, eventName, predicate = () => true) {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      cleanup();
+      reject(new StepTimeoutError(`timeout waiting for ${eventName}`));
+    }, STEP_TIMEOUT_MS);
+    const onEvent = () => { if (predicate()) { cleanup(); resolve(); } };
+    const onError = () => { cleanup(); reject(new Error(`media error code ${video.error && video.error.code}`)); };
+    function cleanup() {
+      clearTimeout(timer);
+      video.removeEventListener(eventName, onEvent);
+      video.removeEventListener("error", onError);
+    }
+    video.addEventListener(eventName, onEvent);
+    video.addEventListener("error", onError);
+  });
+}
+
+function decodedFrames(video) {
+  const quality = video.getVideoPlaybackQuality ? video.getVideoPlaybackQuality() : null;
+  return quality ? quality.totalVideoFrames : -1;
+}
+
+async function playsFrom(video, startTime, label, steps) {
+  const framesBefore = decodedFrames(video);
+  await waitFor(video, "timeupdate", () => video.currentTime > startTime + PLAY_ADVANCE_SECONDS);
+  steps.push({ step: label, currentTime: +video.currentTime.toFixed(2),
+               framesDecoded: decodedFrames(video) - framesBefore, videoWidth: video.videoWidth });
+}
+
+function createVideo(sample, container) {
+  const video = document.createElement("video");
+  video.muted = true;
+  video.setAttribute("muted", "");
+  video.setAttribute("playsinline", "");
+  video.controls = true;
+  video.preload = "auto";
+  container.appendChild(video);
+  video.src = `/media/${sample.name}`;
+  const unlock = video.play().then(() => video.pause(), () => {});
+  return { video, unlock };
+}
+
+async function runSample(sample, video) {
+  const steps = [];
+  steps.push({ step: "canPlayType", codec: sample.codec, answer: video.canPlayType(sample.codec) });
+  try {
+    if (video.readyState < HTMLMediaElement.HAVE_METADATA) await waitFor(video, "loadedmetadata");
+    video.currentTime = 0;
+    steps.push({ step: "metadata", width: video.videoWidth, height: video.videoHeight, duration: +video.duration.toFixed(2) });
+
+    await video.play();
+    await playsFrom(video, 0, "play-start", steps);
+
+    const middle = video.duration / 2;
+    video.currentTime = middle;
+    await waitFor(video, "seeked");
+    await playsFrom(video, middle, "seek-middle", steps);
+
+    video.currentTime = video.duration - END_OFFSET_SECONDS;
+    await waitFor(video, "seeked");
+    await waitFor(video, "ended");
+    steps.push({ step: "seek-end-ended", currentTime: +video.currentTime.toFixed(2) });
+
+    const allFramesAdvanced = steps.filter((s) => "framesDecoded" in s).every((s) => s.framesDecoded !== 0 && s.videoWidth > 0);
+    return { sample: sample.name, steps, result: allFramesAdvanced ? "PASS" : "FAIL: no video frames decoded" };
+  } catch (error) {
+    steps.push({ step: "error", message: String(error.message || error) });
+    return { sample: sample.name, steps, result: `FAIL: ${error.message || error}` };
+  }
+}
+
+async function runAll() {
+  const out = document.getElementById("out");
+  const prepared = SAMPLES.map((sample) => {
+    const section = document.createElement("section");
+    section.innerHTML = `<h2>${sample.name}</h2>`;
+    out.appendChild(section);
+    return { sample, section, ...createVideo(sample, section) };
+  });
+  for (const { sample, section, video, unlock } of prepared) {
+    await unlock;
+    const report = await runSample(sample, video);
+    const pre = document.createElement("pre");
+    pre.className = report.result === "PASS" ? "pass" : "fail";
+    pre.textContent = `${report.result}\n${report.steps.map((s) => JSON.stringify(s)).join("\n")}`;
+    section.appendChild(pre);
+    await fetch("/report", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(report) });
+  }
+  document.title = "S3 done";
+}
+
+document.getElementById("start").addEventListener("click", runAll);
+if (new URLSearchParams(location.search).has("auto")) runAll();
+</script>
+</body>
+</html>
