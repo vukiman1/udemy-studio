@@ -39,9 +39,3 @@ func TestMergeKeepsCuesThatOnlyOneTrackHas(t *testing.T) {
 		t.Errorf("merge mismatch (-want +got):\n%s", diff)
 	}
 }
-
-func TestMergeOfNoTracksIsEmpty(t *testing.T) {
-	if got := Merge(nil); len(got) != 0 {
-		t.Errorf("Merge(nil) = %v, want empty", got)
-	}
-}

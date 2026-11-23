@@ -1,10 +1,13 @@
 package chromecookie
 
 import (
+	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"io"
 	"io/fs"
+	"net/url"
 	"os"
 	"path/filepath"
 )
@@ -15,6 +18,28 @@ const (
 )
 
 var sqliteCompanionSuffixes = []string{"", "-wal", "-shm"}
+
+func openSnapshot(ctx context.Context, profilePath string) (*sql.DB, func(), error) {
+	snapshotPath, removeSnapshot, err := snapshotCookies(profilePath)
+	if err != nil {
+		return nil, nil, err
+	}
+	dataSource := url.URL{Scheme: "file", Path: snapshotPath, RawQuery: "mode=ro"}
+	database, err := sql.Open(sqliteDriver, dataSource.String())
+	if err != nil {
+		removeSnapshot()
+		return nil, nil, fmt.Errorf("open cookie snapshot: %w", err)
+	}
+	if err := database.PingContext(ctx); err != nil {
+		_ = database.Close()
+		removeSnapshot()
+		return nil, nil, fmt.Errorf("open cookie snapshot: %w", err)
+	}
+	return database, func() {
+		_ = database.Close()
+		removeSnapshot()
+	}, nil
+}
 
 // Chrome keeps Cookies locked and partly in its WAL while running, so queries run on a private copy.
 func snapshotCookies(profilePath string) (string, func(), error) {

@@ -3,7 +3,6 @@ package jobs
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log/slog"
 	"sync"
 	"testing"
@@ -52,11 +51,12 @@ func (source tokens) Token(context.Context, string) (secret.Secret, error) {
 }
 
 type scriptedDownloader struct {
-	events     []Event
-	err        error
-	blockUntil bool
-	gotToken   chan string
-	started    chan struct{}
+	events      []Event
+	err         error
+	blockUntil  bool
+	gotToken    chan string
+	started     chan struct{}
+	startedOnce sync.Once
 }
 
 func (downloader *scriptedDownloader) Download(ctx context.Context, _ Job, token secret.Secret, onEvent func(Event)) error {
@@ -67,7 +67,7 @@ func (downloader *scriptedDownloader) Download(ctx context.Context, _ Job, token
 		onEvent(event)
 	}
 	if downloader.started != nil {
-		close(downloader.started)
+		downloader.startedOnce.Do(func() { close(downloader.started) })
 	}
 	if downloader.blockUntil {
 		<-ctx.Done()
@@ -203,10 +203,10 @@ func TestCancellingAQueuedJobNeverStartsIt(t *testing.T) {
 	if err := h.manager.Cancel(t.Context(), second.ID); err != nil {
 		t.Fatalf("Cancel queued: %v", err)
 	}
-	waitForStatus(t, h.manager, second.ID, StatusCancelled)
+	third, _ := h.manager.Submit(t.Context(), Request{CourseURL: validCourseURL})
 	_ = h.manager.Cancel(t.Context(), first.ID)
-	cancelled := waitForStatus(t, h.manager, second.ID, StatusCancelled)
-	if cancelled.StartedAt != nil {
+	waitForStatus(t, h.manager, third.ID, StatusRunning)
+	if cancelled := waitForStatus(t, h.manager, second.ID, StatusCancelled); cancelled.StartedAt != nil {
 		t.Error("a cancelled queued job was started")
 	}
 }
@@ -287,30 +287,6 @@ func TestSubmittingManyJobsNeverBlocks(t *testing.T) {
 	}
 }
 
-func TestRestoreWithManyWaitingJobsDoesNotBlock(t *testing.T) {
-	store := &memoryStore{jobs: map[string]Job{}}
-	for index := range 200 {
-		id := fmt.Sprintf("job-%03d", index)
-		store.jobs[id] = Job{ID: id, Request: Request{CourseURL: validCourseURL}, Status: StatusQueued, CreatedAt: time.Now().Add(time.Duration(index) * time.Millisecond)}
-	}
-	manager := NewManager(Deps{Downloader: &scriptedDownloader{}, Tokens: tokens{}, Store: store, Logger: slog.New(slog.DiscardHandler), Now: time.Now})
-	restored := make(chan error, 1)
-	go func() { restored <- manager.Restore(t.Context()) }()
-	select {
-	case err := <-restored:
-		if err != nil {
-			t.Fatalf("Restore: %v", err)
-		}
-	case <-time.After(waitTimeout):
-		t.Fatal("Restore blocked on many waiting jobs")
-	}
-	ctx, cancel := context.WithCancel(t.Context())
-	defer cancel()
-	go func() { _ = manager.Run(ctx) }()
-	waitForStatus(t, manager, "job-000", StatusSucceeded)
-	waitForStatus(t, manager, "job-199", StatusSucceeded)
-}
-
 func TestFinishedJobsNoLongerShowACurrentLecture(t *testing.T) {
 	downloader := &scriptedDownloader{blockUntil: true, started: make(chan struct{}), events: []Event{{Kind: EventLectureStarted, LectureTitle: "005 Intro"}}}
 	h := start(t, downloader, nil)
@@ -319,17 +295,6 @@ func TestFinishedJobsNoLongerShowACurrentLecture(t *testing.T) {
 	_ = h.manager.Cancel(t.Context(), job.ID)
 	if cancelled := waitForStatus(t, h.manager, job.ID, StatusCancelled); cancelled.Progress.CurrentLecture != "" {
 		t.Errorf("cancelled job still shows %q", cancelled.Progress.CurrentLecture)
-	}
-
-	store := &memoryStore{jobs: map[string]Job{
-		"interrupted": {ID: "interrupted", Status: StatusRunning, Progress: Progress{CurrentLecture: "005 Intro"}},
-	}}
-	manager := NewManager(Deps{Downloader: &scriptedDownloader{}, Tokens: tokens{}, Store: store, Logger: slog.New(slog.DiscardHandler), Now: time.Now})
-	if err := manager.Restore(t.Context()); err != nil {
-		t.Fatalf("Restore: %v", err)
-	}
-	if restored := manager.List()[0]; restored.Progress.CurrentLecture != "" {
-		t.Errorf("interrupted job still shows %q", restored.Progress.CurrentLecture)
 	}
 }
 

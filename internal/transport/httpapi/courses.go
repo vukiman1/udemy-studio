@@ -24,19 +24,15 @@ func (server apiServer) ListCourses(ctx context.Context, _ gen.ListCoursesReques
 }
 
 func (server apiServer) GetCourse(ctx context.Context, request gen.GetCourseRequestObject) (gen.GetCourseResponseObject, error) {
-	if _, ok := server.deps.Catalog.Current().Course(request.CourseId); !ok {
+	course, ok := server.deps.Catalog.Current().Course(request.CourseId)
+	if !ok {
 		return gen.GetCourse404ApplicationProblemPlusJSONResponse{NotFoundApplicationProblemPlusJSONResponse: notFound("no course " + request.CourseId)}, nil
 	}
 	records, err := server.deps.Progress.All(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("get course %s: %w", request.CourseId, err)
 	}
-	for _, overview := range learning.Overviews(server.deps.Catalog.Current(), records) {
-		if overview.Course.ID == request.CourseId {
-			return gen.GetCourse200JSONResponse(toCourseDetail(overview, records)), nil
-		}
-	}
-	return nil, fmt.Errorf("course %s vanished between lookup and overview", request.CourseId)
+	return gen.GetCourse200JSONResponse(toCourseDetail(learning.Overview(course, records), records)), nil
 }
 
 func (server apiServer) GetContinue(ctx context.Context, _ gen.GetContinueRequestObject) (gen.GetContinueResponseObject, error) {

@@ -4,8 +4,7 @@ import "strings"
 
 const (
 	captionClass        = "caption"
-	vttExtension        = "vtt"
-	srtCaptionExtension = "srt"
+	vttURLMarker        = "vtt"
 	AllCaptionLanguages = "all"
 )
 
@@ -34,7 +33,7 @@ func planCaptions(lectureTitle string, captions []Caption, wantedLanguage string
 		plans = append(plans, CaptionPlan{
 			Language: language,
 			URL:      caption.URL,
-			File:     stem + "." + captionExtension(caption.URL),
+			File:     stem + captionExtension(caption.URL),
 			SRTFile:  stem + srtExtension,
 		})
 	}
@@ -53,8 +52,8 @@ func captionLanguage(caption Caption) string {
 
 func captionExtension(captionURL string) string {
 	lastPart := captionURL[strings.LastIndex(captionURL, ".")+1:]
-	if strings.Contains(lastPart, vttExtension) {
+	if strings.Contains(lastPart, vttURLMarker) {
 		return vttExtension
 	}
-	return srtCaptionExtension
+	return srtExtension
 }

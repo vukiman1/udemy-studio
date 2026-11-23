@@ -20,7 +20,9 @@ func newPlanCommand() *cobra.Command {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
 			options.CourseURL = args[0]
-			if err := applyDataDefaults(&options.DataDir, &options.ChromeDataDir); err != nil {
+			var err error
+			options.DataDir, options.ChromeDataDir, err = withDataDefaults(options.DataDir, options.ChromeDataDir)
+			if err != nil {
 				return err
 			}
 			logger := slog.New(slog.NewTextHandler(os.Stderr, nil))

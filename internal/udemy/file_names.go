@@ -11,6 +11,7 @@ const (
 	videoExtension = ".mp4"
 	htmlExtension  = ".html"
 	srtExtension   = ".srt"
+	vttExtension   = ".vtt"
 	urlExtension   = ".url"
 )
 

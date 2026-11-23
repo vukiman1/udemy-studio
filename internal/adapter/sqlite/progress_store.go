@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"time"
 
 	"github.com/vukiman1/udemy-studio/internal/adapter/sqlite/gen"
 	"github.com/vukiman1/udemy-studio/internal/progress"
@@ -86,7 +85,3 @@ func toRecord(row gen.LectureProgress) (progress.Record, error) {
 	}
 	return record, nil
 }
-
-func formatTime(moment time.Time) string { return moment.UTC().Format(time.RFC3339Nano) }
-
-func parseTime(text string) (time.Time, error) { return time.Parse(time.RFC3339Nano, text) }

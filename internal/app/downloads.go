@@ -34,8 +34,7 @@ type downloads struct {
 	jobs  *jobs.Manager
 }
 
-func newDownloads(ctx context.Context, options Options, database *sql.DB, catalog *library.Catalog, logger *slog.Logger) (downloads, error) {
-	config := options.Downloads
+func newDownloads(ctx context.Context, config DownloadOptions, dataDir string, database *sql.DB, catalog *library.Catalog, logger *slog.Logger) (downloads, error) {
 	if !config.isConfigured() {
 		logger.Info("downloads disabled; pass --python and --python-repo to enable them")
 		return downloads{}, nil
@@ -45,7 +44,7 @@ func newDownloads(ctx context.Context, options Options, database *sql.DB, catalo
 		Python:          config.Python,
 		RepoDir:         config.PythonRepo,
 		OutputDir:       config.OutputDir,
-		LogDir:          filepath.Join(options.DataDir, jobLogsDirName),
+		LogDir:          filepath.Join(dataDir, jobLogsDirName),
 		CaptionLanguage: config.CaptionLanguage,
 		KeepAwake:       true,
 	}, logger)
@@ -68,9 +67,9 @@ func newDownloads(ctx context.Context, options Options, database *sql.DB, catalo
 	return downloads{login: loginService, jobs: manager}, nil
 }
 
-func (enabled downloads) workers() []func(context.Context) error {
-	if enabled.jobs == nil {
+func (configured downloads) workers() []func(context.Context) error {
+	if configured.jobs == nil {
 		return nil
 	}
-	return []func(context.Context) error{enabled.jobs.Run}
+	return []func(context.Context) error{configured.jobs.Run}
 }

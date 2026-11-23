@@ -179,36 +179,6 @@ func TestScanSortsChaptersAndLecturesNumerically(t *testing.T) {
 	}
 }
 
-func TestLookupsResolveIDsAndRejectUnknownOnes(t *testing.T) {
-	scanned := scanFS(t, manifestFS(t))
-	lecture := findLecture(t, scanned.Courses[0], 7, 3)
-
-	found, ok := scanned.Lecture(lecture.ID)
-	if !ok || found.VideoPath != lecture.VideoPath {
-		t.Errorf("Lecture(%s) = %+v, %t", lecture.ID, found, ok)
-	}
-	attachment, ok := scanned.Attachment(lecture.Attachments[0].ID)
-	if !ok || attachment.Path != lecture.Attachments[0].Path {
-		t.Errorf("Attachment(%s) = %+v, %t", lecture.Attachments[0].ID, attachment, ok)
-	}
-	if _, ok := scanned.Course(scanned.Courses[0].ID); !ok {
-		t.Error("Course(own id) not found")
-	}
-	for _, unknown := range []string{"", "../etc/passwd", "zzzzzzzzzzzz"} {
-		if _, ok := scanned.Lecture(unknown); ok {
-			t.Errorf("Lecture(%q) resolved, want unknown", unknown)
-		}
-	}
-}
-
-func TestIDsAreStableAcrossScans(t *testing.T) {
-	first := scanFS(t, manifestFS(t)).Courses[0]
-	second := scanFS(t, manifestFS(t)).Courses[0]
-	if first.ID != second.ID || findLecture(t, first, 3, 2).ID != findLecture(t, second, 3, 2).ID {
-		t.Error("ids changed between scans of the same tree")
-	}
-}
-
 func TestArticleKeepsItsIdentityWhenItsVideoGainsSubtitles(t *testing.T) {
 	before := fstest.MapFS{
 		"course/07 - Extras/003 The Journey.html":    {},

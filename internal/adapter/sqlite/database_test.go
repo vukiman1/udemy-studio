@@ -21,3 +21,14 @@ func TestOpenUsesPathsWithURIReservedCharactersVerbatim(t *testing.T) {
 		t.Errorf("database not created at the exact path: %v", err)
 	}
 }
+
+func TestOpenIsIdempotentOnAnExistingDatabase(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "app.db")
+	for attempt := 1; attempt <= 2; attempt++ {
+		database, err := Open(t.Context(), path)
+		if err != nil {
+			t.Fatalf("Open attempt %d: %v", attempt, err)
+		}
+		_ = database.Close()
+	}
+}

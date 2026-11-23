@@ -1,11 +1,9 @@
 package jobs
 
 import (
-	"cmp"
 	"context"
 	"crypto/rand"
 	"encoding/hex"
-	"errors"
 	"fmt"
 	"log/slog"
 	"slices"
@@ -67,13 +65,10 @@ func (manager *Manager) Restore(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("load jobs: %w", err)
 	}
-	slices.SortFunc(stored, func(left, right Job) int { return left.CreatedAt.Compare(right.CreatedAt) })
 	for _, job := range stored {
 		switch job.Status {
 		case StatusRunning:
-			job.Status, job.Error = StatusFailed, interruptedMessage
-			job.FinishedAt = manager.now()
-			job.Progress.CurrentLecture = ""
+			job.finish(StatusFailed, interruptedMessage, manager.now())
 			if err := manager.deps.Store.Save(ctx, job); err != nil {
 				return fmt.Errorf("mark job %s interrupted: %w", job.ID, err)
 			}
@@ -122,7 +117,7 @@ func (manager *Manager) Cancel(ctx context.Context, id string) error {
 		cancel()
 		return nil
 	}
-	job.Status, job.FinishedAt = StatusCancelled, manager.now()
+	job.finish(StatusCancelled, "", manager.now())
 	cancelled := cloneJob(job)
 	manager.mutex.Unlock()
 	if err := manager.deps.Store.Save(ctx, cancelled); err != nil {
@@ -143,7 +138,7 @@ func (manager *Manager) List() []Job {
 	for _, job := range manager.jobs {
 		jobs = append(jobs, cloneJob(job))
 	}
-	slices.SortFunc(jobs, func(left, right Job) int { return cmp.Compare(right.CreatedAt.UnixNano(), left.CreatedAt.UnixNano()) })
+	slices.SortFunc(jobs, func(left, right Job) int { return right.CreatedAt.Compare(left.CreatedAt) })
 	return jobs
 }
 
@@ -214,17 +209,16 @@ func (manager *Manager) run(ctx context.Context, id string) {
 
 	manager.mutex.Lock()
 	delete(manager.cancels, id)
-	job.FinishedAt = manager.now()
-	job.Progress.CurrentLecture = ""
+	finishedAt := manager.now()
 	switch {
 	case err == nil:
-		job.Status = StatusSucceeded
+		job.finish(StatusSucceeded, "", finishedAt)
 	case ctx.Err() != nil:
-		job.Status, job.Error = StatusFailed, interruptedMessage
+		job.finish(StatusFailed, interruptedMessage, finishedAt)
 	case jobCtx.Err() != nil:
-		job.Status = StatusCancelled
+		job.finish(StatusCancelled, "", finishedAt)
 	default:
-		job.Status, job.Error = StatusFailed, err.Error()
+		job.finish(StatusFailed, err.Error(), finishedAt)
 	}
 	finished := cloneJob(job)
 	manager.mutex.Unlock()
@@ -285,7 +279,7 @@ func cloneJob(job *Job) Job {
 func newJobID() (string, error) {
 	random := make([]byte, jobIDBytes)
 	if _, err := rand.Read(random); err != nil {
-		return "", errors.Join(errors.New("generate job id"), err)
+		return "", fmt.Errorf("generate job id: %w", err)
 	}
 	return hex.EncodeToString(random), nil
 }

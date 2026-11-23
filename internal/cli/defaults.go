@@ -30,17 +30,18 @@ func defaultChromeDataDir() (string, error) {
 	return filepath.Join(home, chromeDataDirSuffix), nil
 }
 
-func applyDataDefaults(dataDir, chromeDataDir *string) error {
+// withDataDefaults fills the data and Chrome directories the flags left empty.
+func withDataDefaults(dataDir, chromeDataDir string) (string, string, error) {
 	var err error
-	if *dataDir == "" {
-		if *dataDir, err = defaultDataDir(); err != nil {
-			return err
+	if dataDir == "" {
+		if dataDir, err = defaultDataDir(); err != nil {
+			return "", "", err
 		}
 	}
-	if *chromeDataDir == "" {
-		if *chromeDataDir, err = defaultChromeDataDir(); err != nil {
-			return err
+	if chromeDataDir == "" {
+		if chromeDataDir, err = defaultChromeDataDir(); err != nil {
+			return "", "", err
 		}
 	}
-	return nil
+	return dataDir, chromeDataDir, nil
 }

@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
-	"net/url"
 	"path/filepath"
 	"slices"
 	"strconv"
@@ -186,28 +185,6 @@ func (store *Store) cookieKey(ctx context.Context) ([]byte, error) {
 	return key, nil
 }
 
-func openSnapshot(ctx context.Context, profilePath string) (*sql.DB, func(), error) {
-	snapshotPath, removeSnapshot, err := snapshotCookies(profilePath)
-	if err != nil {
-		return nil, nil, err
-	}
-	dataSource := url.URL{Scheme: "file", Path: snapshotPath, RawQuery: "mode=ro"}
-	database, err := sql.Open(sqliteDriver, dataSource.String())
-	if err != nil {
-		removeSnapshot()
-		return nil, nil, fmt.Errorf("open cookie snapshot: %w", err)
-	}
-	if err := database.PingContext(ctx); err != nil {
-		_ = database.Close()
-		removeSnapshot()
-		return nil, nil, fmt.Errorf("open cookie snapshot: %w", err)
-	}
-	return database, func() {
-		_ = database.Close()
-		removeSnapshot()
-	}, nil
-}
-
 func readSchemaVersion(ctx context.Context, database *sql.DB) (int, error) {
 	var versionText string
 	if err := database.QueryRowContext(ctx, `SELECT value FROM meta WHERE key = 'version'`).Scan(&versionText); err != nil {
@@ -225,11 +202,4 @@ func chromeTime(microseconds int64) time.Time {
 		return time.Time{}
 	}
 	return time.UnixMicro(microseconds - chromeToUnixEpochMicros).UTC()
-}
-
-func wrapAccessError(err error) error {
-	if errors.Is(err, fs.ErrPermission) {
-		return fmt.Errorf("%w (grant Full Disk Access to the app running udemy-studio): %w", login.ErrNoDiskAccess, err)
-	}
-	return err
 }

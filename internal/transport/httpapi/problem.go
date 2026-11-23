@@ -8,7 +8,10 @@ import (
 	"github.com/vukiman1/udemy-studio/internal/transport/httpapi/gen"
 )
 
-const problemContentType = "application/problem+json"
+const (
+	problemContentType         = "application/problem+json"
+	downloadsUnavailableDetail = "downloads are not configured: start the server with --python and --python-repo"
+)
 
 func problem(status int, detail string) gen.Problem {
 	return gen.Problem{Title: http.StatusText(status), Status: status, Detail: &detail}
@@ -16,6 +19,10 @@ func problem(status int, detail string) gen.Problem {
 
 func notFound(detail string) gen.NotFoundApplicationProblemPlusJSONResponse {
 	return gen.NotFoundApplicationProblemPlusJSONResponse(problem(http.StatusNotFound, detail))
+}
+
+func downloadsUnavailable() gen.DownloadsUnavailableApplicationProblemPlusJSONResponse {
+	return gen.DownloadsUnavailableApplicationProblemPlusJSONResponse(problem(http.StatusServiceUnavailable, downloadsUnavailableDetail))
 }
 
 func writeProblem(writer http.ResponseWriter, status int, detail string) {

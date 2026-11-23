@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"slices"
 
 	"github.com/vukiman1/udemy-studio/internal/library"
 	"github.com/vukiman1/udemy-studio/internal/subtitle"
@@ -48,13 +47,17 @@ func (server apiServer) GetLectureSubtitlesVtt(ctx context.Context, request gen.
 }
 
 func (server apiServer) mergedCues(ctx context.Context, lecture library.Lecture, requested *gen.Languages) ([]subtitle.MergedCue, error) {
-	files := selectSubtitles(lecture.Subtitles, requested)
+	var languages []string
+	if requested != nil {
+		languages = *requested
+	}
+	files := lecture.SubtitlesIn(languages)
 	tracks := make([]subtitle.Track, 0, len(files))
 	for _, file := range files {
 		if err := ctx.Err(); err != nil {
 			return nil, err
 		}
-		cues, err := server.parseSubtitle(file.Path)
+		cues, err := subtitle.ParseSRTFile(server.deps.Media, file.Path)
 		if err != nil {
 			server.deps.Logger.Warn("skipping unreadable subtitle", "lecture", lecture.ID, "language", file.Language, "path", file.Path, "err", err)
 			continue
@@ -62,31 +65,4 @@ func (server apiServer) mergedCues(ctx context.Context, lecture library.Lecture,
 		tracks = append(tracks, subtitle.Track{Language: file.Language, Cues: cues})
 	}
 	return subtitle.Merge(tracks), nil
-}
-
-func (server apiServer) parseSubtitle(path string) ([]subtitle.Cue, error) {
-	file, err := server.deps.Media.Open(path)
-	if err != nil {
-		return nil, fmt.Errorf("open: %w", err)
-	}
-	defer file.Close()
-	return subtitle.ParseSRT(file)
-}
-
-func selectSubtitles(available []library.SubtitleFile, requested *gen.Languages) []library.SubtitleFile {
-	if requested == nil {
-		return available
-	}
-	var selected []library.SubtitleFile
-	for _, language := range *requested {
-		if slices.ContainsFunc(selected, func(file library.SubtitleFile) bool { return file.Language == language }) {
-			continue
-		}
-		for _, file := range available {
-			if file.Language == language {
-				selected = append(selected, file)
-			}
-		}
-	}
-	return selected
 }

@@ -24,19 +24,23 @@ type CourseOverview struct {
 func Overviews(scanned *library.Library, records map[string]progress.Record) []CourseOverview {
 	overviews := make([]CourseOverview, 0, len(scanned.Courses))
 	for _, course := range scanned.Courses {
-		overview := CourseOverview{Course: course}
-		for _, lecture := range playableLectures(course) {
-			overview.PlayableLectures++
-			if records[lecture.Key].IsCompleted() {
-				overview.CompletedLectures++
-			}
-		}
-		if resume, ok := resumeCourse(course, records); ok {
-			overview.Resume = &resume.target
-		}
-		overviews = append(overviews, overview)
+		overviews = append(overviews, Overview(course, records))
 	}
 	return overviews
+}
+
+func Overview(course library.Course, records map[string]progress.Record) CourseOverview {
+	overview := CourseOverview{Course: course}
+	for _, lecture := range playableLectures(course) {
+		overview.PlayableLectures++
+		if records[lecture.Key].IsCompleted() {
+			overview.CompletedLectures++
+		}
+	}
+	if resume, ok := resumeCourse(course, records); ok {
+		overview.Resume = &resume.target
+	}
+	return overview
 }
 
 func Resume(scanned *library.Library, records map[string]progress.Record) (Target, bool) {

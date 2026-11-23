@@ -65,7 +65,7 @@ func Run(ctx context.Context, options Options, logger *slog.Logger) error {
 		return fmt.Errorf("load embedded frontend: %w", err)
 	}
 
-	downloads, err := newDownloads(ctx, options, database, catalog, logger)
+	downloads, err := newDownloads(ctx, options.Downloads, options.DataDir, database, catalog, logger)
 	if err != nil {
 		return err
 	}
