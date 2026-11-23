@@ -25,7 +25,7 @@ func writeManifest(courseDir string, plan udemy.Plan) error {
 		return fmt.Errorf("encode course manifest: %w", err)
 	}
 	manifestPath := filepath.Join(courseDir, library.ManifestFile)
-	if err := os.WriteFile(manifestPath+manifestTempSuffix, encoded, fileMode); err != nil {
+	if err := writeLibraryFile(manifestPath+manifestTempSuffix, encoded); err != nil {
 		return fmt.Errorf("write course manifest: %w", err)
 	}
 	if err := os.Rename(manifestPath+manifestTempSuffix, manifestPath); err != nil {

@@ -58,7 +58,7 @@ func convertCaption(vttPath, srtPath string) error {
 	if err != nil {
 		return errors.Join(fmt.Errorf("convert %s: %w", filepath.Base(vttPath), err), os.Remove(vttPath))
 	}
-	if err := os.WriteFile(srtPath, srt, fileMode); err != nil { //nolint:gosec // reason: the path is built from the plan's single-element names under the chapter directory
+	if err := writeLibraryFile(srtPath, srt); err != nil {
 		return fmt.Errorf("write %s: %w", filepath.Base(srtPath), err)
 	}
 	return os.Remove(vttPath)

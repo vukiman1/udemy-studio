@@ -63,7 +63,7 @@ func articlePage(lecture udemy.LecturePlan) string {
 }
 
 func writeExternalLink(chapterDir string, asset udemy.AssetPlan) error {
-	if err := os.WriteFile(filepath.Join(chapterDir, asset.File), fmt.Appendf(nil, internetShortcutFormat, asset.URL), fileMode); err != nil {
+	if err := writeLibraryFile(filepath.Join(chapterDir, asset.File), fmt.Appendf(nil, internetShortcutFormat, asset.URL)); err != nil {
 		return fmt.Errorf("write link %s: %w", asset.File, err)
 	}
 	listPath := filepath.Join(chapterDir, externalLinksFile)
@@ -74,7 +74,7 @@ func writeExternalLink(chapterDir string, asset udemy.AssetPlan) error {
 	if slices.Contains(listedLines(listed), strings.ToLower(asset.File)) {
 		return nil
 	}
-	list, err := os.OpenFile(listPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, fileMode) //nolint:gosec // reason: as above
+	list, err := os.OpenFile(listPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, libraryFileMode) //nolint:gosec // reason: a library file in the chapter directory this download writes
 	if err != nil {
 		return fmt.Errorf("open %s: %w", externalLinksFile, err)
 	}
