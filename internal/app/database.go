@@ -10,9 +10,12 @@ import (
 	"github.com/vukiman1/udemy-studio/internal/adapter/sqlite"
 )
 
-func openDatabase(ctx context.Context, path string) (*sql.DB, error) {
-	if err := os.MkdirAll(filepath.Dir(path), dataDirMode); err != nil {
-		return nil, fmt.Errorf("create data dir for %s: %w", path, err)
+const databaseFileName = "app.db"
+
+// openDatabase opens the database inside dataDir, which also holds the LAN access code and download logs.
+func openDatabase(ctx context.Context, dataDir string) (*sql.DB, error) {
+	if err := os.MkdirAll(dataDir, dataDirMode); err != nil {
+		return nil, fmt.Errorf("create data dir %s: %w", dataDir, err)
 	}
-	return sqlite.Open(ctx, path)
+	return sqlite.Open(ctx, filepath.Join(dataDir, databaseFileName))
 }

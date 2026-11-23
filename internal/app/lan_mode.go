@@ -56,7 +56,7 @@ func announceLANMode(output io.Writer, listening net.Addr, accessCode string) er
 }
 
 func loadOrCreateAccessCode(path string) (string, error) {
-	stored, err := os.ReadFile(path) //nolint:gosec // reason: path is derived from the operator's --db flag, never from a request
+	stored, err := os.ReadFile(path) //nolint:gosec // reason: path is derived from the operator's --data-dir flag, never from a request
 	if err == nil {
 		if code := strings.TrimSpace(string(stored)); code != "" {
 			return code, nil

@@ -8,7 +8,6 @@ import (
 	"net"
 	"net/http"
 	"os"
-	"path/filepath"
 	"time"
 
 	"golang.org/x/sync/errgroup"
@@ -32,7 +31,7 @@ type Options struct {
 	ListenAddress string
 	Version       string
 	LibraryDir    string
-	DatabasePath  string
+	DataDir       string
 	LANMode       bool
 	Downloads     DownloadOptions
 }
@@ -52,7 +51,7 @@ func Run(ctx context.Context, options Options, logger *slog.Logger) error {
 	}
 	logger.Info("library scanned", "dir", options.LibraryDir, "courses", len(catalog.Current().Courses))
 
-	database, err := openDatabase(ctx, options.DatabasePath)
+	database, err := openDatabase(ctx, options.DataDir)
 	if err != nil {
 		return err
 	}
@@ -82,7 +81,7 @@ func Run(ctx context.Context, options Options, logger *slog.Logger) error {
 	})
 	address, accessCode := options.ListenAddress, ""
 	if options.LANMode {
-		address, handler, accessCode, err = enableLANMode(address, handler, filepath.Dir(options.DatabasePath))
+		address, handler, accessCode, err = enableLANMode(address, handler, options.DataDir)
 		if err != nil {
 			return err
 		}

@@ -14,8 +14,8 @@ func TestRelativePathsAreResolvedAgainstTheWorkingDirectory(t *testing.T) {
 		t.Fatalf("getwd: %v", err)
 	}
 	options := app.Options{
-		LibraryDir:   "downloads",
-		DatabasePath: "data/app.db",
+		LibraryDir: "downloads",
+		DataDir:    "data",
 		Downloads: app.DownloadOptions{
 			Python:        ".venv/bin/python",
 			PythonRepo:    "../udemy-downloader",
@@ -28,7 +28,7 @@ func TestRelativePathsAreResolvedAgainstTheWorkingDirectory(t *testing.T) {
 	}
 	want := map[string]string{
 		"library":     filepath.Join(workingDir, "downloads"),
-		"database":    filepath.Join(workingDir, "data/app.db"),
+		"data":        filepath.Join(workingDir, "data"),
 		"python":      filepath.Join(workingDir, ".venv/bin/python"),
 		"python repo": filepath.Join(filepath.Dir(workingDir), "udemy-downloader"),
 		"output":      filepath.Join(workingDir, "shadow"),
@@ -36,7 +36,7 @@ func TestRelativePathsAreResolvedAgainstTheWorkingDirectory(t *testing.T) {
 	}
 	got := map[string]string{
 		"library":     options.LibraryDir,
-		"database":    options.DatabasePath,
+		"data":        options.DataDir,
 		"python":      options.Downloads.Python,
 		"python repo": options.Downloads.PythonRepo,
 		"output":      options.Downloads.OutputDir,
