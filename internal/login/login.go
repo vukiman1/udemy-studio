@@ -15,6 +15,7 @@ var (
 	ErrNotLoggedIn       = errors.New("not logged in to Udemy")
 	ErrTokenExpired      = errors.New("udemy login expired")
 	ErrNoDiskAccess      = errors.New("no permission to read Chrome data")
+	ErrNoKeychainAccess  = errors.New("no access to Chrome's key in the macOS keychain")
 )
 
 type Profile struct {
