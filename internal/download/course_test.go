@@ -330,3 +330,18 @@ func TestArticlePageIsWrittenOnceAndAFailedWriteIsReported(t *testing.T) {
 		t.Errorf("failed = %v, %v; want the page that could not be written", summary.Failed, err)
 	}
 }
+
+func TestYTDLPOutputKeepsAChapterNamedAfterMP4Files(t *testing.T) {
+	plan := samplePlan()
+	plan.Chapters[0].Dir = "01 - Encoding .mp4 files"
+	plan.Chapters[0].Lectures = plan.Chapters[0].Lectures[1:2]
+	outputDir := t.TempDir()
+	tools := &fakeTools{}
+	if _, _, err := runCourse(t, t.Context(), plan, tools, outputDir); err != nil {
+		t.Fatalf("Course: %v", err)
+	}
+	want := filepath.Join(outputDir, "backend-basics", "01 - Encoding .mp4 files", "002 Deep dive.%(ext)s")
+	if !slices.Equal(tools.hlsOutputs, []string{want}) {
+		t.Errorf("yt-dlp output = %v, want %s", tools.hlsOutputs, want)
+	}
+}

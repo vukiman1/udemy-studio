@@ -87,7 +87,6 @@ func (run *courseDownload) hls(ctx context.Context, chapterDir string, lecture u
 		return fmt.Errorf("save HLS playlist: %w", err)
 	}
 	playlistURL := url.URL{Scheme: fileURLScheme, Path: playlistPath}
-	// The Python downloader replaces ".mp4" anywhere in the path, not only at its end.
-	output := strings.ReplaceAll(filepath.Join(chapterDir, lecture.File), videoExtension, ytDLPExtensionTemplate)
+	output := filepath.Join(chapterDir, strings.TrimSuffix(lecture.File, videoExtension)+ytDLPExtensionTemplate)
 	return run.tools.Streams.FetchHLS(ctx, playlistURL.String(), output)
 }
