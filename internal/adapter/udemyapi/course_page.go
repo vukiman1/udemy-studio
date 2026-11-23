@@ -18,13 +18,18 @@ const (
 	courseTakingAppClass = "ud-component--course-taking--app"
 	moduleArgsAttribute  = "data-module-args"
 	coursePagePath       = "/course/%s/learn/"
+	draftCoursePagePath  = "/course/draft/%s/learn/"
 )
 
 var errNoCourseData = errors.New("the course page has no course data: the URL should be the course's /learn page and the profile must be logged in")
 
 // The page URL is rebuilt on the portal so the login cookie never follows a user-typed http:// URL.
-func (client *Client) courseFromPage(ctx context.Context, slug string) (udemy.Course, error) {
-	page, err := client.getText(ctx, client.portalURL+fmt.Sprintf(coursePagePath, url.PathEscape(slug)))
+func (client *Client) courseFromPage(ctx context.Context, ref udemy.CourseRef) (udemy.Course, error) {
+	pagePath := coursePagePath
+	if ref.IsDraft {
+		pagePath = draftCoursePagePath
+	}
+	page, err := client.getText(ctx, client.portalURL+fmt.Sprintf(pagePath, url.PathEscape(ref.Slug)))
 	if err != nil {
 		return udemy.Course{}, fmt.Errorf("fetch course page: %w", err)
 	}

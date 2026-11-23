@@ -43,7 +43,7 @@ func (client *Client) ResolveCourse(ctx context.Context, ref udemy.CourseRef) (u
 			return course, nil
 		}
 	}
-	course, err := client.courseFromPage(ctx, ref.Slug)
+	course, err := client.courseFromPage(ctx, ref)
 	var statusErr *StatusError
 	if errors.Is(err, errNoCourseData) || errors.As(err, &statusErr) {
 		return udemy.Course{}, fmt.Errorf("%w (%q): %w", ErrCourseNotFound, ref.Slug, err)

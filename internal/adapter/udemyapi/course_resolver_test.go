@@ -72,3 +72,13 @@ func TestCancelledCoursePageFetchIsNotReportedAsNotFound(t *testing.T) {
 		t.Errorf("err = %v, want context.Canceled only", err)
 	}
 }
+
+func TestDraftCourseIsFoundFromItsDraftPage(t *testing.T) {
+	fake := &fakeTransport{}
+	fake.reply(testPortalURL+"/course/draft/42/learn/", http.StatusOK, `<div class="ud-component--course-taking--app" data-module-args="{&quot;courseId&quot;: 42}"></div>`)
+	fake.reply(testPortalURL+"/api-2.0/courses/42/", http.StatusOK, `{"id": 42, "title": "Draft", "published_title": "draft-course"}`)
+	draft := udemy.CourseRef{Portal: "example-portal", Slug: "42", IsDraft: true}
+	if course, err := newTestClient(t, fake).ResolveCourse(t.Context(), draft); err != nil || course.ID != 42 {
+		t.Errorf("ResolveCourse = %+v, %v", course, err)
+	}
+}
