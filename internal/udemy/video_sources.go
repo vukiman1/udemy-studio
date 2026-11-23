@@ -3,6 +3,7 @@ package udemy
 import (
 	"cmp"
 	"context"
+	"errors"
 	"fmt"
 	"net/url"
 	"regexp"
@@ -35,6 +36,9 @@ var (
 	widthForHeight = map[int]int{2160: 3840, 1440: 2560, 1080: 1920, 720: 1280, 480: 854, 360: 640, 240: 426}
 	masterAssetID  = regexp.MustCompile(`assets/(\d+)/`)
 )
+
+// ErrPlaylistUnavailable marks a playlist Udemy refused or no longer has, which only costs that lecture its HLS streams.
+var ErrPlaylistUnavailable = errors.New("playlist unavailable")
 
 type PlaylistFetcher interface {
 	FetchPlaylist(ctx context.Context, playlistURL string) (string, error)
@@ -88,12 +92,12 @@ func (collector sourceCollector) hlsChoices(ctx context.Context, masterURL strin
 		return nil, nil
 	}
 	playlist, err := collector.playlists.FetchPlaylist(ctx, masterURL)
-	if ctx.Err() != nil {
-		return nil, ctx.Err()
-	}
-	if err != nil {
+	if errors.Is(err, ErrPlaylistUnavailable) {
 		collector.warn("skipping HLS streams of asset %s: %v", assetID[masterAssetGroup], err)
 		return nil, nil
+	}
+	if err != nil {
+		return nil, fmt.Errorf("fetch HLS master of asset %s: %w", assetID[masterAssetGroup], err)
 	}
 	var choices []VideoChoice
 	for _, variant := range ParseMasterPlaylist(playlist) {

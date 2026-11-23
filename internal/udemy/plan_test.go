@@ -10,12 +10,12 @@ import (
 
 const masterURL = "https://example-portal.udemy.com/assets/77/files/hls/master.m3u8?token=REDACTED"
 
-var errPlaylistUnavailable = errors.New("playlist unavailable")
+var errNetworkDown = errors.New("network is down")
 
-type failingPlaylists struct{}
+type failingPlaylists struct{ err error }
 
-func (failingPlaylists) FetchPlaylist(context.Context, string) (string, error) {
-	return "", errPlaylistUnavailable
+func (playlists failingPlaylists) FetchPlaylist(context.Context, string) (string, error) {
+	return "", playlists.err
 }
 
 func singleLectureCourse(asset *Asset) []CurriculumItem {
@@ -41,12 +41,12 @@ func TestLectureWithoutAssetIsPlannedAsUnavailable(t *testing.T) {
 	}
 }
 
-func TestUnreachableHLSMasterFallsBackToMP4WithWarning(t *testing.T) {
+func TestUnavailableHLSMasterFallsBackToMP4WithWarning(t *testing.T) {
 	asset := &Asset{AssetType: "Video", StreamURLs: map[string][]VideoSource{videoStreamKey: {
 		{Type: "video/mp4", Label: "360", File: "https://mp4-c.udemycdn.com/360.mp4"},
 		{Type: hlsMimeType, Label: "Auto", File: masterURL},
 	}}}
-	lecture, warnings := planSingleLecture(t, asset, PlanOptions{}, failingPlaylists{})
+	lecture, warnings := planSingleLecture(t, asset, PlanOptions{}, failingPlaylists{err: ErrPlaylistUnavailable})
 	want := &VideoChoice{Type: SourceMP4, Height: 360, Width: 640, URL: "https://mp4-c.udemycdn.com/360.mp4"}
 	if diff := cmp.Diff(want, lecture.Video); diff != "" || len(warnings) != 1 {
 		t.Errorf("video (-want +got):\n%s\nwarnings = %v", diff, warnings)
@@ -63,13 +63,11 @@ func TestAudioOnlySourcesLeaveVideoMissingWithoutWarnings(t *testing.T) {
 	}
 }
 
-func TestCancelledPlanStopsAtHLSFetch(t *testing.T) {
-	ctx, cancel := context.WithCancel(t.Context())
-	cancel()
+func TestHLSFetchFailureOtherThanUnavailableAbortsThePlan(t *testing.T) {
 	asset := &Asset{AssetType: "Video", StreamURLs: map[string][]VideoSource{videoStreamKey: {{Type: hlsMimeType, Label: "Auto", File: masterURL}}}}
-	_, err := BuildPlan(ctx, Course{Slug: "course"}, singleLectureCourse(asset), PlanOptions{}, failingPlaylists{})
-	if !errors.Is(err, context.Canceled) {
-		t.Errorf("err = %v, want context.Canceled", err)
+	_, err := BuildPlan(t.Context(), Course{Slug: "course"}, singleLectureCourse(asset), PlanOptions{}, failingPlaylists{err: errNetworkDown})
+	if !errors.Is(err, errNetworkDown) {
+		t.Errorf("err = %v, want errNetworkDown", err)
 	}
 }
 
