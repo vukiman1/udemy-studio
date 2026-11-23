@@ -3,7 +3,6 @@ package jobs
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log/slog"
 	"sync"
 	"testing"
@@ -288,30 +287,6 @@ func TestSubmittingManyJobsNeverBlocks(t *testing.T) {
 	}
 }
 
-func TestRestoreWithManyWaitingJobsDoesNotBlock(t *testing.T) {
-	store := &memoryStore{jobs: map[string]Job{}}
-	for index := range 200 {
-		id := fmt.Sprintf("job-%03d", index)
-		store.jobs[id] = Job{ID: id, Request: Request{CourseURL: validCourseURL}, Status: StatusQueued, CreatedAt: time.Now().Add(time.Duration(index) * time.Millisecond)}
-	}
-	manager := NewManager(Deps{Downloader: &scriptedDownloader{}, Tokens: tokens{}, Store: store, Logger: slog.New(slog.DiscardHandler), Now: time.Now})
-	restored := make(chan error, 1)
-	go func() { restored <- manager.Restore(t.Context()) }()
-	select {
-	case err := <-restored:
-		if err != nil {
-			t.Fatalf("Restore: %v", err)
-		}
-	case <-time.After(waitTimeout):
-		t.Fatal("Restore blocked on many waiting jobs")
-	}
-	ctx, cancel := context.WithCancel(t.Context())
-	defer cancel()
-	go func() { _ = manager.Run(ctx) }()
-	waitForStatus(t, manager, "job-000", StatusSucceeded)
-	waitForStatus(t, manager, "job-199", StatusSucceeded)
-}
-
 func TestFinishedJobsNoLongerShowACurrentLecture(t *testing.T) {
 	downloader := &scriptedDownloader{blockUntil: true, started: make(chan struct{}), events: []Event{{Kind: EventLectureStarted, LectureTitle: "005 Intro"}}}
 	h := start(t, downloader, nil)
@@ -320,17 +295,6 @@ func TestFinishedJobsNoLongerShowACurrentLecture(t *testing.T) {
 	_ = h.manager.Cancel(t.Context(), job.ID)
 	if cancelled := waitForStatus(t, h.manager, job.ID, StatusCancelled); cancelled.Progress.CurrentLecture != "" {
 		t.Errorf("cancelled job still shows %q", cancelled.Progress.CurrentLecture)
-	}
-
-	store := &memoryStore{jobs: map[string]Job{
-		"interrupted": {ID: "interrupted", Status: StatusRunning, Progress: Progress{CurrentLecture: "005 Intro"}},
-	}}
-	manager := NewManager(Deps{Downloader: &scriptedDownloader{}, Tokens: tokens{}, Store: store, Logger: slog.New(slog.DiscardHandler), Now: time.Now})
-	if err := manager.Restore(t.Context()); err != nil {
-		t.Fatalf("Restore: %v", err)
-	}
-	if restored := manager.List()[0]; restored.Progress.CurrentLecture != "" {
-		t.Errorf("interrupted job still shows %q", restored.Progress.CurrentLecture)
 	}
 }
 

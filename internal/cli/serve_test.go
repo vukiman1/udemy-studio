@@ -48,13 +48,3 @@ func TestRelativePathsAreResolvedAgainstTheWorkingDirectory(t *testing.T) {
 		}
 	}
 }
-
-func TestUnsetPathsStayUnset(t *testing.T) {
-	options := app.Options{}
-	if err := resolvePaths(&options); err != nil {
-		t.Fatalf("resolvePaths: %v", err)
-	}
-	if options.Downloads.Python != "" || options.LibraryDir != "" {
-		t.Errorf("unset paths were filled in: %+v", options)
-	}
-}

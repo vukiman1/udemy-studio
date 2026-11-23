@@ -158,7 +158,10 @@ func TestEventStreamSendsJobsAsTheyChange(t *testing.T) {
 	app.do(t, http.MethodPut, "/api/downloads/profile", gen.ProfileSelection{Dir: "Profile 4"})
 	ctx, cancel := context.WithTimeout(t.Context(), 5*time.Second)
 	defer cancel()
-	request, _ := http.NewRequestWithContext(ctx, http.MethodGet, app.server.URL+"/api/events", nil)
+	request, err := http.NewRequestWithContext(ctx, http.MethodGet, app.server.URL+"/api/events", nil)
+	if err != nil {
+		t.Fatalf("build stream request: %v", err)
+	}
 	response, err := app.server.Client().Do(request)
 	if err != nil {
 		t.Fatalf("open stream: %v", err)

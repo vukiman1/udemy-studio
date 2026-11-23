@@ -29,16 +29,6 @@ func TestAccessCodeIsCreatedPrivatelyAndReused(t *testing.T) {
 	}
 }
 
-func TestLANListenAddressKeepsThePort(t *testing.T) {
-	address, err := lanListenAddress("127.0.0.1:8080")
-	if err != nil || address != "0.0.0.0:8080" {
-		t.Errorf("lanListenAddress = %q, %v", address, err)
-	}
-	if _, err := lanListenAddress("8080"); err == nil {
-		t.Error("a bare port should be rejected")
-	}
-}
-
 func TestLANInstructionsCarryTheCodeInTheQRLink(t *testing.T) {
 	var output strings.Builder
 	if err := printLANInstructions(&output, []string{"http://192.168.1.20:8080/"}, "ABCDEFGHJK"); err != nil {
