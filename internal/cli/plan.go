@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log/slog"
-	"os"
 
 	"github.com/spf13/cobra"
 
@@ -25,7 +24,7 @@ func newPlanCommand() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
+			logger := slog.New(slog.NewTextHandler(command.ErrOrStderr(), nil))
 			plan, err := app.PlanCourse(command.Context(), options, logger)
 			if err != nil {
 				return err

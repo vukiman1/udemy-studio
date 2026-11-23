@@ -4,7 +4,6 @@ import (
 	"context"
 	"log/slog"
 
-	"github.com/vukiman1/udemy-studio/internal/adapter/udemyapi"
 	"github.com/vukiman1/udemy-studio/internal/udemy"
 )
 
@@ -21,22 +20,18 @@ func PlanCourse(ctx context.Context, options PlanCourseOptions, logger *slog.Log
 	if err != nil {
 		return udemy.Plan{}, err
 	}
-	database, err := openDatabase(ctx, options.DataDir)
+	client, err := courseClient(ctx, options.DataDir, options.ChromeDataDir, ref, logger)
 	if err != nil {
 		return udemy.Plan{}, err
 	}
-	defer database.Close()
+	return planCourse(ctx, client, ref, options.Plan, logger)
+}
 
-	token, err := newLoginService(options.ChromeDataDir, database).Token(ctx, ref.Host())
+func planCourse(ctx context.Context, client udemy.CourseSource, ref udemy.CourseRef, options udemy.PlanOptions, logger *slog.Logger) (udemy.Plan, error) {
+	plan, err := udemy.PlanCourse(ctx, client, ref, options)
 	if err != nil {
 		return udemy.Plan{}, err
 	}
-	client, err := udemyapi.New(ref.Portal, token, logger)
-	if err != nil {
-		return udemy.Plan{}, err
-	}
-	if err := client.Visit(ctx); err != nil {
-		return udemy.Plan{}, err
-	}
-	return udemy.PlanCourse(ctx, client, ref, options.Plan)
+	logger.Info("course planned", "course", plan.CourseName, "chapters", len(plan.Chapters), "warnings", len(plan.Warnings))
+	return plan, nil
 }
