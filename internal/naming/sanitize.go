@@ -9,11 +9,10 @@ import (
 )
 
 const (
-	maxFilenameBytes = 255
-	reservedSuffix   = "_"
-	asciiDelete      = 0x7f
-	lastASCIIControl = 0x1f
-	// Python's str.strip treats the ASCII file/group/record/unit separators as whitespace.
+	maxFilenameBytes    = 255
+	reservedSuffix      = "_"
+	asciiDelete         = 0x7f
+	lastASCIIControl    = 0x1f
 	firstASCIISeparator = 0x1c
 )
 
