@@ -8,8 +8,8 @@ type ProgressReport = components['schemas']['ProgressReport']
 export class ApiRequestError extends Error {
   readonly status: number
 
-  constructor(operation: string, status: number) {
-    super(`${operation} failed with HTTP ${String(status)}`)
+  constructor(operation: string, status: number, detail?: string) {
+    super(detail ?? `${operation} failed with HTTP ${String(status)}`)
     this.name = 'ApiRequestError'
     this.status = status
   }
@@ -24,6 +24,9 @@ export const QUERY_KEYS = {
     lectureId,
     languages.join(','),
   ],
+  chromeProfiles: ['chrome-profiles'],
+  loginStatus: ['login-status'],
+  jobs: ['jobs'],
 } as const
 
 export function useCourses(): UseQueryResult<CourseSummary[]> {

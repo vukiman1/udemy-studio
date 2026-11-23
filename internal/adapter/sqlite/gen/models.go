@@ -8,10 +8,22 @@ import (
 	"database/sql"
 )
 
+type Job struct {
+	ID        string
+	Status    string
+	CreatedAt string
+	StateJson string
+}
+
 type LectureProgress struct {
 	LectureKey      string
 	PositionSeconds float64
 	DurationSeconds float64
 	CompletedAt     sql.NullString
 	UpdatedAt       string
+}
+
+type Setting struct {
+	Key   string
+	Value string
 }

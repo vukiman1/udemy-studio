@@ -12,7 +12,7 @@ import (
 )
 
 func (server apiServer) GetLectureCues(ctx context.Context, request gen.GetLectureCuesRequestObject) (gen.GetLectureCuesResponseObject, error) {
-	lecture, ok := server.deps.Library.Lecture(request.LectureId)
+	lecture, ok := server.deps.Catalog.Current().Lecture(request.LectureId)
 	if !ok {
 		return gen.GetLectureCues404ApplicationProblemPlusJSONResponse{NotFoundApplicationProblemPlusJSONResponse: notFound("no lecture " + request.LectureId)}, nil
 	}
@@ -32,7 +32,7 @@ func (server apiServer) GetLectureCues(ctx context.Context, request gen.GetLectu
 }
 
 func (server apiServer) GetLectureSubtitlesVtt(ctx context.Context, request gen.GetLectureSubtitlesVttRequestObject) (gen.GetLectureSubtitlesVttResponseObject, error) {
-	lecture, ok := server.deps.Library.Lecture(request.LectureId)
+	lecture, ok := server.deps.Catalog.Current().Lecture(request.LectureId)
 	if !ok {
 		return gen.GetLectureSubtitlesVtt404ApplicationProblemPlusJSONResponse{NotFoundApplicationProblemPlusJSONResponse: notFound("no lecture " + request.LectureId)}, nil
 	}

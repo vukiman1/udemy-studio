@@ -181,6 +181,123 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
 
+  /api/downloads/profiles:
+    get:
+      operationId: listChromeProfiles
+      summary: Chrome profiles and the Udemy portals each one is logged in to
+      responses:
+        "200":
+          description: Profiles ordered by directory
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ChromeProfile"
+        "503":
+          $ref: "#/components/responses/DownloadsUnavailable"
+
+  /api/downloads/profile:
+    put:
+      operationId: selectChromeProfile
+      summary: Choose the Chrome profile whose Udemy login downloads use
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProfileSelection"
+      responses:
+        "204":
+          description: Profile selected
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "503":
+          $ref: "#/components/responses/DownloadsUnavailable"
+
+  /api/downloads/status:
+    get:
+      operationId: getLoginStatus
+      summary: Selected profile and whether its Udemy logins are still valid
+      responses:
+        "200":
+          description: Login status; problem explains what to fix when nothing can be downloaded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginStatus"
+        "503":
+          $ref: "#/components/responses/DownloadsUnavailable"
+
+  /api/jobs:
+    get:
+      operationId: listJobs
+      summary: Download jobs, newest first
+      responses:
+        "200":
+          description: Jobs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Job"
+        "503":
+          $ref: "#/components/responses/DownloadsUnavailable"
+    post:
+      operationId: createJob
+      summary: Queue a course download
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JobRequest"
+      responses:
+        "202":
+          description: Job queued
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Job"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "503":
+          $ref: "#/components/responses/DownloadsUnavailable"
+
+  /api/jobs/{jobId}:
+    delete:
+      operationId: cancelJob
+      summary: Cancel a queued or running job
+      parameters:
+        - name: jobId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Cancellation requested
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "503":
+          $ref: "#/components/responses/DownloadsUnavailable"
+
+  /api/events:
+    get:
+      tags: [raw]
+      operationId: streamEvents
+      summary: Server-Sent Events; each "job" event carries a full Job
+      responses:
+        "200":
+          description: Event stream
+          content:
+            text/event-stream:
+              schema:
+                type: string
+
 components:
   parameters:
     CourseId:
@@ -208,6 +325,18 @@ components:
           type: string
 
   responses:
+    DownloadsUnavailable:
+      description: The server was started without a downloader configured
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+    Conflict:
+      description: The request conflicts with the current state
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
     NotFound:
       description: No such course, lecture or attachment
       content:
@@ -386,4 +515,107 @@ components:
         language:
           type: string
         text:
+          type: string
+
+    ChromeProfile:
+      type: object
+      required: [dir, name, udemyHosts, selected]
+      properties:
+        dir:
+          type: string
+        name:
+          type: string
+        udemyHosts:
+          type: array
+          items:
+            type: string
+        selected:
+          type: boolean
+
+    ProfileSelection:
+      type: object
+      required: [dir]
+      properties:
+        dir:
+          type: string
+
+    LoginStatus:
+      type: object
+      required: [hosts]
+      properties:
+        profile:
+          $ref: "#/components/schemas/ChromeProfile"
+        hosts:
+          type: array
+          items:
+            $ref: "#/components/schemas/HostLogin"
+        problem:
+          type: string
+
+    HostLogin:
+      type: object
+      required: [host, isExpired]
+      properties:
+        host:
+          type: string
+        expiresAt:
+          type: string
+          format: date-time
+        isExpired:
+          type: boolean
+
+    JobRequest:
+      type: object
+      required: [courseUrl]
+      properties:
+        courseUrl:
+          type: string
+        chapters:
+          type: string
+
+    JobStatus:
+      type: string
+      enum: [queued, running, succeeded, failed, cancelled]
+
+    Job:
+      type: object
+      required: [id, courseUrl, status, createdAt, progress, failures]
+      properties:
+        id:
+          type: string
+        courseUrl:
+          type: string
+        chapters:
+          type: string
+        status:
+          $ref: "#/components/schemas/JobStatus"
+        createdAt:
+          type: string
+          format: date-time
+        startedAt:
+          type: string
+          format: date-time
+        finishedAt:
+          type: string
+          format: date-time
+        progress:
+          $ref: "#/components/schemas/JobProgress"
+        failures:
+          type: array
+          items:
+            type: string
+        error:
+          type: string
+
+    JobProgress:
+      type: object
+      required: [courseTitle, totalLectures, finishedCount]
+      properties:
+        courseTitle:
+          type: string
+        totalLectures:
+          type: integer
+        finishedCount:
+          type: integer
+        currentLecture:
           type: string

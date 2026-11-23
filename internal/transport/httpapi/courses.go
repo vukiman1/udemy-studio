@@ -15,7 +15,7 @@ func (server apiServer) ListCourses(ctx context.Context, _ gen.ListCoursesReques
 	if err != nil {
 		return nil, fmt.Errorf("list courses: %w", err)
 	}
-	overviews := learning.Overviews(server.deps.Library, records)
+	overviews := learning.Overviews(server.deps.Catalog.Current(), records)
 	summaries := make(gen.ListCourses200JSONResponse, 0, len(overviews))
 	for _, overview := range overviews {
 		summaries = append(summaries, toCourseSummary(overview))
@@ -24,14 +24,14 @@ func (server apiServer) ListCourses(ctx context.Context, _ gen.ListCoursesReques
 }
 
 func (server apiServer) GetCourse(ctx context.Context, request gen.GetCourseRequestObject) (gen.GetCourseResponseObject, error) {
-	if _, ok := server.deps.Library.Course(request.CourseId); !ok {
+	if _, ok := server.deps.Catalog.Current().Course(request.CourseId); !ok {
 		return gen.GetCourse404ApplicationProblemPlusJSONResponse{NotFoundApplicationProblemPlusJSONResponse: notFound("no course " + request.CourseId)}, nil
 	}
 	records, err := server.deps.Progress.All(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("get course %s: %w", request.CourseId, err)
 	}
-	for _, overview := range learning.Overviews(server.deps.Library, records) {
+	for _, overview := range learning.Overviews(server.deps.Catalog.Current(), records) {
 		if overview.Course.ID == request.CourseId {
 			return gen.GetCourse200JSONResponse(toCourseDetail(overview, records)), nil
 		}
@@ -44,7 +44,7 @@ func (server apiServer) GetContinue(ctx context.Context, _ gen.GetContinueReques
 	if err != nil {
 		return nil, fmt.Errorf("get continue target: %w", err)
 	}
-	target, ok := learning.Resume(server.deps.Library, records)
+	target, ok := learning.Resume(server.deps.Catalog.Current(), records)
 	if !ok {
 		return gen.GetContinue204Response{}, nil
 	}

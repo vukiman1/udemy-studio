@@ -53,6 +53,11 @@ func newTestApp(t *testing.T) testApp {
 
 func newTestAppWith(t *testing.T, files map[string]string) testApp {
 	t.Helper()
+	return newTestAppWithDeps(t, files, func(*Deps) {})
+}
+
+func newTestAppWithDeps(t *testing.T, files map[string]string, customize func(*Deps)) testApp {
+	t.Helper()
 	root := t.TempDir()
 	for relativePath, content := range files {
 		writeFile(t, filepath.Join(root, relativePath), content)
@@ -68,22 +73,23 @@ func newTestAppWith(t *testing.T, files map[string]string) testApp {
 		t.Fatalf("open root: %v", err)
 	}
 	t.Cleanup(func() { _ = media.Close() })
-	scanned, err := library.Scan(media.FS())
+	catalog, err := library.NewCatalog(media.FS())
 	if err != nil {
 		t.Fatalf("scan: %v", err)
 	}
 	now := func() time.Time { return time.Date(2026, 11, 23, 8, 0, 0, 0, time.UTC) }
-	handler := NewHandler(Deps{
+	deps := Deps{
 		Version:  testVersion,
 		Frontend: fstest.MapFS{"index.html": {Data: []byte(indexMarkup)}, "assets/app-1.js": {Data: []byte(scriptContent)}},
-		Library:  scanned,
+		Catalog:  catalog,
 		Media:    media.FS(),
 		Progress: progress.NewService(progresstest.NewMemoryStore(), now),
 		Logger:   slog.New(slog.DiscardHandler),
-	})
-	server := httptest.NewServer(handler)
+	}
+	customize(&deps)
+	server := httptest.NewServer(NewHandler(deps))
 	t.Cleanup(server.Close)
-	return testApp{server: server, library: scanned}
+	return testApp{server: server, library: catalog.Current()}
 }
 
 func writeFile(t *testing.T, path, content string) {
