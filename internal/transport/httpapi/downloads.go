@@ -49,12 +49,15 @@ func (server apiServer) SelectChromeProfile(ctx context.Context, request gen.Sel
 	return gen.SelectChromeProfile204Response{}, nil
 }
 
-// Every login problem is something the learner fixes in Chrome or System Settings, so it is reported, not raised.
+// A login problem the learner fixes in Chrome or System Settings is reported in the status, not raised.
 func (server apiServer) GetLoginStatus(ctx context.Context, _ gen.GetLoginStatusRequestObject) (gen.GetLoginStatusResponseObject, error) {
 	if server.deps.Login == nil {
 		return gen.GetLoginStatus503ApplicationProblemPlusJSONResponse{DownloadsUnavailableApplicationProblemPlusJSONResponse: downloadsUnavailable()}, nil
 	}
 	status, err := server.deps.Login.Status(ctx)
+	if err != nil && !login.NeedsUserAction(err) {
+		return nil, fmt.Errorf("get login status: %w", err)
+	}
 	if err != nil {
 		server.deps.Logger.Info("login status needs attention", "reason", err)
 		problemText := err.Error()

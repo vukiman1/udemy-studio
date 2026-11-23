@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"context"
 	"encoding/json"
+	"errors"
 	"log/slog"
 	"net/http"
 	"strings"
@@ -41,10 +42,13 @@ func (fakeCookieStore) AccessToken(_ context.Context, profileDir, host string) (
 	return login.Token{Value: secret.New("token"), ExpiresAt: time.Now().Add(time.Hour)}, nil
 }
 
-type fakeSettings struct{ selected string }
+type fakeSettings struct {
+	selected string
+	err      error
+}
 
 func (settings *fakeSettings) SelectedProfile(context.Context) (string, bool, error) {
-	return settings.selected, settings.selected != "", nil
+	return settings.selected, settings.selected != "", settings.err
 }
 
 func (settings *fakeSettings) SaveSelectedProfile(_ context.Context, profileDir string) error {
@@ -195,4 +199,10 @@ func waitForJob(t *testing.T, app testApp, id string, want gen.JobStatus) gen.Jo
 	}
 	t.Fatalf("job %s never became %s", id, want)
 	return gen.Job{}
+}
+
+func TestLoginStatusRaisesFailuresTheLearnerCannotFix(t *testing.T) {
+	loginService := login.NewService(fakeCookieStore{}, &fakeSettings{err: errors.New("database is locked")}, time.Now)
+	app := newTestAppWithDeps(t, libraryFixture, func(deps *Deps) { deps.Login = loginService })
+	assertProblem(t, app.do(t, http.MethodGet, "/api/downloads/status", nil), http.StatusInternalServerError)
 }
