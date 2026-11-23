@@ -21,11 +21,12 @@ import (
 )
 
 const (
-	vttBody        = "WEBVTT\n\n00:00:01.000 --> 00:00:02.000\nHello\n"
-	childPlaylist  = "#EXTM3U\n#EXT-X-ENDLIST\n"
-	failingURL     = "https://cdn.example/fails"
-	testFileMode   = 0o600
-	hlsPlaylistURL = "https://example-portal.udemy.com/assets/77/files/hls/1080.m3u8"
+	vttBody          = "WEBVTT\n\n00:00:01.000 --> 00:00:02.000\nHello\n"
+	childPlaylist    = "#EXTM3U\n#EXT-X-ENDLIST\n"
+	failingURL       = "https://cdn.example/fails"
+	brokenCaptionURL = "https://cdn.example/broken.vtt"
+	testFileMode     = 0o600
+	hlsPlaylistURL   = "https://example-portal.udemy.com/assets/77/files/hls/1080.m3u8"
 )
 
 var errFetchFailed = errors.New("aria2c exited with 1")
@@ -49,7 +50,7 @@ func (tools *fakeTools) FetchFile(_ context.Context, fileURL, dir, name string) 
 		return errFetchFailed
 	}
 	content := "fetched " + fileURL
-	if strings.HasSuffix(name, vttExtension) {
+	if strings.HasSuffix(name, vttExtension) && fileURL != brokenCaptionURL {
 		content = vttBody
 	}
 	if err := os.WriteFile(filepath.Join(dir, name), []byte(content), testFileMode); err != nil {
@@ -79,7 +80,7 @@ func (tools *fakeTools) FetchPlaylist(context.Context, string) (string, error) {
 
 func samplePlan() udemy.Plan {
 	videoLecture := udemy.LecturePlan{
-		Number: 1, ID: 101, Title: "001 Welcome", Kind: udemy.KindVideo, File: "001 Welcome.mp4", PresenceFile: "001 Welcome.mp4",
+		Number: 1, ID: 101, Title: "001 Welcome", Kind: udemy.KindVideo, File: "001 Welcome.mp4",
 		Video:    &udemy.VideoChoice{Type: udemy.SourceMP4, URL: "https://cdn.example/welcome.mp4"},
 		Captions: []udemy.CaptionPlan{{Language: "en", URL: "https://cdn.example/en.vtt", File: "001 Welcome_en.vtt", SRTFile: "001 Welcome_en.srt"}},
 		Assets: []udemy.AssetPlan{
@@ -88,18 +89,18 @@ func samplePlan() udemy.Plan {
 		},
 	}
 	hlsLecture := udemy.LecturePlan{
-		Number: 2, ID: 102, Title: "002 Deep dive", Kind: udemy.KindVideo, File: "002 Deep dive.mp4", PresenceFile: "002 Deep dive.mp4",
+		Number: 2, ID: 102, Title: "002 Deep dive", Kind: udemy.KindVideo, File: "002 Deep dive.mp4",
 		Video: &udemy.VideoChoice{Type: udemy.SourceHLS, URL: hlsPlaylistURL, PlaylistFile: "index_77_1920x1080.m3u8"},
 	}
 	article := udemy.LecturePlan{
-		Number: 3, ID: 103, Title: "003 Notes 🚀", Kind: udemy.KindHTML, File: "003 Notes 🚀.html", PresenceFile: "003 Notes .html", HTMLBody: "<p>body</p>",
+		Number: 3, ID: 103, Title: "003 Notes 🚀", Kind: udemy.KindHTML, File: "003 Notes 🚀.html", HTMLBody: "<p>body</p>",
 		Assets: []udemy.AssetPlan{{Type: udemy.AssetArticle, File: "003 Notes 🚀.html"}},
 	}
-	drm := udemy.LecturePlan{Number: 4, Title: "004 Locked", Kind: udemy.KindDRM, File: "004 Locked.mp4", PresenceFile: "004 Locked.mp4"}
-	quiz := udemy.LecturePlan{Number: 5, Title: "005 Quiz", Kind: udemy.KindQuiz, File: "005 Quiz.html", PresenceFile: "005 Quiz.html"}
+	drm := udemy.LecturePlan{Number: 4, Title: "004 Locked", Kind: udemy.KindDRM, File: "004 Locked.mp4"}
+	quiz := udemy.LecturePlan{Number: 5, Title: "005 Quiz", Kind: udemy.KindQuiz, File: "005 Quiz.html"}
 	return udemy.Plan{CourseName: "backend-basics", CourseDir: "backend-basics", Chapters: []udemy.ChapterPlan{
 		{Index: 1, Dir: "01 - Intro", Lectures: []udemy.LecturePlan{videoLecture, hlsLecture, article, drm, quiz}},
-		{Index: 2, Dir: "02 - Skipped", Lectures: []udemy.LecturePlan{{Number: 1, Title: "001 Other", Kind: udemy.KindHTML, File: "001 Other.html", PresenceFile: "001 Other.html", HTMLBody: "x"}}},
+		{Index: 2, Dir: "02 - Skipped", Lectures: []udemy.LecturePlan{{Number: 1, Title: "001 Other", Kind: udemy.KindHTML, File: "001 Other.html", HTMLBody: "x"}}},
 	}}
 }
 
@@ -167,8 +168,8 @@ func TestCourseWritesThePythonLayoutAndSkipsItOnARerun(t *testing.T) {
 	if err != nil {
 		t.Fatalf("rerun: %v", err)
 	}
-	// The page is written again because its presence check drops the emoji; attachments are always fetched, as in Python.
-	wantRerun := Summary{Downloaded: 1, AlreadyPresent: 2, Failed: []string{"004 Locked"}}
+	// Attachments are always fetched again, as in Python; aria2c's -c keeps what is there.
+	wantRerun := Summary{AlreadyPresent: 3, Failed: []string{"004 Locked"}}
 	if diff := cmp.Diff(wantRerun, summary); diff != "" || !slices.Equal(rerun.fetched, []string{"001 slides.pdf"}) {
 		t.Errorf("rerun summary (-want +got):\n%s\nfetched = %v", diff, rerun.fetched)
 	}
@@ -279,5 +280,91 @@ func TestFileAria2cLeftPartialIsDownloadedAgain(t *testing.T) {
 		if !slices.Contains(tools.fetched, name) {
 			t.Errorf("%s was left partial, fetched only %v", name, tools.fetched)
 		}
+	}
+}
+
+func TestCaptionThatDoesNotConvertIsRetriedOnTheNextRun(t *testing.T) {
+	plan := samplePlan()
+	plan.Chapters[0].Lectures = plan.Chapters[0].Lectures[:1]
+	plan.Chapters[0].Lectures[0].Captions[0].URL = brokenCaptionURL
+	outputDir := t.TempDir()
+	summary, _, err := runCourse(t, t.Context(), plan, &fakeTools{}, outputDir)
+	if err != nil || !slices.Equal(summary.Failed, []string{"001 Welcome (caption: en)"}) {
+		t.Fatalf("summary = %+v, %v; want the caption failed", summary, err)
+	}
+	rerun := &fakeTools{}
+	if _, _, err := runCourse(t, t.Context(), plan, rerun, outputDir); err != nil {
+		t.Fatalf("rerun: %v", err)
+	}
+	if !slices.Contains(rerun.fetched, "001 Welcome_en.vtt") {
+		t.Errorf("rerun fetched %v, want the caption downloaded again", rerun.fetched)
+	}
+}
+
+func TestArticlePageIsNotRewrittenOnARerun(t *testing.T) {
+	outputDir := t.TempDir()
+	pagePath := filepath.Join(outputDir, "backend-basics", "01 - Intro", "003 Notes 🚀.html")
+	if _, _, err := runCourse(t, t.Context(), samplePlan(), &fakeTools{}, outputDir); err != nil {
+		t.Fatalf("Course: %v", err)
+	}
+	written, err := fs.ReadFile(os.DirFS(filepath.Dir(pagePath)), filepath.Base(pagePath))
+	if err != nil || !strings.Contains(string(written), "Notes 🚀") || !strings.Contains(string(written), "<p>body</p>") {
+		t.Fatalf("page = %q, %v; want the article template with title and body", written, err)
+	}
+	if err := os.WriteFile(pagePath, []byte("kept"), testFileMode); err != nil {
+		t.Fatalf("edit page: %v", err)
+	}
+	if _, _, err := runCourse(t, t.Context(), samplePlan(), &fakeTools{}, outputDir); err != nil {
+		t.Fatalf("rerun: %v", err)
+	}
+	if kept, _ := fs.ReadFile(os.DirFS(filepath.Dir(pagePath)), filepath.Base(pagePath)); string(kept) != "kept" {
+		t.Errorf("rerun rewrote the page: %q", kept)
+	}
+}
+
+func TestPageThatCannotBeWrittenIsReported(t *testing.T) {
+	blocked := t.TempDir()
+	if err := os.MkdirAll(filepath.Join(blocked, "backend-basics", "01 - Intro", "003 Notes 🚀.html", "in-the-way"), dirMode); err != nil {
+		t.Fatalf("block page path: %v", err)
+	}
+	summary, _, err := runCourse(t, t.Context(), samplePlan(), &fakeTools{}, blocked)
+	if err != nil || !slices.Contains(summary.Failed, "003 Notes 🚀") {
+		t.Errorf("failed = %v, %v; want the page that could not be written", summary.Failed, err)
+	}
+}
+
+func TestYTDLPOutputKeepsAChapterNamedAfterMP4Files(t *testing.T) {
+	plan := samplePlan()
+	plan.Chapters[0].Dir = "01 - Encoding .mp4 files"
+	plan.Chapters[0].Lectures = plan.Chapters[0].Lectures[1:2]
+	outputDir := t.TempDir()
+	tools := &fakeTools{}
+	if _, _, err := runCourse(t, t.Context(), plan, tools, outputDir); err != nil {
+		t.Fatalf("Course: %v", err)
+	}
+	want := filepath.Join(outputDir, "backend-basics", "01 - Encoding .mp4 files", "002 Deep dive.%(ext)s")
+	if !slices.Equal(tools.hlsOutputs, []string{want}) {
+		t.Errorf("yt-dlp output = %v, want %s", tools.hlsOutputs, want)
+	}
+}
+
+func TestCaptionLeftWithoutItsSRTIsConvertedWithoutDownloading(t *testing.T) {
+	plan := samplePlan()
+	plan.Chapters[0].Lectures = plan.Chapters[0].Lectures[:1]
+	plan.Chapters[0].Lectures[0].Assets = nil
+	outputDir := t.TempDir()
+	chapterDir := filepath.Join(outputDir, "backend-basics", "01 - Intro")
+	if err := os.MkdirAll(chapterDir, dirMode); err != nil {
+		t.Fatalf("mkdir: %v", err)
+	}
+	if err := os.WriteFile(filepath.Join(chapterDir, "001 Welcome_en.vtt"), []byte(vttBody), testFileMode); err != nil {
+		t.Fatalf("write vtt: %v", err)
+	}
+	tools := &fakeTools{}
+	if _, _, err := runCourse(t, t.Context(), plan, tools, outputDir); err != nil {
+		t.Fatalf("Course: %v", err)
+	}
+	if slices.Contains(tools.fetched, "001 Welcome_en.vtt") || !isFile(filepath.Join(chapterDir, "001 Welcome_en.srt")) {
+		t.Errorf("fetched %v; want the existing VTT converted to SRT without a download", tools.fetched)
 	}
 }

@@ -7,13 +7,14 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 
 	"github.com/vukiman1/udemy-studio/internal/udemy"
 )
 
 const (
-	fileMode               = 0o600
+	playlistFileMode       = 0o600
 	videoExtension         = ".mp4"
 	ytDLPExtensionTemplate = ".%(ext)s"
 	fileURLScheme          = "file"
@@ -26,7 +27,7 @@ var (
 )
 
 func (run *courseDownload) mainFile(ctx context.Context, chapterDir string, lecture udemy.LecturePlan) error {
-	if isDownloaded(filepath.Join(chapterDir, lecture.PresenceFile)) {
+	if isDownloaded(filepath.Join(chapterDir, lecture.File)) {
 		run.summary.AlreadyPresent++
 		return nil
 	}
@@ -43,12 +44,16 @@ func (run *courseDownload) mainFile(ctx context.Context, chapterDir string, lect
 	return nil
 }
 
-// An empty page is left unwritten and uncounted, as in the Python downloader.
+// A page with an empty body is left unwritten and uncounted, as in the Python downloader; an article always has its template.
 func (run *courseDownload) page(ctx context.Context, chapterDir string, lecture udemy.LecturePlan) error {
-	if lecture.HTMLBody == "" {
+	content := lecture.HTMLBody
+	if slices.ContainsFunc(lecture.Assets, func(asset udemy.AssetPlan) bool { return asset.Type == udemy.AssetArticle }) {
+		content = articlePage(lecture)
+	}
+	if content == "" {
 		return nil
 	}
-	if err := os.WriteFile(filepath.Join(chapterDir, lecture.File), []byte(lecture.HTMLBody), fileMode); err != nil {
+	if err := writeLibraryFile(filepath.Join(chapterDir, lecture.File), []byte(content)); err != nil {
 		return run.recordFailure(ctx, lecture.Title, err)
 	}
 	run.summary.Downloaded++
@@ -78,11 +83,10 @@ func (run *courseDownload) hls(ctx context.Context, chapterDir string, lecture u
 		return fmt.Errorf("fetch HLS playlist: %w", err)
 	}
 	playlistPath := filepath.Join(run.options.TempDir, lecture.Video.PlaylistFile)
-	if err := os.WriteFile(playlistPath, []byte(playlist), fileMode); err != nil {
+	if err := os.WriteFile(playlistPath, []byte(playlist), playlistFileMode); err != nil {
 		return fmt.Errorf("save HLS playlist: %w", err)
 	}
 	playlistURL := url.URL{Scheme: fileURLScheme, Path: playlistPath}
-	// The Python downloader replaces ".mp4" anywhere in the path, not only at its end.
-	output := strings.ReplaceAll(filepath.Join(chapterDir, lecture.File), videoExtension, ytDLPExtensionTemplate)
+	output := filepath.Join(chapterDir, strings.TrimSuffix(lecture.File, videoExtension)+ytDLPExtensionTemplate)
 	return run.tools.Streams.FetchHLS(ctx, playlistURL.String(), output)
 }

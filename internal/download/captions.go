@@ -2,6 +2,7 @@ package download
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -25,42 +26,49 @@ func (run *courseDownload) captions(ctx context.Context, chapterDir string, lect
 	return nil
 }
 
-// Each retry rechecks the files first, as Python's recursion does, so a partial file from a failed attempt counts as done.
+// A VTT left without its SRT, by a failed write or an interrupt, is converted without downloading it again.
 func (run *courseDownload) caption(ctx context.Context, chapterDir string, caption udemy.CaptionPlan) error {
+	captionPath, srtPath := filepath.Join(chapterDir, caption.File), filepath.Join(chapterDir, caption.SRTFile)
 	isVTT := strings.HasSuffix(caption.File, vttExtension)
-	for attempt := 1; ; attempt++ {
-		if isDownloaded(filepath.Join(chapterDir, caption.File)) || (isVTT && isDownloaded(filepath.Join(chapterDir, caption.SRTFile))) {
-			return nil
-		}
-		err := run.tools.Files.FetchFile(ctx, caption.URL, chapterDir, caption.File)
-		if err == nil {
-			break
-		}
-		if ctx.Err() != nil || attempt == captionAttempts {
+	if isVTT && isDownloaded(srtPath) {
+		return nil
+	}
+	if !isDownloaded(captionPath) {
+		if err := run.fetchCaption(ctx, chapterDir, caption); err != nil {
 			return err
 		}
-		run.logger.Warn("caption download failed, retrying", "caption", caption.File, "attempt", attempt, "err", err)
 	}
 	if !isVTT {
 		return nil
 	}
-	return convertCaption(filepath.Join(chapterDir, caption.File), filepath.Join(chapterDir, caption.SRTFile))
+	return convertCaption(captionPath, srtPath)
 }
 
-// The Python downloader creates the SRT before converting, so a failed conversion leaves it empty and the VTT in place.
-func convertCaption(vttPath, srtPath string) error {
-	if err := os.WriteFile(srtPath, nil, fileMode); err != nil {
-		return fmt.Errorf("create %s: %w", filepath.Base(srtPath), err)
+// fetchCaption retries a failed download, rechecking the file first as the Python downloader's recursion does.
+func (run *courseDownload) fetchCaption(ctx context.Context, chapterDir string, caption udemy.CaptionPlan) error {
+	for attempt := 1; ; attempt++ {
+		err := run.tools.Files.FetchFile(ctx, caption.URL, chapterDir, caption.File)
+		if err == nil || ctx.Err() != nil || attempt == captionAttempts {
+			return err
+		}
+		run.logger.Warn("caption download failed, retrying", "caption", caption.File, "attempt", attempt, "err", err)
+		if isDownloaded(filepath.Join(chapterDir, caption.File)) {
+			return nil
+		}
 	}
+}
+
+// A VTT that does not convert is removed, so the next run downloads it again instead of finding it present.
+func convertCaption(vttPath, srtPath string) error {
 	vtt, err := os.ReadFile(vttPath) //nolint:gosec // reason: the path is the caption this download just wrote
 	if err != nil {
 		return fmt.Errorf("read %s: %w", filepath.Base(vttPath), err)
 	}
 	srt, err := subtitle.ConvertVTTToSRT(vtt)
 	if err != nil {
-		return fmt.Errorf("convert %s: %w", filepath.Base(vttPath), err)
+		return errors.Join(fmt.Errorf("convert %s: %w", filepath.Base(vttPath), err), os.Remove(vttPath))
 	}
-	if err := os.WriteFile(srtPath, srt, fileMode); err != nil { //nolint:gosec // reason: the path is built from the plan's single-element names under the chapter directory
+	if err := writeLibraryFile(srtPath, srt); err != nil {
 		return fmt.Errorf("write %s: %w", filepath.Base(srtPath), err)
 	}
 	return os.Remove(vttPath)
