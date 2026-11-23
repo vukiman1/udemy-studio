@@ -8,10 +8,7 @@ import (
 	"strings"
 )
 
-const (
-	spaIndexFile = "index.html"
-	apiPrefix    = "/api/"
-)
+const spaIndexFile = "index.html"
 
 func spaHandler(frontend fs.FS) http.Handler {
 	files := http.FileServerFS(frontend)
