@@ -11,6 +11,7 @@ require (
 	github.com/spf13/cobra v1.10.2
 	golang.org/x/sync v0.25.0
 	modernc.org/sqlite v1.63.0
+	rsc.io/qr v0.2.0
 )
 
 require (
@@ -294,7 +295,6 @@ require (
 	modernc.org/memory v1.12.1 // indirect
 	mvdan.cc/gofumpt v0.12.0 // indirect
 	mvdan.cc/unparam v0.0.0-20260823230713-2fa3d841b0c8 // indirect
-	rsc.io/qr v0.2.0 // indirect
 )
 
 tool (
