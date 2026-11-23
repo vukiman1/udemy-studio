@@ -1,0 +1,150 @@
+package app
+
+import (
+	"context"
+	"errors"
+	"fmt"
+	"log/slog"
+	"net"
+	"net/http"
+	"os"
+	"path/filepath"
+	"time"
+
+	"golang.org/x/sync/errgroup"
+
+	"github.com/vukiman1/udemy-studio/internal/adapter/sqlite"
+	"github.com/vukiman1/udemy-studio/internal/library"
+	"github.com/vukiman1/udemy-studio/internal/progress"
+	"github.com/vukiman1/udemy-studio/internal/transport/httpapi"
+	"github.com/vukiman1/udemy-studio/web"
+)
+
+const (
+	readHeaderTimeout   = 10 * time.Second
+	shutdownGracePeriod = 3 * time.Second
+	dataDirMode         = 0o750
+)
+
+var ErrMissingLibraryDir = errors.New("library directory is required")
+
+type Options struct {
+	ListenAddress string
+	Version       string
+	LibraryDir    string
+	DatabasePath  string
+	LANMode       bool
+}
+
+const lanAccessCodeFileName = "lan-access-code"
+
+func Run(ctx context.Context, options Options, logger *slog.Logger) error {
+	if options.LibraryDir == "" {
+		return ErrMissingLibraryDir
+	}
+	media, err := os.OpenRoot(options.LibraryDir)
+	if err != nil {
+		return fmt.Errorf("open library %s: %w", options.LibraryDir, err)
+	}
+	defer media.Close()
+	scanned, err := library.Scan(media.FS())
+	if err != nil {
+		return fmt.Errorf("scan library %s: %w", options.LibraryDir, err)
+	}
+	logger.Info("library scanned", "dir", options.LibraryDir, "courses", len(scanned.Courses))
+
+	if err := os.MkdirAll(filepath.Dir(options.DatabasePath), dataDirMode); err != nil {
+		return fmt.Errorf("create data dir for %s: %w", options.DatabasePath, err)
+	}
+	database, err := sqlite.Open(ctx, options.DatabasePath)
+	if err != nil {
+		return err
+	}
+	defer database.Close()
+
+	frontend, err := web.Assets()
+	if errors.Is(err, web.ErrFrontendNotBuilt) {
+		logger.Warn("serving API only", "reason", err)
+		frontend = nil
+	} else if err != nil {
+		return fmt.Errorf("load embedded frontend: %w", err)
+	}
+
+	handler := httpapi.NewHandler(httpapi.Deps{
+		Version:  options.Version,
+		Frontend: frontend,
+		Library:  scanned,
+		Media:    media.FS(),
+		Progress: progress.NewService(sqlite.NewProgressStore(database), time.Now),
+		Logger:   logger,
+	})
+	address := options.ListenAddress
+	if options.LANMode {
+		address, handler, err = enableLANMode(address, handler, filepath.Join(filepath.Dir(options.DatabasePath), lanAccessCodeFileName))
+		if err != nil {
+			return err
+		}
+	}
+	listener, err := new(net.ListenConfig).Listen(ctx, "tcp", address)
+	if err != nil {
+		return fmt.Errorf("listen on %s: %w", address, err)
+	}
+	logger.Info("http server listening", "addr", listener.Addr().String(), "version", options.Version)
+	return serve(ctx, listener, handler, logger, shutdownGracePeriod)
+}
+
+func enableLANMode(address string, handler http.Handler, accessCodePath string) (string, http.Handler, error) {
+	lanAddress, err := lanListenAddress(address)
+	if err != nil {
+		return "", nil, err
+	}
+	accessCode, err := loadOrCreateAccessCode(accessCodePath)
+	if err != nil {
+		return "", nil, err
+	}
+	_, port, _ := net.SplitHostPort(lanAddress)
+	urls, err := lanURLs(port)
+	if err != nil {
+		return "", nil, err
+	}
+	if err := printLANInstructions(os.Stdout, urls, accessCode); err != nil {
+		return "", nil, fmt.Errorf("print LAN instructions: %w", err)
+	}
+	return lanAddress, httpapi.RequireLANAccess(accessCode, handler), nil
+}
+
+func serve(ctx context.Context, listener net.Listener, handler http.Handler, logger *slog.Logger, gracePeriod time.Duration) error {
+	server := &http.Server{Handler: handler, ReadHeaderTimeout: readHeaderTimeout}
+
+	group, groupCtx := errgroup.WithContext(ctx)
+	group.Go(func() error {
+		if err := server.Serve(listener); !errors.Is(err, http.ErrServerClosed) {
+			return fmt.Errorf("serve http on %s: %w", listener.Addr(), err)
+		}
+		return nil
+	})
+	group.Go(func() error {
+		<-groupCtx.Done()
+		return shutdown(context.WithoutCancel(ctx), server, logger, gracePeriod)
+	})
+	return group.Wait()
+}
+
+// Video streams stay open for as long as the browser buffers, so after the grace period they are cut rather than awaited.
+func shutdown(ctx context.Context, server *http.Server, logger *slog.Logger, gracePeriod time.Duration) error {
+	logger.Info("http server shutting down", "grace_period", gracePeriod)
+	graceCtx, cancel := context.WithTimeout(ctx, gracePeriod)
+	defer cancel()
+	err := server.Shutdown(graceCtx)
+	if !errors.Is(err, context.DeadlineExceeded) {
+		if err != nil {
+			return fmt.Errorf("shutdown http server: %w", err)
+		}
+		return nil
+	}
+	logger.Info("closing connections still streaming after the grace period")
+	if err := server.Close(); err != nil {
+		return fmt.Errorf("force close http server: %w", err)
+	}
+	return nil
+}
