@@ -20,7 +20,7 @@ func newPlanCommand() *cobra.Command {
 		Args:  cobra.ExactArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
 			options.CourseURL = args[0]
-			if err := applyDataDefaults(&options.DatabasePath, &options.ChromeDataDir); err != nil {
+			if err := applyDataDefaults(&options.DataDir, &options.ChromeDataDir); err != nil {
 				return err
 			}
 			logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
@@ -37,8 +37,8 @@ func newPlanCommand() *cobra.Command {
 		},
 	}
 	flags := command.Flags()
-	flags.StringVar(&options.DatabasePath, "db", "", "SQLite file holding the selected Chrome profile (default: user config dir)")
-	flags.StringVar(&options.ChromeDataDir, "chrome-data-dir", "", "Chrome user data dir (default: ~/"+chromeDataDirSuffix+")")
+	flags.StringVar(&options.DataDir, "data-dir", "", dataDirUsage)
+	flags.StringVar(&options.ChromeDataDir, "chrome-data-dir", "", chromeDataDirUsage)
 	flags.IntVarP(&options.Plan.Quality, "quality", "q", udemy.BestQuality, "video height to aim for; the nearest one wins (default: highest)")
 	flags.StringVarP(&options.Plan.CaptionLanguage, "caption-language", "l", defaultCaptionLang, `caption language, "all", or "" for none`)
 	flags.BoolVar(&options.Plan.DownloadAssets, "assets", true, "plan attachments, source code and external links")

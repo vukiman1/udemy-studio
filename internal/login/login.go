@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"slices"
 	"time"
 
 	"github.com/vukiman1/udemy-studio/internal/platform/secret"
@@ -15,7 +16,15 @@ var (
 	ErrNotLoggedIn       = errors.New("not logged in to Udemy")
 	ErrTokenExpired      = errors.New("udemy login expired")
 	ErrNoDiskAccess      = errors.New("no permission to read Chrome data")
+	ErrNoKeychainAccess  = errors.New("no access to Chrome's key in the macOS keychain")
+
+	userFixableErrors = []error{ErrNoProfileSelected, ErrProfileNotFound, ErrNotLoggedIn, ErrTokenExpired, ErrNoDiskAccess, ErrNoKeychainAccess}
 )
+
+// NeedsUserAction reports whether the learner fixes err in Chrome or System Settings rather than it being a fault of the app.
+func NeedsUserAction(err error) bool {
+	return slices.ContainsFunc(userFixableErrors, func(target error) bool { return errors.Is(err, target) })
+}
 
 type Profile struct {
 	Dir        string

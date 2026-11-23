@@ -8,7 +8,6 @@ import (
 	"net"
 	"net/http"
 	"os"
-	"path/filepath"
 	"time"
 
 	"golang.org/x/sync/errgroup"
@@ -32,12 +31,10 @@ type Options struct {
 	ListenAddress string
 	Version       string
 	LibraryDir    string
-	DatabasePath  string
+	DataDir       string
 	LANMode       bool
 	Downloads     DownloadOptions
 }
-
-const lanAccessCodeFileName = "lan-access-code"
 
 func Run(ctx context.Context, options Options, logger *slog.Logger) error {
 	if options.LibraryDir == "" {
@@ -54,7 +51,7 @@ func Run(ctx context.Context, options Options, logger *slog.Logger) error {
 	}
 	logger.Info("library scanned", "dir", options.LibraryDir, "courses", len(catalog.Current().Courses))
 
-	database, err := openDatabase(ctx, options.DatabasePath)
+	database, err := openDatabase(ctx, options.DataDir)
 	if err != nil {
 		return err
 	}
@@ -82,9 +79,9 @@ func Run(ctx context.Context, options Options, logger *slog.Logger) error {
 		Jobs:     downloads.jobs,
 		Logger:   logger,
 	})
-	address := options.ListenAddress
+	address, accessCode := options.ListenAddress, ""
 	if options.LANMode {
-		address, handler, err = enableLANMode(address, handler, filepath.Join(filepath.Dir(options.DatabasePath), lanAccessCodeFileName))
+		address, handler, accessCode, err = enableLANMode(address, handler, options.DataDir)
 		if err != nil {
 			return err
 		}
@@ -93,28 +90,14 @@ func Run(ctx context.Context, options Options, logger *slog.Logger) error {
 	if err != nil {
 		return fmt.Errorf("listen on %s: %w", address, err)
 	}
+	if options.LANMode {
+		if err := announceLANMode(os.Stdout, listener.Addr(), accessCode); err != nil {
+			_ = listener.Close()
+			return err
+		}
+	}
 	logger.Info("http server listening", "addr", listener.Addr().String(), "version", options.Version)
 	return serve(ctx, listener, handler, logger, shutdownGracePeriod, downloads.workers()...)
-}
-
-func enableLANMode(address string, handler http.Handler, accessCodePath string) (string, http.Handler, error) {
-	lanAddress, err := lanListenAddress(address)
-	if err != nil {
-		return "", nil, err
-	}
-	accessCode, err := loadOrCreateAccessCode(accessCodePath)
-	if err != nil {
-		return "", nil, err
-	}
-	_, port, _ := net.SplitHostPort(lanAddress)
-	urls, err := lanURLs(port)
-	if err != nil {
-		return "", nil, err
-	}
-	if err := printLANInstructions(os.Stdout, urls, accessCode); err != nil {
-		return "", nil, fmt.Errorf("print LAN instructions: %w", err)
-	}
-	return lanAddress, httpapi.RequireLANAccess(accessCode, handler), nil
 }
 
 func serve(

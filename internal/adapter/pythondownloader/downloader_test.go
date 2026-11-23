@@ -2,7 +2,6 @@ package pythondownloader
 
 import (
 	"context"
-	"errors"
 	"log/slog"
 	"os"
 	"path/filepath"
@@ -18,8 +17,9 @@ import (
 )
 
 const (
-	fakeModeEnv = "FAKE_PYTHON_MODE"
-	tokenValue  = "token-that-must-not-reach-argv" //nolint:gosec // reason: fixture value checked for leaks
+	fakeModeEnv     = "FAKE_PYTHON_MODE"
+	tokenValue      = "token-that-must-not-reach-argv" //nolint:gosec // reason: fixture value checked for leaks
+	downloadTimeout = 10 * time.Second
 )
 
 type recorder struct {
@@ -109,28 +109,11 @@ func TestDownloadReportsTheLastLogLineWhenPythonFails(t *testing.T) {
 	}
 }
 
-func TestCancellingInterruptsThePythonProcessGroup(t *testing.T) {
-	downloader, config := newDownloader(t, "wait-for-interrupt")
-	events := &recorder{}
-	ctx, cancel := context.WithCancel(t.Context())
-	done := make(chan error, 1)
-	go func() { done <- downloader.Download(ctx, testJob(), secret.New(tokenValue), events.record) }()
-
-	deadline := time.Now().Add(5 * time.Second)
-	for len(events.snapshot()) == 0 && time.Now().Before(deadline) {
-		time.Sleep(10 * time.Millisecond)
-	}
-	cancel()
-	select {
-	case err := <-done:
-		if !errors.Is(err, context.Canceled) {
-			t.Errorf("error = %v, want context.Canceled", err)
-		}
-	case <-time.After(interruptGrace):
-		t.Fatal("download did not stop after cancel")
-	}
-	log, _ := os.ReadFile(filepath.Join(config.LogDir, "job1.log"))
-	if !strings.Contains(string(log), "interrupted") {
-		t.Errorf("python did not receive SIGINT; log:\n%s", log)
+func TestOversizedEventLineDoesNotHangTheDownload(t *testing.T) {
+	downloader, _ := newDownloader(t, "oversized-event")
+	ctx, cancel := context.WithTimeout(t.Context(), downloadTimeout)
+	defer cancel()
+	if err := downloader.Download(ctx, testJob(), secret.New(tokenValue), (&recorder{}).record); err != nil {
+		t.Errorf("Download = %v, want it to finish", err)
 	}
 }

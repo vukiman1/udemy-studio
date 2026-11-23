@@ -11,7 +11,7 @@ import (
 
 type PlanCourseOptions struct {
 	CourseURL     string
-	DatabasePath  string
+	DataDir       string
 	ChromeDataDir string
 	Plan          udemy.PlanOptions
 }
@@ -22,7 +22,7 @@ func PlanCourse(ctx context.Context, options PlanCourseOptions, logger *slog.Log
 	if err != nil {
 		return udemy.Plan{}, err
 	}
-	database, err := openDatabase(ctx, options.DatabasePath)
+	database, err := openDatabase(ctx, options.DataDir)
 	if err != nil {
 		return udemy.Plan{}, err
 	}

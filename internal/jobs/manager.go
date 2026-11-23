@@ -123,9 +123,17 @@ func (manager *Manager) Cancel(ctx context.Context, id string) error {
 		return nil
 	}
 	job.Status, job.FinishedAt = StatusCancelled, manager.now()
-	snapshot := cloneJob(job)
+	cancelled := cloneJob(job)
 	manager.mutex.Unlock()
-	return manager.persistAndPublish(ctx, snapshot)
+	if err := manager.deps.Store.Save(ctx, cancelled); err != nil {
+		manager.mutex.Lock()
+		job.Status, job.FinishedAt = StatusQueued, nil
+		manager.mutex.Unlock()
+		manager.signalWork()
+		return fmt.Errorf("save job %s: %w", id, err)
+	}
+	manager.publish(cancelled)
+	return nil
 }
 
 func (manager *Manager) List() []Job {
@@ -241,21 +249,15 @@ func (manager *Manager) download(ctx context.Context, job Job) error {
 	})
 }
 
+// A running job lives in memory, so its state is still published when saving it fails.
 func (manager *Manager) persistAndLog(ctx context.Context, job Job) {
-	if err := manager.persistAndPublish(ctx, job); err != nil {
+	if err := manager.deps.Store.Save(ctx, job); err != nil {
 		manager.deps.Logger.Error("save job state", "job", job.ID, "status", job.Status, "err", err)
 	}
-}
-
-func (manager *Manager) persistAndPublish(ctx context.Context, job Job) error {
 	manager.publish(job)
-	if err := manager.deps.Store.Save(ctx, job); err != nil {
-		return fmt.Errorf("save job %s: %w", job.ID, err)
-	}
-	return nil
 }
 
-// A subscriber that cannot keep up misses intermediate updates; the next one carries the full job state.
+// A subscriber that falls behind is closed rather than skipped, so it reconnects and reloads every job instead of missing a final state.
 func (manager *Manager) publish(job Job) {
 	manager.mutex.Lock()
 	defer manager.mutex.Unlock()
@@ -263,6 +265,8 @@ func (manager *Manager) publish(job Job) {
 		select {
 		case subscriber <- job:
 		default:
+			delete(manager.subscribers, subscriber)
+			close(subscriber)
 		}
 	}
 }

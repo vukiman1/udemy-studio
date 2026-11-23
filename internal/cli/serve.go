@@ -27,7 +27,7 @@ func newServeCommand(version string) *cobra.Command {
 			if options.Downloads.OutputDir == "" {
 				options.Downloads.OutputDir = options.LibraryDir
 			}
-			if err := applyDataDefaults(&options.DatabasePath, &options.Downloads.ChromeDataDir); err != nil {
+			if err := applyDataDefaults(&options.DataDir, &options.Downloads.ChromeDataDir); err != nil {
 				return err
 			}
 			if err := resolvePaths(&options); err != nil {
@@ -41,14 +41,14 @@ func newServeCommand(version string) *cobra.Command {
 	flags.StringVar(&options.ListenAddress, "addr", defaultListenAddress, "listen address")
 	flags.StringVar(&options.LibraryDir, "library", os.Getenv(libraryDirEnv),
 		"downloads/ directory the player reads and downloads go to by default (env "+libraryDirEnv+")")
-	flags.StringVar(&options.DatabasePath, "db", "", "SQLite file for progress (default: user config dir)")
+	flags.StringVar(&options.DataDir, "data-dir", "", dataDirUsage)
 	flags.BoolVar(&options.LANMode, "lan", false, "listen on the local network; other devices need the printed access code")
 	flags.StringVar(&options.Downloads.Python, "python", os.Getenv(pythonEnv),
 		"python of the udemy-downloader venv; enables downloads (env "+pythonEnv+")")
 	flags.StringVar(&options.Downloads.PythonRepo, "python-repo", os.Getenv(pythonRepoEnv),
 		"udemy-downloader checkout the downloader runs in (env "+pythonRepoEnv+")")
 	flags.StringVar(&options.Downloads.OutputDir, "download-dir", "", "where downloads are written (default: --library)")
-	flags.StringVar(&options.Downloads.ChromeDataDir, "chrome-data-dir", "", "Chrome user data dir (default: ~/"+chromeDataDirSuffix+")")
+	flags.StringVar(&options.Downloads.ChromeDataDir, "chrome-data-dir", "", chromeDataDirUsage)
 	flags.StringVar(&options.Downloads.CaptionLanguage, "caption-language", defaultCaptionLang, "caption language to download")
 	return command
 }
@@ -57,7 +57,7 @@ func newServeCommand(version string) *cobra.Command {
 func resolvePaths(options *app.Options) error {
 	paths := []*string{
 		&options.LibraryDir,
-		&options.DatabasePath,
+		&options.DataDir,
 		&options.Downloads.Python,
 		&options.Downloads.PythonRepo,
 		&options.Downloads.OutputDir,

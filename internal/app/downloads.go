@@ -45,7 +45,7 @@ func newDownloads(ctx context.Context, options Options, database *sql.DB, catalo
 		Python:          config.Python,
 		RepoDir:         config.PythonRepo,
 		OutputDir:       config.OutputDir,
-		LogDir:          filepath.Join(filepath.Dir(options.DatabasePath), jobLogsDirName),
+		LogDir:          filepath.Join(options.DataDir, jobLogsDirName),
 		CaptionLanguage: config.CaptionLanguage,
 		KeepAwake:       true,
 	}, logger)
