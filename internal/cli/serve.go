@@ -45,11 +45,11 @@ func newServeCommand(version string) *cobra.Command {
 		"downloads/ directory the player reads and downloads go to by default (env "+libraryDirEnv+")")
 	flags.StringVar(&options.DataDir, "data-dir", "", dataDirUsage)
 	flags.BoolVar(&options.LANMode, "lan", false, "listen on the local network; other devices need the printed access code")
-	flags.StringVar(&options.Downloads.Downloader, "downloader", app.DownloaderPython,
-		"what runs download jobs: "+app.DownloaderPython+" (needs --python and --python-repo) or "+app.DownloaderGo)
+	flags.StringVar(&options.Downloads.Downloader, "downloader", app.DownloaderGo,
+		"what runs download jobs: "+app.DownloaderGo+", or "+app.DownloaderPython+" with --python and --python-repo")
 	addToolFlags(command, &options.Downloads.Tools)
 	flags.StringVar(&options.Downloads.Python, "python", os.Getenv(pythonEnv),
-		"python of the udemy-downloader venv; enables downloads (env "+pythonEnv+")")
+		"python of the udemy-downloader venv, for --downloader "+app.DownloaderPython+" (env "+pythonEnv+")")
 	flags.StringVar(&options.Downloads.PythonRepo, "python-repo", os.Getenv(pythonRepoEnv),
 		"udemy-downloader checkout the downloader runs in (env "+pythonRepoEnv+")")
 	flags.StringVar(&options.Downloads.OutputDir, "download-dir", "", "where downloads are written (default: --library)")

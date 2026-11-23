@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"os/exec"
 	"path/filepath"
 	"time"
 
@@ -40,6 +41,19 @@ func (options DownloadOptions) isConfigured() bool {
 	return options.Downloader != DownloaderPython || (options.Python != "" && options.PythonRepo != "")
 }
 
+// missingTool names the first tool the Go downloader cannot find, so jobs are not offered only to fail.
+func (options DownloadOptions) missingTool() (string, bool) {
+	if options.Downloader != DownloaderGo {
+		return "", false
+	}
+	for _, tool := range []string{options.Tools.Aria2c, options.Tools.YTDLP} {
+		if _, err := exec.LookPath(tool); err != nil {
+			return filepath.Base(tool), true
+		}
+	}
+	return "", false
+}
+
 func (options DownloadOptions) newDownloader(logDir string, logger *slog.Logger) (jobs.Downloader, error) {
 	switch options.Downloader {
 	case DownloaderGo:
@@ -65,7 +79,11 @@ type downloads struct {
 
 func newDownloads(ctx context.Context, config DownloadOptions, dataDir string, database *sql.DB, catalog *library.Catalog, progressService *progress.Service, logger *slog.Logger) (downloads, error) {
 	if !config.isConfigured() {
-		logger.Info("downloads disabled; pass --downloader go, or --python and --python-repo, to enable them")
+		logger.Info("downloads disabled; the Python downloader needs --python and --python-repo, or use --downloader go")
+		return downloads{}, nil
+	}
+	if tool, missing := config.missingTool(); missing {
+		logger.Warn("downloads disabled: the Go downloader needs "+tool+"; install it or pass its path with --"+tool, "downloader", config.Downloader)
 		return downloads{}, nil
 	}
 	downloader, err := config.newDownloader(filepath.Join(dataDir, jobLogsDirName), logger)
