@@ -1,5 +1,4 @@
 import type { ReactElement } from 'react'
-import styles from './ProgressBar.module.css'
 
 interface ProgressBarProps {
   readonly completed: number
@@ -12,13 +11,13 @@ export function ProgressBar({ completed, total }: ProgressBarProps): ReactElemen
   const percent = total === 0 ? 0 : Math.round((completed / total) * PERCENT)
   return (
     <div
-      className={styles.track}
+      className="h-1.5 overflow-hidden rounded-full bg-surface-strong"
       role="progressbar"
       aria-valuemin={0}
       aria-valuemax={PERCENT}
       aria-valuenow={percent}
     >
-      <div className={styles.fill} style={{ width: `${String(percent)}%` }} />
+      <div className="h-full bg-accent" style={{ width: `${String(percent)}%` }} />
     </div>
   )
 }

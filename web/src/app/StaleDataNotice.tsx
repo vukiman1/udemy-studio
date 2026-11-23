@@ -1,5 +1,4 @@
 import type { ReactElement } from 'react'
-import styles from './StaleDataNotice.module.css'
 
 interface StaleDataNoticeProps {
   readonly error: Error
@@ -7,7 +6,7 @@ interface StaleDataNoticeProps {
 
 export function StaleDataNotice({ error }: StaleDataNoticeProps): ReactElement {
   return (
-    <p className={styles.notice} role="status">
+    <p className="m-0 px-4 py-1.5 text-[0.85rem] text-danger" role="status">
       Không làm mới được dữ liệu ({error.message}), đang hiển thị bản đã tải.
     </p>
   )

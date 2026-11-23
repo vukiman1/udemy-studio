@@ -2,7 +2,6 @@ import { useEffect, useRef, type ReactElement } from 'react'
 import { NavLink, useParams } from 'react-router'
 import type { CourseDetail, LectureSummary } from '../../api/types'
 import { lecturePath } from '../../app/paths'
-import styles from './LectureSidebar.module.css'
 
 interface LectureSidebarProps {
   readonly course: CourseDetail
@@ -21,27 +20,29 @@ export function LectureSidebar({ course }: LectureSidebarProps): ReactElement {
   return (
     <nav aria-label="Danh sách bài học">
       {course.chapters.map((chapter) => (
-        <section key={`${String(chapter.index)}-${chapter.title}`} className={styles.chapter}>
-          <h2 className={styles.chapterTitle}>
+        <section key={`${String(chapter.index)}-${chapter.title}`} className="py-2">
+          <h2 className="mx-4 my-2 text-[0.8rem] tracking-[0.04em] text-muted uppercase">
             {String(chapter.index).padStart(2, '0')} · {chapter.title}
           </h2>
-          <ol className={styles.lectures}>
+          <ol className="list-none">
             {chapter.lectures.map((lecture) => (
               <li key={lecture.id}>
                 <NavLink
                   ref={lecture.id === lectureId ? activeRef : undefined}
                   to={lecturePath(course.id, lecture.id)}
-                  className={({ isActive }) => (isActive ? styles.activeLecture : styles.lecture)}
+                  className="grid grid-cols-[1.2em_2.4em_1fr_auto] items-baseline gap-1.5 px-4 py-2 text-[0.92rem] hover:bg-surface aria-[current=page]:bg-surface-strong aria-[current=page]:font-semibold"
                 >
-                  <span className={styles.status} aria-label={statusLabel(lecture)}>
+                  <span className="text-accent" aria-label={statusLabel(lecture)}>
                     {statusIcon(lecture)}
                   </span>
-                  <span className={styles.number}>
+                  <span className="text-muted tabular-nums">
                     {String(lecture.number).padStart(LECTURE_NUMBER_DIGITS, '0')}
                   </span>
-                  <span className={styles.lectureTitle}>{lecture.title}</span>
+                  <span className="wrap-anywhere">{lecture.title}</span>
                   {lecture.kind !== 'video' && (
-                    <span className={styles.kind}>{kindLabel(lecture)}</span>
+                    <span className="rounded border border-line px-1 text-[0.75rem] text-muted">
+                      {kindLabel(lecture)}
+                    </span>
                   )}
                 </NavLink>
               </li>

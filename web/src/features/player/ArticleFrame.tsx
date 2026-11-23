@@ -1,6 +1,5 @@
 import type { ReactElement } from 'react'
 import { articleUrl } from '../../api/queries'
-import styles from './ArticleFrame.module.css'
 
 interface ArticleFrameProps {
   readonly lectureId: string
@@ -10,7 +9,7 @@ interface ArticleFrameProps {
 export function ArticleFrame({ lectureId, title }: ArticleFrameProps): ReactElement {
   return (
     <iframe
-      className={styles.frame}
+      className="h-[70dvh] w-full rounded-lg border border-line bg-white"
       src={articleUrl(lectureId)}
       title={title}
       sandbox=""

@@ -9,7 +9,6 @@ import { AttachmentList } from './AttachmentList'
 import { LectureNav } from './LectureNav'
 import { MarkCompleteButton } from './MarkCompleteButton'
 import { VideoPlayer } from './VideoPlayer'
-import styles from './LecturePage.module.css'
 
 export function LecturePage(): ReactElement {
   const { courseId = '', lectureId = '' } = useParams()
@@ -20,8 +19,8 @@ export function LecturePage(): ReactElement {
     return <PageStatus tone="error" message="Không tìm thấy bài học này trong khoá." />
 
   return (
-    <article className={styles.page}>
-      <h2 className={styles.title}>{lecture.title}</h2>
+    <article className="mx-auto grid max-w-[1100px] gap-3 p-4">
+      <h2 className="text-[1.15rem] font-semibold">{lecture.title}</h2>
       {lecture.hasVideo && <VideoPlayer key={lecture.id} lecture={lecture} courseId={courseId} />}
       {lecture.hasArticle && <ArticleFrame lectureId={lecture.id} title={lecture.title} />}
       {lecture.kind === 'unavailable' && (

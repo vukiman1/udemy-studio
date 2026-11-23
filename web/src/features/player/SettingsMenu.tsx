@@ -8,7 +8,6 @@ import {
   parseSubtitleMode,
   type PlayerSettings,
 } from './player-settings'
-import styles from './SettingsMenu.module.css'
 
 interface SettingsMenuProps {
   readonly settings: PlayerSettings
@@ -22,6 +21,11 @@ interface Choice {
 }
 
 const PERCENT = 100
+
+const MENU_PAGE =
+  'col-start-1 row-start-1 grid content-start outline-none data-child-open:invisible'
+const MENU_ITEM =
+  'flex cursor-pointer items-center justify-between gap-4 rounded-md px-2.5 py-2 outline-none data-highlighted:bg-white/12'
 
 export const SUBTITLE_MODE_LABELS: Readonly<Record<SubtitleMode, string>> = {
   [SubtitleMode.Bilingual]: 'Song ngữ',
@@ -38,14 +42,14 @@ export function SettingsMenu({
   return (
     <Menu.Root side="top" align="end">
       <Menu.Trigger
-        className={styles.trigger}
+        className="inline-grid size-10 place-items-center rounded-md border-0 bg-transparent p-0 text-inherit hover:bg-white/15 data-open:bg-white/15"
         aria-label="Cài đặt"
         render={<button type="button" />}
       >
-        <GearIcon className={styles.icon} />
+        <GearIcon className="size-5" />
       </Menu.Trigger>
-      <Menu.Popup className={styles.popup}>
-        <Menu.Content className={styles.content}>
+      <Menu.Popup className="grid min-w-[230px] rounded-[10px] bg-[rgb(28_28_32/0.96)] p-1.5 text-[0.9rem] text-white shadow-[0_8px_24px_rgb(0_0_0/0.4)] outline-none">
+        <Menu.Content className={MENU_PAGE}>
           <SettingsSubmenu
             label="Tốc độ"
             value={String(settings.playbackRate)}
@@ -101,28 +105,28 @@ function SettingsSubmenu({ label, value, choices, onSelect }: SettingsSubmenuPro
   return (
     <Menu.Root>
       <Menu.Trigger
-        className={styles.item}
+        className={MENU_ITEM}
         render={(props) => (
           <div {...props}>
             <span>{label}</span>
-            <span className={styles.value}>
+            <span className="inline-flex items-center gap-1 text-white/70">
               {selected?.label}
-              <ChevronIcon className={styles.chevron} />
+              <ChevronIcon className="size-3.5" />
             </span>
           </div>
         )}
       />
-      <Menu.Content className={styles.content}>
-        <Menu.Item className={styles.back}>
-          <ChevronIcon className={styles.backChevron} />
+      <Menu.Content className={MENU_PAGE}>
+        <Menu.Item className="mb-1 flex cursor-pointer items-center gap-1.5 rounded-t-md border-b border-white/12 px-2.5 py-2 font-semibold outline-none data-highlighted:bg-white/12">
+          <ChevronIcon className="size-3.5 -scale-x-100" />
           {label}
         </Menu.Item>
         <Menu.RadioGroup value={value} onValueChange={onSelect} aria-label={label}>
           {choices.map((choice) => (
-            <Menu.RadioItem key={choice.value} value={choice.value} className={styles.item}>
+            <Menu.RadioItem key={choice.value} value={choice.value} className={MENU_ITEM}>
               <span>{choice.label}</span>
-              <Menu.ItemIndicator checked={choice.value === value} className={styles.indicator}>
-                <CheckIcon className={styles.icon} />
+              <Menu.ItemIndicator checked={choice.value === value} className="inline-grid">
+                <CheckIcon className="size-5" />
               </Menu.ItemIndicator>
             </Menu.RadioItem>
           ))}

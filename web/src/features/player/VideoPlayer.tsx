@@ -21,7 +21,6 @@ import { useLectureProgress } from './use-lecture-progress'
 import { useNativeFullscreenSubtitles } from './use-native-fullscreen-subtitles'
 import { usePlayerSettings } from './use-player-settings'
 import { useSettingsShortcuts } from './use-settings-shortcuts'
-import styles from './VideoPlayer.module.css'
 
 interface VideoPlayerProps {
   readonly lecture: LectureSummary
@@ -76,7 +75,7 @@ export function VideoPlayer({ lecture, courseId }: VideoPlayerProps): ReactEleme
   const areSubtitlesOn = settings.subtitleMode !== SubtitleMode.Off
 
   return (
-    <div className={styles.player}>
+    <div className="grid gap-2">
       <Player>
         <I18nProvider locale={PLAYER_LOCALE}>
           <StudioSkin
@@ -101,12 +100,12 @@ export function VideoPlayer({ lecture, courseId }: VideoPlayerProps): ReactEleme
         </I18nProvider>
       </Player>
       {cuesQuery.isError && (
-        <p className={styles.warning} role="alert">
+        <p className="m-0 text-[0.9rem] text-danger" role="alert">
           Không tải được phụ đề ({cuesQuery.error.message}).
         </p>
       )}
       {lastError !== undefined && (
-        <p className={styles.warning} role="alert">
+        <p className="m-0 text-[0.9rem] text-danger" role="alert">
           Chưa lưu được tiến độ ({lastError.message}). Sẽ thử lại ở lần lưu sau.
         </p>
       )}

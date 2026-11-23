@@ -1,5 +1,4 @@
 import type { ReactElement } from 'react'
-import styles from './PageStatus.module.css'
 
 interface PageStatusProps {
   readonly message: string
@@ -9,7 +8,7 @@ interface PageStatusProps {
 export function PageStatus({ message, tone }: PageStatusProps): ReactElement {
   return (
     <p
-      className={tone === 'error' ? styles.error : styles.info}
+      className={tone === 'error' ? 'm-0 p-6 text-danger' : 'm-0 p-6'}
       role={tone === 'error' ? 'alert' : 'status'}
     >
       {message}
