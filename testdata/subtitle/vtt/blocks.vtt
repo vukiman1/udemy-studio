@@ -1,0 +1,33 @@
+WEBVTT - with header text
+Kind: captions
+Language: en
+
+NOTE a comment
+that spans lines
+
+STYLE
+::cue { color: red }
+
+REGION
+id:fred width:40%
+
+00:00:01.000 --> 00:00:02.000
+first
+00:00:02.000 --> 00:00:03.000
+no blank line before me
+
+id with spaces
+00:00:03.000 --> 00:00:04.000
+   
+whitespace-only line above
+
+00:00:04.000 --> 00:00:05.000
+
+not a cue
+just text
+
+00:00:06.000 --> 00:00:07.000
+line one
+line two
+00:00:07.000 --> 00:00:08.000
+split by an arrow
