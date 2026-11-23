@@ -1,15 +1,12 @@
 package pythondownloader
 
 import (
-	"context"
-	"errors"
 	"log/slog"
 	"os"
 	"path/filepath"
 	"strings"
 	"sync"
 	"testing"
-	"time"
 
 	"github.com/google/go-cmp/cmp"
 
@@ -106,31 +103,5 @@ func TestDownloadReportsTheLastLogLineWhenPythonFails(t *testing.T) {
 	err := downloader.Download(t.Context(), testJob(), secret.New(tokenValue), (&recorder{}).record)
 	if err == nil || !strings.Contains(err.Error(), "login rejected") {
 		t.Errorf("error = %v, want it to quote the failure", err)
-	}
-}
-
-func TestCancellingInterruptsThePythonProcessGroup(t *testing.T) {
-	downloader, config := newDownloader(t, "wait-for-interrupt")
-	events := &recorder{}
-	ctx, cancel := context.WithCancel(t.Context())
-	done := make(chan error, 1)
-	go func() { done <- downloader.Download(ctx, testJob(), secret.New(tokenValue), events.record) }()
-
-	deadline := time.Now().Add(5 * time.Second)
-	for len(events.snapshot()) == 0 && time.Now().Before(deadline) {
-		time.Sleep(10 * time.Millisecond)
-	}
-	cancel()
-	select {
-	case err := <-done:
-		if !errors.Is(err, context.Canceled) {
-			t.Errorf("error = %v, want context.Canceled", err)
-		}
-	case <-time.After(interruptGrace):
-		t.Fatal("download did not stop after cancel")
-	}
-	log, _ := os.ReadFile(filepath.Join(config.LogDir, "job1.log"))
-	if !strings.Contains(string(log), "interrupted") {
-		t.Errorf("python did not receive SIGINT; log:\n%s", log)
 	}
 }

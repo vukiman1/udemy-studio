@@ -12,3 +12,7 @@ func startInOwnProcessGroup(*exec.Cmd) {}
 func interruptProcessGroup(process *os.Process) error {
 	return process.Signal(os.Interrupt)
 }
+
+func killProcessGroup(process *os.Process) {
+	_ = process.Kill()
+}

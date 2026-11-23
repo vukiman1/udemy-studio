@@ -88,6 +88,7 @@ func (downloader *Downloader) Download(ctx context.Context, job jobs.Job, token 
 		downloader.forwardEvents(eventsReader, onEvent)
 	}()
 	waitErr := command.Wait()
+	killProcessGroup(command.Process)
 	<-eventsDone
 
 	if ctx.Err() != nil {

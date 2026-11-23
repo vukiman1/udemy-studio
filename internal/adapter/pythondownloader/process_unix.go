@@ -16,3 +16,8 @@ func startInOwnProcessGroup(command *exec.Cmd) {
 func interruptProcessGroup(process *os.Process) error {
 	return syscall.Kill(-process.Pid, syscall.SIGINT)
 }
+
+// os/exec kills only the leader once the grace period ends, and a crashed leader leaves its children behind.
+func killProcessGroup(process *os.Process) {
+	_ = syscall.Kill(-process.Pid, syscall.SIGKILL)
+}

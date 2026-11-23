@@ -22,6 +22,8 @@ case "$FAKE_PYTHON_MODE" in
     exit 1
     ;;
   wait-for-interrupt)
+    sh -c 'trap "" INT; while :; do sleep 0.05; done' &
+    echo $! > "$FAKE_CHILD_PID_FILE"
     trap 'echo "interrupted"; exit 130' INT
     printf '%s\n' '{"event": "course_started", "course_title": "Backend", "total_lectures": 9}' >&4
     while :; do sleep 0.05; done
