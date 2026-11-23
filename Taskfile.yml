@@ -135,6 +135,15 @@ tasks:
         "{{.PYTHON_REPO}}/.venv/bin/python" tools/pynaminggolden/naming_golden.py
         testdata/udemy/python/course_content.json internal/naming/emoji_codes.json testdata/naming/naming_golden.json
 
+  fixtures:vtt:
+    desc: Record VTT fixtures, the SRT the Python downloader converts each to, and Python's HTML unescape tables
+    requires:
+      vars: [PYTHON_REPO]
+    env:
+      PYTHONPATH: "{{.PYTHON_REPO}}"
+    cmds:
+      - '"{{.PYTHON_REPO}}/.venv/bin/python" tools/pyvttgolden/vtt_golden.py testdata/subtitle/vtt internal/subtitle/html_entities.json'
+
   fixtures:subtitles:
     desc: Record pysrt digests of every SRT in a downloads/ tree
     requires:

@@ -12,8 +12,6 @@ import (
 	"time"
 )
 
-const byteOrderMark = "\ufeff"
-
 var ErrMalformedSRT = errors.New("malformed srt")
 
 var timingLine = regexp.MustCompile(`^(\d{2,}):(\d{2}):(\d{2})[,.](\d{3})\s*-->\s*(\d{2,}):(\d{2}):(\d{2})[,.](\d{3})`)
