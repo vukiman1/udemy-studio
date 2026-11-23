@@ -369,3 +369,29 @@ func TestShutdownLeavesWaitingJobsQueued(t *testing.T) {
 		t.Error("a waiting job was started after shutdown")
 	}
 }
+
+func idleManager(store Store) *Manager {
+	return NewManager(Deps{Downloader: &scriptedDownloader{}, Tokens: tokens{}, Store: store, Logger: slog.New(slog.DiscardHandler), Now: time.Now})
+}
+
+func TestSubscriberThatFallsBehindIsClosedSoItReloads(t *testing.T) {
+	manager := idleManager(&memoryStore{jobs: map[string]Job{}})
+	updates, unsubscribe := manager.Subscribe()
+	defer unsubscribe()
+	for range subscriberBuffer + 1 {
+		if _, err := manager.Submit(t.Context(), Request{CourseURL: validCourseURL}); err != nil {
+			t.Fatalf("Submit: %v", err)
+		}
+	}
+	for range subscriberBuffer {
+		<-updates
+	}
+	select {
+	case _, isOpen := <-updates:
+		if isOpen {
+			t.Error("subscriber got an update past its buffer instead of being closed")
+		}
+	case <-time.After(waitTimeout):
+		t.Fatal("subscriber that fell behind was neither closed nor updated")
+	}
+}

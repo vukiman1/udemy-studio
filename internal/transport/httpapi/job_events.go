@@ -48,8 +48,8 @@ func (stream jobEventStream) serve(writer http.ResponseWriter, request *http.Req
 		select {
 		case <-request.Context().Done():
 			return
-		case job := <-updates:
-			if writeJobEvent(writer, job) != nil {
+		case job, isOpen := <-updates:
+			if !isOpen || writeJobEvent(writer, job) != nil {
 				return
 			}
 		case <-keepAlive.C:

@@ -255,7 +255,7 @@ func (manager *Manager) persistAndPublish(ctx context.Context, job Job) error {
 	return nil
 }
 
-// A subscriber that cannot keep up misses intermediate updates; the next one carries the full job state.
+// A subscriber that falls behind is closed rather than skipped, so it reconnects and reloads every job instead of missing a final state.
 func (manager *Manager) publish(job Job) {
 	manager.mutex.Lock()
 	defer manager.mutex.Unlock()
@@ -263,6 +263,8 @@ func (manager *Manager) publish(job Job) {
 		select {
 		case subscriber <- job:
 		default:
+			delete(manager.subscribers, subscriber)
+			close(subscriber)
 		}
 	}
 }
