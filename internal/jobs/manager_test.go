@@ -52,11 +52,12 @@ func (source tokens) Token(context.Context, string) (secret.Secret, error) {
 }
 
 type scriptedDownloader struct {
-	events     []Event
-	err        error
-	blockUntil bool
-	gotToken   chan string
-	started    chan struct{}
+	events      []Event
+	err         error
+	blockUntil  bool
+	gotToken    chan string
+	started     chan struct{}
+	startedOnce sync.Once
 }
 
 func (downloader *scriptedDownloader) Download(ctx context.Context, _ Job, token secret.Secret, onEvent func(Event)) error {
@@ -67,7 +68,7 @@ func (downloader *scriptedDownloader) Download(ctx context.Context, _ Job, token
 		onEvent(event)
 	}
 	if downloader.started != nil {
-		close(downloader.started)
+		downloader.startedOnce.Do(func() { close(downloader.started) })
 	}
 	if downloader.blockUntil {
 		<-ctx.Done()
@@ -203,10 +204,10 @@ func TestCancellingAQueuedJobNeverStartsIt(t *testing.T) {
 	if err := h.manager.Cancel(t.Context(), second.ID); err != nil {
 		t.Fatalf("Cancel queued: %v", err)
 	}
-	waitForStatus(t, h.manager, second.ID, StatusCancelled)
+	third, _ := h.manager.Submit(t.Context(), Request{CourseURL: validCourseURL})
 	_ = h.manager.Cancel(t.Context(), first.ID)
-	cancelled := waitForStatus(t, h.manager, second.ID, StatusCancelled)
-	if cancelled.StartedAt != nil {
+	waitForStatus(t, h.manager, third.ID, StatusRunning)
+	if cancelled := waitForStatus(t, h.manager, second.ID, StatusCancelled); cancelled.StartedAt != nil {
 		t.Error("a cancelled queued job was started")
 	}
 }
