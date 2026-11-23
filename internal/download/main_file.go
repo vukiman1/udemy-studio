@@ -26,7 +26,7 @@ var (
 )
 
 func (run *courseDownload) mainFile(ctx context.Context, chapterDir string, lecture udemy.LecturePlan) error {
-	if isDownloaded(filepath.Join(chapterDir, lecture.PresenceFile)) {
+	if isDownloaded(filepath.Join(chapterDir, lecture.File)) {
 		run.summary.AlreadyPresent++
 		return nil
 	}

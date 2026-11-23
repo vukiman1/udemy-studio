@@ -80,7 +80,7 @@ func (tools *fakeTools) FetchPlaylist(context.Context, string) (string, error) {
 
 func samplePlan() udemy.Plan {
 	videoLecture := udemy.LecturePlan{
-		Number: 1, ID: 101, Title: "001 Welcome", Kind: udemy.KindVideo, File: "001 Welcome.mp4", PresenceFile: "001 Welcome.mp4",
+		Number: 1, ID: 101, Title: "001 Welcome", Kind: udemy.KindVideo, File: "001 Welcome.mp4",
 		Video:    &udemy.VideoChoice{Type: udemy.SourceMP4, URL: "https://cdn.example/welcome.mp4"},
 		Captions: []udemy.CaptionPlan{{Language: "en", URL: "https://cdn.example/en.vtt", File: "001 Welcome_en.vtt", SRTFile: "001 Welcome_en.srt"}},
 		Assets: []udemy.AssetPlan{
@@ -89,18 +89,18 @@ func samplePlan() udemy.Plan {
 		},
 	}
 	hlsLecture := udemy.LecturePlan{
-		Number: 2, ID: 102, Title: "002 Deep dive", Kind: udemy.KindVideo, File: "002 Deep dive.mp4", PresenceFile: "002 Deep dive.mp4",
+		Number: 2, ID: 102, Title: "002 Deep dive", Kind: udemy.KindVideo, File: "002 Deep dive.mp4",
 		Video: &udemy.VideoChoice{Type: udemy.SourceHLS, URL: hlsPlaylistURL, PlaylistFile: "index_77_1920x1080.m3u8"},
 	}
 	article := udemy.LecturePlan{
-		Number: 3, ID: 103, Title: "003 Notes 🚀", Kind: udemy.KindHTML, File: "003 Notes 🚀.html", PresenceFile: "003 Notes .html", HTMLBody: "<p>body</p>",
+		Number: 3, ID: 103, Title: "003 Notes 🚀", Kind: udemy.KindHTML, File: "003 Notes 🚀.html", HTMLBody: "<p>body</p>",
 		Assets: []udemy.AssetPlan{{Type: udemy.AssetArticle, File: "003 Notes 🚀.html"}},
 	}
-	drm := udemy.LecturePlan{Number: 4, Title: "004 Locked", Kind: udemy.KindDRM, File: "004 Locked.mp4", PresenceFile: "004 Locked.mp4"}
-	quiz := udemy.LecturePlan{Number: 5, Title: "005 Quiz", Kind: udemy.KindQuiz, File: "005 Quiz.html", PresenceFile: "005 Quiz.html"}
+	drm := udemy.LecturePlan{Number: 4, Title: "004 Locked", Kind: udemy.KindDRM, File: "004 Locked.mp4"}
+	quiz := udemy.LecturePlan{Number: 5, Title: "005 Quiz", Kind: udemy.KindQuiz, File: "005 Quiz.html"}
 	return udemy.Plan{CourseName: "backend-basics", CourseDir: "backend-basics", Chapters: []udemy.ChapterPlan{
 		{Index: 1, Dir: "01 - Intro", Lectures: []udemy.LecturePlan{videoLecture, hlsLecture, article, drm, quiz}},
-		{Index: 2, Dir: "02 - Skipped", Lectures: []udemy.LecturePlan{{Number: 1, Title: "001 Other", Kind: udemy.KindHTML, File: "001 Other.html", PresenceFile: "001 Other.html", HTMLBody: "x"}}},
+		{Index: 2, Dir: "02 - Skipped", Lectures: []udemy.LecturePlan{{Number: 1, Title: "001 Other", Kind: udemy.KindHTML, File: "001 Other.html", HTMLBody: "x"}}},
 	}}
 }
 
@@ -168,8 +168,8 @@ func TestCourseWritesThePythonLayoutAndSkipsItOnARerun(t *testing.T) {
 	if err != nil {
 		t.Fatalf("rerun: %v", err)
 	}
-	// The page is written again because its presence check drops the emoji; attachments are always fetched, as in Python.
-	wantRerun := Summary{Downloaded: 1, AlreadyPresent: 2, Failed: []string{"004 Locked"}}
+	// Attachments are always fetched again, as in Python; aria2c's -c keeps what is there.
+	wantRerun := Summary{AlreadyPresent: 3, Failed: []string{"004 Locked"}}
 	if diff := cmp.Diff(wantRerun, summary); diff != "" || !slices.Equal(rerun.fetched, []string{"001 slides.pdf"}) {
 		t.Errorf("rerun summary (-want +got):\n%s\nfetched = %v", diff, rerun.fetched)
 	}

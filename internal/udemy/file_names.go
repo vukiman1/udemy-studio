@@ -27,11 +27,7 @@ func courseDirName(course Course, idAsCourseName bool) string {
 }
 
 func videoFileName(lectureTitle string) string {
-	return downloadedFileName(lectureTitle, videoExtension)
-}
-
-func downloadedFileName(lectureTitle, extension string) string {
-	return naming.RemoveEmoji(naming.SanitizeFilename(lectureTitle + extension))
+	return naming.RemoveEmoji(naming.SanitizeFilename(lectureTitle + videoExtension))
 }
 
 func htmlFileName(lectureTitle string) string {
