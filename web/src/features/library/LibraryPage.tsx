@@ -1,15 +1,17 @@
 import type { ReactElement } from 'react'
 import { Link } from 'react-router'
+import { useCourseTools } from '../../api/library-tools-queries'
 import { useContinueTarget, useCourses } from '../../api/queries'
 import type { CourseSummary } from '../../api/types'
 import { PageStatus } from '../../app/PageStatus'
 import { StaleDataNotice } from '../../app/StaleDataNotice'
-import { SEARCH_PATH, lecturePath } from '../../app/paths'
+import { AI_SETTINGS_PATH, SEARCH_PATH, lecturePath } from '../../app/paths'
 import { CourseCard } from './CourseCard'
 import { PlayIcon } from '@videojs/react/icons'
 
 export function LibraryPage(): ReactElement {
   const courses = useCourses()
+  const tools = useCourseTools()
   const continueTarget = useContinueTarget()
 
   if (courses.data === undefined) {
@@ -34,6 +36,9 @@ export function LibraryPage(): ReactElement {
         <Link to="/downloads" className="text-accent underline">
           Tải khoá học
         </Link>
+        <Link to={AI_SETTINGS_PATH} className="text-accent underline">
+          Cài đặt AI
+        </Link>
         {target !== null && resumeCourse !== undefined && (
           <Link
             className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2.5 font-semibold text-on-accent"
@@ -51,7 +56,10 @@ export function LibraryPage(): ReactElement {
         <ul className="mt-6 grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-4">
           {courses.data.map((course: CourseSummary) => (
             <li key={course.id}>
-              <CourseCard course={course} />
+              <CourseCard
+                course={course}
+                tools={tools.data?.find((entry) => entry.courseId === course.id)}
+              />
             </li>
           ))}
         </ul>

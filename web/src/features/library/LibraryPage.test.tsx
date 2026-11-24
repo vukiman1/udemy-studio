@@ -83,6 +83,7 @@ describe('LibraryPage after a failed background refresh', () => {
     vi.spyOn(globalThis, 'fetch').mockImplementation((input) => {
       const path = new URL(input instanceof Request ? input.url : String(input)).pathname
       if (path === '/api/continue') return Promise.resolve(new Response(null, { status: 204 }))
+      if (path === '/api/library/tools') return Promise.resolve(Response.json([]))
       return Promise.resolve(
         failNext ? new Response(null, { status: 503 }) : Response.json([COURSE]),
       )
