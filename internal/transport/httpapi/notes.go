@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"mime"
-	"net/http"
 
 	"github.com/vukiman1/udemy-studio/internal/notes"
 	"github.com/vukiman1/udemy-studio/internal/transport/httpapi/gen"
@@ -37,7 +36,7 @@ func (server apiServer) AddLectureNote(ctx context.Context, request gen.AddLectu
 	}
 	note, err := server.deps.Notes.Add(ctx, lecture.Key, request.Body.AtSeconds, request.Body.Body)
 	if errors.Is(err, notes.ErrInvalidNote) {
-		return gen.AddLectureNote400ApplicationProblemPlusJSONResponse{BadRequestApplicationProblemPlusJSONResponse: invalidNote(err)}, nil
+		return gen.AddLectureNote400ApplicationProblemPlusJSONResponse{BadRequestApplicationProblemPlusJSONResponse: badRequest(err)}, nil
 	}
 	if err != nil {
 		return nil, err
@@ -49,7 +48,7 @@ func (server apiServer) EditNote(ctx context.Context, request gen.EditNoteReques
 	note, err := server.deps.Notes.Edit(ctx, request.NoteId, request.Body.Body)
 	switch {
 	case errors.Is(err, notes.ErrInvalidNote):
-		return gen.EditNote400ApplicationProblemPlusJSONResponse{BadRequestApplicationProblemPlusJSONResponse: invalidNote(err)}, nil
+		return gen.EditNote400ApplicationProblemPlusJSONResponse{BadRequestApplicationProblemPlusJSONResponse: badRequest(err)}, nil
 	case errors.Is(err, notes.ErrNotFound):
 		return gen.EditNote404ApplicationProblemPlusJSONResponse{NotFoundApplicationProblemPlusJSONResponse: noSuchNote(request.NoteId)}, nil
 	case err != nil:
@@ -99,10 +98,6 @@ func toNote(note notes.Note) gen.Note {
 		CreatedAt: note.CreatedAt,
 		UpdatedAt: note.UpdatedAt,
 	}
-}
-
-func invalidNote(err error) gen.BadRequestApplicationProblemPlusJSONResponse {
-	return gen.BadRequestApplicationProblemPlusJSONResponse(problem(http.StatusBadRequest, err.Error()))
 }
 
 func noSuchNote(id int64) gen.NotFoundApplicationProblemPlusJSONResponse {

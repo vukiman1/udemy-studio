@@ -32,10 +32,12 @@ type Service struct {
 	plans         map[string]Plan
 	queue         []string
 	cancelRunning context.CancelFunc
+	cache         mediaCache
+	resurvey      chan struct{}
 }
 
 func NewService(deps Deps) *Service {
-	return &Service{deps: deps, wake: make(chan struct{}, 1), runs: map[string]*Run{}, plans: map[string]Plan{}}
+	return &Service{deps: deps, wake: make(chan struct{}, 1), runs: map[string]*Run{}, plans: map[string]Plan{}, cache: mediaCache{entries: map[string]cachedMedia{}}, resurvey: make(chan struct{}, 1)}
 }
 
 func (service *Service) Plan(ctx context.Context, courseID string) (Plan, error) {
@@ -59,36 +61,90 @@ func (service *Service) Plan(ctx context.Context, courseID string) (Plan, error)
 }
 
 func (service *Service) addToPlan(ctx context.Context, plan *Plan, lecture library.Lecture) error {
-	media, err := service.deps.Prober.Probe(ctx, lecture.VideoPath)
+	media, probeErr := service.probe(ctx, lecture.VideoPath)
+	if ctx.Err() != nil {
+		return ctx.Err()
+	}
+	kind, err := service.classify(ctx, lecture.VideoPath, media, probeErr == nil)
 	if err != nil {
-		if ctx.Err() != nil {
-			return ctx.Err()
-		}
-		service.deps.Logger.Warn("not compressing unreadable video", "path", lecture.VideoPath, "err", err)
+		return err
+	}
+	switch kind {
+	case videoUnreadable:
+		service.deps.Logger.Warn("not compressing unreadable video", "path", lecture.VideoPath, "err", probeErr)
 		plan.Unreadable++
-		return nil
-	}
-	switch media.Codec {
-	case HEVCCodec:
+	case videoHEVC:
 		plan.AlreadyHEVC++
-		return nil
-	case H264Codec:
-	default:
+	case videoOtherCodec:
 		plan.OtherCodec++
-		return nil
+	case videoNotWorthIt:
+		plan.NotWorthIt++
+	case videoPending:
+		plan.Candidates = append(plan.Candidates, Candidate{LectureTitle: lecture.Title, Path: lecture.VideoPath, Media: media})
+		plan.TotalBytes += media.SizeBytes
+		plan.TotalLength += media.Duration
 	}
-	skip, found, err := service.deps.Skips.Find(ctx, lecture.VideoPath)
+	return nil
+}
+
+type videoKind int
+
+const (
+	videoPending videoKind = iota
+	videoHEVC
+	videoOtherCodec
+	videoNotWorthIt
+	videoUnreadable
+)
+
+// classify tells what compressing a video would do; only an H.264 video not already found not worth it is pending.
+func (service *Service) classify(ctx context.Context, path string, media Media, isReadable bool) (videoKind, error) {
+	switch {
+	case !isReadable:
+		return videoUnreadable, nil
+	case media.Codec == HEVCCodec:
+		return videoHEVC, nil
+	case media.Codec != H264Codec:
+		return videoOtherCodec, nil
+	}
+	skip, found, err := service.deps.Skips.Find(ctx, path)
 	if err != nil {
-		return fmt.Errorf("look up skipped %s: %w", lecture.VideoPath, err)
+		return videoPending, fmt.Errorf("look up skipped %s: %w", path, err)
 	}
 	if found && skip.SizeBytes == media.SizeBytes {
-		plan.NotWorthIt++
-		return nil
+		return videoNotWorthIt, nil
 	}
-	plan.Candidates = append(plan.Candidates, Candidate{LectureTitle: lecture.Title, Path: lecture.VideoPath, Media: media})
-	plan.TotalBytes += media.SizeBytes
-	plan.TotalLength += media.Duration
-	return nil
+	return videoPending, nil
+}
+
+// Summarize counts what is left to compress in a course without asking ffprobe; videos the survey has not read are Unchecked.
+func (service *Service) Summarize(ctx context.Context, course library.Course) (Summary, error) {
+	var summary Summary
+	for _, chapter := range course.Chapters {
+		for _, lecture := range chapter.Lectures {
+			if lecture.VideoPath == "" {
+				continue
+			}
+			summary.Videos++
+			info, err := service.deps.Files.Stat(lecture.VideoPath)
+			if err != nil {
+				continue
+			}
+			cached, ok := service.cache.lookup(lecture.VideoPath, info)
+			if !ok {
+				summary.Unchecked++
+				continue
+			}
+			kind, err := service.classify(ctx, lecture.VideoPath, cached.media, cached.probeErr == nil)
+			if err != nil {
+				return Summary{}, err
+			}
+			if kind == videoPending {
+				summary.Pending++
+			}
+		}
+	}
+	return summary, nil
 }
 
 // Start plans the course again, since files may have changed since it was shown, and queues it.

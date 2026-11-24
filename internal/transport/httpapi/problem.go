@@ -18,6 +18,10 @@ func problem(status int, detail string) gen.Problem {
 	return gen.Problem{Title: http.StatusText(status), Status: status, Detail: &detail}
 }
 
+func badRequest(err error) gen.BadRequestApplicationProblemPlusJSONResponse {
+	return gen.BadRequestApplicationProblemPlusJSONResponse(problem(http.StatusBadRequest, err.Error()))
+}
+
 func notFound(detail string) gen.NotFoundApplicationProblemPlusJSONResponse {
 	return gen.NotFoundApplicationProblemPlusJSONResponse(problem(http.StatusNotFound, detail))
 }

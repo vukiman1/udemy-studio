@@ -17,6 +17,27 @@ import (
 	"github.com/oapi-codegen/runtime"
 )
 
+// Defines values for AIProviderId.
+const (
+	Claude AIProviderId = "claude"
+	Gemini AIProviderId = "gemini"
+	Openai AIProviderId = "openai"
+)
+
+// Valid indicates whether the value is a known member of the AIProviderId enum.
+func (e AIProviderId) Valid() bool {
+	switch e {
+	case Claude:
+		return true
+	case Gemini:
+		return true
+	case Openai:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for CompressionRunState.
 const (
 	CompressionRunStateCancelled CompressionRunState = "cancelled"
@@ -107,6 +128,106 @@ func (e LectureKind) Valid() bool {
 	}
 }
 
+// Defines values for TranslationRunState.
+const (
+	TranslationRunStateCancelled TranslationRunState = "cancelled"
+	TranslationRunStateDone      TranslationRunState = "done"
+	TranslationRunStateFailed    TranslationRunState = "failed"
+	TranslationRunStateQueued    TranslationRunState = "queued"
+	TranslationRunStateRunning   TranslationRunState = "running"
+)
+
+// Valid indicates whether the value is a known member of the TranslationRunState enum.
+func (e TranslationRunState) Valid() bool {
+	switch e {
+	case TranslationRunStateCancelled:
+		return true
+	case TranslationRunStateDone:
+		return true
+	case TranslationRunStateFailed:
+		return true
+	case TranslationRunStateQueued:
+		return true
+	case TranslationRunStateRunning:
+		return true
+	default:
+		return false
+	}
+}
+
+// AICheck defines model for AICheck.
+type AICheck struct {
+	LatencyMs *int64  `json:"latencyMs,omitempty"`
+	Model     *string `json:"model,omitempty"`
+	Reply     *string `json:"reply,omitempty"`
+}
+
+// AICheckRequest defines model for AICheckRequest.
+type AICheckRequest struct {
+	ApiKey *string `json:"apiKey,omitempty"`
+
+	// Model The model to call; leave out to check the key only
+	Model    *string      `json:"model,omitempty"`
+	Provider AIProviderId `json:"provider"`
+}
+
+// AIEnabled defines model for AIEnabled.
+type AIEnabled struct {
+	Enabled bool `json:"enabled"`
+}
+
+// AIKeyProbe defines model for AIKeyProbe.
+type AIKeyProbe struct {
+	ApiKey   *string      `json:"apiKey,omitempty"`
+	Provider AIProviderId `json:"provider"`
+}
+
+// AIModel defines model for AIModel.
+type AIModel struct {
+	Id    string `json:"id"`
+	Label string `json:"label"`
+}
+
+// AIProvider defines model for AIProvider.
+type AIProvider struct {
+	Id     AIProviderId `json:"id"`
+	Label  string       `json:"label"`
+	Models []AIModel    `json:"models"`
+
+	// Recommended Model ids, first answering and the rest standing by
+	Recommended []string `json:"recommended"`
+}
+
+// AIProviderId defines model for AIProviderId.
+type AIProviderId string
+
+// AISavedProvider defines model for AISavedProvider.
+type AISavedProvider struct {
+	// KeyHint The key's first and last four characters, the rest masked
+	KeyHint  string       `json:"keyHint"`
+	Models   []string     `json:"models"`
+	Provider AIProviderId `json:"provider"`
+}
+
+// AISettings defines model for AISettings.
+type AISettings struct {
+	// Configured Whether a provider is chosen to be used
+	Configured bool          `json:"configured"`
+	Enabled    bool          `json:"enabled"`
+	Provider   *AIProviderId `json:"provider,omitempty"`
+
+	// Providers Every provider with a saved key, whether in use or not
+	Providers []AISavedProvider `json:"providers"`
+}
+
+// AISettingsDraft defines model for AISettingsDraft.
+type AISettingsDraft struct {
+	// ApiKey A new key; leave out to keep the saved key of the same provider
+	ApiKey   *string      `json:"apiKey,omitempty"`
+	Models   []string     `json:"models"`
+	Provider AIProviderId `json:"provider"`
+}
+
 // Attachment defines model for Attachment.
 type Attachment struct {
 	Id   string `json:"id"`
@@ -183,6 +304,17 @@ type CompressionRun struct {
 // CompressionRunState defines model for CompressionRun.State.
 type CompressionRunState string
 
+// CompressionTools defines model for CompressionTools.
+type CompressionTools struct {
+	// Pending H.264 videos still to compress, among those already read
+	Pending int             `json:"pending"`
+	Run     *CompressionRun `json:"run,omitempty"`
+
+	// Unchecked Videos not read yet, so pending may grow
+	Unchecked int `json:"unchecked"`
+	Videos    int `json:"videos"`
+}
+
 // ContinueTarget defines model for ContinueTarget.
 type ContinueTarget struct {
 	CourseId        string  `json:"courseId"`
@@ -207,6 +339,13 @@ type CourseSummary struct {
 	PlayableLectures  int             `json:"playableLectures"`
 	Resume            *ContinueTarget `json:"resume,omitempty"`
 	Title             string          `json:"title"`
+}
+
+// CourseTools defines model for CourseTools.
+type CourseTools struct {
+	Compression *CompressionTools `json:"compression,omitempty"`
+	CourseId    string            `json:"courseId"`
+	Translation TranslationTools  `json:"translation"`
 }
 
 // Cue defines model for Cue.
@@ -354,6 +493,55 @@ type SearchHit struct {
 	StartMs int64  `json:"startMs"`
 }
 
+// TranslationOutcome defines model for TranslationOutcome.
+type TranslationOutcome struct {
+	LectureTitle string `json:"lectureTitle"`
+	Path         string `json:"path"`
+	Reason       string `json:"reason"`
+}
+
+// TranslationPlan defines model for TranslationPlan.
+type TranslationPlan struct {
+	AlreadyTranslated int `json:"alreadyTranslated"`
+	Characters        int `json:"characters"`
+
+	// EstimatedUsd Rough cost, measured from earlier translations
+	EstimatedUsd float64 `json:"estimatedUsd"`
+
+	// IsPriced False when the first configured model's price is unknown, so there is no estimate
+	IsPriced bool `json:"isPriced"`
+
+	// Lectures Lectures with English subtitles and no Vietnamese ones
+	Lectures int `json:"lectures"`
+}
+
+// TranslationRun defines model for TranslationRun.
+type TranslationRun struct {
+	// CostUsd What the run has spent so far, from the provider's token counts
+	CostUsd        float64 `json:"costUsd"`
+	CurrentLecture *string `json:"currentLecture,omitempty"`
+
+	// Error Why the whole run stopped, such as a rejected API key
+	Error    *string              `json:"error,omitempty"`
+	Failed   []TranslationOutcome `json:"failed"`
+	Finished int                  `json:"finished"`
+	State    TranslationRunState  `json:"state"`
+	Total    int                  `json:"total"`
+}
+
+// TranslationRunState defines model for TranslationRun.State.
+type TranslationRunState string
+
+// TranslationTools defines model for TranslationTools.
+type TranslationTools struct {
+	// Lectures Lectures with English subtitles
+	Lectures int `json:"lectures"`
+
+	// Pending Those of them still without Vietnamese subtitles
+	Pending int             `json:"pending"`
+	Run     *TranslationRun `json:"run,omitempty"`
+}
+
 // CourseId defines model for CourseId.
 type CourseId = string
 
@@ -381,6 +569,9 @@ type DownloadsUnavailable = Problem
 // NotFound RFC 9457 problem details
 type NotFound = Problem
 
+// ProviderUnreachable RFC 9457 problem details
+type ProviderUnreachable = Problem
+
 // GetLectureCuesParams defines parameters for GetLectureCues.
 type GetLectureCuesParams struct {
 	// Langs Subtitle languages in display order; all available languages when omitted
@@ -397,6 +588,18 @@ type GetLectureSubtitlesVttParams struct {
 type SearchSubtitlesParams struct {
 	Q string `form:"q" json:"q"`
 }
+
+// CheckAIJSONRequestBody defines body for CheckAI for application/json ContentType.
+type CheckAIJSONRequestBody = AICheckRequest
+
+// ListAIModelsJSONRequestBody defines body for ListAIModels for application/json ContentType.
+type ListAIModelsJSONRequestBody = AIKeyProbe
+
+// SaveAISettingsJSONRequestBody defines body for SaveAISettings for application/json ContentType.
+type SaveAISettingsJSONRequestBody = AISettingsDraft
+
+// SetAIEnabledJSONRequestBody defines body for SetAIEnabled for application/json ContentType.
+type SetAIEnabledJSONRequestBody = AIEnabled
 
 // SelectChromeProfileJSONRequestBody defines body for SelectChromeProfile for application/json ContentType.
 type SelectChromeProfileJSONRequestBody = ProfileSelection
@@ -415,6 +618,27 @@ type EditNoteJSONRequestBody = NoteEdit
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
+	// CheckAI Check a key and, given a model, call it with a tiny prompt and time the answer; empty key uses the saved one
+	// (POST /api/ai/check)
+	CheckAI(w http.ResponseWriter, r *http.Request)
+	// ListAIModels Every model the provider offers for text with this key; an empty key uses the saved one
+	// (POST /api/ai/models)
+	ListAIModels(w http.ResponseWriter, r *http.Request)
+	// ListAIProviders The AI providers the app can use, with the models it knows and recommends for each
+	// (GET /api/ai/providers)
+	ListAIProviders(w http.ResponseWriter, r *http.Request)
+	// GetAISettings The saved AI configuration; the key itself is never sent back
+	// (GET /api/ai/settings)
+	GetAISettings(w http.ResponseWriter, r *http.Request)
+	// SaveAISettings Save and turn on an AI configuration; a new key is checked with the provider first
+	// (PUT /api/ai/settings)
+	SaveAISettings(w http.ResponseWriter, r *http.Request)
+	// SetAIEnabled Stop or resume using the saved AI configuration without forgetting it
+	// (PUT /api/ai/settings/enabled)
+	SetAIEnabled(w http.ResponseWriter, r *http.Request)
+	// ForgetAIProvider Forget one provider's key and models; forgetting the provider in use leaves none in use
+	// (DELETE /api/ai/settings/providers/{provider})
+	ForgetAIProvider(w http.ResponseWriter, r *http.Request, provider AIProviderId)
 	// GetContinue The lecture to open for "continue learning"
 	// (GET /api/continue)
 	GetContinue(w http.ResponseWriter, r *http.Request)
@@ -439,6 +663,18 @@ type ServerInterface interface {
 	// ExportCourseNotes Every note of a course as a Markdown file, in course order
 	// (GET /api/courses/{courseId}/notes.md)
 	ExportCourseNotes(w http.ResponseWriter, r *http.Request, courseId CourseId)
+	// CancelCourseTranslation Stop translating a course; lectures already translated keep their subtitles
+	// (DELETE /api/courses/{courseId}/translation)
+	CancelCourseTranslation(w http.ResponseWriter, r *http.Request, courseId CourseId)
+	// GetCourseTranslation The latest translation of a course since the server started
+	// (GET /api/courses/{courseId}/translation)
+	GetCourseTranslation(w http.ResponseWriter, r *http.Request, courseId CourseId)
+	// StartCourseTranslation Queue a course to have its English subtitles translated into Vietnamese in the background
+	// (POST /api/courses/{courseId}/translation)
+	StartCourseTranslation(w http.ResponseWriter, r *http.Request, courseId CourseId)
+	// PlanCourseTranslation Which lectures would get Vietnamese subtitles, and roughly what it costs with the configured AI
+	// (GET /api/courses/{courseId}/translation/plan)
+	PlanCourseTranslation(w http.ResponseWriter, r *http.Request, courseId CourseId)
 	// SelectChromeProfile Choose the Chrome profile whose Udemy login downloads use
 	// (PUT /api/downloads/profile)
 	SelectChromeProfile(w http.ResponseWriter, r *http.Request)
@@ -472,6 +708,9 @@ type ServerInterface interface {
 	// GetLectureSubtitlesVtt WebVTT with one line per language, for the native iOS fullscreen player
 	// (GET /api/lectures/{lectureId}/subtitles.vtt)
 	GetLectureSubtitlesVtt(w http.ResponseWriter, r *http.Request, lectureId LectureId, params GetLectureSubtitlesVttParams)
+	// ListCourseTools What is left to translate and compress in every course, with the runs in progress
+	// (GET /api/library/tools)
+	ListCourseTools(w http.ResponseWriter, r *http.Request)
 	// DeleteNote Delete a note
 	// (DELETE /api/notes/{noteId})
 	DeleteNote(w http.ResponseWriter, r *http.Request, noteId NoteId)
@@ -494,6 +733,116 @@ type ServerInterfaceWrapper struct {
 }
 
 type MiddlewareFunc func(http.Handler) http.Handler
+
+// CheckAI operation middleware
+func (siw *ServerInterfaceWrapper) CheckAI(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CheckAI(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ListAIModels operation middleware
+func (siw *ServerInterfaceWrapper) ListAIModels(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListAIModels(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ListAIProviders operation middleware
+func (siw *ServerInterfaceWrapper) ListAIProviders(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListAIProviders(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetAISettings operation middleware
+func (siw *ServerInterfaceWrapper) GetAISettings(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetAISettings(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// SaveAISettings operation middleware
+func (siw *ServerInterfaceWrapper) SaveAISettings(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.SaveAISettings(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// SetAIEnabled operation middleware
+func (siw *ServerInterfaceWrapper) SetAIEnabled(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.SetAIEnabled(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ForgetAIProvider operation middleware
+func (siw *ServerInterfaceWrapper) ForgetAIProvider(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "provider" -------------
+	var provider AIProviderId
+
+	err = runtime.BindStyledParameterWithOptions("simple", "provider", r.PathValue("provider"), &provider, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "provider", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ForgetAIProvider(w, r, provider)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
 
 // GetContinue operation middleware
 func (siw *ServerInterfaceWrapper) GetContinue(w http.ResponseWriter, r *http.Request) {
@@ -670,6 +1019,110 @@ func (siw *ServerInterfaceWrapper) ExportCourseNotes(w http.ResponseWriter, r *h
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.ExportCourseNotes(w, r, courseId)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// CancelCourseTranslation operation middleware
+func (siw *ServerInterfaceWrapper) CancelCourseTranslation(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "courseId" -------------
+	var courseId CourseId
+
+	err = runtime.BindStyledParameterWithOptions("simple", "courseId", r.PathValue("courseId"), &courseId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "courseId", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CancelCourseTranslation(w, r, courseId)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetCourseTranslation operation middleware
+func (siw *ServerInterfaceWrapper) GetCourseTranslation(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "courseId" -------------
+	var courseId CourseId
+
+	err = runtime.BindStyledParameterWithOptions("simple", "courseId", r.PathValue("courseId"), &courseId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "courseId", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetCourseTranslation(w, r, courseId)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// StartCourseTranslation operation middleware
+func (siw *ServerInterfaceWrapper) StartCourseTranslation(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "courseId" -------------
+	var courseId CourseId
+
+	err = runtime.BindStyledParameterWithOptions("simple", "courseId", r.PathValue("courseId"), &courseId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "courseId", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.StartCourseTranslation(w, r, courseId)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// PlanCourseTranslation operation middleware
+func (siw *ServerInterfaceWrapper) PlanCourseTranslation(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "courseId" -------------
+	var courseId CourseId
+
+	err = runtime.BindStyledParameterWithOptions("simple", "courseId", r.PathValue("courseId"), &courseId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "courseId", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PlanCourseTranslation(w, r, courseId)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -937,6 +1390,20 @@ func (siw *ServerInterfaceWrapper) GetLectureSubtitlesVtt(w http.ResponseWriter,
 	handler.ServeHTTP(w, r)
 }
 
+// ListCourseTools operation middleware
+func (siw *ServerInterfaceWrapper) ListCourseTools(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListCourseTools(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
 // DeleteNote operation middleware
 func (siw *ServerInterfaceWrapper) DeleteNote(w http.ResponseWriter, r *http.Request) {
 
@@ -1169,10 +1636,22 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 	m.HandleFunc(http.MethodDelete+" "+options.BaseURL+"/api/notes/{noteId}", wrapper.DeleteNote)
 	m.HandleFunc(http.MethodPatch+" "+options.BaseURL+"/api/notes/{noteId}", wrapper.EditNote)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/courses/{courseId}/notes.md", wrapper.ExportCourseNotes)
+	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/library/tools", wrapper.ListCourseTools)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/courses/{courseId}/compression/plan", wrapper.PlanCourseCompression)
 	m.HandleFunc(http.MethodDelete+" "+options.BaseURL+"/api/courses/{courseId}/compression", wrapper.CancelCourseCompression)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/courses/{courseId}/compression", wrapper.GetCourseCompression)
 	m.HandleFunc(http.MethodPost+" "+options.BaseURL+"/api/courses/{courseId}/compression", wrapper.StartCourseCompression)
+	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/ai/providers", wrapper.ListAIProviders)
+	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/ai/settings", wrapper.GetAISettings)
+	m.HandleFunc(http.MethodPut+" "+options.BaseURL+"/api/ai/settings", wrapper.SaveAISettings)
+	m.HandleFunc(http.MethodDelete+" "+options.BaseURL+"/api/ai/settings/providers/{provider}", wrapper.ForgetAIProvider)
+	m.HandleFunc(http.MethodPut+" "+options.BaseURL+"/api/ai/settings/enabled", wrapper.SetAIEnabled)
+	m.HandleFunc(http.MethodPost+" "+options.BaseURL+"/api/ai/check", wrapper.CheckAI)
+	m.HandleFunc(http.MethodPost+" "+options.BaseURL+"/api/ai/models", wrapper.ListAIModels)
+	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/courses/{courseId}/translation/plan", wrapper.PlanCourseTranslation)
+	m.HandleFunc(http.MethodDelete+" "+options.BaseURL+"/api/courses/{courseId}/translation", wrapper.CancelCourseTranslation)
+	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/courses/{courseId}/translation", wrapper.GetCourseTranslation)
+	m.HandleFunc(http.MethodPost+" "+options.BaseURL+"/api/courses/{courseId}/translation", wrapper.StartCourseTranslation)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/downloads/profiles", wrapper.ListChromeProfiles)
 	m.HandleFunc(http.MethodPut+" "+options.BaseURL+"/api/downloads/profile", wrapper.SelectChromeProfile)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/downloads/status", wrapper.GetLoginStatus)
@@ -1192,6 +1671,266 @@ type ConflictApplicationProblemPlusJSONResponse Problem
 type DownloadsUnavailableApplicationProblemPlusJSONResponse Problem
 
 type NotFoundApplicationProblemPlusJSONResponse Problem
+
+type ProviderUnreachableApplicationProblemPlusJSONResponse Problem
+
+type CheckAIRequestObject struct {
+	Body *CheckAIJSONRequestBody
+}
+
+type CheckAIResponseObject interface {
+	VisitCheckAIResponse(w http.ResponseWriter) error
+}
+
+type CheckAI200JSONResponse AICheck
+
+func (response CheckAI200JSONResponse) VisitCheckAIResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CheckAI400ApplicationProblemPlusJSONResponse struct {
+	BadRequestApplicationProblemPlusJSONResponse
+}
+
+func (response CheckAI400ApplicationProblemPlusJSONResponse) VisitCheckAIResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.BadRequestApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CheckAI502ApplicationProblemPlusJSONResponse struct {
+	ProviderUnreachableApplicationProblemPlusJSONResponse
+}
+
+func (response CheckAI502ApplicationProblemPlusJSONResponse) VisitCheckAIResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.ProviderUnreachableApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(502)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListAIModelsRequestObject struct {
+	Body *ListAIModelsJSONRequestBody
+}
+
+type ListAIModelsResponseObject interface {
+	VisitListAIModelsResponse(w http.ResponseWriter) error
+}
+
+type ListAIModels200JSONResponse []AIModel
+
+func (response ListAIModels200JSONResponse) VisitListAIModelsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListAIModels400ApplicationProblemPlusJSONResponse struct {
+	BadRequestApplicationProblemPlusJSONResponse
+}
+
+func (response ListAIModels400ApplicationProblemPlusJSONResponse) VisitListAIModelsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.BadRequestApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListAIModels502ApplicationProblemPlusJSONResponse struct {
+	ProviderUnreachableApplicationProblemPlusJSONResponse
+}
+
+func (response ListAIModels502ApplicationProblemPlusJSONResponse) VisitListAIModelsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.ProviderUnreachableApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(502)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListAIProvidersRequestObject struct {
+}
+
+type ListAIProvidersResponseObject interface {
+	VisitListAIProvidersResponse(w http.ResponseWriter) error
+}
+
+type ListAIProviders200JSONResponse []AIProvider
+
+func (response ListAIProviders200JSONResponse) VisitListAIProvidersResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetAISettingsRequestObject struct {
+}
+
+type GetAISettingsResponseObject interface {
+	VisitGetAISettingsResponse(w http.ResponseWriter) error
+}
+
+type GetAISettings200JSONResponse AISettings
+
+func (response GetAISettings200JSONResponse) VisitGetAISettingsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SaveAISettingsRequestObject struct {
+	Body *SaveAISettingsJSONRequestBody
+}
+
+type SaveAISettingsResponseObject interface {
+	VisitSaveAISettingsResponse(w http.ResponseWriter) error
+}
+
+type SaveAISettings200JSONResponse AISettings
+
+func (response SaveAISettings200JSONResponse) VisitSaveAISettingsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SaveAISettings400ApplicationProblemPlusJSONResponse struct {
+	BadRequestApplicationProblemPlusJSONResponse
+}
+
+func (response SaveAISettings400ApplicationProblemPlusJSONResponse) VisitSaveAISettingsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.BadRequestApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SaveAISettings502ApplicationProblemPlusJSONResponse struct {
+	ProviderUnreachableApplicationProblemPlusJSONResponse
+}
+
+func (response SaveAISettings502ApplicationProblemPlusJSONResponse) VisitSaveAISettingsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.ProviderUnreachableApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(502)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SetAIEnabledRequestObject struct {
+	Body *SetAIEnabledJSONRequestBody
+}
+
+type SetAIEnabledResponseObject interface {
+	VisitSetAIEnabledResponse(w http.ResponseWriter) error
+}
+
+type SetAIEnabled200JSONResponse AISettings
+
+func (response SetAIEnabled200JSONResponse) VisitSetAIEnabledResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SetAIEnabled409ApplicationProblemPlusJSONResponse struct {
+	ConflictApplicationProblemPlusJSONResponse
+}
+
+func (response SetAIEnabled409ApplicationProblemPlusJSONResponse) VisitSetAIEnabledResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.ConflictApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(409)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ForgetAIProviderRequestObject struct {
+	Provider AIProviderId `json:"provider"`
+}
+
+type ForgetAIProviderResponseObject interface {
+	VisitForgetAIProviderResponse(w http.ResponseWriter) error
+}
+
+type ForgetAIProvider204Response struct {
+}
+
+func (response ForgetAIProvider204Response) VisitForgetAIProviderResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
 
 type GetContinueRequestObject struct {
 }
@@ -1544,6 +2283,192 @@ type ExportCourseNotes404ApplicationProblemPlusJSONResponse struct {
 }
 
 func (response ExportCourseNotes404ApplicationProblemPlusJSONResponse) VisitExportCourseNotesResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.NotFoundApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CancelCourseTranslationRequestObject struct {
+	CourseId CourseId `json:"courseId"`
+}
+
+type CancelCourseTranslationResponseObject interface {
+	VisitCancelCourseTranslationResponse(w http.ResponseWriter) error
+}
+
+type CancelCourseTranslation204Response struct {
+}
+
+func (response CancelCourseTranslation204Response) VisitCancelCourseTranslationResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type CancelCourseTranslation409ApplicationProblemPlusJSONResponse struct {
+	ConflictApplicationProblemPlusJSONResponse
+}
+
+func (response CancelCourseTranslation409ApplicationProblemPlusJSONResponse) VisitCancelCourseTranslationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.ConflictApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(409)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetCourseTranslationRequestObject struct {
+	CourseId CourseId `json:"courseId"`
+}
+
+type GetCourseTranslationResponseObject interface {
+	VisitGetCourseTranslationResponse(w http.ResponseWriter) error
+}
+
+type GetCourseTranslation200JSONResponse TranslationRun
+
+func (response GetCourseTranslation200JSONResponse) VisitGetCourseTranslationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetCourseTranslation204Response struct {
+}
+
+func (response GetCourseTranslation204Response) VisitGetCourseTranslationResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type StartCourseTranslationRequestObject struct {
+	CourseId CourseId `json:"courseId"`
+}
+
+type StartCourseTranslationResponseObject interface {
+	VisitStartCourseTranslationResponse(w http.ResponseWriter) error
+}
+
+type StartCourseTranslation202JSONResponse TranslationRun
+
+func (response StartCourseTranslation202JSONResponse) VisitStartCourseTranslationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(202)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type StartCourseTranslation400ApplicationProblemPlusJSONResponse struct {
+	BadRequestApplicationProblemPlusJSONResponse
+}
+
+func (response StartCourseTranslation400ApplicationProblemPlusJSONResponse) VisitStartCourseTranslationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.BadRequestApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type StartCourseTranslation404ApplicationProblemPlusJSONResponse struct {
+	NotFoundApplicationProblemPlusJSONResponse
+}
+
+func (response StartCourseTranslation404ApplicationProblemPlusJSONResponse) VisitStartCourseTranslationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.NotFoundApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type StartCourseTranslation409ApplicationProblemPlusJSONResponse struct {
+	ConflictApplicationProblemPlusJSONResponse
+}
+
+func (response StartCourseTranslation409ApplicationProblemPlusJSONResponse) VisitStartCourseTranslationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.ConflictApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(409)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PlanCourseTranslationRequestObject struct {
+	CourseId CourseId `json:"courseId"`
+}
+
+type PlanCourseTranslationResponseObject interface {
+	VisitPlanCourseTranslationResponse(w http.ResponseWriter) error
+}
+
+type PlanCourseTranslation200JSONResponse TranslationPlan
+
+func (response PlanCourseTranslation200JSONResponse) VisitPlanCourseTranslationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PlanCourseTranslation400ApplicationProblemPlusJSONResponse struct {
+	BadRequestApplicationProblemPlusJSONResponse
+}
+
+func (response PlanCourseTranslation400ApplicationProblemPlusJSONResponse) VisitPlanCourseTranslationResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.BadRequestApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PlanCourseTranslation404ApplicationProblemPlusJSONResponse struct {
+	NotFoundApplicationProblemPlusJSONResponse
+}
+
+func (response PlanCourseTranslation404ApplicationProblemPlusJSONResponse) VisitPlanCourseTranslationResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
 	if err := runtime.JSONMarshalWrite(&buf, response.NotFoundApplicationProblemPlusJSONResponse); err != nil {
@@ -2064,6 +2989,27 @@ func (response GetLectureSubtitlesVtt404ApplicationProblemPlusJSONResponse) Visi
 	return err
 }
 
+type ListCourseToolsRequestObject struct {
+}
+
+type ListCourseToolsResponseObject interface {
+	VisitListCourseToolsResponse(w http.ResponseWriter) error
+}
+
+type ListCourseTools200JSONResponse []CourseTools
+
+func (response ListCourseTools200JSONResponse) VisitListCourseToolsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 type DeleteNoteRequestObject struct {
 	NoteId NoteId `json:"noteId"`
 }
@@ -2196,6 +3142,27 @@ func (response GetHealth200JSONResponse) VisitGetHealthResponse(w http.ResponseW
 
 // StrictServerInterface represents all server handlers.
 type StrictServerInterface interface {
+	// CheckAI Check a key and, given a model, call it with a tiny prompt and time the answer; empty key uses the saved one
+	// (POST /api/ai/check)
+	CheckAI(ctx context.Context, request CheckAIRequestObject) (CheckAIResponseObject, error)
+	// ListAIModels Every model the provider offers for text with this key; an empty key uses the saved one
+	// (POST /api/ai/models)
+	ListAIModels(ctx context.Context, request ListAIModelsRequestObject) (ListAIModelsResponseObject, error)
+	// ListAIProviders The AI providers the app can use, with the models it knows and recommends for each
+	// (GET /api/ai/providers)
+	ListAIProviders(ctx context.Context, request ListAIProvidersRequestObject) (ListAIProvidersResponseObject, error)
+	// GetAISettings The saved AI configuration; the key itself is never sent back
+	// (GET /api/ai/settings)
+	GetAISettings(ctx context.Context, request GetAISettingsRequestObject) (GetAISettingsResponseObject, error)
+	// SaveAISettings Save and turn on an AI configuration; a new key is checked with the provider first
+	// (PUT /api/ai/settings)
+	SaveAISettings(ctx context.Context, request SaveAISettingsRequestObject) (SaveAISettingsResponseObject, error)
+	// SetAIEnabled Stop or resume using the saved AI configuration without forgetting it
+	// (PUT /api/ai/settings/enabled)
+	SetAIEnabled(ctx context.Context, request SetAIEnabledRequestObject) (SetAIEnabledResponseObject, error)
+	// ForgetAIProvider Forget one provider's key and models; forgetting the provider in use leaves none in use
+	// (DELETE /api/ai/settings/providers/{provider})
+	ForgetAIProvider(ctx context.Context, request ForgetAIProviderRequestObject) (ForgetAIProviderResponseObject, error)
 	// GetContinue The lecture to open for "continue learning"
 	// (GET /api/continue)
 	GetContinue(ctx context.Context, request GetContinueRequestObject) (GetContinueResponseObject, error)
@@ -2220,6 +3187,18 @@ type StrictServerInterface interface {
 	// ExportCourseNotes Every note of a course as a Markdown file, in course order
 	// (GET /api/courses/{courseId}/notes.md)
 	ExportCourseNotes(ctx context.Context, request ExportCourseNotesRequestObject) (ExportCourseNotesResponseObject, error)
+	// CancelCourseTranslation Stop translating a course; lectures already translated keep their subtitles
+	// (DELETE /api/courses/{courseId}/translation)
+	CancelCourseTranslation(ctx context.Context, request CancelCourseTranslationRequestObject) (CancelCourseTranslationResponseObject, error)
+	// GetCourseTranslation The latest translation of a course since the server started
+	// (GET /api/courses/{courseId}/translation)
+	GetCourseTranslation(ctx context.Context, request GetCourseTranslationRequestObject) (GetCourseTranslationResponseObject, error)
+	// StartCourseTranslation Queue a course to have its English subtitles translated into Vietnamese in the background
+	// (POST /api/courses/{courseId}/translation)
+	StartCourseTranslation(ctx context.Context, request StartCourseTranslationRequestObject) (StartCourseTranslationResponseObject, error)
+	// PlanCourseTranslation Which lectures would get Vietnamese subtitles, and roughly what it costs with the configured AI
+	// (GET /api/courses/{courseId}/translation/plan)
+	PlanCourseTranslation(ctx context.Context, request PlanCourseTranslationRequestObject) (PlanCourseTranslationResponseObject, error)
 	// SelectChromeProfile Choose the Chrome profile whose Udemy login downloads use
 	// (PUT /api/downloads/profile)
 	SelectChromeProfile(ctx context.Context, request SelectChromeProfileRequestObject) (SelectChromeProfileResponseObject, error)
@@ -2253,6 +3232,9 @@ type StrictServerInterface interface {
 	// GetLectureSubtitlesVtt WebVTT with one line per language, for the native iOS fullscreen player
 	// (GET /api/lectures/{lectureId}/subtitles.vtt)
 	GetLectureSubtitlesVtt(ctx context.Context, request GetLectureSubtitlesVttRequestObject) (GetLectureSubtitlesVttResponseObject, error)
+	// ListCourseTools What is left to translate and compress in every course, with the runs in progress
+	// (GET /api/library/tools)
+	ListCourseTools(ctx context.Context, request ListCourseToolsRequestObject) (ListCourseToolsResponseObject, error)
 	// DeleteNote Delete a note
 	// (DELETE /api/notes/{noteId})
 	DeleteNote(ctx context.Context, request DeleteNoteRequestObject) (DeleteNoteResponseObject, error)
@@ -2307,6 +3289,204 @@ type strictHandler struct {
 	ssi         StrictServerInterface
 	middlewares []StrictMiddlewareFunc
 	options     StrictHTTPServerOptions
+}
+
+// CheckAI operation middleware
+func (sh *strictHandler) CheckAI(w http.ResponseWriter, r *http.Request) {
+	var request CheckAIRequestObject
+
+	var body CheckAIJSONRequestBody
+	if err := runtime.BindJSONBody(r, &body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error) {
+		return sh.ssi.CheckAI(ctx, request.(CheckAIRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CheckAI")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(CheckAIResponseObject); ok {
+		if err := validResponse.VisitCheckAIResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ListAIModels operation middleware
+func (sh *strictHandler) ListAIModels(w http.ResponseWriter, r *http.Request) {
+	var request ListAIModelsRequestObject
+
+	var body ListAIModelsJSONRequestBody
+	if err := runtime.BindJSONBody(r, &body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error) {
+		return sh.ssi.ListAIModels(ctx, request.(ListAIModelsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListAIModels")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListAIModelsResponseObject); ok {
+		if err := validResponse.VisitListAIModelsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ListAIProviders operation middleware
+func (sh *strictHandler) ListAIProviders(w http.ResponseWriter, r *http.Request) {
+	var request ListAIProvidersRequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error) {
+		return sh.ssi.ListAIProviders(ctx, request.(ListAIProvidersRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListAIProviders")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListAIProvidersResponseObject); ok {
+		if err := validResponse.VisitListAIProvidersResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetAISettings operation middleware
+func (sh *strictHandler) GetAISettings(w http.ResponseWriter, r *http.Request) {
+	var request GetAISettingsRequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error) {
+		return sh.ssi.GetAISettings(ctx, request.(GetAISettingsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetAISettings")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetAISettingsResponseObject); ok {
+		if err := validResponse.VisitGetAISettingsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// SaveAISettings operation middleware
+func (sh *strictHandler) SaveAISettings(w http.ResponseWriter, r *http.Request) {
+	var request SaveAISettingsRequestObject
+
+	var body SaveAISettingsJSONRequestBody
+	if err := runtime.BindJSONBody(r, &body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error) {
+		return sh.ssi.SaveAISettings(ctx, request.(SaveAISettingsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "SaveAISettings")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(SaveAISettingsResponseObject); ok {
+		if err := validResponse.VisitSaveAISettingsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// SetAIEnabled operation middleware
+func (sh *strictHandler) SetAIEnabled(w http.ResponseWriter, r *http.Request) {
+	var request SetAIEnabledRequestObject
+
+	var body SetAIEnabledJSONRequestBody
+	if err := runtime.BindJSONBody(r, &body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error) {
+		return sh.ssi.SetAIEnabled(ctx, request.(SetAIEnabledRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "SetAIEnabled")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(SetAIEnabledResponseObject); ok {
+		if err := validResponse.VisitSetAIEnabledResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ForgetAIProvider operation middleware
+func (sh *strictHandler) ForgetAIProvider(w http.ResponseWriter, r *http.Request, provider AIProviderId) {
+	var request ForgetAIProviderRequestObject
+
+	request.Provider = provider
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error) {
+		return sh.ssi.ForgetAIProvider(ctx, request.(ForgetAIProviderRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ForgetAIProvider")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ForgetAIProviderResponseObject); ok {
+		if err := validResponse.VisitForgetAIProviderResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
 }
 
 // GetContinue operation middleware
@@ -2506,6 +3686,110 @@ func (sh *strictHandler) ExportCourseNotes(w http.ResponseWriter, r *http.Reques
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(ExportCourseNotesResponseObject); ok {
 		if err := validResponse.VisitExportCourseNotesResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// CancelCourseTranslation operation middleware
+func (sh *strictHandler) CancelCourseTranslation(w http.ResponseWriter, r *http.Request, courseId CourseId) {
+	var request CancelCourseTranslationRequestObject
+
+	request.CourseId = courseId
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error) {
+		return sh.ssi.CancelCourseTranslation(ctx, request.(CancelCourseTranslationRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CancelCourseTranslation")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(CancelCourseTranslationResponseObject); ok {
+		if err := validResponse.VisitCancelCourseTranslationResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetCourseTranslation operation middleware
+func (sh *strictHandler) GetCourseTranslation(w http.ResponseWriter, r *http.Request, courseId CourseId) {
+	var request GetCourseTranslationRequestObject
+
+	request.CourseId = courseId
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error) {
+		return sh.ssi.GetCourseTranslation(ctx, request.(GetCourseTranslationRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetCourseTranslation")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetCourseTranslationResponseObject); ok {
+		if err := validResponse.VisitGetCourseTranslationResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// StartCourseTranslation operation middleware
+func (sh *strictHandler) StartCourseTranslation(w http.ResponseWriter, r *http.Request, courseId CourseId) {
+	var request StartCourseTranslationRequestObject
+
+	request.CourseId = courseId
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error) {
+		return sh.ssi.StartCourseTranslation(ctx, request.(StartCourseTranslationRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "StartCourseTranslation")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(StartCourseTranslationResponseObject); ok {
+		if err := validResponse.VisitStartCourseTranslationResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// PlanCourseTranslation operation middleware
+func (sh *strictHandler) PlanCourseTranslation(w http.ResponseWriter, r *http.Request, courseId CourseId) {
+	var request PlanCourseTranslationRequestObject
+
+	request.CourseId = courseId
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error) {
+		return sh.ssi.PlanCourseTranslation(ctx, request.(PlanCourseTranslationRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PlanCourseTranslation")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(PlanCourseTranslationResponseObject); ok {
+		if err := validResponse.VisitPlanCourseTranslationResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {
@@ -2812,6 +4096,30 @@ func (sh *strictHandler) GetLectureSubtitlesVtt(w http.ResponseWriter, r *http.R
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(GetLectureSubtitlesVttResponseObject); ok {
 		if err := validResponse.VisitGetLectureSubtitlesVttResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ListCourseTools operation middleware
+func (sh *strictHandler) ListCourseTools(w http.ResponseWriter, r *http.Request) {
+	var request ListCourseToolsRequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error) {
+		return sh.ssi.ListCourseTools(ctx, request.(ListCourseToolsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListCourseTools")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListCourseToolsResponseObject); ok {
+		if err := validResponse.VisitListCourseToolsResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {
