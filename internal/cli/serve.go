@@ -1,19 +1,25 @@
 package cli
 
 import (
+	"errors"
 	"fmt"
 	"log/slog"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/spf13/cobra"
 
 	"github.com/vukiman1/udemy-studio/internal/app"
 )
 
+// ErrInvalidPublicHost is a --public-host given as a URL or with a port instead of a bare hostname.
+var ErrInvalidPublicHost = errors.New("--public-host takes a hostname such as studio.example.com, without scheme, port or path")
+
 const (
 	defaultListenAddress = "127.0.0.1:8765"
 	libraryDirEnv        = "UDEMY_STUDIO_LIBRARY"
+	publicHostEnv        = "UDEMY_STUDIO_PUBLIC_HOST"
 )
 
 func newServeCommand(version string) *cobra.Command {
@@ -33,6 +39,9 @@ func newServeCommand(version string) *cobra.Command {
 			if err := resolvePaths(&options); err != nil {
 				return err
 			}
+			if options.PublicHosts, err = publicHosts(options.PublicHosts); err != nil {
+				return err
+			}
 			logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
 			return app.Run(command.Context(), options, logger)
 		},
@@ -43,6 +52,8 @@ func newServeCommand(version string) *cobra.Command {
 		"downloads/ directory the player reads and downloads go to by default (env "+libraryDirEnv+")")
 	flags.StringVar(&options.DataDir, "data-dir", "", dataDirUsage)
 	flags.BoolVar(&options.LANMode, "lan", false, "listen on the local network; other devices need the printed access code")
+	flags.StringSliceVar(&options.PublicHosts, "public-host", splitList(os.Getenv(publicHostEnv)),
+		"hostname a tunnel or proxy serves the app under, such as studio.example.com; put a login such as Cloudflare Access in front (env "+publicHostEnv+")")
 	addToolFlags(command, &options.Downloads.Tools)
 	flags.StringVar(&options.Downloads.OutputDir, "download-dir", "", "where downloads are written (default: --library)")
 	flags.StringVar(&options.Downloads.ChromeDataDir, "chrome-data-dir", "", chromeDataDirUsage)
@@ -70,4 +81,27 @@ func resolvePaths(options *app.Options) error {
 		*path = absolute
 	}
 	return nil
+}
+
+// publicHosts keeps bare hostnames only, lowercased as the host guard compares them.
+func publicHosts(values []string) ([]string, error) {
+	hosts := make([]string, 0, len(values))
+	for _, value := range values {
+		host := strings.ToLower(strings.TrimSpace(value))
+		if host == "" {
+			continue
+		}
+		if strings.ContainsAny(host, "/:@ ") {
+			return nil, fmt.Errorf("%w: %q", ErrInvalidPublicHost, value)
+		}
+		hosts = append(hosts, host)
+	}
+	return hosts, nil
+}
+
+func splitList(value string) []string {
+	if value == "" {
+		return nil
+	}
+	return strings.Split(value, ",")
 }

@@ -15,4 +15,19 @@ services:
           create_host_path: false
       # Database and the key sealing saved tokens and API keys: back this folder up, never commit it.
       - ${DATA_DIR:-./data}:/data
+    environment:
+      # The tunnel's hostname, such as studio.example.com; the app refuses hostnames it was not told about.
+      UDEMY_STUDIO_PUBLIC_HOST: ${PUBLIC_HOST:-}
     restart: unless-stopped
+
+  # Runs only with COMPOSE_PROFILES=tunnel. Point the tunnel's public hostname at http://udemy-studio:8765 and put a
+  # Cloudflare Access policy in front: the app has no login of its own.
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN:-}
+    depends_on:
+      - udemy-studio
+    restart: unless-stopped
+    profiles: [tunnel]

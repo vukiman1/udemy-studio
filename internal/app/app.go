@@ -35,8 +35,10 @@ type Options struct {
 	LibraryDir    string
 	DataDir       string
 	LANMode       bool
-	Downloads     DownloadOptions
-	Compression   CompressionOptions
+	// PublicHosts are hostnames a tunnel or proxy serves the app under, trusted besides localhost and IPs.
+	PublicHosts []string
+	Downloads   DownloadOptions
+	Compression CompressionOptions
 }
 
 func Run(ctx context.Context, options Options, logger *slog.Logger) error {
@@ -107,6 +109,7 @@ func Run(ctx context.Context, options Options, logger *slog.Logger) error {
 		Login:       downloads.login,
 		Jobs:        downloads.jobs,
 		Logger:      logger,
+		PublicHosts: options.PublicHosts,
 	})
 	address, accessCode := options.ListenAddress, ""
 	if options.LANMode {
