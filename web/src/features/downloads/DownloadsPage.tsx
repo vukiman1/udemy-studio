@@ -4,6 +4,7 @@ import { Link } from 'react-router'
 import { DOWNLOADS_UNAVAILABLE_STATUS, useJobs } from '../../api/download-queries'
 import { ApiRequestError } from '../../api/queries'
 import { PageStatus } from '../../app/PageStatus'
+import { CompressionSection } from '../compression/CompressionSection'
 import { JobCard } from './JobCard'
 import { NewJobForm } from './NewJobForm'
 import { ProfilePicker } from './ProfilePicker'
@@ -42,6 +43,7 @@ export function DownloadsPage(): ReactElement {
           </section>
         </>
       )}
+      <CompressionSection />
     </main>
   )
 }

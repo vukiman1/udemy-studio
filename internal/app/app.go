@@ -36,6 +36,7 @@ type Options struct {
 	DataDir       string
 	LANMode       bool
 	Downloads     DownloadOptions
+	Compression   CompressionOptions
 }
 
 func Run(ctx context.Context, options Options, logger *slog.Logger) error {
@@ -84,17 +85,19 @@ func Run(ctx context.Context, options Options, logger *slog.Logger) error {
 	if err != nil {
 		return err
 	}
+	compression := newCompression(options.Compression, options.LibraryDir, media, database, catalog, logger)
 	handler := httpapi.NewHandler(httpapi.Deps{
-		Version:  options.Version,
-		Frontend: frontend,
-		Catalog:  catalog,
-		Media:    media.FS(),
-		Progress: progressService,
-		Search:   refresher.search,
-		Notes:    notesService,
-		Login:    downloads.login,
-		Jobs:     downloads.jobs,
-		Logger:   logger,
+		Version:     options.Version,
+		Frontend:    frontend,
+		Catalog:     catalog,
+		Media:       media.FS(),
+		Progress:    progressService,
+		Search:      refresher.search,
+		Notes:       notesService,
+		Compression: compression,
+		Login:       downloads.login,
+		Jobs:        downloads.jobs,
+		Logger:      logger,
 	})
 	address, accessCode := options.ListenAddress, ""
 	if options.LANMode {
@@ -114,7 +117,11 @@ func Run(ctx context.Context, options Options, logger *slog.Logger) error {
 		}
 	}
 	logger.Info("http server listening", "addr", listener.Addr().String(), "version", options.Version)
-	return serve(ctx, listener, handler, logger, shutdownGracePeriod, append(downloads.workers(), refresher.indexSubtitles)...)
+	workers := append(downloads.workers(), refresher.indexSubtitles)
+	if compression != nil {
+		workers = append(workers, compression.Run)
+	}
+	return serve(ctx, listener, handler, logger, shutdownGracePeriod, workers...)
 }
 
 func serve(

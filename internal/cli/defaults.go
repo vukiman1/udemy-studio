@@ -16,6 +16,8 @@ const (
 	defaultCaptionLang  = "en"
 	defaultAria2c       = "aria2c"
 	defaultYTDLP        = "yt-dlp"
+	defaultFFmpeg       = "ffmpeg"
+	defaultFFprobe      = "ffprobe"
 	dataDirUsage        = "directory for the progress database, LAN access code and download logs (default: user config dir)"
 	chromeDataDirUsage  = "Chrome user data dir (default: ~/" + chromeDataDirSuffix + ")"
 )

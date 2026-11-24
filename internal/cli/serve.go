@@ -54,6 +54,8 @@ func newServeCommand(version string) *cobra.Command {
 		"udemy-downloader checkout the downloader runs in (env "+pythonRepoEnv+")")
 	flags.StringVar(&options.Downloads.OutputDir, "download-dir", "", "where downloads are written (default: --library)")
 	flags.StringVar(&options.Downloads.ChromeDataDir, "chrome-data-dir", "", chromeDataDirUsage)
+	flags.StringVar(&options.Compression.FFmpeg, "ffmpeg", defaultFFmpeg, "ffmpeg binary that compresses videos to H.265")
+	flags.StringVar(&options.Compression.FFprobe, "ffprobe", defaultFFprobe, "ffprobe binary that reads video codecs and lengths")
 	flags.StringVar(&options.Downloads.CaptionLanguage, "caption-language", defaultCaptionLang, "caption language to download")
 	return command
 }

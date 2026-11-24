@@ -17,6 +17,30 @@ import (
 	"github.com/oapi-codegen/runtime"
 )
 
+// Defines values for CompressionRunState.
+const (
+	CompressionRunStateCancelled CompressionRunState = "cancelled"
+	CompressionRunStateDone      CompressionRunState = "done"
+	CompressionRunStateQueued    CompressionRunState = "queued"
+	CompressionRunStateRunning   CompressionRunState = "running"
+)
+
+// Valid indicates whether the value is a known member of the CompressionRunState enum.
+func (e CompressionRunState) Valid() bool {
+	switch e {
+	case CompressionRunStateCancelled:
+		return true
+	case CompressionRunStateDone:
+		return true
+	case CompressionRunStateQueued:
+		return true
+	case CompressionRunStateRunning:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for HealthStatus.
 const (
 	Ok HealthStatus = "ok"
@@ -34,25 +58,25 @@ func (e HealthStatus) Valid() bool {
 
 // Defines values for JobStatus.
 const (
-	Cancelled JobStatus = "cancelled"
-	Failed    JobStatus = "failed"
-	Queued    JobStatus = "queued"
-	Running   JobStatus = "running"
-	Succeeded JobStatus = "succeeded"
+	JobStatusCancelled JobStatus = "cancelled"
+	JobStatusFailed    JobStatus = "failed"
+	JobStatusQueued    JobStatus = "queued"
+	JobStatusRunning   JobStatus = "running"
+	JobStatusSucceeded JobStatus = "succeeded"
 )
 
 // Valid indicates whether the value is a known member of the JobStatus enum.
 func (e JobStatus) Valid() bool {
 	switch e {
-	case Cancelled:
+	case JobStatusCancelled:
 		return true
-	case Failed:
+	case JobStatusFailed:
 		return true
-	case Queued:
+	case JobStatusQueued:
 		return true
-	case Running:
+	case JobStatusRunning:
 		return true
-	case Succeeded:
+	case JobStatusSucceeded:
 		return true
 	default:
 		return false
@@ -103,6 +127,61 @@ type ChromeProfile struct {
 	Selected   bool     `json:"selected"`
 	UdemyHosts []string `json:"udemyHosts"`
 }
+
+// CompressionCurrent defines model for CompressionCurrent.
+type CompressionCurrent struct {
+	EncodedSeconds float64 `json:"encodedSeconds"`
+	LectureTitle   string  `json:"lectureTitle"`
+	LengthSeconds  float64 `json:"lengthSeconds"`
+}
+
+// CompressionOutcome defines model for CompressionOutcome.
+type CompressionOutcome struct {
+	LectureTitle string `json:"lectureTitle"`
+
+	// Path The video's path in the library
+	Path   string `json:"path"`
+	Reason string `json:"reason"`
+}
+
+// CompressionPlan defines model for CompressionPlan.
+type CompressionPlan struct {
+	AlreadyHevc int `json:"alreadyHevc"`
+
+	// EstimatedSeconds Rough encode time on this machine
+	EstimatedSeconds float64 `json:"estimatedSeconds"`
+
+	// Files H.264 videos that would be encoded
+	Files int `json:"files"`
+
+	// NotWorthIt Videos an earlier run found not worth re-encoding
+	NotWorthIt int `json:"notWorthIt"`
+
+	// OtherCodec Videos in neither H.264 nor H.265, left as they are
+	OtherCodec   int     `json:"otherCodec"`
+	TotalBytes   int64   `json:"totalBytes"`
+	TotalSeconds float64 `json:"totalSeconds"`
+
+	// Unreadable Videos ffprobe cannot read, such as an unfinished download
+	Unreadable int `json:"unreadable"`
+}
+
+// CompressionRun defines model for CompressionRun.
+type CompressionRun struct {
+	BytesAfter int64 `json:"bytesAfter"`
+
+	// BytesBefore Size of the videos replaced so far, before compression
+	BytesBefore int64                `json:"bytesBefore"`
+	Current     *CompressionCurrent  `json:"current,omitempty"`
+	Failed      []CompressionOutcome `json:"failed"`
+	Finished    int                  `json:"finished"`
+	Skipped     []CompressionOutcome `json:"skipped"`
+	State       CompressionRunState  `json:"state"`
+	Total       int                  `json:"total"`
+}
+
+// CompressionRunState defines model for CompressionRun.State.
+type CompressionRunState string
 
 // ContinueTarget defines model for ContinueTarget.
 type ContinueTarget struct {
@@ -290,6 +369,9 @@ type NoteId = int64
 // BadRequest RFC 9457 problem details
 type BadRequest = Problem
 
+// CompressionUnavailable RFC 9457 problem details
+type CompressionUnavailable = Problem
+
 // Conflict RFC 9457 problem details
 type Conflict = Problem
 
@@ -342,6 +424,18 @@ type ServerInterface interface {
 	// GetCourse Chapter and lecture tree with per-lecture progress
 	// (GET /api/courses/{courseId})
 	GetCourse(w http.ResponseWriter, r *http.Request, courseId CourseId)
+	// CancelCourseCompression Stop compressing a course; videos already compressed stay compressed
+	// (DELETE /api/courses/{courseId}/compression)
+	CancelCourseCompression(w http.ResponseWriter, r *http.Request, courseId CourseId)
+	// GetCourseCompression The latest compression of a course since the server started
+	// (GET /api/courses/{courseId}/compression)
+	GetCourseCompression(w http.ResponseWriter, r *http.Request, courseId CourseId)
+	// StartCourseCompression Queue a course to have its H.264 videos re-encoded to H.265 in the background
+	// (POST /api/courses/{courseId}/compression)
+	StartCourseCompression(w http.ResponseWriter, r *http.Request, courseId CourseId)
+	// PlanCourseCompression What compressing a course to H.265 would encode, and roughly how long it takes
+	// (GET /api/courses/{courseId}/compression/plan)
+	PlanCourseCompression(w http.ResponseWriter, r *http.Request, courseId CourseId)
 	// ExportCourseNotes Every note of a course as a Markdown file, in course order
 	// (GET /api/courses/{courseId}/notes.md)
 	ExportCourseNotes(w http.ResponseWriter, r *http.Request, courseId CourseId)
@@ -446,6 +540,110 @@ func (siw *ServerInterfaceWrapper) GetCourse(w http.ResponseWriter, r *http.Requ
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.GetCourse(w, r, courseId)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// CancelCourseCompression operation middleware
+func (siw *ServerInterfaceWrapper) CancelCourseCompression(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "courseId" -------------
+	var courseId CourseId
+
+	err = runtime.BindStyledParameterWithOptions("simple", "courseId", r.PathValue("courseId"), &courseId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "courseId", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CancelCourseCompression(w, r, courseId)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetCourseCompression operation middleware
+func (siw *ServerInterfaceWrapper) GetCourseCompression(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "courseId" -------------
+	var courseId CourseId
+
+	err = runtime.BindStyledParameterWithOptions("simple", "courseId", r.PathValue("courseId"), &courseId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "courseId", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetCourseCompression(w, r, courseId)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// StartCourseCompression operation middleware
+func (siw *ServerInterfaceWrapper) StartCourseCompression(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "courseId" -------------
+	var courseId CourseId
+
+	err = runtime.BindStyledParameterWithOptions("simple", "courseId", r.PathValue("courseId"), &courseId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "courseId", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.StartCourseCompression(w, r, courseId)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// PlanCourseCompression operation middleware
+func (siw *ServerInterfaceWrapper) PlanCourseCompression(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "courseId" -------------
+	var courseId CourseId
+
+	err = runtime.BindStyledParameterWithOptions("simple", "courseId", r.PathValue("courseId"), &courseId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "courseId", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PlanCourseCompression(w, r, courseId)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -971,6 +1169,10 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 	m.HandleFunc(http.MethodDelete+" "+options.BaseURL+"/api/notes/{noteId}", wrapper.DeleteNote)
 	m.HandleFunc(http.MethodPatch+" "+options.BaseURL+"/api/notes/{noteId}", wrapper.EditNote)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/courses/{courseId}/notes.md", wrapper.ExportCourseNotes)
+	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/courses/{courseId}/compression/plan", wrapper.PlanCourseCompression)
+	m.HandleFunc(http.MethodDelete+" "+options.BaseURL+"/api/courses/{courseId}/compression", wrapper.CancelCourseCompression)
+	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/courses/{courseId}/compression", wrapper.GetCourseCompression)
+	m.HandleFunc(http.MethodPost+" "+options.BaseURL+"/api/courses/{courseId}/compression", wrapper.StartCourseCompression)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/downloads/profiles", wrapper.ListChromeProfiles)
 	m.HandleFunc(http.MethodPut+" "+options.BaseURL+"/api/downloads/profile", wrapper.SelectChromeProfile)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/downloads/status", wrapper.GetLoginStatus)
@@ -982,6 +1184,8 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 }
 
 type BadRequestApplicationProblemPlusJSONResponse Problem
+
+type CompressionUnavailableApplicationProblemPlusJSONResponse Problem
 
 type ConflictApplicationProblemPlusJSONResponse Problem
 
@@ -1073,6 +1277,224 @@ func (response GetCourse404ApplicationProblemPlusJSONResponse) VisitGetCourseRes
 	}
 	w.Header().Set("Content-Type", "application/problem+json")
 	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CancelCourseCompressionRequestObject struct {
+	CourseId CourseId `json:"courseId"`
+}
+
+type CancelCourseCompressionResponseObject interface {
+	VisitCancelCourseCompressionResponse(w http.ResponseWriter) error
+}
+
+type CancelCourseCompression204Response struct {
+}
+
+func (response CancelCourseCompression204Response) VisitCancelCourseCompressionResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type CancelCourseCompression409ApplicationProblemPlusJSONResponse struct {
+	ConflictApplicationProblemPlusJSONResponse
+}
+
+func (response CancelCourseCompression409ApplicationProblemPlusJSONResponse) VisitCancelCourseCompressionResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.ConflictApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(409)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CancelCourseCompression503ApplicationProblemPlusJSONResponse struct {
+	CompressionUnavailableApplicationProblemPlusJSONResponse
+}
+
+func (response CancelCourseCompression503ApplicationProblemPlusJSONResponse) VisitCancelCourseCompressionResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.CompressionUnavailableApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(503)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetCourseCompressionRequestObject struct {
+	CourseId CourseId `json:"courseId"`
+}
+
+type GetCourseCompressionResponseObject interface {
+	VisitGetCourseCompressionResponse(w http.ResponseWriter) error
+}
+
+type GetCourseCompression200JSONResponse CompressionRun
+
+func (response GetCourseCompression200JSONResponse) VisitGetCourseCompressionResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetCourseCompression204Response struct {
+}
+
+func (response GetCourseCompression204Response) VisitGetCourseCompressionResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type GetCourseCompression503ApplicationProblemPlusJSONResponse struct {
+	CompressionUnavailableApplicationProblemPlusJSONResponse
+}
+
+func (response GetCourseCompression503ApplicationProblemPlusJSONResponse) VisitGetCourseCompressionResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.CompressionUnavailableApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(503)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type StartCourseCompressionRequestObject struct {
+	CourseId CourseId `json:"courseId"`
+}
+
+type StartCourseCompressionResponseObject interface {
+	VisitStartCourseCompressionResponse(w http.ResponseWriter) error
+}
+
+type StartCourseCompression202JSONResponse CompressionRun
+
+func (response StartCourseCompression202JSONResponse) VisitStartCourseCompressionResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(202)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type StartCourseCompression404ApplicationProblemPlusJSONResponse struct {
+	NotFoundApplicationProblemPlusJSONResponse
+}
+
+func (response StartCourseCompression404ApplicationProblemPlusJSONResponse) VisitStartCourseCompressionResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.NotFoundApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type StartCourseCompression409ApplicationProblemPlusJSONResponse struct {
+	ConflictApplicationProblemPlusJSONResponse
+}
+
+func (response StartCourseCompression409ApplicationProblemPlusJSONResponse) VisitStartCourseCompressionResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.ConflictApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(409)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type StartCourseCompression503ApplicationProblemPlusJSONResponse struct {
+	CompressionUnavailableApplicationProblemPlusJSONResponse
+}
+
+func (response StartCourseCompression503ApplicationProblemPlusJSONResponse) VisitStartCourseCompressionResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.CompressionUnavailableApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(503)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PlanCourseCompressionRequestObject struct {
+	CourseId CourseId `json:"courseId"`
+}
+
+type PlanCourseCompressionResponseObject interface {
+	VisitPlanCourseCompressionResponse(w http.ResponseWriter) error
+}
+
+type PlanCourseCompression200JSONResponse CompressionPlan
+
+func (response PlanCourseCompression200JSONResponse) VisitPlanCourseCompressionResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PlanCourseCompression404ApplicationProblemPlusJSONResponse struct {
+	NotFoundApplicationProblemPlusJSONResponse
+}
+
+func (response PlanCourseCompression404ApplicationProblemPlusJSONResponse) VisitPlanCourseCompressionResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.NotFoundApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PlanCourseCompression503ApplicationProblemPlusJSONResponse struct {
+	CompressionUnavailableApplicationProblemPlusJSONResponse
+}
+
+func (response PlanCourseCompression503ApplicationProblemPlusJSONResponse) VisitPlanCourseCompressionResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.CompressionUnavailableApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(503)
 	_, err := buf.WriteTo(w)
 	return err
 }
@@ -1783,6 +2205,18 @@ type StrictServerInterface interface {
 	// GetCourse Chapter and lecture tree with per-lecture progress
 	// (GET /api/courses/{courseId})
 	GetCourse(ctx context.Context, request GetCourseRequestObject) (GetCourseResponseObject, error)
+	// CancelCourseCompression Stop compressing a course; videos already compressed stay compressed
+	// (DELETE /api/courses/{courseId}/compression)
+	CancelCourseCompression(ctx context.Context, request CancelCourseCompressionRequestObject) (CancelCourseCompressionResponseObject, error)
+	// GetCourseCompression The latest compression of a course since the server started
+	// (GET /api/courses/{courseId}/compression)
+	GetCourseCompression(ctx context.Context, request GetCourseCompressionRequestObject) (GetCourseCompressionResponseObject, error)
+	// StartCourseCompression Queue a course to have its H.264 videos re-encoded to H.265 in the background
+	// (POST /api/courses/{courseId}/compression)
+	StartCourseCompression(ctx context.Context, request StartCourseCompressionRequestObject) (StartCourseCompressionResponseObject, error)
+	// PlanCourseCompression What compressing a course to H.265 would encode, and roughly how long it takes
+	// (GET /api/courses/{courseId}/compression/plan)
+	PlanCourseCompression(ctx context.Context, request PlanCourseCompressionRequestObject) (PlanCourseCompressionResponseObject, error)
 	// ExportCourseNotes Every note of a course as a Markdown file, in course order
 	// (GET /api/courses/{courseId}/notes.md)
 	ExportCourseNotes(ctx context.Context, request ExportCourseNotesRequestObject) (ExportCourseNotesResponseObject, error)
@@ -1942,6 +2376,110 @@ func (sh *strictHandler) GetCourse(w http.ResponseWriter, r *http.Request, cours
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(GetCourseResponseObject); ok {
 		if err := validResponse.VisitGetCourseResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// CancelCourseCompression operation middleware
+func (sh *strictHandler) CancelCourseCompression(w http.ResponseWriter, r *http.Request, courseId CourseId) {
+	var request CancelCourseCompressionRequestObject
+
+	request.CourseId = courseId
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error) {
+		return sh.ssi.CancelCourseCompression(ctx, request.(CancelCourseCompressionRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CancelCourseCompression")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(CancelCourseCompressionResponseObject); ok {
+		if err := validResponse.VisitCancelCourseCompressionResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetCourseCompression operation middleware
+func (sh *strictHandler) GetCourseCompression(w http.ResponseWriter, r *http.Request, courseId CourseId) {
+	var request GetCourseCompressionRequestObject
+
+	request.CourseId = courseId
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error) {
+		return sh.ssi.GetCourseCompression(ctx, request.(GetCourseCompressionRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetCourseCompression")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetCourseCompressionResponseObject); ok {
+		if err := validResponse.VisitGetCourseCompressionResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// StartCourseCompression operation middleware
+func (sh *strictHandler) StartCourseCompression(w http.ResponseWriter, r *http.Request, courseId CourseId) {
+	var request StartCourseCompressionRequestObject
+
+	request.CourseId = courseId
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error) {
+		return sh.ssi.StartCourseCompression(ctx, request.(StartCourseCompressionRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "StartCourseCompression")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(StartCourseCompressionResponseObject); ok {
+		if err := validResponse.VisitStartCourseCompressionResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// PlanCourseCompression operation middleware
+func (sh *strictHandler) PlanCourseCompression(w http.ResponseWriter, r *http.Request, courseId CourseId) {
+	var request PlanCourseCompressionRequestObject
+
+	request.CourseId = courseId
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error) {
+		return sh.ssi.PlanCourseCompression(ctx, request.(PlanCourseCompressionRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PlanCourseCompression")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(PlanCourseCompressionResponseObject); ok {
+		if err := validResponse.VisitPlanCourseCompressionResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

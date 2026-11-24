@@ -237,6 +237,72 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
 
+  /api/courses/{courseId}/compression/plan:
+    get:
+      operationId: planCourseCompression
+      summary: What compressing a course to H.265 would encode, and roughly how long it takes
+      parameters:
+        - $ref: "#/components/parameters/CourseId"
+      responses:
+        "200":
+          description: The videos that would be encoded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CompressionPlan"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "503":
+          $ref: "#/components/responses/CompressionUnavailable"
+
+  /api/courses/{courseId}/compression:
+    get:
+      operationId: getCourseCompression
+      summary: The latest compression of a course since the server started
+      parameters:
+        - $ref: "#/components/parameters/CourseId"
+      responses:
+        "200":
+          description: The compression run
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CompressionRun"
+        "204":
+          description: The course has not been compressed since the server started
+        "503":
+          $ref: "#/components/responses/CompressionUnavailable"
+    post:
+      operationId: startCourseCompression
+      summary: Queue a course to have its H.264 videos re-encoded to H.265 in the background
+      parameters:
+        - $ref: "#/components/parameters/CourseId"
+      responses:
+        "202":
+          description: Queued
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CompressionRun"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "503":
+          $ref: "#/components/responses/CompressionUnavailable"
+    delete:
+      operationId: cancelCourseCompression
+      summary: Stop compressing a course; videos already compressed stay compressed
+      parameters:
+        - $ref: "#/components/parameters/CourseId"
+      responses:
+        "204":
+          description: Cancelled
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "503":
+          $ref: "#/components/responses/CompressionUnavailable"
+
   /media/{lectureId}:
     get:
       tags: [raw]
@@ -453,6 +519,12 @@ components:
         application/problem+json:
           schema:
             $ref: "#/components/schemas/Problem"
+    CompressionUnavailable:
+      description: ffmpeg or ffprobe was not found when the server started
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
     Conflict:
       description: The request conflicts with the current state
       content:
@@ -652,6 +724,89 @@ components:
       required: [body]
       properties:
         body:
+          type: string
+
+    CompressionPlan:
+      type: object
+      required: [files, totalBytes, totalSeconds, estimatedSeconds, alreadyHevc, otherCodec, notWorthIt, unreadable]
+      properties:
+        files:
+          type: integer
+          description: H.264 videos that would be encoded
+        totalBytes:
+          type: integer
+          format: int64
+        totalSeconds:
+          type: number
+          format: double
+        estimatedSeconds:
+          type: number
+          format: double
+          description: Rough encode time on this machine
+        alreadyHevc:
+          type: integer
+        otherCodec:
+          type: integer
+          description: Videos in neither H.264 nor H.265, left as they are
+        notWorthIt:
+          type: integer
+          description: Videos an earlier run found not worth re-encoding
+        unreadable:
+          type: integer
+          description: Videos ffprobe cannot read, such as an unfinished download
+
+    CompressionRun:
+      type: object
+      required: [state, total, finished, bytesBefore, bytesAfter, skipped, failed]
+      properties:
+        state:
+          type: string
+          enum: [queued, running, done, cancelled]
+        total:
+          type: integer
+        finished:
+          type: integer
+        current:
+          $ref: "#/components/schemas/CompressionCurrent"
+        bytesBefore:
+          type: integer
+          format: int64
+          description: Size of the videos replaced so far, before compression
+        bytesAfter:
+          type: integer
+          format: int64
+        skipped:
+          type: array
+          items:
+            $ref: "#/components/schemas/CompressionOutcome"
+        failed:
+          type: array
+          items:
+            $ref: "#/components/schemas/CompressionOutcome"
+
+    CompressionCurrent:
+      type: object
+      required: [lectureTitle, encodedSeconds, lengthSeconds]
+      properties:
+        lectureTitle:
+          type: string
+        encodedSeconds:
+          type: number
+          format: double
+        lengthSeconds:
+          type: number
+          format: double
+
+    CompressionOutcome:
+      type: object
+      required: [path, lectureTitle, reason]
+      properties:
+        path:
+          type: string
+          description: The video's path in the library
+        lectureTitle:
+          type: string
+        reason:
           type: string
 
     SearchHit:

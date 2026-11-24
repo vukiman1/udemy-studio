@@ -36,6 +36,8 @@ export const QUERY_KEYS = {
   jobs: ['jobs'],
   search: (query: string) => ['search', query],
   notes: (lectureId: string) => ['notes', lectureId],
+  compression: (courseId: string) => ['compression', courseId],
+  compressionPlan: (courseId: string) => ['compression-plan', courseId],
 } as const
 
 export function useCourses(): UseQueryResult<CourseSummary[]> {
