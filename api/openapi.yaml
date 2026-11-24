@@ -810,7 +810,7 @@ components:
 
     CourseSummary:
       type: object
-      required: [id, title, playableLectures, completedLectures]
+      required: [id, title, playableLectures, completedLectures, sizeBytes]
       properties:
         id:
           type: string
@@ -820,6 +820,10 @@ components:
           type: integer
         completedLectures:
           type: integer
+        sizeBytes:
+          type: integer
+          format: int64
+          description: Every file in the course's folder, measured when asked
         resume:
           $ref: "#/components/schemas/ContinueTarget"
 

@@ -11,6 +11,7 @@ const COURSE: CourseSummary = {
   title: 'Backend Fundamentals',
   playableLectures: 4,
   completedLectures: 1,
+  sizeBytes: 15_800_000_000,
 }
 
 function respondWith(routes: Record<string, () => Response>): void {
@@ -38,14 +39,14 @@ afterEach(() => {
 })
 
 describe('LibraryPage', () => {
-  it('lists courses with their completion', async () => {
+  it('lists courses with their completion and size', async () => {
     respondWith({
       '/api/courses': () => Response.json([COURSE]),
       '/api/continue': () => new Response(null, { status: 204 }),
     })
     renderPage()
     expect(await screen.findByText('Backend Fundamentals')).toBeInTheDocument()
-    expect(screen.getByText('1/4 bài đã học')).toBeInTheDocument()
+    expect(screen.getByText('1/4 bài đã học · 15,8 GB')).toBeInTheDocument()
     expect(screen.queryByText(/Tiếp tục học/)).not.toBeInTheDocument()
   })
 

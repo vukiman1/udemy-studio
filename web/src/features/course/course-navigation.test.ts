@@ -21,6 +21,7 @@ function course(overrides: Partial<CourseDetail> = {}): CourseDetail {
     title: 'Course',
     playableLectures: 3,
     completedLectures: 0,
+    sizeBytes: 0,
     chapters: [
       { index: 1, title: 'One', lectures: [lecture('drm', 'unavailable'), lecture('a')] },
       { index: 2, title: 'Two', lectures: [lecture('b'), lecture('c', 'article')] },
