@@ -3,7 +3,9 @@ package chromecookie
 import (
 	"cmp"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"slices"
@@ -24,8 +26,12 @@ type profileEntry struct {
 	name string
 }
 
+// readProfiles finds no profiles where Chrome was never installed, such as in Docker, where tokens are pasted instead.
 func readProfiles(dataDir string) ([]profileEntry, error) {
 	raw, err := os.ReadFile(filepath.Join(dataDir, localStateFile)) //nolint:gosec // reason: dataDir is the configured Chrome data directory
+	if errors.Is(err, fs.ErrNotExist) {
+		return nil, nil
+	}
 	if err != nil {
 		return nil, wrapAccessError(fmt.Errorf("read Chrome %s: %w", localStateFile, err))
 	}

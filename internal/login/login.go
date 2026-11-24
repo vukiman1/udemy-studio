@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
 	"slices"
 	"time"
 
@@ -18,10 +19,14 @@ var (
 	ErrNoDiskAccess      = errors.New("no permission to read Chrome data")
 	ErrNoKeychainAccess  = errors.New("no access to Chrome's key in the macOS keychain")
 
-	userFixableErrors = []error{ErrNoProfileSelected, ErrProfileNotFound, ErrNotLoggedIn, ErrTokenExpired, ErrNoDiskAccess, ErrNoKeychainAccess}
+	userFixableErrors = []error{
+		ErrNoProfileSelected, ErrProfileNotFound, ErrNotLoggedIn, ErrTokenExpired, ErrNoDiskAccess, ErrNoKeychainAccess,
+		ErrInvalidHost, ErrEmptyToken, ErrTokenRejected,
+	}
 )
 
-// NeedsUserAction reports whether the learner fixes err in Chrome or System Settings rather than it being a fault of the app.
+// NeedsUserAction reports whether the learner fixes err in Chrome, System Settings or the pasted token rather than it
+// being a fault of the app.
 func NeedsUserAction(err error) bool {
 	return slices.ContainsFunc(userFixableErrors, func(target error) bool { return errors.Is(err, target) })
 }
@@ -59,14 +64,27 @@ type HostStatus struct {
 	IsExpired bool
 }
 
+type Deps struct {
+	Cookies  CookieStore
+	Settings SettingsStore
+	Pasted   PastedLoginStore
+	Checker  TokenChecker
+	Now      func() time.Time
+	Logger   *slog.Logger
+}
+
+// Service finds the Udemy login a download uses: a token pasted for the portal, else the selected Chrome profile's.
 type Service struct {
 	cookies  CookieStore
 	settings SettingsStore
+	pasted   PastedLoginStore
+	checker  TokenChecker
 	now      func() time.Time
+	logger   *slog.Logger
 }
 
-func NewService(cookies CookieStore, settings SettingsStore, now func() time.Time) *Service {
-	return &Service{cookies: cookies, settings: settings, now: now}
+func NewService(deps Deps) *Service {
+	return &Service{cookies: deps.Cookies, settings: deps.Settings, pasted: deps.Pasted, checker: deps.Checker, now: deps.Now, logger: deps.Logger}
 }
 
 func (service *Service) Profiles(ctx context.Context) ([]Profile, error) {
@@ -108,7 +126,13 @@ func (service *Service) Status(ctx context.Context) (Status, error) {
 }
 
 func (service *Service) Token(ctx context.Context, host string) (secret.Secret, error) {
+	if token, found, err := service.pastedToken(ctx, host); err != nil || found {
+		return token, err
+	}
 	profile, err := service.selectedProfile(ctx)
+	if errors.Is(err, ErrNoProfileSelected) {
+		return secret.Secret{}, fmt.Errorf("%w: paste a token for %s on the downloads page, or choose a Chrome profile", ErrNotLoggedIn, host)
+	}
 	if err != nil {
 		return secret.Secret{}, err
 	}

@@ -3,7 +3,6 @@ package httpapi
 import (
 	"context"
 	"errors"
-	"net/http"
 
 	"github.com/vukiman1/udemy-studio/internal/llm"
 	"github.com/vukiman1/udemy-studio/internal/transport/httpapi/gen"
@@ -105,10 +104,6 @@ func (server apiServer) aiSettings(ctx context.Context) (gen.AISettings, error) 
 // isBadAIRequest separates what the learner can fix in the form from a provider that could not be reached.
 func isBadAIRequest(err error) bool {
 	return errors.Is(err, llm.ErrInvalidAPIKey) || errors.Is(err, llm.ErrNoKey) || errors.Is(err, llm.ErrUnknownProvider)
-}
-
-func providerUnreachable(err error) gen.ProviderUnreachableApplicationProblemPlusJSONResponse {
-	return gen.ProviderUnreachableApplicationProblemPlusJSONResponse(problem(http.StatusBadGateway, err.Error()))
 }
 
 func valueOf(optional *string) string {

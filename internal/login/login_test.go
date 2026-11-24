@@ -3,6 +3,7 @@ package login
 import (
 	"context"
 	"errors"
+	"log/slog"
 	"strings"
 	"testing"
 	"time"
@@ -59,7 +60,15 @@ func newService(selected string) (*Service, *fakeSettings) {
 		},
 	}
 	settings := &fakeSettings{selected: selected}
-	return NewService(cookies, settings, func() time.Time { return now }), settings
+	service := NewService(Deps{
+		Cookies:  cookies,
+		Settings: settings,
+		Pasted:   &memoryPasted{},
+		Checker:  fakeChecker{},
+		Now:      func() time.Time { return now },
+		Logger:   slog.New(slog.DiscardHandler),
+	})
+	return service, settings
 }
 
 func TestTokenComesFromTheSelectedProfile(t *testing.T) {
@@ -77,7 +86,7 @@ func TestTokenErrorsNameTheProfileToFix(t *testing.T) {
 		host     string
 		want     error
 	}{
-		{name: "nothing selected", selected: "", host: "acme.udemy.com", want: ErrNoProfileSelected},
+		{name: "nothing selected or pasted", selected: "", host: "acme.udemy.com", want: ErrNotLoggedIn},
 		{name: "selected profile disappeared", selected: "Profile 99", host: "acme.udemy.com", want: ErrProfileNotFound},
 		{name: "not logged in to that portal", selected: "Profile 13", host: "acme.udemy.com", want: ErrNotLoggedIn},
 		{name: "login expired", selected: "Profile 4", host: "old.udemy.com", want: ErrTokenExpired},

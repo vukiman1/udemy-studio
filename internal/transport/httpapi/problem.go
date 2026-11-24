@@ -57,3 +57,7 @@ func strictErrorHandlers(logger *slog.Logger) gen.StrictHTTPServerOptions {
 func writeBadRequestProblem(writer http.ResponseWriter, _ *http.Request, err error) {
 	writeProblem(writer, http.StatusBadRequest, err.Error())
 }
+
+func providerUnreachable(err error) gen.ProviderUnreachableApplicationProblemPlusJSONResponse {
+	return gen.ProviderUnreachableApplicationProblemPlusJSONResponse(problem(http.StatusBadGateway, err.Error()))
+}

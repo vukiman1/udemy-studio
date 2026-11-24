@@ -470,6 +470,41 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/downloads/tokens": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Udemy tokens pasted by hand, one per portal; the tokens themselves never leave the server */
+        get: operations["listPastedLogins"];
+        /** Check a pasted access_token with its portal and use it for downloads from there */
+        put: operations["savePastedLogin"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/downloads/tokens/{host}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Forget the token pasted for a portal */
+        delete: operations["forgetPastedLogin"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/jobs": {
         parameters: {
             query?: never;
@@ -779,6 +814,19 @@ export interface components {
             language: string;
             text: string;
         };
+        PastedLogin: {
+            host: string;
+            /** @description The account the token logs in as, as the portal names it */
+            userName: string;
+            /** Format: date-time */
+            savedAt: string;
+        };
+        PastedLoginDraft: {
+            /** @description The portal's host, or any URL on it */
+            host: string;
+            /** @description The value of the access_token cookie */
+            token: string;
+        };
         ChromeProfile: {
             dir: string;
             name: string;
@@ -846,7 +894,7 @@ export interface components {
                 "application/problem+json": components["schemas"]["Problem"];
             };
         };
-        /** @description The translation provider could not be reached */
+        /** @description An outside service, such as the AI provider or Udemy, could not be reached */
         ProviderUnreachable: {
             headers: {
                 [name: string]: unknown;
@@ -1707,6 +1755,75 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["LoginStatus"];
                 };
+            };
+            503: components["responses"]["DownloadsUnavailable"];
+        };
+    };
+    listPastedLogins: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Pasted logins */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PastedLogin"][];
+                };
+            };
+            503: components["responses"]["DownloadsUnavailable"];
+        };
+    };
+    savePastedLogin: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PastedLoginDraft"];
+            };
+        };
+        responses: {
+            /** @description The portal accepted the token */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PastedLogin"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            502: components["responses"]["ProviderUnreachable"];
+            503: components["responses"]["DownloadsUnavailable"];
+        };
+    };
+    forgetPastedLogin: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                host: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Forgotten */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             503: components["responses"]["DownloadsUnavailable"];
         };

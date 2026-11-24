@@ -181,3 +181,10 @@ func TestProfileReadsOnlyTheRequestedProfile(t *testing.T) {
 		t.Errorf("unknown profile error = %v", err)
 	}
 }
+
+func TestAMachineWithoutChromeHasNoProfiles(t *testing.T) {
+	profiles, err := NewStore(filepath.Join(t.TempDir(), "no-chrome-here"), nil).Profiles(t.Context())
+	if err != nil || len(profiles) != 0 {
+		t.Errorf("Profiles = %+v, %v; want none and no error", profiles, err)
+	}
+}

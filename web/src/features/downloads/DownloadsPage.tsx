@@ -6,6 +6,7 @@ import { ApiRequestError } from '../../api/queries'
 import { PageStatus } from '../../app/PageStatus'
 import { JobCard } from './JobCard'
 import { NewJobForm } from './NewJobForm'
+import { PastedLogins } from './PastedLogins'
 import { ProfilePicker } from './ProfilePicker'
 import { useJobEvents } from './use-job-events'
 
@@ -30,7 +31,11 @@ export function DownloadsPage(): ReactElement {
         <PageStatus tone="error" message={unavailable.message} />
       ) : (
         <>
-          <ProfilePicker />
+          <section className="grid gap-4 rounded-xl border border-line bg-surface p-4">
+            <h2 className="font-semibold">Tài khoản Udemy</h2>
+            <ProfilePicker />
+            <PastedLogins />
+          </section>
           <NewJobForm />
           <section className="grid gap-3">
             <h2 className="font-semibold">Lịch sử tải</h2>
