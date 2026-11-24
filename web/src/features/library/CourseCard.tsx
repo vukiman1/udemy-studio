@@ -34,6 +34,7 @@ export function CourseCard({ course, tools }: CourseCardProps): ReactElement {
   return (
     <article className="relative grid gap-2.5 overflow-hidden rounded-xl border border-line bg-surface p-4 hover:border-accent">
       <Link className="grid gap-2.5" to={coursePath(course.id)}>
+        <CourseCover course={course} />
         <h2 className="text-[1.05rem] font-semibold wrap-anywhere">{course.title}</h2>
         <ProgressBar completed={course.completedLectures} total={course.playableLectures} />
         <span className="text-[0.85rem] text-muted">
@@ -90,4 +91,23 @@ export function CourseCard({ course, tools }: CourseCardProps): ReactElement {
       )}
     </article>
   )
+}
+
+// Courses downloaded without a cover get a tinted panel of the same shape, so the grid stays even.
+interface CourseCoverProps {
+  readonly course: CourseSummary
+}
+
+function CourseCover({ course }: CourseCoverProps): ReactElement {
+  const frame = '-mx-4 -mt-4 mb-1 aspect-video w-[calc(100%+2rem)] max-w-none'
+  if (course.coverUrl === undefined)
+    return (
+      <div
+        className={`${frame} grid place-items-center bg-linear-135 from-accent/25 to-surface-strong text-4xl font-semibold text-accent/80`}
+        aria-hidden="true"
+      >
+        {course.title.slice(0, 1).toUpperCase()}
+      </div>
+    )
+  return <img className={`${frame} object-cover`} src={course.coverUrl} alt="" loading="lazy" />
 }

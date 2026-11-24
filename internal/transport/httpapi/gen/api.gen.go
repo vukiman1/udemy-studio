@@ -308,11 +308,14 @@ type ContinueTarget struct {
 
 // CourseDetail defines model for CourseDetail.
 type CourseDetail struct {
-	Chapters          []Chapter       `json:"chapters"`
-	CompletedLectures int             `json:"completedLectures"`
-	Id                string          `json:"id"`
-	PlayableLectures  int             `json:"playableLectures"`
-	Resume            *ContinueTarget `json:"resume,omitempty"`
+	Chapters          []Chapter `json:"chapters"`
+	CompletedLectures int       `json:"completedLectures"`
+
+	// CoverUrl Where the course's cover image is served; absent when it was downloaded without one
+	CoverUrl         *string         `json:"coverUrl,omitempty"`
+	Id               string          `json:"id"`
+	PlayableLectures int             `json:"playableLectures"`
+	Resume           *ContinueTarget `json:"resume,omitempty"`
 
 	// SizeBytes Every file in the course's folder, measured when asked
 	SizeBytes int64  `json:"sizeBytes"`
@@ -321,10 +324,13 @@ type CourseDetail struct {
 
 // CourseSummary defines model for CourseSummary.
 type CourseSummary struct {
-	CompletedLectures int             `json:"completedLectures"`
-	Id                string          `json:"id"`
-	PlayableLectures  int             `json:"playableLectures"`
-	Resume            *ContinueTarget `json:"resume,omitempty"`
+	CompletedLectures int `json:"completedLectures"`
+
+	// CoverUrl Where the course's cover image is served; absent when it was downloaded without one
+	CoverUrl         *string         `json:"coverUrl,omitempty"`
+	Id               string          `json:"id"`
+	PlayableLectures int             `json:"playableLectures"`
+	Resume           *ContinueTarget `json:"resume,omitempty"`
 
 	// SizeBytes Every file in the course's folder, measured when asked
 	SizeBytes int64  `json:"sizeBytes"`

@@ -824,6 +824,9 @@ components:
           type: integer
           format: int64
           description: Every file in the course's folder, measured when asked
+        coverUrl:
+          type: string
+          description: Where the course's cover image is served; absent when it was downloaded without one
         resume:
           $ref: "#/components/schemas/ContinueTarget"
 
