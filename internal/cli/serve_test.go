@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"errors"
 	"os"
 	"path/filepath"
 	"testing"
@@ -39,6 +40,18 @@ func TestRelativePathsAreResolvedAgainstTheWorkingDirectory(t *testing.T) {
 	for name, path := range want {
 		if got[name] != path {
 			t.Errorf("%s = %q, want %q", name, got[name], path)
+		}
+	}
+}
+
+func TestPublicHostsAreBareLowercaseHostnames(t *testing.T) {
+	hosts, err := publicHosts([]string{" Studio.Example.com ", ""})
+	if err != nil || len(hosts) != 1 || hosts[0] != "studio.example.com" {
+		t.Errorf("publicHosts = %v, %v; want [studio.example.com]", hosts, err)
+	}
+	for _, value := range []string{"https://studio.example.com", "studio.example.com:443", "studio.example.com/app"} {
+		if _, err := publicHosts([]string{value}); !errors.Is(err, ErrInvalidPublicHost) {
+			t.Errorf("publicHosts(%q) = %v; want ErrInvalidPublicHost", value, err)
 		}
 	}
 }

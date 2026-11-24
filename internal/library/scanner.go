@@ -43,7 +43,7 @@ func scanCourse(downloads fs.FS, courseDir string) (Course, error) {
 	if err != nil {
 		return Course{}, err
 	}
-	course := Course{ID: shortID("course", courseDir), Title: courseDir}
+	course := Course{ID: shortID("course", courseDir), Title: courseDir, Dir: courseDir}
 	for _, chapterDir := range chapterDirs {
 		match := chapterDirName.FindStringSubmatch(chapterDir)
 		if match == nil {

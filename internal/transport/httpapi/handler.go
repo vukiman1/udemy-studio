@@ -32,6 +32,8 @@ type Deps struct {
 	Login       *login.Service
 	Jobs        *jobs.Manager
 	Logger      *slog.Logger
+	// PublicHosts are the lowercase hostnames the app is also reached by, such as a tunnel's, besides localhost and IPs.
+	PublicHosts []string
 }
 
 func NewHandler(deps Deps) http.Handler {
@@ -51,7 +53,7 @@ func NewHandler(deps Deps) http.Handler {
 	if deps.Frontend != nil {
 		mux.Handle("GET /", spaHandler(deps.Frontend))
 	}
-	return RejectForeignHosts(RejectCrossSiteWrites(mux))
+	return RejectForeignHosts(deps.PublicHosts, RejectCrossSiteWrites(mux))
 }
 
 type apiServer struct {

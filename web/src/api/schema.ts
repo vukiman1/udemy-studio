@@ -578,6 +578,11 @@ export interface components {
             title: string;
             playableLectures: number;
             completedLectures: number;
+            /**
+             * Format: int64
+             * @description Every file in the course's folder, measured when asked
+             */
+            sizeBytes: number;
             resume?: components["schemas"]["ContinueTarget"];
         };
         CourseDetail: components["schemas"]["CourseSummary"] & {
