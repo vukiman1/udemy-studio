@@ -416,7 +416,7 @@ components:
 
     LectureKind:
       type: string
-      enum: [video, article, unavailable]
+      enum: [video, article, quiz, unavailable]
 
     LectureSummary:
       type: object

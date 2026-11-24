@@ -398,6 +398,24 @@ func TestQuizIsSavedAsItsPageAndSkippedOnARerun(t *testing.T) {
 	}
 }
 
+func TestLibraryShowsADownloadedQuizAsAQuiz(t *testing.T) {
+	plan := samplePlan()
+	plan.Chapters[0].Lectures = []udemy.LecturePlan{
+		{Number: 5, ID: 105, Class: udemy.QuizClass, Title: "005 Quiz", Kind: udemy.KindQuiz, File: "005 Quiz.html", Quiz: &udemy.QuizInfo{Title: "Quiz"}},
+	}
+	outputDir := t.TempDir()
+	if _, _, err := runCourse(t, t.Context(), plan, &fakeTools{}, outputDir); err != nil {
+		t.Fatalf("Course: %v", err)
+	}
+	scanned, err := library.Scan(os.DirFS(outputDir))
+	if err != nil {
+		t.Fatalf("Scan: %v", err)
+	}
+	if kind := scanned.Courses[0].Chapters[0].Lectures[0].Kind; kind != library.LectureKindQuiz {
+		t.Errorf("kind = %q, want quiz", kind)
+	}
+}
+
 func TestQuizThatCannotBeFetchedIsReportedAsAFailedQuiz(t *testing.T) {
 	plan := samplePlan()
 	plan.Chapters[0].Lectures = []udemy.LecturePlan{

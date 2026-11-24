@@ -1,9 +1,12 @@
 package httpapi
 
 import (
+	"maps"
 	"net/http"
 	"strings"
 	"testing"
+
+	"github.com/vukiman1/udemy-studio/internal/library"
 )
 
 func TestVideoSupportsRangeRequests(t *testing.T) {
@@ -35,11 +38,21 @@ func TestLibraryFilesRefuseWhatIsNotInTheIndex(t *testing.T) {
 	}
 }
 
-func TestArticleIsServedInASandbox(t *testing.T) {
+func TestArticleIsServedInASandboxWithoutScripts(t *testing.T) {
 	app := newTestApp(t)
 	result := app.do(t, http.MethodGet, "/articles/"+app.lectureID(t, 2), nil)
-	if result.status != http.StatusOK || !strings.HasPrefix(result.header.Get("Content-Security-Policy"), "sandbox") {
-		t.Errorf("status=%d csp=%q", result.status, result.header.Get("Content-Security-Policy"))
+	if csp := result.header.Get("Content-Security-Policy"); result.status != http.StatusOK || !strings.HasPrefix(csp, "sandbox;") {
+		t.Errorf("status=%d csp=%q, want a sandbox that allows nothing", result.status, csp)
+	}
+}
+
+func TestQuizPageRunsItsScriptsInASandbox(t *testing.T) {
+	files := maps.Clone(libraryFixture)
+	files["course/"+library.ManifestFile] = `{"format": 1, "lectures": [{"udemy_id": 7, "class": "quiz", "chapter_dir": "01 - Intro", "file": "002 Read me.html"}]}`
+	app := newTestAppWith(t, files)
+	result := app.do(t, http.MethodGet, "/articles/"+app.lectureID(t, 2), nil)
+	if csp := result.header.Get("Content-Security-Policy"); result.status != http.StatusOK || !strings.HasPrefix(csp, "sandbox allow-scripts;") || strings.Contains(csp, "allow-same-origin") {
+		t.Errorf("status=%d csp=%q, want scripts in an opaque-origin sandbox", result.status, csp)
 	}
 }
 

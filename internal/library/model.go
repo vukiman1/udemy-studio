@@ -6,6 +6,8 @@ const (
 	LectureKindVideo       LectureKind = "video"
 	LectureKindArticle     LectureKind = "article"
 	LectureKindUnavailable LectureKind = "unavailable"
+	// LectureKindQuiz is a page that needs its own scripts to show the questions.
+	LectureKindQuiz LectureKind = "quiz"
 )
 
 type Course struct {

@@ -17,6 +17,8 @@ const (
 	articleContentType = "text/html; charset=utf-8"
 	binaryContentType  = "application/octet-stream"
 	articleSandboxCSP  = "sandbox; default-src 'none'; img-src https: data:; style-src 'unsafe-inline' https:; font-src https: data:"
+	// A quiz page runs its own inline scripts, still in a sandbox with an opaque origin and nothing it can fetch.
+	quizSandboxCSP = "sandbox allow-scripts; default-src 'none'; script-src 'unsafe-inline'; img-src https: data:; style-src 'unsafe-inline' https:; font-src https: data:"
 )
 
 type libraryFiles struct {
@@ -40,9 +42,13 @@ func (files libraryFiles) serveArticle(writer http.ResponseWriter, request *http
 		writeProblem(writer, http.StatusNotFound, "no article for lecture "+request.PathValue("lectureId"))
 		return
 	}
+	policy := articleSandboxCSP
+	if lecture.Kind == library.LectureKindQuiz {
+		policy = quizSandboxCSP
+	}
 	files.serve(writer, request, lecture.ArticlePath, http.Header{
 		"Content-Type":            {articleContentType},
-		"Content-Security-Policy": {articleSandboxCSP},
+		"Content-Security-Policy": {policy},
 	})
 }
 
