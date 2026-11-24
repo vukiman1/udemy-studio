@@ -1,0 +1,17 @@
+services:
+  udemy-studio:
+    build: .
+    image: udemy-studio
+    ports:
+      # Reachable from this machine only; for other devices publish the port and add --lan to the command.
+      - "127.0.0.1:8765:8765"
+    volumes:
+      # A mistyped LIBRARY_DIR fails to start rather than serving a new empty folder.
+      - type: bind
+        source: ${LIBRARY_DIR:?set LIBRARY_DIR to the folder of downloaded courses}
+        target: /library
+        bind:
+          create_host_path: false
+      # Database and the key sealing saved tokens and API keys: back this folder up, never commit it.
+      - ${DATA_DIR:-./data}:/data
+    restart: unless-stopped
