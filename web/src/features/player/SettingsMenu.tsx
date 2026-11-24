@@ -2,8 +2,10 @@ import { Menu } from '@videojs/react'
 import { CheckIcon, ChevronIcon, GearIcon } from '@videojs/react/icons'
 import type { ReactElement } from 'react'
 import {
+  BACKGROUND_OPACITIES,
   FONT_SCALES,
   PLAYBACK_RATES,
+  TEXT_OPACITIES,
   SubtitleMode,
   parseSubtitleMode,
   type PlayerSettings,
@@ -81,10 +83,32 @@ export function SettingsMenu({
             value={String(settings.fontScale)}
             choices={FONT_SCALES.map((scale) => ({
               value: String(scale),
-              label: `${String(Math.round(scale * PERCENT))}%`,
+              label: asPercent(scale),
             }))}
             onSelect={(value) => {
               onChange((current) => ({ ...current, fontScale: Number(value) }))
+            }}
+          />
+          <SettingsSubmenu
+            label="Độ đậm chữ phụ đề"
+            value={String(settings.textOpacity)}
+            choices={TEXT_OPACITIES.map((opacity) => ({
+              value: String(opacity),
+              label: asPercent(opacity),
+            }))}
+            onSelect={(value) => {
+              onChange((current) => ({ ...current, textOpacity: Number(value) }))
+            }}
+          />
+          <SettingsSubmenu
+            label="Nền phụ đề"
+            value={String(settings.backgroundOpacity)}
+            choices={BACKGROUND_OPACITIES.map((opacity) => ({
+              value: String(opacity),
+              label: opacity === 0 ? 'Trong suốt' : asPercent(opacity),
+            }))}
+            onSelect={(value) => {
+              onChange((current) => ({ ...current, backgroundOpacity: Number(value) }))
             }}
           />
         </Menu.Content>
@@ -134,4 +158,8 @@ function SettingsSubmenu({ label, value, choices, onSelect }: SettingsSubmenuPro
       </Menu.Content>
     </Menu.Root>
   )
+}
+
+function asPercent(fraction: number): string {
+  return `${String(Math.round(fraction * PERCENT))}%`
 }

@@ -13,11 +13,19 @@ import {
 
 describe('parsePlayerSettings', () => {
   it('reads back stored settings', () => {
-    const stored = JSON.stringify({ playbackRate: 1.5, subtitleMode: 'primary', fontScale: 1.4 })
+    const stored = JSON.stringify({
+      playbackRate: 1.5,
+      subtitleMode: 'primary',
+      fontScale: 1.4,
+      textOpacity: 0.75,
+      backgroundOpacity: 0,
+    })
     expect(parsePlayerSettings(stored)).toEqual({
       playbackRate: 1.5,
       subtitleMode: SubtitleMode.Primary,
       fontScale: 1.4,
+      textOpacity: 0.75,
+      backgroundOpacity: 0,
     })
   })
 
@@ -26,7 +34,13 @@ describe('parsePlayerSettings', () => {
   })
 
   it('replaces each invalid field on its own', () => {
-    const stored = JSON.stringify({ playbackRate: 3, subtitleMode: 'karaoke', fontScale: 99 })
+    const stored = JSON.stringify({
+      playbackRate: 3,
+      subtitleMode: 'karaoke',
+      fontScale: 99,
+      textOpacity: 0,
+      backgroundOpacity: 2,
+    })
     expect(parsePlayerSettings(stored)).toEqual(DEFAULT_PLAYER_SETTINGS)
   })
 })
