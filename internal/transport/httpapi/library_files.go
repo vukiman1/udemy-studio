@@ -16,6 +16,7 @@ const (
 	videoContentType   = "video/mp4"
 	articleContentType = "text/html; charset=utf-8"
 	binaryContentType  = "application/octet-stream"
+	coverContentType   = "image/jpeg"
 	articleSandboxCSP  = "sandbox; default-src 'none'; img-src https: data:; style-src 'unsafe-inline' https:; font-src https: data:"
 	// A quiz page runs its own inline scripts, still in a sandbox with an opaque origin and nothing it can fetch.
 	quizSandboxCSP = "sandbox allow-scripts; default-src 'none'; script-src 'unsafe-inline'; img-src https: data:; style-src 'unsafe-inline' https:; font-src https: data:"
@@ -66,6 +67,15 @@ func (files libraryFiles) serveAttachment(writer http.ResponseWriter, request *h
 		"Content-Type":        {contentType},
 		"Content-Disposition": {mime.FormatMediaType("attachment", map[string]string{"filename": attachment.Name})},
 	})
+}
+
+func (files libraryFiles) serveCover(writer http.ResponseWriter, request *http.Request) {
+	course, ok := files.catalog.Current().Course(request.PathValue("courseId"))
+	if !ok || course.CoverPath == "" {
+		writeProblem(writer, http.StatusNotFound, "no cover for course "+request.PathValue("courseId"))
+		return
+	}
+	files.serve(writer, request, course.CoverPath, http.Header{"Content-Type": {coverContentType}})
 }
 
 func (files libraryFiles) serve(writer http.ResponseWriter, request *http.Request, filePath string, headers http.Header) {

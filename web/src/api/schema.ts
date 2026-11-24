@@ -583,6 +583,8 @@ export interface components {
              * @description Every file in the course's folder, measured when asked
              */
             sizeBytes: number;
+            /** @description Where the course's cover image is served; absent when it was downloaded without one */
+            coverUrl?: string;
             resume?: components["schemas"]["ContinueTarget"];
         };
         CourseDetail: components["schemas"]["CourseSummary"] & {

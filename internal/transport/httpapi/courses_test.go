@@ -1,6 +1,7 @@
 package httpapi
 
 import (
+	"maps"
 	"net/http"
 	"testing"
 
@@ -55,4 +56,24 @@ func TestContinueIsEmptyUntilSomethingIsWatched(t *testing.T) {
 	if target.LectureId != app.lectureID(t, 1) || target.PositionSeconds != 1.25 {
 		t.Errorf("target = %+v, want lecture 001 at 1.25s", target)
 	}
+}
+
+func TestACourseCoverIsListedAndServedOnlyWhenDownloaded(t *testing.T) {
+	withCover := maps.Clone(libraryFixture)
+	withCover["course/cover.jpg"] = "jpeg bytes"
+	app := newTestAppWith(t, withCover)
+	course := decode[[]gen.CourseSummary](t, app.do(t, http.MethodGet, "/api/courses", nil))[0]
+	if course.CoverUrl == nil {
+		t.Fatal("coverUrl missing for a course with cover.jpg")
+	}
+	cover := app.do(t, http.MethodGet, *course.CoverUrl, nil)
+	if cover.status != http.StatusOK || cover.header.Get("Content-Type") != "image/jpeg" || string(cover.body) != "jpeg bytes" {
+		t.Errorf("cover = %d %q %q", cover.status, cover.header.Get("Content-Type"), cover.body)
+	}
+	plain := newTestApp(t)
+	without := decode[[]gen.CourseSummary](t, plain.do(t, http.MethodGet, "/api/courses", nil))[0]
+	if without.CoverUrl != nil {
+		t.Errorf("coverUrl = %q for a course without a cover", *without.CoverUrl)
+	}
+	assertProblem(t, plain.do(t, http.MethodGet, "/covers/"+without.Id, nil), http.StatusNotFound)
 }

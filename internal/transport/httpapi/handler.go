@@ -48,6 +48,7 @@ func NewHandler(deps Deps) http.Handler {
 	mux.HandleFunc("GET "+mediaPrefix+"{lectureId}", files.serveVideo)
 	mux.HandleFunc("GET "+articlesPrefix+"{lectureId}", files.serveArticle)
 	mux.HandleFunc("GET "+attachmentsPrefix+"{attachmentId}", files.serveAttachment)
+	mux.HandleFunc("GET "+coversPrefix+"{courseId}", files.serveCover)
 	mux.HandleFunc("GET "+jobEventsPath, jobEventStream{jobs: deps.Jobs}.serve)
 
 	if deps.Frontend != nil {

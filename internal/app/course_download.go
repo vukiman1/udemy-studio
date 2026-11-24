@@ -88,6 +88,10 @@ func downloadCourse(ctx context.Context, client *udemyapi.Client, request course
 		Playlists: client,
 		Quizzes:   client,
 	}
-	options := download.Options{OutputDir: request.outputDir, TempDir: tempDir, Chapters: request.chapters}
+	coverURL, err := client.CourseCoverURL(ctx, plan.CourseID)
+	if err != nil {
+		logger.Warn("downloading without the course cover", "err", err)
+	}
+	options := download.Options{OutputDir: request.outputDir, TempDir: tempDir, Chapters: request.chapters, CoverURL: coverURL}
 	return download.Course(ctx, plan, tools, options, logger, onEvent)
 }

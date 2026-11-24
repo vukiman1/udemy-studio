@@ -44,6 +44,9 @@ func scanCourse(downloads fs.FS, courseDir string) (Course, error) {
 		return Course{}, err
 	}
 	course := Course{ID: shortID("course", courseDir), Title: courseDir, Dir: courseDir}
+	if cover := path.Join(courseDir, CoverFileName); isFile(downloads, cover) {
+		course.CoverPath = cover
+	}
 	for _, chapterDir := range chapterDirs {
 		match := chapterDirName.FindStringSubmatch(chapterDir)
 		if match == nil {
@@ -104,4 +107,9 @@ func visibleEntries(downloads fs.FS, dir string, wantDirs bool) ([]string, error
 		names = append(names, entry.Name())
 	}
 	return names, nil
+}
+
+func isFile(downloads fs.FS, name string) bool {
+	info, err := fs.Stat(downloads, name)
+	return err == nil && !info.IsDir()
 }

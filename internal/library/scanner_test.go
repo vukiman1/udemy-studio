@@ -198,3 +198,22 @@ func TestArticleKeepsItsIdentityWhenItsVideoGainsSubtitles(t *testing.T) {
 		t.Errorf("video=%q subtitles=%+v, want the attached video with its subtitle", translated.VideoPath, translated.Subtitles)
 	}
 }
+
+func TestScanFindsTheCoursesCover(t *testing.T) {
+	downloads := fstest.MapFS{
+		"with/01 - Intro/001 Welcome.mp4":    {},
+		"with/" + CoverFileName:              {Data: []byte("jpeg")},
+		"without/01 - Intro/001 Welcome.mp4": {},
+	}
+	scanned, err := Scan(downloads)
+	if err != nil {
+		t.Fatalf("Scan: %v", err)
+	}
+	covers := map[string]string{}
+	for _, course := range scanned.Courses {
+		covers[course.Title] = course.CoverPath
+	}
+	if covers["with"] != "with/"+CoverFileName || covers["without"] != "" {
+		t.Errorf("covers = %v; want only the course with a cover.jpg to have one", covers)
+	}
+}
