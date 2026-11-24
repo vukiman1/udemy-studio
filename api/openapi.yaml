@@ -589,6 +589,60 @@ paths:
         "503":
           $ref: "#/components/responses/DownloadsUnavailable"
 
+  /api/downloads/tokens:
+    get:
+      operationId: listPastedLogins
+      summary: Udemy tokens pasted by hand, one per portal; the tokens themselves never leave the server
+      responses:
+        "200":
+          description: Pasted logins
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PastedLogin"
+        "503":
+          $ref: "#/components/responses/DownloadsUnavailable"
+    put:
+      operationId: savePastedLogin
+      summary: Check a pasted access_token with its portal and use it for downloads from there
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PastedLoginDraft"
+      responses:
+        "200":
+          description: The portal accepted the token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PastedLogin"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "502":
+          $ref: "#/components/responses/ProviderUnreachable"
+        "503":
+          $ref: "#/components/responses/DownloadsUnavailable"
+
+  /api/downloads/tokens/{host}:
+    delete:
+      operationId: forgetPastedLogin
+      summary: Forget the token pasted for a portal
+      parameters:
+        - name: host
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Forgotten
+        "503":
+          $ref: "#/components/responses/DownloadsUnavailable"
+
   /api/jobs:
     get:
       operationId: listJobs
@@ -705,7 +759,7 @@ components:
           schema:
             $ref: "#/components/schemas/Problem"
     ProviderUnreachable:
-      description: The translation provider could not be reached
+      description: An outside service, such as the AI provider or Udemy, could not be reached
       content:
         application/problem+json:
           schema:
@@ -1220,6 +1274,30 @@ components:
           type: string
         text:
           type: string
+
+    PastedLogin:
+      type: object
+      required: [host, userName, savedAt]
+      properties:
+        host:
+          type: string
+        userName:
+          type: string
+          description: The account the token logs in as, as the portal names it
+        savedAt:
+          type: string
+          format: date-time
+
+    PastedLoginDraft:
+      type: object
+      required: [host, token]
+      properties:
+        host:
+          type: string
+          description: The portal's host, or any URL on it
+        token:
+          type: string
+          description: The value of the access_token cookie
 
     ChromeProfile:
       type: object

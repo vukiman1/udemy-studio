@@ -12,6 +12,7 @@ import (
 	"github.com/vukiman1/udemy-studio/internal/adapter/sqlite"
 	"github.com/vukiman1/udemy-studio/internal/jobs"
 	"github.com/vukiman1/udemy-studio/internal/login"
+	"github.com/vukiman1/udemy-studio/internal/platform/sealedbox"
 )
 
 const jobLogsDirName = "job-logs"
@@ -43,7 +44,7 @@ type downloads struct {
 	jobs  *jobs.Manager
 }
 
-func newDownloads(ctx context.Context, config DownloadOptions, dataDir string, database *sql.DB, onDownloaded func(context.Context) error, logger *slog.Logger) (downloads, error) {
+func newDownloads(ctx context.Context, config DownloadOptions, dataDir string, database *sql.DB, box *sealedbox.Box, onDownloaded func(context.Context) error, logger *slog.Logger) (downloads, error) {
 	if !config.canFindTools(logger) {
 		return downloads{}, nil
 	}
@@ -53,7 +54,7 @@ func newDownloads(ctx context.Context, config DownloadOptions, dataDir string, d
 		captionLanguage: config.CaptionLanguage,
 		tools:           config.Tools,
 	}
-	loginService := newLoginService(config.ChromeDataDir, database)
+	loginService := newLoginService(config.ChromeDataDir, database, box, logger)
 	manager := jobs.NewManager(jobs.Deps{
 		Downloader: downloader,
 		Tokens:     loginService,

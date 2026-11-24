@@ -71,7 +71,14 @@ func (blockingDownloader) Download(ctx context.Context, _ jobs.Job, _ secret.Sec
 
 func newDownloadsApp(t *testing.T) testApp {
 	t.Helper()
-	loginService := login.NewService(fakeCookieStore{}, &fakeSettings{}, time.Now)
+	loginService := login.NewService(login.Deps{
+		Cookies:  fakeCookieStore{},
+		Settings: &fakeSettings{},
+		Pasted:   &memoryPastedLogins{},
+		Checker:  fakeTokenChecker{},
+		Now:      time.Now,
+		Logger:   slog.New(slog.DiscardHandler),
+	})
 	manager := jobs.NewManager(jobs.Deps{
 		Downloader: blockingDownloader{}, Tokens: loginService, Store: memoryJobStore{},
 		Logger: slog.New(slog.DiscardHandler), Now: time.Now,
@@ -205,7 +212,50 @@ func waitForJob(t *testing.T, app testApp, id string, want gen.JobStatus) gen.Jo
 }
 
 func TestLoginStatusRaisesFailuresTheLearnerCannotFix(t *testing.T) {
-	loginService := login.NewService(fakeCookieStore{}, &fakeSettings{err: errors.New("database is locked")}, time.Now)
+	loginService := login.NewService(login.Deps{
+		Cookies:  fakeCookieStore{},
+		Settings: &fakeSettings{err: errors.New("database is locked")},
+		Pasted:   &memoryPastedLogins{},
+		Checker:  fakeTokenChecker{},
+		Now:      time.Now,
+		Logger:   slog.New(slog.DiscardHandler),
+	})
 	app := newTestAppWithDeps(t, libraryFixture, func(deps *Deps) { deps.Login = loginService })
 	assertProblem(t, app.do(t, http.MethodGet, "/api/downloads/status", nil), http.StatusInternalServerError)
+}
+
+const acceptedUdemyToken = "accepted-udemy-token" //nolint:gosec // reason: fake token for the fake portal
+
+type memoryPastedLogins struct{ logins []login.PastedLogin }
+
+func (store *memoryPastedLogins) LoadPastedLogins(context.Context) ([]login.PastedLogin, error) {
+	return store.logins, nil
+}
+
+func (store *memoryPastedLogins) SavePastedLogins(_ context.Context, logins []login.PastedLogin) error {
+	store.logins = logins
+	return nil
+}
+
+type fakeTokenChecker struct{}
+
+func (fakeTokenChecker) UserName(_ context.Context, _ string, token secret.Secret) (string, error) {
+	if token.Reveal() != acceptedUdemyToken {
+		return "", login.ErrTokenRejected
+	}
+	return "Learner", nil
+}
+
+func TestAPastedTokenIsCheckedAndNeverSentBack(t *testing.T) {
+	app := newDownloadsApp(t)
+	rejected := app.do(t, http.MethodPut, "/api/downloads/tokens", map[string]string{"host": "acme.udemy.com", "token": "copied-wrong"})
+	assertProblem(t, rejected, http.StatusBadRequest)
+	accepted := app.do(t, http.MethodPut, "/api/downloads/tokens", map[string]string{"host": "https://acme.udemy.com/course/go/", "token": acceptedUdemyToken})
+	if accepted.status != http.StatusOK || !strings.Contains(string(accepted.body), `"userName":"Learner"`) {
+		t.Errorf("save accepted token = %d %s", accepted.status, accepted.body)
+	}
+	listed := app.do(t, http.MethodGet, "/api/downloads/tokens", nil)
+	if listed.status != http.StatusOK || !strings.Contains(string(listed.body), `"host":"acme.udemy.com"`) || strings.Contains(string(listed.body), acceptedUdemyToken) {
+		t.Errorf("list = %d %s; want the portal listed and its token left out", listed.status, listed.body)
+	}
 }

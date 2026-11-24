@@ -18,6 +18,7 @@ const (
 	retryDelay        = 800 * time.Millisecond
 	portalURLTemplate = "https://%s.udemy.com"
 	visitPath         = "/api-2.0/visits/current/?fields%5Bvisit%5D=@default,visitor,country&locale=en_US"
+	currentUserPath   = "/api-2.0/users/me/?fields%5Buser%5D=title"
 )
 
 var (
@@ -38,10 +39,15 @@ func (err *StatusError) Error() string {
 	if err.Detail != "" {
 		message += ": " + err.Detail
 	}
-	if authFailedStatuses[err.Status] {
-		message += " (check that the Chrome profile is logged in and enrolled in this course)"
+	if err.IsAuthFailure() {
+		message += " (check that the Udemy login, from Chrome or a pasted token, is still valid and enrolled in this course)"
 	}
 	return message
+}
+
+// IsAuthFailure reports whether Udemy refused the login rather than the request.
+func (err *StatusError) IsAuthFailure() bool {
+	return authFailedStatuses[err.Status]
 }
 
 type UnexpectedResponseError struct {
@@ -86,6 +92,17 @@ func (client *Client) Visit(ctx context.Context) error {
 		return &StatusError{URL: redactQuery(client.portalURL + visitPath), Status: reply.status}
 	}
 	return nil
+}
+
+// CurrentUserName is the display name of the account the token logs in as; a refused token is an auth failure.
+func (client *Client) CurrentUserName(ctx context.Context) (string, error) {
+	var user struct {
+		Title string `json:"title"`
+	}
+	if err := client.getJSON(ctx, client.portalURL+currentUserPath, &user); err != nil {
+		return "", fmt.Errorf("read the account of the token: %w", err)
+	}
+	return user.Title, nil
 }
 
 func (client *Client) getJSON(ctx context.Context, target string, value any) error {

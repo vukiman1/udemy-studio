@@ -83,14 +83,15 @@ func Run(ctx context.Context, options Options, logger *slog.Logger) error {
 		compression: compression,
 		logger:      logger,
 	}
-	downloads, err := newDownloads(ctx, options.Downloads, options.DataDir, database, refresher.afterLibraryChanged, logger)
+	box, err := openSettingsBox(options.DataDir)
 	if err != nil {
 		return err
 	}
-	ai, err := newAISettings(options.DataDir, database, logger)
+	downloads, err := newDownloads(ctx, options.Downloads, options.DataDir, database, box, refresher.afterLibraryChanged, logger)
 	if err != nil {
 		return err
 	}
+	ai := newAISettings(box, database, logger)
 	translation := newTranslationQueue(media, refresher, ai, logger)
 	handler := httpapi.NewHandler(httpapi.Deps{
 		Version:     options.Version,

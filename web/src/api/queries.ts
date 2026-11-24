@@ -33,6 +33,7 @@ export const QUERY_KEYS = {
   ],
   chromeProfiles: ['chrome-profiles'],
   loginStatus: ['login-status'],
+  pastedLogins: ['pasted-logins'],
   jobs: ['jobs'],
   search: (query: string) => ['search', query],
   notes: (lectureId: string) => ['notes', lectureId],

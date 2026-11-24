@@ -1,3 +1,5 @@
+//go:build darwin
+
 package app
 
 import (
@@ -8,7 +10,7 @@ import (
 	"strconv"
 )
 
-// caffeinate -i keeps macOS from sleeping while it runs; other systems lack it and simply may sleep. With -w it also
+// caffeinate -i keeps macOS from sleeping while it runs. With -w it also
 // exits with this process, even one killed before it could stop caffeinate itself.
 const caffeinateBinary = "caffeinate"
 

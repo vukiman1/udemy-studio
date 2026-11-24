@@ -5,7 +5,8 @@ import { QUERY_KEYS } from '../../api/queries'
 
 const DATE_FORMAT = new Intl.DateTimeFormat('vi-VN', { dateStyle: 'medium' })
 
-export function ProfilePicker(): ReactElement {
+// A machine without Chrome, such as a Docker host, lists no profiles, so the picker gives way to pasted tokens.
+export function ProfilePicker(): ReactElement | null {
   const queryClient = useQueryClient()
   const profiles = useChromeProfiles()
   const status = useLoginStatus()
@@ -19,10 +20,10 @@ export function ProfilePicker(): ReactElement {
     },
   })
   const selected = profiles.data?.find((profile) => profile.selected)
+  if (profiles.data?.length === 0) return null
 
   return (
-    <section className="grid gap-3 rounded-xl border border-line bg-surface p-4">
-      <h2 className="font-semibold">Tài khoản Udemy</h2>
+    <div className="grid gap-3">
       <label className="grid gap-1 text-[0.9rem]">
         Đọc đăng nhập từ profile Chrome
         <select
@@ -58,6 +59,6 @@ export function ProfilePicker(): ReactElement {
           ))}
         </ul>
       )}
-    </section>
+    </div>
   )
 }

@@ -444,6 +444,24 @@ type NoteEdit struct {
 	Body string `json:"body"`
 }
 
+// PastedLogin defines model for PastedLogin.
+type PastedLogin struct {
+	Host    string    `json:"host"`
+	SavedAt time.Time `json:"savedAt"`
+
+	// UserName The account the token logs in as, as the portal names it
+	UserName string `json:"userName"`
+}
+
+// PastedLoginDraft defines model for PastedLoginDraft.
+type PastedLoginDraft struct {
+	// Host The portal's host, or any URL on it
+	Host string `json:"host"`
+
+	// Token The value of the access_token cookie
+	Token string `json:"token"`
+}
+
 // Problem RFC 9457 problem details
 type Problem struct {
 	Detail *string `json:"detail,omitempty"`
@@ -582,6 +600,9 @@ type SetAIEnabledJSONRequestBody = AIEnabled
 // SelectChromeProfileJSONRequestBody defines body for SelectChromeProfile for application/json ContentType.
 type SelectChromeProfileJSONRequestBody = ProfileSelection
 
+// SavePastedLoginJSONRequestBody defines body for SavePastedLogin for application/json ContentType.
+type SavePastedLoginJSONRequestBody = PastedLoginDraft
+
 // CreateJobJSONRequestBody defines body for CreateJob for application/json ContentType.
 type CreateJobJSONRequestBody = JobRequest
 
@@ -659,6 +680,15 @@ type ServerInterface interface {
 	// GetLoginStatus Selected profile and whether its Udemy logins are still valid
 	// (GET /api/downloads/status)
 	GetLoginStatus(w http.ResponseWriter, r *http.Request)
+	// ListPastedLogins Udemy tokens pasted by hand, one per portal; the tokens themselves never leave the server
+	// (GET /api/downloads/tokens)
+	ListPastedLogins(w http.ResponseWriter, r *http.Request)
+	// SavePastedLogin Check a pasted access_token with its portal and use it for downloads from there
+	// (PUT /api/downloads/tokens)
+	SavePastedLogin(w http.ResponseWriter, r *http.Request)
+	// ForgetPastedLogin Forget the token pasted for a portal
+	// (DELETE /api/downloads/tokens/{host})
+	ForgetPastedLogin(w http.ResponseWriter, r *http.Request, host string)
 	// ListJobs Download jobs, newest first
 	// (GET /api/jobs)
 	ListJobs(w http.ResponseWriter, r *http.Request)
@@ -1126,6 +1156,60 @@ func (siw *ServerInterfaceWrapper) GetLoginStatus(w http.ResponseWriter, r *http
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.GetLoginStatus(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ListPastedLogins operation middleware
+func (siw *ServerInterfaceWrapper) ListPastedLogins(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListPastedLogins(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// SavePastedLogin operation middleware
+func (siw *ServerInterfaceWrapper) SavePastedLogin(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.SavePastedLogin(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ForgetPastedLogin operation middleware
+func (siw *ServerInterfaceWrapper) ForgetPastedLogin(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "host" -------------
+	var host string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "host", r.PathValue("host"), &host, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "host", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ForgetPastedLogin(w, r, host)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -1615,6 +1699,9 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/downloads/profiles", wrapper.ListChromeProfiles)
 	m.HandleFunc(http.MethodPut+" "+options.BaseURL+"/api/downloads/profile", wrapper.SelectChromeProfile)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/downloads/status", wrapper.GetLoginStatus)
+	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/downloads/tokens", wrapper.ListPastedLogins)
+	m.HandleFunc(http.MethodPut+" "+options.BaseURL+"/api/downloads/tokens", wrapper.SavePastedLogin)
+	m.HandleFunc(http.MethodDelete+" "+options.BaseURL+"/api/downloads/tokens/{host}", wrapper.ForgetPastedLogin)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/jobs", wrapper.ListJobs)
 	m.HandleFunc(http.MethodPost+" "+options.BaseURL+"/api/jobs", wrapper.CreateJob)
 	m.HandleFunc(http.MethodDelete+" "+options.BaseURL+"/api/jobs/{jobId}", wrapper.CancelJob)
@@ -2508,6 +2595,145 @@ func (response GetLoginStatus503ApplicationProblemPlusJSONResponse) VisitGetLogi
 	return err
 }
 
+type ListPastedLoginsRequestObject struct {
+}
+
+type ListPastedLoginsResponseObject interface {
+	VisitListPastedLoginsResponse(w http.ResponseWriter) error
+}
+
+type ListPastedLogins200JSONResponse []PastedLogin
+
+func (response ListPastedLogins200JSONResponse) VisitListPastedLoginsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListPastedLogins503ApplicationProblemPlusJSONResponse struct {
+	DownloadsUnavailableApplicationProblemPlusJSONResponse
+}
+
+func (response ListPastedLogins503ApplicationProblemPlusJSONResponse) VisitListPastedLoginsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.DownloadsUnavailableApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(503)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SavePastedLoginRequestObject struct {
+	Body *SavePastedLoginJSONRequestBody
+}
+
+type SavePastedLoginResponseObject interface {
+	VisitSavePastedLoginResponse(w http.ResponseWriter) error
+}
+
+type SavePastedLogin200JSONResponse PastedLogin
+
+func (response SavePastedLogin200JSONResponse) VisitSavePastedLoginResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SavePastedLogin400ApplicationProblemPlusJSONResponse struct {
+	BadRequestApplicationProblemPlusJSONResponse
+}
+
+func (response SavePastedLogin400ApplicationProblemPlusJSONResponse) VisitSavePastedLoginResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.BadRequestApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SavePastedLogin502ApplicationProblemPlusJSONResponse struct {
+	ProviderUnreachableApplicationProblemPlusJSONResponse
+}
+
+func (response SavePastedLogin502ApplicationProblemPlusJSONResponse) VisitSavePastedLoginResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.ProviderUnreachableApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(502)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SavePastedLogin503ApplicationProblemPlusJSONResponse struct {
+	DownloadsUnavailableApplicationProblemPlusJSONResponse
+}
+
+func (response SavePastedLogin503ApplicationProblemPlusJSONResponse) VisitSavePastedLoginResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.DownloadsUnavailableApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(503)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ForgetPastedLoginRequestObject struct {
+	Host string `json:"host"`
+}
+
+type ForgetPastedLoginResponseObject interface {
+	VisitForgetPastedLoginResponse(w http.ResponseWriter) error
+}
+
+type ForgetPastedLogin204Response struct {
+}
+
+func (response ForgetPastedLogin204Response) VisitForgetPastedLoginResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type ForgetPastedLogin503ApplicationProblemPlusJSONResponse struct {
+	DownloadsUnavailableApplicationProblemPlusJSONResponse
+}
+
+func (response ForgetPastedLogin503ApplicationProblemPlusJSONResponse) VisitForgetPastedLoginResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.DownloadsUnavailableApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(503)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 type ListJobsRequestObject struct {
 }
 
@@ -3111,6 +3337,15 @@ type StrictServerInterface interface {
 	// GetLoginStatus Selected profile and whether its Udemy logins are still valid
 	// (GET /api/downloads/status)
 	GetLoginStatus(ctx context.Context, request GetLoginStatusRequestObject) (GetLoginStatusResponseObject, error)
+	// ListPastedLogins Udemy tokens pasted by hand, one per portal; the tokens themselves never leave the server
+	// (GET /api/downloads/tokens)
+	ListPastedLogins(ctx context.Context, request ListPastedLoginsRequestObject) (ListPastedLoginsResponseObject, error)
+	// SavePastedLogin Check a pasted access_token with its portal and use it for downloads from there
+	// (PUT /api/downloads/tokens)
+	SavePastedLogin(ctx context.Context, request SavePastedLoginRequestObject) (SavePastedLoginResponseObject, error)
+	// ForgetPastedLogin Forget the token pasted for a portal
+	// (DELETE /api/downloads/tokens/{host})
+	ForgetPastedLogin(ctx context.Context, request ForgetPastedLoginRequestObject) (ForgetPastedLoginResponseObject, error)
 	// ListJobs Download jobs, newest first
 	// (GET /api/jobs)
 	ListJobs(ctx context.Context, request ListJobsRequestObject) (ListJobsResponseObject, error)
@@ -3741,6 +3976,87 @@ func (sh *strictHandler) GetLoginStatus(w http.ResponseWriter, r *http.Request) 
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(GetLoginStatusResponseObject); ok {
 		if err := validResponse.VisitGetLoginStatusResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ListPastedLogins operation middleware
+func (sh *strictHandler) ListPastedLogins(w http.ResponseWriter, r *http.Request) {
+	var request ListPastedLoginsRequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error) {
+		return sh.ssi.ListPastedLogins(ctx, request.(ListPastedLoginsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListPastedLogins")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListPastedLoginsResponseObject); ok {
+		if err := validResponse.VisitListPastedLoginsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// SavePastedLogin operation middleware
+func (sh *strictHandler) SavePastedLogin(w http.ResponseWriter, r *http.Request) {
+	var request SavePastedLoginRequestObject
+
+	var body SavePastedLoginJSONRequestBody
+	if err := runtime.BindJSONBody(r, &body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error) {
+		return sh.ssi.SavePastedLogin(ctx, request.(SavePastedLoginRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "SavePastedLogin")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(SavePastedLoginResponseObject); ok {
+		if err := validResponse.VisitSavePastedLoginResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ForgetPastedLogin operation middleware
+func (sh *strictHandler) ForgetPastedLogin(w http.ResponseWriter, r *http.Request, host string) {
+	var request ForgetPastedLoginRequestObject
+
+	request.Host = host
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error) {
+		return sh.ssi.ForgetPastedLogin(ctx, request.(ForgetPastedLoginRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ForgetPastedLogin")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ForgetPastedLoginResponseObject); ok {
+		if err := validResponse.VisitForgetPastedLoginResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {
