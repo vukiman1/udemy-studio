@@ -1,5 +1,7 @@
 export const PLAYBACK_RATES = [0.75, 1, 1.25, 1.5, 1.75, 2] as const
 export const FONT_SCALES = [0.8, 1, 1.2, 1.4, 1.7] as const
+export const TEXT_OPACITIES = [0.25, 0.5, 0.75, 1] as const
+export const BACKGROUND_OPACITIES = [0, 0.25, 0.5, 0.75, 1] as const
 export const PRIMARY_LANGUAGE = 'vi'
 export const SECONDARY_LANGUAGE = 'en'
 
@@ -21,12 +23,16 @@ export interface PlayerSettings {
   readonly playbackRate: number
   readonly subtitleMode: SubtitleMode
   readonly fontScale: number
+  readonly textOpacity: number
+  readonly backgroundOpacity: number
 }
 
 export const DEFAULT_PLAYER_SETTINGS: PlayerSettings = {
   playbackRate: 1,
   subtitleMode: SubtitleMode.Bilingual,
   fontScale: 1,
+  textOpacity: 1,
+  backgroundOpacity: 0.75,
 }
 
 export function parsePlayerSettings(stored: string | null): PlayerSettings {
@@ -47,6 +53,12 @@ export function parsePlayerSettings(stored: string | null): PlayerSettings {
     fontScale: isListed(FONT_SCALES, record.fontScale)
       ? record.fontScale
       : DEFAULT_PLAYER_SETTINGS.fontScale,
+    textOpacity: isListed(TEXT_OPACITIES, record.textOpacity)
+      ? record.textOpacity
+      : DEFAULT_PLAYER_SETTINGS.textOpacity,
+    backgroundOpacity: isListed(BACKGROUND_OPACITIES, record.backgroundOpacity)
+      ? record.backgroundOpacity
+      : DEFAULT_PLAYER_SETTINGS.backgroundOpacity,
   }
 }
 

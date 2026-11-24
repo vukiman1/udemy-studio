@@ -85,7 +85,14 @@ export function VideoPlayer({
       <Player>
         <I18nProvider locale={PLAYER_LOCALE}>
           <StudioSkin
-            overlay={<SubtitleOverlay lines={activeLines} fontScale={settings.fontScale} />}
+            overlay={
+              <SubtitleOverlay
+                lines={activeLines}
+                fontScale={settings.fontScale}
+                textOpacity={settings.textOpacity}
+                backgroundOpacity={settings.backgroundOpacity}
+              />
+            }
             settingsMenu={
               <SettingsMenu
                 settings={settings}
