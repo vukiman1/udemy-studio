@@ -163,7 +163,7 @@ func TestJobFailsWithTheDownloaderOrLoginError(t *testing.T) {
 		tokenErr   error
 		wantError  string
 	}{
-		"downloader exits with an error": {downloader: &scriptedDownloader{err: errors.New("python exited with status 1")}, wantError: "python exited with status 1"},
+		"downloader exits with an error": {downloader: &scriptedDownloader{err: errors.New("yt-dlp exited with status 1")}, wantError: "yt-dlp exited with status 1"},
 		"login is missing":               {downloader: &scriptedDownloader{}, tokenErr: errors.New("not logged in to Udemy: log in to acme.udemy.com"), wantError: "not logged in to Udemy: log in to acme.udemy.com"},
 	}
 	for name, testCase := range cases {

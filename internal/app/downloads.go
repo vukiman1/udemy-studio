@@ -3,71 +3,39 @@ package app
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"fmt"
 	"log/slog"
 	"os/exec"
 	"path/filepath"
 	"time"
 
-	"github.com/vukiman1/udemy-studio/internal/adapter/pythondownloader"
 	"github.com/vukiman1/udemy-studio/internal/adapter/sqlite"
 	"github.com/vukiman1/udemy-studio/internal/jobs"
 	"github.com/vukiman1/udemy-studio/internal/login"
 )
 
-const (
-	jobLogsDirName   = "job-logs"
-	DownloaderPython = "python"
-	DownloaderGo     = "go"
-)
-
-var ErrUnknownDownloader = errors.New("unknown downloader: use " + DownloaderPython + " or " + DownloaderGo)
+const jobLogsDirName = "job-logs"
 
 type DownloadOptions struct {
-	Downloader      string
-	Python          string
-	PythonRepo      string
 	Tools           ToolPaths
 	OutputDir       string
 	ChromeDataDir   string
 	CaptionLanguage string
 }
 
-// isConfigured is false only for the Python downloader without its checkout; any other value reaches newDownloader.
-func (options DownloadOptions) isConfigured() bool {
-	return options.Downloader != DownloaderPython || (options.Python != "" && options.PythonRepo != "")
-}
-
-// missingTool names the first tool the Go downloader cannot find, so jobs are not offered only to fail.
-func (options DownloadOptions) missingTool() (string, bool) {
-	if options.Downloader != DownloaderGo {
-		return "", false
+// canFindTools logs the first tool downloads cannot run, so jobs are not offered only to fail.
+func (options DownloadOptions) canFindTools(logger *slog.Logger) bool {
+	required := []struct{ path, flag string }{
+		{options.Tools.Aria2c, "--aria2c"},
+		{options.Tools.YTDLP, "--yt-dlp"},
 	}
-	for _, tool := range []string{options.Tools.Aria2c, options.Tools.YTDLP} {
-		if _, err := exec.LookPath(tool); err != nil {
-			return filepath.Base(tool), true
+	for _, tool := range required {
+		if _, err := exec.LookPath(tool.path); err != nil {
+			logger.Warn("downloads disabled: "+tool.path+" cannot run; install it or pass its path with "+tool.flag, "err", err)
+			return false
 		}
 	}
-	return "", false
-}
-
-func (options DownloadOptions) newDownloader(logDir string, logger *slog.Logger) (jobs.Downloader, error) {
-	switch options.Downloader {
-	case DownloaderGo:
-		return goDownloader{outputDir: options.OutputDir, logDir: logDir, captionLanguage: options.CaptionLanguage, tools: options.Tools}, nil
-	case DownloaderPython:
-		return pythondownloader.New(pythondownloader.Config{
-			Python:          options.Python,
-			RepoDir:         options.PythonRepo,
-			OutputDir:       options.OutputDir,
-			LogDir:          logDir,
-			CaptionLanguage: options.CaptionLanguage,
-			KeepAwake:       true,
-		}, logger), nil
-	default:
-		return nil, fmt.Errorf("%w: %q", ErrUnknownDownloader, options.Downloader)
-	}
+	return true
 }
 
 type downloads struct {
@@ -76,17 +44,14 @@ type downloads struct {
 }
 
 func newDownloads(ctx context.Context, config DownloadOptions, dataDir string, database *sql.DB, onDownloaded func(context.Context) error, logger *slog.Logger) (downloads, error) {
-	if !config.isConfigured() {
-		logger.Info("downloads disabled; the Python downloader needs --python and --python-repo, or use --downloader go")
+	if !config.canFindTools(logger) {
 		return downloads{}, nil
 	}
-	if tool, missing := config.missingTool(); missing {
-		logger.Warn("downloads disabled: the Go downloader needs "+tool+"; install it or pass its path with --"+tool, "downloader", config.Downloader)
-		return downloads{}, nil
-	}
-	downloader, err := config.newDownloader(filepath.Join(dataDir, jobLogsDirName), logger)
-	if err != nil {
-		return downloads{}, err
+	downloader := jobDownloader{
+		outputDir:       config.OutputDir,
+		logDir:          filepath.Join(dataDir, jobLogsDirName),
+		captionLanguage: config.CaptionLanguage,
+		tools:           config.Tools,
 	}
 	loginService := newLoginService(config.ChromeDataDir, database)
 	manager := jobs.NewManager(jobs.Deps{
@@ -104,7 +69,7 @@ func newDownloads(ctx context.Context, config DownloadOptions, dataDir string, d
 	if err := manager.Restore(ctx); err != nil {
 		return downloads{}, fmt.Errorf("restore download jobs: %w", err)
 	}
-	logger.Info("downloads enabled", "downloader", config.Downloader, "output", config.OutputDir)
+	logger.Info("downloads enabled", "output", config.OutputDir)
 	return downloads{login: loginService, jobs: manager}, nil
 }
 

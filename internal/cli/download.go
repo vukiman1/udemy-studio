@@ -17,7 +17,7 @@ func newDownloadCommand() *cobra.Command {
 	var options app.DownloadCourseOptions
 	command := &cobra.Command{
 		Use:   "download <course-url>",
-		Short: "Download a course with the Go downloader, the way the Python downloader lays it out",
+		Short: "Download a course into the --output directory, laid out as the library expects",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(command *cobra.Command, args []string) error {
 			options.CourseURL = args[0]

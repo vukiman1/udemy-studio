@@ -14,8 +14,6 @@ import (
 const (
 	defaultListenAddress = "127.0.0.1:8765"
 	libraryDirEnv        = "UDEMY_STUDIO_LIBRARY"
-	pythonEnv            = "UDEMY_STUDIO_PYTHON"
-	pythonRepoEnv        = "UDEMY_STUDIO_PYTHON_REPO"
 )
 
 func newServeCommand(version string) *cobra.Command {
@@ -45,13 +43,7 @@ func newServeCommand(version string) *cobra.Command {
 		"downloads/ directory the player reads and downloads go to by default (env "+libraryDirEnv+")")
 	flags.StringVar(&options.DataDir, "data-dir", "", dataDirUsage)
 	flags.BoolVar(&options.LANMode, "lan", false, "listen on the local network; other devices need the printed access code")
-	flags.StringVar(&options.Downloads.Downloader, "downloader", app.DownloaderGo,
-		"what runs download jobs: "+app.DownloaderGo+", or "+app.DownloaderPython+" with --python and --python-repo")
 	addToolFlags(command, &options.Downloads.Tools)
-	flags.StringVar(&options.Downloads.Python, "python", os.Getenv(pythonEnv),
-		"python of the udemy-downloader venv, for --downloader "+app.DownloaderPython+" (env "+pythonEnv+")")
-	flags.StringVar(&options.Downloads.PythonRepo, "python-repo", os.Getenv(pythonRepoEnv),
-		"udemy-downloader checkout the downloader runs in (env "+pythonRepoEnv+")")
 	flags.StringVar(&options.Downloads.OutputDir, "download-dir", "", "where downloads are written (default: --library)")
 	flags.StringVar(&options.Downloads.ChromeDataDir, "chrome-data-dir", "", chromeDataDirUsage)
 	flags.StringVar(&options.Compression.FFmpeg, "ffmpeg", defaultFFmpeg, "ffmpeg binary that compresses videos to H.265")
@@ -60,13 +52,10 @@ func newServeCommand(version string) *cobra.Command {
 	return command
 }
 
-// The downloader runs inside its own checkout, so a relative path would point somewhere else for it.
 func resolvePaths(options *app.Options) error {
 	paths := []*string{
 		&options.LibraryDir,
 		&options.DataDir,
-		&options.Downloads.Python,
-		&options.Downloads.PythonRepo,
 		&options.Downloads.OutputDir,
 		&options.Downloads.ChromeDataDir,
 	}

@@ -32,7 +32,7 @@ type DownloadCourseOptions struct {
 	ToolOutput      io.Writer
 }
 
-// courseDownload is what both the CLI and a download job ask the Go downloader for.
+// courseDownload is what both the CLI and a download job ask the downloader for.
 type courseDownload struct {
 	ref             udemy.CourseRef
 	chapters        download.ChapterFilter
@@ -70,6 +70,8 @@ func newCourseDownload(courseURL, chapters string) (courseDownload, error) {
 }
 
 func downloadCourse(ctx context.Context, client *udemyapi.Client, request courseDownload, logger *slog.Logger, onEvent func(jobs.Event)) (download.Summary, error) {
+	stopKeepingAwake := keepAwake(ctx, logger)
+	defer stopKeepingAwake()
 	planOptions := udemy.PlanOptions{Quality: udemy.BestQuality, CaptionLanguage: request.captionLanguage, DownloadAssets: true}
 	plan, err := planCourse(ctx, client, request.ref, planOptions, logger)
 	if err != nil {

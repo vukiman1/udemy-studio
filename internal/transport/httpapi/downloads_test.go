@@ -104,7 +104,7 @@ func TestDownloadEndpointsExplainWhenDownloadsAreOff(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			result := app.do(t, request[0], request[1], nil)
 			assertProblem(t, result, http.StatusServiceUnavailable)
-			if !strings.Contains(string(result.body), "--python") {
+			if !strings.Contains(string(result.body), "--yt-dlp") {
 				t.Errorf("problem does not say how to enable downloads: %s", result.body)
 			}
 		})

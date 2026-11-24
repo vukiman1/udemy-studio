@@ -693,7 +693,7 @@ components:
 
   responses:
     DownloadsUnavailable:
-      description: The server was started without a downloader configured
+      description: yt-dlp or aria2c could not be found when the server started
       content:
         application/problem+json:
           schema:
