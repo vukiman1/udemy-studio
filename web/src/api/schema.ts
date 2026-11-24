@@ -828,7 +828,7 @@ export interface components {
         };
     };
     responses: {
-        /** @description The server was started without a downloader configured */
+        /** @description yt-dlp or aria2c could not be found when the server started */
         DownloadsUnavailable: {
             headers: {
                 [name: string]: unknown;

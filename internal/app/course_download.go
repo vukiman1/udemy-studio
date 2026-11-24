@@ -32,7 +32,7 @@ type DownloadCourseOptions struct {
 	ToolOutput      io.Writer
 }
 
-// courseDownload is what both the CLI and a download job ask the Go downloader for.
+// courseDownload is what both the CLI and a download job ask the downloader for.
 type courseDownload struct {
 	ref             udemy.CourseRef
 	chapters        download.ChapterFilter

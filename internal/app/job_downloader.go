@@ -17,15 +17,15 @@ const (
 	jobLogSuffix   = ".log"
 )
 
-// goDownloader runs a download job in process, writing what it and the tools print to the job's log like the Python runner.
-type goDownloader struct {
+// jobDownloader runs a download job in process, writing what it and the tools print to the job's log.
+type jobDownloader struct {
 	outputDir       string
 	logDir          string
 	captionLanguage string
 	tools           ToolPaths
 }
 
-func (downloader goDownloader) Download(ctx context.Context, job jobs.Job, token secret.Secret, onEvent func(jobs.Event)) error {
+func (downloader jobDownloader) Download(ctx context.Context, job jobs.Job, token secret.Secret, onEvent func(jobs.Event)) error {
 	request, err := newCourseDownload(job.Request.CourseURL, job.Request.Chapters)
 	if err != nil {
 		return err
@@ -51,7 +51,7 @@ func (downloader goDownloader) Download(ctx context.Context, job jobs.Job, token
 		return ctx.Err()
 	}
 	if err != nil {
-		return fmt.Errorf("go downloader failed (see %s): %w", logPath, err)
+		return fmt.Errorf("download failed (see %s): %w", logPath, err)
 	}
 	return nil
 }

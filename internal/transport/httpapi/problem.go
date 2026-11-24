@@ -10,7 +10,7 @@ import (
 
 const (
 	problemContentType           = "application/problem+json"
-	downloadsUnavailableDetail   = "downloads are not configured: start the server with --downloader go, or with --python and --python-repo"
+	downloadsUnavailableDetail   = "downloads need yt-dlp and aria2c; install them or pass their paths with --yt-dlp and --aria2c"
 	compressionUnavailableDetail = "compression needs ffmpeg and ffprobe; install them or pass their paths with --ffmpeg and --ffprobe"
 )
 

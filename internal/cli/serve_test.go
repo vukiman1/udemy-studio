@@ -17,8 +17,6 @@ func TestRelativePathsAreResolvedAgainstTheWorkingDirectory(t *testing.T) {
 		LibraryDir: "downloads",
 		DataDir:    "data",
 		Downloads: app.DownloadOptions{
-			Python:        ".venv/bin/python",
-			PythonRepo:    "../udemy-downloader",
 			OutputDir:     "shadow",
 			ChromeDataDir: "/already/absolute",
 		},
@@ -27,20 +25,16 @@ func TestRelativePathsAreResolvedAgainstTheWorkingDirectory(t *testing.T) {
 		t.Fatalf("resolvePaths: %v", err)
 	}
 	want := map[string]string{
-		"library":     filepath.Join(workingDir, "downloads"),
-		"data":        filepath.Join(workingDir, "data"),
-		"python":      filepath.Join(workingDir, ".venv/bin/python"),
-		"python repo": filepath.Join(filepath.Dir(workingDir), "udemy-downloader"),
-		"output":      filepath.Join(workingDir, "shadow"),
-		"chrome":      "/already/absolute",
+		"library": filepath.Join(workingDir, "downloads"),
+		"data":    filepath.Join(workingDir, "data"),
+		"output":  filepath.Join(workingDir, "shadow"),
+		"chrome":  "/already/absolute",
 	}
 	got := map[string]string{
-		"library":     options.LibraryDir,
-		"data":        options.DataDir,
-		"python":      options.Downloads.Python,
-		"python repo": options.Downloads.PythonRepo,
-		"output":      options.Downloads.OutputDir,
-		"chrome":      options.Downloads.ChromeDataDir,
+		"library": options.LibraryDir,
+		"data":    options.DataDir,
+		"output":  options.Downloads.OutputDir,
+		"chrome":  options.Downloads.ChromeDataDir,
 	}
 	for name, path := range want {
 		if got[name] != path {

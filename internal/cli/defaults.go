@@ -55,6 +55,6 @@ func withDataDefaults(dataDir, chromeDataDir string) (string, string, error) {
 }
 
 func addToolFlags(command *cobra.Command, tools *app.ToolPaths) {
-	command.Flags().StringVar(&tools.Aria2c, "aria2c", defaultAria2c, "aria2c binary the Go downloader runs")
-	command.Flags().StringVar(&tools.YTDLP, "yt-dlp", defaultYTDLP, "yt-dlp binary the Go downloader runs")
+	command.Flags().StringVar(&tools.Aria2c, "aria2c", defaultAria2c, "aria2c binary downloads run")
+	command.Flags().StringVar(&tools.YTDLP, "yt-dlp", defaultYTDLP, "yt-dlp binary downloads run")
 }
