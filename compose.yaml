@@ -1,7 +1,8 @@
 services:
   udemy-studio:
+    # GitHub builds this image on every merge to main: `docker compose pull` fetches it, `--build` builds this checkout.
+    image: ghcr.io/vukiman1/udemy-studio:latest
     build: .
-    image: udemy-studio
     ports:
       # Reachable from this machine only; for other devices publish the port and add --lan to the command.
       - "127.0.0.1:8765:8765"

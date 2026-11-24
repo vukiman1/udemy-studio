@@ -1,6 +1,7 @@
 # syntax=docker/dockerfile:1
 
-FROM node:26-slim AS web
+# The web and Go stages run on the build machine and cross-compile, so a multi-arch build emulates only apt.
+FROM --platform=$BUILDPLATFORM node:26-slim AS web
 WORKDIR /src/web
 COPY web/package.json web/pnpm-lock.yaml ./
 # Node 25 dropped corepack, so pnpm is installed at the version package.json pins.
@@ -9,14 +10,16 @@ RUN npm install --global "$(node -p "require('./package.json').packageManager")"
 COPY web/ ./
 RUN pnpm build
 
-FROM golang:1.27 AS server
+FROM --platform=$BUILDPLATFORM golang:1.27 AS server
 WORKDIR /src
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
 COPY --from=web /src/web/dist ./web/dist
 ARG VERSION=docker
-RUN CGO_ENABLED=0 go build -trimpath -ldflags "-s -w -X main.version=${VERSION}" -o /out/udemy-studio ./cmd/udemy-studio
+ARG TARGETOS
+ARG TARGETARCH
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -trimpath -ldflags "-s -w -X main.version=${VERSION}" -o /out/udemy-studio ./cmd/udemy-studio
 
 FROM debian:trixie-slim
 RUN apt-get update \
