@@ -1,0 +1,22 @@
+{
+  "lecture": {
+    "id": 908,
+    "lecture_title": "014 Untyped",
+    "lecture_index": 14,
+    "_class": "quiz",
+    "data": {
+      "_class": "quiz",
+      "id": 908,
+      "title": "Quiz 1: Cloud & \"AI\" <b>'Tiếng Việt'</b> 😀",
+      "object_index": 7,
+      "type": "simple-quiz"
+    }
+  },
+  "assessments": [
+    {
+      "_class": "assessment",
+      "id": 9,
+      "prompt": {}
+    }
+  ]
+}

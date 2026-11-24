@@ -1,0 +1,29 @@
+{
+  "lecture": {
+    "id": 906,
+    "lecture_title": "012 Mixed",
+    "lecture_index": 12,
+    "_class": "quiz",
+    "data": {
+      "_class": "quiz",
+      "id": 906,
+      "title": "Quiz 1: Cloud & \"AI\" <b>'Tiếng Việt'</b> 😀",
+      "object_index": 7,
+      "type": "simple-quiz"
+    }
+  },
+  "assessments": [
+    {
+      "_class": "assessment",
+      "id": 7,
+      "assessment_type": "coding-problem",
+      "prompt": {}
+    },
+    {
+      "_class": "assessment",
+      "id": 8,
+      "assessment_type": "multiple-choice",
+      "prompt": {}
+    }
+  ]
+}

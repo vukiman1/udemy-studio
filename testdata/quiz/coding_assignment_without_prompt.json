@@ -1,0 +1,23 @@
+{
+  "lecture": {
+    "id": 905,
+    "lecture_title": "011 Coding exercise 3",
+    "lecture_index": 11,
+    "_class": "quiz",
+    "data": {
+      "_class": "quiz",
+      "id": 905,
+      "title": "Quiz 1: Cloud & \"AI\" <b>'Tiếng Việt'</b> 😀",
+      "object_index": 7,
+      "type": "simple-quiz"
+    }
+  },
+  "assessments": [
+    {
+      "_class": "assessment",
+      "id": 6,
+      "assessment_type": "coding-problem",
+      "prompt": {}
+    }
+  ]
+}

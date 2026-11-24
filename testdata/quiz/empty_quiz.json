@@ -1,0 +1,16 @@
+{
+  "lecture": {
+    "id": 907,
+    "lecture_title": "013 Empty",
+    "lecture_index": 13,
+    "_class": "quiz",
+    "data": {
+      "_class": "quiz",
+      "id": 907,
+      "title": "Quiz 1: Cloud & \"AI\" <b>'Tiếng Việt'</b> 😀",
+      "object_index": 7,
+      "type": "simple-quiz"
+    }
+  },
+  "assessments": []
+}

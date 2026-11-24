@@ -1,0 +1,34 @@
+[
+  {
+    "input": "{\"b\": 1, \"a\": [true, false, null], \"c\": {}}",
+    "output": "{\"b\": 1, \"a\": [true, false, null], \"c\": {}}"
+  },
+  {
+    "input": "[]",
+    "output": "[]"
+  },
+  {
+    "input": "{\"float\": [0.1, 1.5, 100.0, 1e16, 1e15, 0.0001, 0.00001, 1.5e-07, -0.0, 2.5e+20, 123456789012345678.0]}",
+    "output": "{\"float\": [0.1, 1.5, 100.0, 1e+16, 1000000000000000.0, 0.0001, 1e-05, 1.5e-07, -0.0, 2.5e+20, 1.2345678901234568e+17]}"
+  },
+  {
+    "input": "{\"int\": [0, -0, 7, 12345678901234567890123, -42]}",
+    "output": "{\"int\": [0, 0, 7, 12345678901234567890123, -42]}"
+  },
+  {
+    "input": "{\"overflow\": [1e400, -1e400]}",
+    "output": "{\"overflow\": [Infinity, -Infinity]}"
+  },
+  {
+    "input": "\"Tiếng Việt — emoji 😀 and \\u0000 \\u001f \\u007f tab\\t quote\\\" slash/ backslash\\\\\"",
+    "output": "\"Ti\\u1ebfng Vi\\u1ec7t \\u2014 emoji \\ud83d\\ude00 and \\u0000 \\u001f \\u007f tab\\t quote\\\" slash/ backslash\\\\\""
+  },
+  {
+    "input": "{\"dup\": 1, \"other\": 2, \"dup\": 3}",
+    "output": "{\"dup\": 3, \"other\": 2}"
+  },
+  {
+    "input": "{\"script\": \"</script><script>alert(1)</script>\"}",
+    "output": "{\"script\": \"</script><script>alert(1)</script>\"}"
+  }
+]

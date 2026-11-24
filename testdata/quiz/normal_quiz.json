@@ -1,0 +1,67 @@
+{
+  "lecture": {
+    "id": 901,
+    "lecture_title": "007 Quiz 1 Cloud & AI",
+    "lecture_index": 7,
+    "_class": "quiz",
+    "data": {
+      "_class": "quiz",
+      "id": 901,
+      "title": "Quiz 1: Cloud & \"AI\" <b>'Tiếng Việt'</b> 😀",
+      "object_index": 7,
+      "type": "simple-quiz"
+    }
+  },
+  "assessments": [
+    {
+      "_class": "assessment",
+      "id": 1,
+      "assessment_type": "multiple-choice",
+      "prompt": {
+        "question": "<p>Which service runs </script> code? ✓</p>",
+        "answers": [
+          "<p>Lambda</p>",
+          "<p>S3 – storage</p>"
+        ],
+        "feedbacks": [
+          "Đúng rồi",
+          ""
+        ],
+        "relatedLectureIds": ""
+      },
+      "correct_response": [
+        "a"
+      ],
+      "section": "Compute",
+      "question_plain": "Which service runs code?",
+      "related_lectures": [
+        {
+          "id": 5,
+          "title": "Intro"
+        }
+      ],
+      "score": 0.1,
+      "weight": 1e-07
+    },
+    {
+      "_class": "assessment",
+      "id": 2,
+      "assessment_type": "multi-select",
+      "prompt": {
+        "question": "Pick 😀 two",
+        "answers": [
+          "A",
+          "B",
+          "C"
+        ]
+      },
+      "correct_response": [
+        "a",
+        "c"
+      ],
+      "section": null,
+      "question_plain": "Pick two",
+      "related_lectures": []
+    }
+  ]
+}
