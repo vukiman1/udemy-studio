@@ -5,6 +5,7 @@ import type { CourseSummary, CourseTools } from '../../api/types'
 import { coursePath } from '../../app/paths'
 import { ProgressBar } from '../../app/ProgressBar'
 import { CompressionDialog } from '../compression/CompressionDialog'
+import { formatBytes } from '../compression/format'
 import { TranslationDialog } from '../translation/TranslationDialog'
 import { CourseToolButton } from './CourseToolButton'
 import { ToolState, compressionStatus, translationStatus } from './tool-state'
@@ -36,7 +37,8 @@ export function CourseCard({ course, tools }: CourseCardProps): ReactElement {
         <h2 className="text-[1.05rem] font-semibold wrap-anywhere">{course.title}</h2>
         <ProgressBar completed={course.completedLectures} total={course.playableLectures} />
         <span className="text-[0.85rem] text-muted">
-          {course.completedLectures}/{course.playableLectures} bài đã học
+          {course.completedLectures}/{course.playableLectures} bài đã học ·{' '}
+          {formatBytes(course.sizeBytes)}
         </span>
       </Link>
       {translation !== undefined && compression !== undefined && (

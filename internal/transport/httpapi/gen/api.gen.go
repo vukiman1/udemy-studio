@@ -313,7 +313,10 @@ type CourseDetail struct {
 	Id                string          `json:"id"`
 	PlayableLectures  int             `json:"playableLectures"`
 	Resume            *ContinueTarget `json:"resume,omitempty"`
-	Title             string          `json:"title"`
+
+	// SizeBytes Every file in the course's folder, measured when asked
+	SizeBytes int64  `json:"sizeBytes"`
+	Title     string `json:"title"`
 }
 
 // CourseSummary defines model for CourseSummary.
@@ -322,7 +325,10 @@ type CourseSummary struct {
 	Id                string          `json:"id"`
 	PlayableLectures  int             `json:"playableLectures"`
 	Resume            *ContinueTarget `json:"resume,omitempty"`
-	Title             string          `json:"title"`
+
+	// SizeBytes Every file in the course's folder, measured when asked
+	SizeBytes int64  `json:"sizeBytes"`
+	Title     string `json:"title"`
 }
 
 // CourseTools defines model for CourseTools.

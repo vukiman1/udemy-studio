@@ -18,7 +18,11 @@ func (server apiServer) ListCourses(ctx context.Context, _ gen.ListCoursesReques
 	overviews := learning.Overviews(server.deps.Catalog.Current(), records)
 	summaries := make(gen.ListCourses200JSONResponse, 0, len(overviews))
 	for _, overview := range overviews {
-		summaries = append(summaries, toCourseSummary(overview))
+		sizeBytes, err := library.SizeBytes(server.deps.Media, overview.Course)
+		if err != nil {
+			return nil, err
+		}
+		summaries = append(summaries, toCourseSummary(overview, sizeBytes))
 	}
 	return summaries, nil
 }
@@ -32,7 +36,11 @@ func (server apiServer) GetCourse(ctx context.Context, request gen.GetCourseRequ
 	if err != nil {
 		return nil, fmt.Errorf("get course %s: %w", request.CourseId, err)
 	}
-	return gen.GetCourse200JSONResponse(toCourseDetail(learning.Overview(course, records), records)), nil
+	sizeBytes, err := library.SizeBytes(server.deps.Media, course)
+	if err != nil {
+		return nil, err
+	}
+	return gen.GetCourse200JSONResponse(toCourseDetail(learning.Overview(course, records), records, sizeBytes)), nil
 }
 
 func (server apiServer) GetContinue(ctx context.Context, _ gen.GetContinueRequestObject) (gen.GetContinueResponseObject, error) {
@@ -47,12 +55,13 @@ func (server apiServer) GetContinue(ctx context.Context, _ gen.GetContinueReques
 	return gen.GetContinue200JSONResponse(toContinueTarget(target)), nil
 }
 
-func toCourseSummary(overview learning.CourseOverview) gen.CourseSummary {
+func toCourseSummary(overview learning.CourseOverview, sizeBytes int64) gen.CourseSummary {
 	summary := gen.CourseSummary{
 		Id:                overview.Course.ID,
 		Title:             overview.Course.Title,
 		PlayableLectures:  overview.PlayableLectures,
 		CompletedLectures: overview.CompletedLectures,
+		SizeBytes:         sizeBytes,
 	}
 	if overview.Resume != nil {
 		target := toContinueTarget(*overview.Resume)
@@ -61,13 +70,14 @@ func toCourseSummary(overview learning.CourseOverview) gen.CourseSummary {
 	return summary
 }
 
-func toCourseDetail(overview learning.CourseOverview, records map[string]progress.Record) gen.CourseDetail {
-	summary := toCourseSummary(overview)
+func toCourseDetail(overview learning.CourseOverview, records map[string]progress.Record, sizeBytes int64) gen.CourseDetail {
+	summary := toCourseSummary(overview, sizeBytes)
 	detail := gen.CourseDetail{
 		Id:                summary.Id,
 		Title:             summary.Title,
 		PlayableLectures:  summary.PlayableLectures,
 		CompletedLectures: summary.CompletedLectures,
+		SizeBytes:         summary.SizeBytes,
 		Resume:            summary.Resume,
 		Chapters:          make([]gen.Chapter, 0, len(overview.Course.Chapters)),
 	}

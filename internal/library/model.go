@@ -11,8 +11,10 @@ const (
 )
 
 type Course struct {
-	ID       string
-	Title    string
+	ID    string
+	Title string
+	// Dir is the course's folder in the library, holding everything downloaded with it.
+	Dir      string
 	Chapters []Chapter
 }
 
