@@ -5,13 +5,15 @@ import { DownloadsPage } from '../features/downloads/DownloadsPage'
 import { LibraryPage } from '../features/library/LibraryPage'
 import { LecturePage } from '../features/player/LecturePage'
 import { SearchPage } from '../features/search/SearchPage'
+import { AISettingsPage } from '../features/ai-settings/AISettingsPage'
 import { NotFoundPage } from './NotFoundPage'
-import { SEARCH_PATH } from './paths'
+import { AI_SETTINGS_PATH, SEARCH_PATH } from './paths'
 
 export const router = createBrowserRouter([
   { path: '/', element: <LibraryPage /> },
   { path: '/downloads', element: <DownloadsPage /> },
   { path: SEARCH_PATH, element: <SearchPage /> },
+  { path: AI_SETTINGS_PATH, element: <AISettingsPage /> },
   {
     path: '/courses/:courseId',
     element: <CourseLayout />,

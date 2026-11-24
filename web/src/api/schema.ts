@@ -193,6 +193,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/library/tools": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** What is left to translate and compress in every course, with the runs in progress */
+        get: operations["listCourseTools"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/courses/{courseId}/compression/plan": {
         parameters: {
             query?: never;
@@ -224,6 +241,145 @@ export interface paths {
         post: operations["startCourseCompression"];
         /** Stop compressing a course; videos already compressed stay compressed */
         delete: operations["cancelCourseCompression"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ai/providers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The AI providers the app can use, with the models it knows and recommends for each */
+        get: operations["listAIProviders"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ai/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The saved AI configuration; the key itself is never sent back */
+        get: operations["getAISettings"];
+        /** Save and turn on an AI configuration; a new key is checked with the provider first */
+        put: operations["saveAISettings"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ai/settings/providers/{provider}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Forget one provider's key and models; forgetting the provider in use leaves none in use */
+        delete: operations["forgetAIProvider"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ai/settings/enabled": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Stop or resume using the saved AI configuration without forgetting it */
+        put: operations["setAIEnabled"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ai/check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Check a key and, given a model, call it with a tiny prompt and time the answer; empty key uses the saved one */
+        post: operations["checkAI"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/ai/models": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Every model the provider offers for text with this key; an empty key uses the saved one */
+        post: operations["listAIModels"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/courses/{courseId}/translation/plan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Which lectures would get Vietnamese subtitles, and roughly what it costs with the configured AI */
+        get: operations["planCourseTranslation"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/courses/{courseId}/translation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The latest translation of a course since the server started */
+        get: operations["getCourseTranslation"];
+        put?: never;
+        /** Queue a course to have its English subtitles translated into Vietnamese in the background */
+        post: operations["startCourseTranslation"];
+        /** Stop translating a course; lectures already translated keep their subtitles */
+        delete: operations["cancelCourseTranslation"];
         options?: never;
         head?: never;
         patch?: never;
@@ -475,6 +631,26 @@ export interface components {
         NoteEdit: {
             body: string;
         };
+        CourseTools: {
+            courseId: string;
+            translation: components["schemas"]["TranslationTools"];
+            compression?: components["schemas"]["CompressionTools"];
+        };
+        TranslationTools: {
+            /** @description Lectures with English subtitles */
+            lectures: number;
+            /** @description Those of them still without Vietnamese subtitles */
+            pending: number;
+            run?: components["schemas"]["TranslationRun"];
+        };
+        CompressionTools: {
+            videos: number;
+            /** @description H.264 videos still to compress, among those already read */
+            pending: number;
+            /** @description Videos not read yet, so pending may grow */
+            unchecked: number;
+            run?: components["schemas"]["CompressionRun"];
+        };
         CompressionPlan: {
             /** @description H.264 videos that would be encoded */
             files: number;
@@ -520,6 +696,91 @@ export interface components {
         };
         CompressionOutcome: {
             /** @description The video's path in the library */
+            path: string;
+            lectureTitle: string;
+            reason: string;
+        };
+        AIProvider: {
+            id: components["schemas"]["AIProviderId"];
+            label: string;
+            models: components["schemas"]["AIModel"][];
+            /** @description Model ids, first answering and the rest standing by */
+            recommended: string[];
+        };
+        /** @enum {string} */
+        AIProviderId: "claude" | "openai" | "gemini";
+        AIModel: {
+            id: string;
+            label: string;
+        };
+        AISettings: {
+            /** @description Whether a provider is chosen to be used */
+            configured: boolean;
+            provider?: components["schemas"]["AIProviderId"];
+            enabled: boolean;
+            /** @description Every provider with a saved key, whether in use or not */
+            providers: components["schemas"]["AISavedProvider"][];
+        };
+        AISavedProvider: {
+            provider: components["schemas"]["AIProviderId"];
+            /** @description The key's first and last four characters, the rest masked */
+            keyHint: string;
+            models: string[];
+        };
+        AISettingsDraft: {
+            provider: components["schemas"]["AIProviderId"];
+            /** @description A new key; leave out to keep the saved key of the same provider */
+            apiKey?: string;
+            models: string[];
+        };
+        AIEnabled: {
+            enabled: boolean;
+        };
+        AIKeyProbe: {
+            provider: components["schemas"]["AIProviderId"];
+            apiKey?: string;
+        };
+        AICheckRequest: {
+            provider: components["schemas"]["AIProviderId"];
+            apiKey?: string;
+            /** @description The model to call; leave out to check the key only */
+            model?: string;
+        };
+        AICheck: {
+            model?: string;
+            /** Format: int64 */
+            latencyMs?: number;
+            reply?: string;
+        };
+        TranslationPlan: {
+            /** @description Lectures with English subtitles and no Vietnamese ones */
+            lectures: number;
+            alreadyTranslated: number;
+            characters: number;
+            /**
+             * Format: double
+             * @description Rough cost, measured from earlier translations
+             */
+            estimatedUsd: number;
+            /** @description False when the first configured model's price is unknown, so there is no estimate */
+            isPriced: boolean;
+        };
+        TranslationRun: {
+            /** @enum {string} */
+            state: "queued" | "running" | "done" | "cancelled" | "failed";
+            total: number;
+            finished: number;
+            currentLecture?: string;
+            /**
+             * Format: double
+             * @description What the run has spent so far, from the provider's token counts
+             */
+            costUsd: number;
+            failed: components["schemas"]["TranslationOutcome"][];
+            /** @description Why the whole run stopped, such as a rejected API key */
+            error?: string;
+        };
+        TranslationOutcome: {
             path: string;
             lectureTitle: string;
             reason: string;
@@ -604,6 +865,15 @@ export interface components {
         };
         /** @description ffmpeg or ffprobe was not found when the server started */
         CompressionUnavailable: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/problem+json": components["schemas"]["Problem"];
+            };
+        };
+        /** @description The translation provider could not be reached */
+        ProviderUnreachable: {
             headers: {
                 [name: string]: unknown;
             };
@@ -968,6 +1238,26 @@ export interface operations {
             404: components["responses"]["NotFound"];
         };
     };
+    listCourseTools: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description One entry per course */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CourseTools"][];
+                };
+            };
+        };
+    };
     planCourseCompression: {
         parameters: {
             query?: never;
@@ -1067,6 +1357,268 @@ export interface operations {
             };
             409: components["responses"]["Conflict"];
             503: components["responses"]["CompressionUnavailable"];
+        };
+    };
+    listAIProviders: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Providers */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AIProvider"][];
+                };
+            };
+        };
+    };
+    getAISettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Settings */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AISettings"];
+                };
+            };
+        };
+    };
+    saveAISettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AISettingsDraft"];
+            };
+        };
+        responses: {
+            /** @description Saved */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AISettings"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            502: components["responses"]["ProviderUnreachable"];
+        };
+    };
+    forgetAIProvider: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                provider: components["schemas"]["AIProviderId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Forgotten */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    setAIEnabled: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AIEnabled"];
+            };
+        };
+        responses: {
+            /** @description Updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AISettings"];
+                };
+            };
+            409: components["responses"]["Conflict"];
+        };
+    };
+    checkAI: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AICheckRequest"];
+            };
+        };
+        responses: {
+            /** @description The key works, and the model answered when one was given */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AICheck"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            502: components["responses"]["ProviderUnreachable"];
+        };
+    };
+    listAIModels: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AIKeyProbe"];
+            };
+        };
+        responses: {
+            /** @description Models */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AIModel"][];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            502: components["responses"]["ProviderUnreachable"];
+        };
+    };
+    planCourseTranslation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                courseId: components["parameters"]["CourseId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The lectures that would be translated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TranslationPlan"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    getCourseTranslation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                courseId: components["parameters"]["CourseId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The translation run */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TranslationRun"];
+                };
+            };
+            /** @description The course has not been translated since the server started */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    startCourseTranslation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                courseId: components["parameters"]["CourseId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Queued */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TranslationRun"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+        };
+    };
+    cancelCourseTranslation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                courseId: components["parameters"]["CourseId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Cancelled */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            409: components["responses"]["Conflict"];
         };
     };
     getLectureVideo: {

@@ -73,19 +73,25 @@ func Run(ctx context.Context, options Options, logger *slog.Logger) error {
 		return fmt.Errorf("load embedded frontend: %w", err)
 	}
 
+	compression := newCompression(options.Compression, options.LibraryDir, media, database, catalog, logger)
 	refresher := libraryRefresher{
-		catalog:  catalog,
-		media:    media.FS(),
-		progress: progressService,
-		notes:    notesService,
-		search:   search.NewService(sqlite.NewCueIndex(database), logger),
-		logger:   logger,
+		catalog:     catalog,
+		media:       media.FS(),
+		progress:    progressService,
+		notes:       notesService,
+		search:      search.NewService(sqlite.NewCueIndex(database), logger),
+		compression: compression,
+		logger:      logger,
 	}
-	downloads, err := newDownloads(ctx, options.Downloads, options.DataDir, database, refresher.afterDownload, logger)
+	downloads, err := newDownloads(ctx, options.Downloads, options.DataDir, database, refresher.afterLibraryChanged, logger)
 	if err != nil {
 		return err
 	}
-	compression := newCompression(options.Compression, options.LibraryDir, media, database, catalog, logger)
+	ai, err := newAISettings(options.DataDir, database, logger)
+	if err != nil {
+		return err
+	}
+	translation := newTranslationQueue(media, refresher, ai, logger)
 	handler := httpapi.NewHandler(httpapi.Deps{
 		Version:     options.Version,
 		Frontend:    frontend,
@@ -95,6 +101,8 @@ func Run(ctx context.Context, options Options, logger *slog.Logger) error {
 		Search:      refresher.search,
 		Notes:       notesService,
 		Compression: compression,
+		Translation: translation,
+		AI:          ai,
 		Login:       downloads.login,
 		Jobs:        downloads.jobs,
 		Logger:      logger,
@@ -117,9 +125,9 @@ func Run(ctx context.Context, options Options, logger *slog.Logger) error {
 		}
 	}
 	logger.Info("http server listening", "addr", listener.Addr().String(), "version", options.Version)
-	workers := append(downloads.workers(), refresher.indexSubtitles)
+	workers := append(downloads.workers(), refresher.indexSubtitles, translation.Run)
 	if compression != nil {
-		workers = append(workers, compression.Run)
+		workers = append(workers, compression.Run, compression.Survey)
 	}
 	return serve(ctx, listener, handler, logger, shutdownGracePeriod, workers...)
 }

@@ -4,6 +4,7 @@ package transcode
 import (
 	"context"
 	"errors"
+	"io/fs"
 	"time"
 )
 
@@ -36,8 +37,16 @@ type Encoder interface {
 
 // Files changes the library; *os.Root satisfies it.
 type Files interface {
+	Stat(path string) (fs.FileInfo, error)
 	Rename(oldPath, newPath string) error
 	Remove(path string) error
+}
+
+// Summary is what is left to compress in a course, from the cache alone; Unchecked videos are not read yet.
+type Summary struct {
+	Videos    int
+	Pending   int
+	Unchecked int
 }
 
 // Skip remembers a video whose H.265 encode was not worth keeping, until the file changes size.

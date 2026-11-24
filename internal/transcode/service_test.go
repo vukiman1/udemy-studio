@@ -28,6 +28,7 @@ const (
 // fakeVideos stands in for ffprobe, ffmpeg and the library directory, keyed by library path.
 type fakeVideos struct {
 	mutex    sync.Mutex
+	probes   int
 	media    map[string]Media
 	encodeAs map[string]Media
 	blockOn  string
@@ -37,6 +38,7 @@ type fakeVideos struct {
 func (videos *fakeVideos) Probe(_ context.Context, path string) (Media, error) {
 	videos.mutex.Lock()
 	defer videos.mutex.Unlock()
+	videos.probes++
 	media, ok := videos.media[path]
 	if !ok {
 		return Media{}, fs.ErrNotExist
@@ -53,6 +55,29 @@ func (videos *fakeVideos) Encode(ctx context.Context, source, target string, _ f
 	defer videos.mutex.Unlock()
 	videos.media[target] = videos.encodeAs[source]
 	return nil
+}
+
+// fileInfo gives a fake video the size of its media, the one property the cache keys on that changes on replacement.
+type fileInfo struct{ size int64 }
+
+func (info fileInfo) Name() string       { return "" }
+func (info fileInfo) Size() int64        { return info.size }
+func (info fileInfo) Mode() fs.FileMode  { return 0 }
+func (info fileInfo) ModTime() time.Time { return time.Time{} }
+func (info fileInfo) IsDir() bool        { return false }
+func (info fileInfo) Sys() any           { return nil }
+
+func (videos *fakeVideos) Stat(path string) (fs.FileInfo, error) {
+	videos.mutex.Lock()
+	defer videos.mutex.Unlock()
+	if path == unfinished {
+		return fileInfo{size: 1}, nil
+	}
+	media, ok := videos.media[path]
+	if !ok {
+		return nil, fs.ErrNotExist
+	}
+	return fileInfo{size: media.SizeBytes}, nil
 }
 
 func (videos *fakeVideos) Rename(oldPath, newPath string) error {
@@ -203,5 +228,52 @@ func TestCancellingKeepsFinishedVideosAndDiscardsTheOneInProgress(t *testing.T) 
 	files := videos.snapshot()
 	if files[shrinks].Codec != HEVCCodec || files[drifts].Codec != h264Codec || len(files) != 5 || run.Finished != 1 {
 		t.Errorf("after cancel: library = %+v, run = %+v", files, run)
+	}
+}
+
+func TestTheLibraryPageCountsWhatIsLeftFromVideosReadOnce(t *testing.T) {
+	videos := newFakeVideos()
+	videos.skips[drifts] = Skip{Path: drifts, SizeBytes: 1000}
+	service, courseID := startService(t, videos)
+	course, _ := service.deps.Catalog.Current().Course(courseID)
+
+	before, err := service.Summarize(t.Context(), course)
+	if err != nil || before.Unchecked != before.Videos || before.Pending != 0 {
+		t.Fatalf("summary before any probe = %+v, %v; want every video unchecked", before, err)
+	}
+	if _, err := service.Plan(t.Context(), courseID); err != nil {
+		t.Fatalf("Plan: %v", err)
+	}
+	probesAfterPlan := videos.probes
+	if _, err := service.Plan(t.Context(), courseID); err != nil || videos.probes != probesAfterPlan+1 {
+		t.Errorf("planning again probed %d more videos; want only the unreadable one, since none changed", videos.probes-probesAfterPlan)
+	}
+	read, err := service.Summarize(t.Context(), course)
+	if err != nil || read.Unchecked != 0 || read.Pending != 2 {
+		t.Errorf("summary after reading = %+v, %v; want the 2 H.264 videos not found not worth it", read, err)
+	}
+	if _, err := service.Start(t.Context(), courseID); err != nil {
+		t.Fatalf("Start: %v", err)
+	}
+	waitFor(t, service, courseID, StateDone)
+	after, err := service.Summarize(t.Context(), course)
+	if err != nil || after.Pending != 0 || after.Unchecked != 0 {
+		t.Errorf("summary after compressing = %+v, %v; want nothing left, from the cache", after, err)
+	}
+}
+
+func TestAVideoFfprobeFailedOnIsReadAgainAtTheNextPlan(t *testing.T) {
+	videos := newFakeVideos()
+	recovering := videos.media[shrinks]
+	delete(videos.media, shrinks)
+	service, courseID := startService(t, videos)
+	if plan, _ := service.Plan(t.Context(), courseID); plan.Unreadable != 2 {
+		t.Fatalf("plan while ffprobe fails = %+v; want the failing video unreadable", plan)
+	}
+	videos.mutex.Lock()
+	videos.media[shrinks] = recovering
+	videos.mutex.Unlock()
+	if plan, _ := service.Plan(t.Context(), courseID); plan.Unreadable != 1 || len(plan.Candidates) != 3 {
+		t.Errorf("plan once ffprobe recovers = %+v; want the video back among the candidates", plan)
 	}
 }

@@ -237,6 +237,20 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
 
+  /api/library/tools:
+    get:
+      operationId: listCourseTools
+      summary: What is left to translate and compress in every course, with the runs in progress
+      responses:
+        "200":
+          description: One entry per course
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CourseTools"
+
   /api/courses/{courseId}/compression/plan:
     get:
       operationId: planCourseCompression
@@ -302,6 +316,194 @@ paths:
           $ref: "#/components/responses/Conflict"
         "503":
           $ref: "#/components/responses/CompressionUnavailable"
+
+  /api/ai/providers:
+    get:
+      operationId: listAIProviders
+      summary: The AI providers the app can use, with the models it knows and recommends for each
+      responses:
+        "200":
+          description: Providers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AIProvider"
+
+  /api/ai/settings:
+    get:
+      operationId: getAISettings
+      summary: The saved AI configuration; the key itself is never sent back
+      responses:
+        "200":
+          description: Settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AISettings"
+    put:
+      operationId: saveAISettings
+      summary: Save and turn on an AI configuration; a new key is checked with the provider first
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AISettingsDraft"
+      responses:
+        "200":
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AISettings"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "502":
+          $ref: "#/components/responses/ProviderUnreachable"
+
+  /api/ai/settings/providers/{provider}:
+    delete:
+      operationId: forgetAIProvider
+      summary: Forget one provider's key and models; forgetting the provider in use leaves none in use
+      parameters:
+        - name: provider
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/AIProviderId"
+      responses:
+        "204":
+          description: Forgotten
+
+  /api/ai/settings/enabled:
+    put:
+      operationId: setAIEnabled
+      summary: Stop or resume using the saved AI configuration without forgetting it
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AIEnabled"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AISettings"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /api/ai/check:
+    post:
+      operationId: checkAI
+      summary: Check a key and, given a model, call it with a tiny prompt and time the answer; empty key uses the saved one
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AICheckRequest"
+      responses:
+        "200":
+          description: The key works, and the model answered when one was given
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AICheck"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "502":
+          $ref: "#/components/responses/ProviderUnreachable"
+
+  /api/ai/models:
+    post:
+      operationId: listAIModels
+      summary: Every model the provider offers for text with this key; an empty key uses the saved one
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AIKeyProbe"
+      responses:
+        "200":
+          description: Models
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AIModel"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "502":
+          $ref: "#/components/responses/ProviderUnreachable"
+
+  /api/courses/{courseId}/translation/plan:
+    get:
+      operationId: planCourseTranslation
+      summary: Which lectures would get Vietnamese subtitles, and roughly what it costs with the configured AI
+      parameters:
+        - $ref: "#/components/parameters/CourseId"
+      responses:
+        "200":
+          description: The lectures that would be translated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TranslationPlan"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/courses/{courseId}/translation:
+    get:
+      operationId: getCourseTranslation
+      summary: The latest translation of a course since the server started
+      parameters:
+        - $ref: "#/components/parameters/CourseId"
+      responses:
+        "200":
+          description: The translation run
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TranslationRun"
+        "204":
+          description: The course has not been translated since the server started
+    post:
+      operationId: startCourseTranslation
+      summary: Queue a course to have its English subtitles translated into Vietnamese in the background
+      parameters:
+        - $ref: "#/components/parameters/CourseId"
+      responses:
+        "202":
+          description: Queued
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TranslationRun"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+    delete:
+      operationId: cancelCourseTranslation
+      summary: Stop translating a course; lectures already translated keep their subtitles
+      parameters:
+        - $ref: "#/components/parameters/CourseId"
+      responses:
+        "204":
+          description: Cancelled
+        "409":
+          $ref: "#/components/responses/Conflict"
 
   /media/{lectureId}:
     get:
@@ -525,6 +727,12 @@ components:
         application/problem+json:
           schema:
             $ref: "#/components/schemas/Problem"
+    ProviderUnreachable:
+      description: The translation provider could not be reached
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/Problem"
     Conflict:
       description: The request conflicts with the current state
       content:
@@ -726,6 +934,45 @@ components:
         body:
           type: string
 
+    CourseTools:
+      type: object
+      required: [courseId, translation]
+      properties:
+        courseId:
+          type: string
+        translation:
+          $ref: "#/components/schemas/TranslationTools"
+        compression:
+          $ref: "#/components/schemas/CompressionTools"
+
+    TranslationTools:
+      type: object
+      required: [lectures, pending]
+      properties:
+        lectures:
+          type: integer
+          description: Lectures with English subtitles
+        pending:
+          type: integer
+          description: Those of them still without Vietnamese subtitles
+        run:
+          $ref: "#/components/schemas/TranslationRun"
+
+    CompressionTools:
+      type: object
+      required: [videos, pending, unchecked]
+      properties:
+        videos:
+          type: integer
+        pending:
+          type: integer
+          description: H.264 videos still to compress, among those already read
+        unchecked:
+          type: integer
+          description: Videos not read yet, so pending may grow
+        run:
+          $ref: "#/components/schemas/CompressionRun"
+
     CompressionPlan:
       type: object
       required: [files, totalBytes, totalSeconds, estimatedSeconds, alreadyHevc, otherCodec, notWorthIt, unreadable]
@@ -804,6 +1051,176 @@ components:
         path:
           type: string
           description: The video's path in the library
+        lectureTitle:
+          type: string
+        reason:
+          type: string
+
+    AIProvider:
+      type: object
+      required: [id, label, models, recommended]
+      properties:
+        id:
+          $ref: "#/components/schemas/AIProviderId"
+        label:
+          type: string
+        models:
+          type: array
+          items:
+            $ref: "#/components/schemas/AIModel"
+        recommended:
+          type: array
+          description: Model ids, first answering and the rest standing by
+          items:
+            type: string
+
+    AIProviderId:
+      type: string
+      enum: [claude, openai, gemini]
+
+    AIModel:
+      type: object
+      required: [id, label]
+      properties:
+        id:
+          type: string
+        label:
+          type: string
+
+    AISettings:
+      type: object
+      required: [configured, enabled, providers]
+      properties:
+        configured:
+          type: boolean
+          description: Whether a provider is chosen to be used
+        provider:
+          $ref: "#/components/schemas/AIProviderId"
+        enabled:
+          type: boolean
+        providers:
+          type: array
+          description: Every provider with a saved key, whether in use or not
+          items:
+            $ref: "#/components/schemas/AISavedProvider"
+
+    AISavedProvider:
+      type: object
+      required: [provider, keyHint, models]
+      properties:
+        provider:
+          $ref: "#/components/schemas/AIProviderId"
+        keyHint:
+          type: string
+          description: The key's first and last four characters, the rest masked
+        models:
+          type: array
+          items:
+            type: string
+
+    AISettingsDraft:
+      type: object
+      required: [provider, models]
+      properties:
+        provider:
+          $ref: "#/components/schemas/AIProviderId"
+        apiKey:
+          type: string
+          description: A new key; leave out to keep the saved key of the same provider
+        models:
+          type: array
+          items:
+            type: string
+
+    AIEnabled:
+      type: object
+      required: [enabled]
+      properties:
+        enabled:
+          type: boolean
+
+    AIKeyProbe:
+      type: object
+      required: [provider]
+      properties:
+        provider:
+          $ref: "#/components/schemas/AIProviderId"
+        apiKey:
+          type: string
+
+    AICheckRequest:
+      type: object
+      required: [provider]
+      properties:
+        provider:
+          $ref: "#/components/schemas/AIProviderId"
+        apiKey:
+          type: string
+        model:
+          type: string
+          description: The model to call; leave out to check the key only
+
+    AICheck:
+      type: object
+      properties:
+        model:
+          type: string
+        latencyMs:
+          type: integer
+          format: int64
+        reply:
+          type: string
+
+    TranslationPlan:
+      type: object
+      required: [lectures, alreadyTranslated, characters, estimatedUsd, isPriced]
+      properties:
+        lectures:
+          type: integer
+          description: Lectures with English subtitles and no Vietnamese ones
+        alreadyTranslated:
+          type: integer
+        characters:
+          type: integer
+        estimatedUsd:
+          type: number
+          format: double
+          description: Rough cost, measured from earlier translations
+        isPriced:
+          type: boolean
+          description: False when the first configured model's price is unknown, so there is no estimate
+
+    TranslationRun:
+      type: object
+      required: [state, total, finished, costUsd, failed]
+      properties:
+        state:
+          type: string
+          enum: [queued, running, done, cancelled, failed]
+        total:
+          type: integer
+        finished:
+          type: integer
+        currentLecture:
+          type: string
+        costUsd:
+          type: number
+          format: double
+          description: What the run has spent so far, from the provider's token counts
+        failed:
+          type: array
+          items:
+            $ref: "#/components/schemas/TranslationOutcome"
+        error:
+          type: string
+          description: Why the whole run stopped, such as a rejected API key
+
+    TranslationOutcome:
+      type: object
+      required: [path, lectureTitle, reason]
+      properties:
+        path:
+          type: string
         lectureTitle:
           type: string
         reason:

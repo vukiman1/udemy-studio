@@ -12,6 +12,7 @@ import (
 	"github.com/vukiman1/udemy-studio/internal/notes"
 	"github.com/vukiman1/udemy-studio/internal/progress"
 	"github.com/vukiman1/udemy-studio/internal/search"
+	"github.com/vukiman1/udemy-studio/internal/transcode"
 )
 
 // libraryRefresher keeps what is derived from the library, lecture keys and the subtitle index, in step with it.
@@ -21,12 +22,19 @@ type libraryRefresher struct {
 	progress *progress.Service
 	notes    *notes.Service
 	search   *search.Service
-	logger   *slog.Logger
+	// compression is nil when ffmpeg or ffprobe is missing.
+	compression *transcode.Service
+	logger      *slog.Logger
 }
 
-func (refresher libraryRefresher) afterDownload(ctx context.Context) error {
+// afterLibraryChanged runs whenever files were added, by a download or a translation: a rescan switches lectures
+// whose manifest appeared to their Udemy id keys, so progress and notes must follow before anyone reads them.
+func (refresher libraryRefresher) afterLibraryChanged(ctx context.Context) error {
 	if err := refresher.catalog.Rescan(); err != nil {
 		return fmt.Errorf("rescan library: %w", err)
+	}
+	if refresher.compression != nil {
+		refresher.compression.Resurvey()
 	}
 	return errors.Join(
 		adoptLectureKeys(ctx, refresher.catalog, refresher.progress, refresher.notes),

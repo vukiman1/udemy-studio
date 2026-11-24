@@ -70,6 +70,9 @@ func (service *Service) compressFile(ctx context.Context, candidate Candidate, o
 	if err := service.deps.Files.Rename(temporary, candidate.Path); err != nil {
 		return fileResult{kind: fileFailed, reason: fmt.Sprintf("replace the original: %v", err)}
 	}
+	if info, err := service.deps.Files.Stat(candidate.Path); err == nil {
+		service.cache.store(candidate.Path, info, encoded, nil)
+	}
 	return fileResult{kind: fileCompressed, bytesAfter: encoded.SizeBytes}
 }
 

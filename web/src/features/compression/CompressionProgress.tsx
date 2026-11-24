@@ -1,12 +1,14 @@
 import type { ReactElement } from 'react'
 import type { CompressionRun } from '../../api/types'
 import { ProgressBar } from '../../app/ProgressBar'
+import { RunInBackgroundButton } from '../../app/RunInBackgroundButton'
 import { formatBytes } from './format'
 
 interface CompressionProgressProps {
   readonly run: CompressionRun
   readonly isCancelling: boolean
   readonly onCancel: () => void
+  readonly onRunInBackground: () => void
 }
 
 const PERCENT = 100
@@ -15,6 +17,7 @@ export function CompressionProgress({
   run,
   isCancelling,
   onCancel,
+  onRunInBackground,
 }: CompressionProgressProps): ReactElement {
   const { current } = run
   const currentPercent =
@@ -38,7 +41,8 @@ export function CompressionProgress({
           Đã giảm {formatBytes(run.bytesBefore)} → {formatBytes(run.bytesAfter)}
         </p>
       )}
-      <div>
+      <div className="flex gap-3">
+        <RunInBackgroundButton onClick={onRunInBackground} />
         <button type="button" disabled={isCancelling} onClick={onCancel}>
           Dừng nén
         </button>

@@ -2,12 +2,15 @@ package library
 
 import (
 	"io/fs"
+	"sync"
 	"sync/atomic"
 )
 
 type Catalog struct {
 	downloads fs.FS
 	current   atomic.Pointer[Library]
+	// rescanning keeps a scan that started earlier from storing its older snapshot over a newer one.
+	rescanning sync.Mutex
 }
 
 func NewCatalog(downloads fs.FS) (*Catalog, error) {
@@ -24,6 +27,8 @@ func (catalog *Catalog) Current() *Library {
 
 // Rescan keeps serving the previous scan when the new one fails, so a half-written download never empties the library.
 func (catalog *Catalog) Rescan() error {
+	catalog.rescanning.Lock()
+	defer catalog.rescanning.Unlock()
 	scanned, err := Scan(catalog.downloads)
 	if err != nil {
 		return err
