@@ -13,15 +13,12 @@ interface ApiKeyFieldProps {
 
 export function ApiKeyField({ editor }: ApiKeyFieldProps): ReactElement {
   const { draft, provider, isEditingKey } = editor
-  const firstModel = draft.models[0]
   const check = useMutation({
     mutationFn: async () => ({
-      result: await checkAI(draft.provider, draft.apiKey, firstModel),
+      result: await checkAI(draft.provider, draft.apiKey),
       at: new Date(),
     }),
   })
-  const labelOf = (id: string): string =>
-    provider.models.find((model) => model.id === id)?.label ?? id
   const canCheck = !check.isPending && (!isEditingKey || draft.apiKey.trim() !== '')
 
   return (
@@ -77,8 +74,7 @@ export function ApiKeyField({ editor }: ApiKeyFieldProps): ReactElement {
       {check.isSuccess && (
         <p className="m-0 text-[0.9rem]">
           <span className="text-accent">● Khoá dùng được.</span>
-          {check.data.result.model !== undefined &&
-            ` ${labelOf(check.data.result.model)} trả lời sau ${SECONDS_FORMAT.format((check.data.result.latencyMs ?? 0) / MS_PER_SECOND)} giây, lúc ${CLOCK_FORMAT.format(check.data.at)}.`}
+          {` ${provider.model.label} trả lời sau ${SECONDS_FORMAT.format(check.data.result.latencyMs / MS_PER_SECOND)} giây, lúc ${CLOCK_FORMAT.format(check.data.at)}.`}
         </p>
       )}
       {check.isError && (

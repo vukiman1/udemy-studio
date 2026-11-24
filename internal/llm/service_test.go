@@ -13,9 +13,9 @@ import (
 )
 
 const (
-	workingKey = "sk-test-working-1234" //nolint:gosec // reason: fake key for the fake provider
-	primary    = "big-model"
-	standby    = "small-model"
+	workingKey  = "sk-test-working-1234" //nolint:gosec // reason: fake key for the fake provider
+	claudeModel = "claude-model"
+	openAIModel = "openai-model"
 )
 
 // fakeClient accepts only workingKey and fails the models listed in failing.
@@ -26,21 +26,10 @@ type fakeClient struct {
 	asked         []string
 }
 
-func (client *fakeClient) CheckKey(_ context.Context, key secret.Secret) error {
-	if key.Reveal() != workingKey {
-		return fmt.Errorf("%w by the fake provider", ErrInvalidAPIKey)
-	}
-	return nil
-}
-
-func (client *fakeClient) ListModels(context.Context, secret.Secret) ([]ModelInfo, error) {
-	return nil, nil
-}
-
-func (client *fakeClient) Complete(ctx context.Context, key secret.Secret, model string, _ Prompt) (Completion, error) {
+func (client *fakeClient) Complete(_ context.Context, key secret.Secret, model string, _ Prompt) (Completion, error) {
 	client.asked = append(client.asked, model)
-	if err := client.CheckKey(ctx, key); err != nil {
-		return Completion{}, err
+	if key.Reveal() != workingKey {
+		return Completion{}, fmt.Errorf("%w by the fake provider", ErrInvalidAPIKey)
 	}
 	if err := client.failing[model]; err != nil {
 		if client.billsFailures {
@@ -70,61 +59,77 @@ func (store *memoryStore) Delete(context.Context) error {
 	return nil
 }
 
-func newTestService(client *fakeClient, store *memoryStore) *Service {
+func newTestService(client *fakeClient, store ConfigStore) *Service {
 	profiles := []Profile{
-		{Provider: ProviderClaude, Client: client, Prices: map[string]Price{primary: {InputUSDPerMillion: 4, OutputUSDPerMillion: 20}, standby: {InputUSDPerMillion: 1, OutputUSDPerMillion: 5}}},
-		{Provider: ProviderOpenAI, Client: client},
+		{Provider: ProviderClaude, Client: client, Model: ModelInfo{ID: claudeModel}, Price: Price{InputUSDPerMillion: 1, OutputUSDPerMillion: 5}},
+		{Provider: ProviderOpenAI, Client: client, Model: ModelInfo{ID: openAIModel}},
 	}
-	return NewService(store, profiles, time.Now, slog.New(slog.DiscardHandler))
+	service := NewService(store, profiles, time.Now, slog.New(slog.DiscardHandler))
+	service.pause = func(context.Context, time.Duration) error { return nil }
+	return service
 }
 
 func savedService(t *testing.T, client *fakeClient) *Service {
 	t.Helper()
 	service := newTestService(client, &memoryStore{})
-	if err := service.Save(t.Context(), Draft{Provider: ProviderClaude, APIKey: workingKey, Models: []string{primary, standby}}); err != nil {
+	if err := service.Save(t.Context(), Draft{Provider: ProviderClaude, APIKey: workingKey}); err != nil {
 		t.Fatalf("Save: %v", err)
 	}
 	return service
 }
 
-func TestAFailingModelFallsBackToTheNextAndIsPricedByTheOneThatAnswered(t *testing.T) {
-	client := &fakeClient{failing: map[string]error{primary: errors.New("overloaded")}}
-	completion, err := savedService(t, client).Complete(t.Context(), Prompt{})
-	if err != nil || completion.Model != standby || completion.CostUSD != 6 {
-		t.Errorf("Complete = %+v, %v; want the standby's answer priced at $1+$5", completion, err)
+func TestAFailedAnswerIsNeverAskedOfAnotherModel(t *testing.T) {
+	client := &fakeClient{}
+	service := savedService(t, client)
+	client.failing, client.asked = map[string]error{claudeModel: errors.New("refused")}, nil
+	if _, err := service.Complete(t.Context(), Prompt{}); err == nil || strings.Join(client.asked, ",") != claudeModel {
+		t.Errorf("Complete = %v after asking %v; want the failure returned after asking only %s", err, client.asked, claudeModel)
 	}
 }
 
-func TestARejectedKeyStopsWithoutTryingTheOtherModels(t *testing.T) {
-	store := &memoryStore{}
+func TestABusyModelIsAskedAgainThenGivenUp(t *testing.T) {
 	client := &fakeClient{}
-	service := newTestService(client, store)
-	store.config, store.found = Config{
-		Active:    ProviderClaude,
-		Providers: map[Provider]ProviderSettings{ProviderClaude: {APIKey: secret.New("sk-revoked"), Models: []string{primary, standby}}},
-		IsEnabled: true,
-	}, true
-	if _, err := service.Complete(t.Context(), Prompt{}); !errors.Is(err, ErrInvalidAPIKey) || len(client.asked) != 1 {
-		t.Errorf("err = %v after asking %v; want ErrInvalidAPIKey after one model", err, client.asked)
+	service := savedService(t, client)
+	client.failing, client.asked = map[string]error{claudeModel: fmt.Errorf("%w: overloaded", ErrTemporary)}, nil
+	_, err := service.Complete(t.Context(), Prompt{})
+	if !errors.Is(err, ErrTemporary) || len(client.asked) != 1+len(retryPauses) {
+		t.Errorf("Complete = %v after asking %v; want ErrTemporary after %d attempts at the same model", err, client.asked, 1+len(retryPauses))
+	}
+}
+
+func TestAnAnswerIsPricedAtTheProvidersModel(t *testing.T) {
+	completion, err := savedService(t, &fakeClient{}).Complete(t.Context(), Prompt{})
+	if err != nil || completion.Text != "answer from "+claudeModel || completion.CostUSD != 1+5 {
+		t.Errorf("Complete = %+v, %v; want %s's answer priced at $1+$5", completion, err, claudeModel)
+	}
+}
+
+func TestATruncatedAnswerStillCountsTowardsTheCost(t *testing.T) {
+	client := &fakeClient{billsFailures: true}
+	service := savedService(t, client)
+	client.failing = map[string]error{claudeModel: errors.New("cut off at max tokens")}
+	completion, err := service.Complete(t.Context(), Prompt{})
+	if err == nil || completion.CostUSD != 1+5 {
+		t.Errorf("Complete = %+v, %v; want the failure with its $6 still reported", completion, err)
 	}
 }
 
 func TestSavingKeepsAWorkingKeyUntilANewOneIsAccepted(t *testing.T) {
 	service := savedService(t, &fakeClient{})
-	if err := service.Save(t.Context(), Draft{Provider: ProviderClaude, APIKey: "sk-typo", Models: []string{standby}}); !errors.Is(err, ErrInvalidAPIKey) {
+	if err := service.Save(t.Context(), Draft{Provider: ProviderClaude, APIKey: "sk-typo"}); !errors.Is(err, ErrInvalidAPIKey) {
 		t.Errorf("Save with a rejected key: %v, want ErrInvalidAPIKey", err)
 	}
-	if err := service.Save(t.Context(), Draft{Provider: ProviderClaude, Models: []string{standby}}); err != nil {
+	if err := service.Save(t.Context(), Draft{Provider: ProviderClaude}); err != nil {
 		t.Errorf("Save with the key left empty: %v, want the saved key reused", err)
 	}
-	if err := service.Save(t.Context(), Draft{Provider: ProviderOpenAI, Models: []string{"gpt"}}); !errors.Is(err, ErrNoKey) {
+	if err := service.Save(t.Context(), Draft{Provider: ProviderOpenAI}); !errors.Is(err, ErrNoKey) {
 		t.Errorf("Save for another provider without a key: %v, want ErrNoKey", err)
 	}
 	view, err := service.View(t.Context())
 	if err != nil || view.Active != ProviderClaude || len(view.Providers) != 1 {
 		t.Fatalf("view = %+v, %v; want only Claude saved and in use", view, err)
 	}
-	if saved := view.Providers[0]; len(saved.Models) != 1 || strings.Contains(saved.KeyHint, "working") || !strings.HasSuffix(saved.KeyHint, "1234") {
+	if saved := view.Providers[0]; strings.Contains(saved.KeyHint, "working") || !strings.HasSuffix(saved.KeyHint, "1234") {
 		t.Errorf("saved Claude = %+v; want the first save's key, masked", saved)
 	}
 }
@@ -139,35 +144,22 @@ func TestAStoppedConfigurationAnswersNothing(t *testing.T) {
 	}
 }
 
-func TestCheckingWithAModelAsksThatModelAndOnlyChecksTheKeyWithout(t *testing.T) {
+func TestCheckingAsksTheProvidersModel(t *testing.T) {
 	client := &fakeClient{}
 	service := savedService(t, client)
-	check, err := service.Check(t.Context(), ProviderClaude, "", standby)
-	if err != nil || check.Model != standby || check.Reply != "answer from "+standby || len(client.asked) != 1 {
-		t.Errorf("Check with a model = %+v, %v after asking %v", check, err, client.asked)
-	}
-	if check, err := service.Check(t.Context(), ProviderClaude, "", ""); err != nil || check.Model != "" || len(client.asked) != 1 {
-		t.Errorf("Check without a model = %+v, %v after asking %v; want the key checked only", check, err, client.asked)
-	}
-}
-
-func TestABusyModelIsAskedAgainBeforeTheNextOne(t *testing.T) {
-	client := &fakeClient{failing: map[string]error{primary: fmt.Errorf("%w: overloaded", ErrTemporary)}}
-	service := savedService(t, client)
-	service.pause = func(context.Context, time.Duration) error { return nil }
-	completion, err := service.Complete(t.Context(), Prompt{})
-	wantAsked := []string{primary, primary, primary, standby}
-	if err != nil || completion.Model != standby || strings.Join(client.asked, ",") != strings.Join(wantAsked, ",") {
-		t.Errorf("Complete = %+v, %v after asking %v; want %v", completion, err, client.asked, wantAsked)
+	client.asked = nil
+	check, err := service.Check(t.Context(), ProviderOpenAI, workingKey)
+	if err != nil || check.Reply != "answer from "+openAIModel || strings.Join(client.asked, ",") != openAIModel {
+		t.Errorf("Check = %+v, %v after asking %v; want %s asked", check, err, client.asked, openAIModel)
 	}
 }
 
 func TestEachProviderKeepsItsOwnKeyWhenAnotherIsInUse(t *testing.T) {
 	service := savedService(t, &fakeClient{})
-	if err := service.Save(t.Context(), Draft{Provider: ProviderOpenAI, APIKey: workingKey, Models: []string{"gpt"}}); err != nil {
+	if err := service.Save(t.Context(), Draft{Provider: ProviderOpenAI, APIKey: workingKey}); err != nil {
 		t.Fatalf("Save OpenAI: %v", err)
 	}
-	if err := service.Save(t.Context(), Draft{Provider: ProviderClaude, Models: []string{primary}}); err != nil {
+	if err := service.Save(t.Context(), Draft{Provider: ProviderClaude}); err != nil {
 		t.Errorf("switching back to Claude without typing its key again: %v", err)
 	}
 	if err := service.Forget(t.Context(), ProviderOpenAI); err != nil {
@@ -176,6 +168,22 @@ func TestEachProviderKeepsItsOwnKeyWhenAnotherIsInUse(t *testing.T) {
 	view, err := service.View(t.Context())
 	if err != nil || view.Active != ProviderClaude || len(view.Providers) != 1 || view.Providers[0].Provider != ProviderClaude {
 		t.Errorf("view = %+v, %v; want Claude still saved and in use", view, err)
+	}
+}
+
+func TestAProviderNoLongerOfferedIsNotUsed(t *testing.T) {
+	retired := Provider("gemini")
+	store := &memoryStore{found: true, config: Config{
+		Active:    retired,
+		IsEnabled: true,
+		Providers: map[Provider]ProviderSettings{retired: {APIKey: secret.New(workingKey)}, ProviderClaude: {APIKey: secret.New(workingKey)}},
+	}}
+	service := newTestService(&fakeClient{}, store)
+	if _, err := service.Complete(t.Context(), Prompt{}); !errors.Is(err, ErrNotConfigured) {
+		t.Errorf("Complete with a retired provider in use: %v, want ErrNotConfigured", err)
+	}
+	if view, err := service.View(t.Context()); err != nil || view.Active != "" || len(view.Providers) != 1 {
+		t.Errorf("view = %+v, %v; want only Claude's key left and nothing in use", view, err)
 	}
 }
 
@@ -190,21 +198,11 @@ func (store *unreadableStore) Load(ctx context.Context) (Config, bool, error) {
 }
 
 func TestSettingsThatCannotBeOpenedCanBeSavedOver(t *testing.T) {
-	store := &unreadableStore{}
-	service := NewService(store, []Profile{{Provider: ProviderClaude, Client: &fakeClient{}}}, time.Now, slog.New(slog.DiscardHandler))
+	service := newTestService(&fakeClient{}, &unreadableStore{})
 	if view, err := service.View(t.Context()); err != nil || view.Active != "" {
 		t.Fatalf("View of unreadable settings = %+v, %v; want empty settings", view, err)
 	}
-	if err := service.Save(t.Context(), Draft{Provider: ProviderClaude, APIKey: workingKey, Models: []string{primary}}); err != nil {
+	if err := service.Save(t.Context(), Draft{Provider: ProviderClaude, APIKey: workingKey}); err != nil {
 		t.Errorf("Save over unreadable settings: %v", err)
-	}
-}
-
-func TestATruncatedAnswerStillCountsTowardsTheCost(t *testing.T) {
-	client := &fakeClient{failing: map[string]error{primary: errors.New("cut off at max tokens")}, billsFailures: true}
-	service := savedService(t, client)
-	completion, err := service.Complete(t.Context(), Prompt{})
-	if err != nil || completion.CostUSD != 24+6 || completion.Usage.OutputTokens != 2_000_000 {
-		t.Errorf("Complete = %+v, %v; want the failed big model's $24 added to the standby's $6", completion, err)
 	}
 }

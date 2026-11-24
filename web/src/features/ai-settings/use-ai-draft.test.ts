@@ -6,15 +6,16 @@ import { useAIDraft } from './use-ai-draft'
 const CLAUDE: AIProvider = {
   id: 'claude',
   label: 'Claude (Anthropic)',
-  models: [{ id: 'claude-opus-5-5', label: 'Claude Opus 5.5' }],
-  recommended: ['claude-opus-5-5'],
+  model: { id: 'claude-haiku-5-5', label: 'Claude Haiku 5.5' },
+  inputUsdPerMillion: 0.1,
+  outputUsdPerMillion: 0.5,
 }
 
 const SAVED: AISettings = {
   configured: true,
   provider: 'claude',
   enabled: true,
-  providers: [{ provider: 'claude', keyHint: 'sk-a••••••••GAAA', models: ['claude-opus-5-5'] }],
+  providers: [{ provider: 'claude', keyHint: 'sk-a••••••••GAAA' }],
 }
 
 describe('useAIDraft', () => {

@@ -39,8 +39,8 @@ func (model *scriptedModel) Complete(_ context.Context, prompt llm.Prompt) (llm.
 	return llm.Completion{Text: model.reply(call, lines), Usage: llm.Usage{InputTokens: 10, OutputTokens: 20}, CostUSD: 0.01}, nil
 }
 
-func (*scriptedModel) EstimateUSD(context.Context, llm.Usage) (float64, bool, error) {
-	return 1, true, nil
+func (*scriptedModel) EstimateUSD(context.Context, llm.Usage) (float64, error) {
+	return 1, nil
 }
 
 func (*scriptedModel) IsReady(context.Context) error { return nil }

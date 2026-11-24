@@ -27,8 +27,8 @@ func (model failingModel) Complete(context.Context, llm.Prompt) (llm.Completion,
 	return llm.Completion{}, model.err
 }
 
-func (failingModel) EstimateUSD(context.Context, llm.Usage) (float64, bool, error) {
-	return 1, true, nil
+func (failingModel) EstimateUSD(context.Context, llm.Usage) (float64, error) {
+	return 1, nil
 }
 
 func (failingModel) IsReady(context.Context) error { return nil }
@@ -204,5 +204,25 @@ func TestALectureTranslatedMeanwhileIsNeitherPaidForNorOverwritten(t *testing.T)
 	kept, err := os.ReadFile(imported) //nolint:gosec // reason: a path inside the test's own temp dir
 	if err != nil || string(kept) != "imported\n" || model.calls != 1 {
 		t.Errorf("imported subtitle = %q, %v after %d model calls; want it kept and not translated again", kept, err, model.calls)
+	}
+}
+
+// quotaSpent never answers, as a provider does once its quota is used up.
+type quotaSpent struct{ failingModel }
+
+func (*quotaSpent) Complete(context.Context, llm.Prompt) (llm.Completion, error) {
+	return llm.Completion{}, fmt.Errorf("%w: HTTP 429", llm.ErrQuotaExhausted)
+}
+
+func TestASpentQuotaStopsTheRunInsteadOfFailingEveryLecture(t *testing.T) {
+	root := t.TempDir()
+	writeLecture(t, root, "001 Welcome", SourceLanguage)
+	writeLecture(t, root, "002 Next", SourceLanguage)
+	queue, courseID := startQueue(t, root, &quotaSpent{})
+	if _, err := queue.Start(t.Context(), courseID); err != nil {
+		t.Fatalf("Start: %v", err)
+	}
+	if run := finishedRun(t, queue, courseID); run.State != StateFailed || run.Finished != 0 || len(run.Failed) != 0 {
+		t.Errorf("run = %+v; want it stopped at the first lecture, not each lecture failed", run)
 	}
 }

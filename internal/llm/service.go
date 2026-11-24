@@ -19,15 +19,13 @@ const (
 	maxCheckReply    = 200
 )
 
-// An overloaded provider usually recovers within seconds, so a model is asked again after these pauses before the next one.
+// An overloaded provider usually recovers within seconds, so the model is asked again after these pauses before giving up.
 var retryPauses = []time.Duration{2 * time.Second, 5 * time.Second}
 
 // The check asks for the shortest useful answer, so it costs as little as the provider allows.
 var checkPrompt = Prompt{System: "Reply with the single word OK.", User: "ping"}
 
-// Check is what checking a key found; Model is empty when no model was asked.
 type Check struct {
-	Model   string
 	Latency time.Duration
 	Reply   string
 }
@@ -42,14 +40,12 @@ type View struct {
 type ProviderView struct {
 	Provider Provider
 	KeyHint  string
-	Models   []string
 }
 
 // Draft is what the settings form sends; an empty APIKey keeps the saved key of the same provider.
 type Draft struct {
 	Provider Provider
 	APIKey   string
-	Models   []string
 }
 
 type Service struct {
@@ -85,28 +81,25 @@ func (service *Service) View(ctx context.Context) (View, error) {
 	view := View{Active: config.Active, IsEnabled: config.IsEnabled}
 	for _, profile := range service.profiles {
 		if saved, found := config.Providers[profile.Provider]; found {
-			view.Providers = append(view.Providers, ProviderView{Provider: profile.Provider, KeyHint: keyHint(saved.APIKey), Models: saved.Models})
+			view.Providers = append(view.Providers, ProviderView{Provider: profile.Provider, KeyHint: keyHint(saved.APIKey)})
 		}
 	}
 	return view, nil
 }
 
-// Save makes the draft's provider the one in use; a new key is kept only once the provider has accepted it.
+// Save makes the draft's provider the one in use; a new key is kept only once the provider's model has answered with it,
+// since a key may list models yet not be allowed this one.
 func (service *Service) Save(ctx context.Context, draft Draft) error {
 	profile, err := service.profile(draft.Provider)
 	if err != nil {
 		return err
-	}
-	models := cleanModels(draft.Models)
-	if len(models) == 0 {
-		return ErrNoModels
 	}
 	key, isNew, err := service.key(ctx, draft.Provider, draft.APIKey)
 	if err != nil {
 		return err
 	}
 	if isNew {
-		if err := profile.Client.CheckKey(ctx, key); err != nil {
+		if _, err := service.completeWithRetries(ctx, profile, key, checkPrompt); err != nil {
 			return fromProvider(err)
 		}
 	}
@@ -114,14 +107,13 @@ func (service *Service) Save(ctx context.Context, draft Draft) error {
 	if err != nil {
 		return err
 	}
-	config.Providers[draft.Provider] = ProviderSettings{APIKey: key, Models: models}
+	config.Providers[draft.Provider] = ProviderSettings{APIKey: key}
 	config.Active, config.IsEnabled = draft.Provider, true
 	return service.store.Save(ctx, config)
 }
 
-// Check confirms the key works and, given a model, that the model answers with it, timing the answer;
-// it uses what is on the form, saved or not.
-func (service *Service) Check(ctx context.Context, provider Provider, typedKey, model string) (Check, error) {
+// Check asks the provider's model a short question with the key on the form, saved or not, and times the answer.
+func (service *Service) Check(ctx context.Context, provider Provider, typedKey string) (Check, error) {
 	profile, err := service.profile(provider)
 	if err != nil {
 		return Check{}, err
@@ -130,28 +122,12 @@ func (service *Service) Check(ctx context.Context, provider Provider, typedKey, 
 	if err != nil {
 		return Check{}, err
 	}
-	if model == "" {
-		return Check{}, fromProvider(profile.Client.CheckKey(ctx, key))
-	}
 	started := service.now()
-	completion, err := profile.Client.Complete(ctx, key, model, checkPrompt)
+	completion, err := service.completeWithRetries(ctx, profile, key, checkPrompt)
 	if err != nil {
 		return Check{}, fromProvider(err)
 	}
-	return Check{Model: model, Latency: service.now().Sub(started), Reply: truncate(strings.TrimSpace(completion.Text), maxCheckReply)}, nil
-}
-
-func (service *Service) ListModels(ctx context.Context, provider Provider, typedKey string) ([]ModelInfo, error) {
-	profile, err := service.profile(provider)
-	if err != nil {
-		return nil, err
-	}
-	key, _, err := service.key(ctx, provider, typedKey)
-	if err != nil {
-		return nil, err
-	}
-	models, err := profile.Client.ListModels(ctx, key)
-	return models, fromProvider(err)
+	return Check{Latency: service.now().Sub(started), Reply: truncate(strings.TrimSpace(completion.Text), maxCheckReply)}, nil
 }
 
 func (service *Service) SetEnabled(ctx context.Context, isEnabled bool) error {
@@ -166,7 +142,7 @@ func (service *Service) SetEnabled(ctx context.Context, isEnabled bool) error {
 	return service.store.Save(ctx, config)
 }
 
-// Forget removes one provider's key and models; forgetting the provider in use leaves none in use.
+// Forget removes one provider's key; forgetting the provider in use leaves none in use.
 func (service *Service) Forget(ctx context.Context, provider Provider) error {
 	config, err := service.load(ctx)
 	if err != nil {
@@ -182,33 +158,20 @@ func (service *Service) Forget(ctx context.Context, provider Provider) error {
 	return service.store.Save(ctx, config)
 }
 
-// Complete asks the configured models in order and returns the first answer; a rejected key stops at once, since every model would reject it.
+// Complete asks the active provider's model, again while the provider is busy; failed attempts are billed too, so
+// their tokens and cost stay in what is returned, error or not.
 func (service *Service) Complete(ctx context.Context, prompt Prompt) (Completion, error) {
 	settings, profile, err := service.active(ctx)
 	if err != nil {
 		return Completion{}, err
 	}
-	var failures []error
-	// Failed attempts are billed too, so their tokens and cost stay in what is reported.
-	var spent Completion
-	for _, model := range settings.Models {
-		completion, err := service.completeWithRetries(ctx, profile, settings.APIKey, model, prompt)
-		spent.Usage = spent.Usage.Plus(completion.Usage)
-		spent.CostUSD += profile.cost(model, completion.Usage)
-		if err == nil {
-			completion.Model, completion.Usage, completion.CostUSD = model, spent.Usage, spent.CostUSD
-			return completion, nil
-		}
-		if errors.Is(err, ErrInvalidAPIKey) || ctx.Err() != nil {
-			return spent, err
-		}
-		service.logger.Warn("model failed, trying the next one", "provider", profile.Provider, "model", model, "err", err)
-		failures = append(failures, fmt.Errorf("%s: %w", model, err))
-	}
-	return spent, fmt.Errorf("every configured model failed: %w", errors.Join(failures...))
+	completion, err := service.completeWithRetries(ctx, profile, settings.APIKey, prompt)
+	completion.CostUSD = profile.Price.cost(completion.Usage)
+	return completion, err
 }
 
-func (service *Service) completeWithRetries(ctx context.Context, profile Profile, key secret.Secret, model string, prompt Prompt) (Completion, error) {
+func (service *Service) completeWithRetries(ctx context.Context, profile Profile, key secret.Secret, prompt Prompt) (Completion, error) {
+	model := profile.Model.ID
 	completion, err := profile.Client.Complete(ctx, key, model, prompt)
 	usage := completion.Usage
 	for _, pause := range retryPauses {
@@ -226,17 +189,12 @@ func (service *Service) completeWithRetries(ctx context.Context, profile Profile
 	return completion, err
 }
 
-// EstimateUSD prices usage at the first model, which answers unless it fails; false when that price is unknown.
-func (service *Service) EstimateUSD(ctx context.Context, usage Usage) (float64, bool, error) {
-	settings, profile, err := service.active(ctx)
+func (service *Service) EstimateUSD(ctx context.Context, usage Usage) (float64, error) {
+	_, profile, err := service.active(ctx)
 	if err != nil {
-		return 0, false, err
+		return 0, err
 	}
-	price, known := profile.Prices[settings.Models[0]]
-	if !known {
-		return 0, false, nil
-	}
-	return price.cost(usage), true, nil
+	return profile.Price.cost(usage), nil
 }
 
 func (service *Service) IsReady(ctx context.Context) error {
@@ -250,7 +208,7 @@ func (service *Service) active(ctx context.Context) (ProviderSettings, Profile, 
 		return ProviderSettings{}, Profile{}, err
 	}
 	settings, found := config.Providers[config.Active]
-	if !found || !config.IsEnabled || len(settings.Models) == 0 {
+	if !found || !config.IsEnabled {
 		return ProviderSettings{}, Profile{}, ErrNotConfigured
 	}
 	profile, err := service.profile(config.Active)
@@ -271,7 +229,20 @@ func (service *Service) load(ctx context.Context) (Config, error) {
 	if !found || config.Providers == nil {
 		config.Providers = map[Provider]ProviderSettings{}
 	}
+	service.dropRetiredProviders(&config)
 	return config, nil
+}
+
+// dropRetiredProviders forgets the keys of providers the app no longer offers, such as Gemini, so none stays in use.
+func (service *Service) dropRetiredProviders(config *Config) {
+	for provider := range config.Providers {
+		if _, err := service.profile(provider); err != nil {
+			delete(config.Providers, provider)
+		}
+	}
+	if _, found := config.Providers[config.Active]; !found {
+		config.Active, config.IsEnabled = "", false
+	}
 }
 
 // key returns the typed key, or the provider's saved one when nothing was typed.
@@ -299,25 +270,8 @@ func (service *Service) profile(provider Provider) (Profile, error) {
 	return Profile{}, fmt.Errorf("%w: %q", ErrUnknownProvider, provider)
 }
 
-func (profile Profile) cost(model string, usage Usage) float64 {
-	return profile.Prices[model].cost(usage)
-}
-
 func (price Price) cost(usage Usage) float64 {
 	return (float64(usage.InputTokens)*price.InputUSDPerMillion + float64(usage.OutputTokens)*price.OutputUSDPerMillion) / tokensPerMillion
-}
-
-func cleanModels(models []string) []string {
-	seen := map[string]bool{}
-	var cleaned []string
-	for _, model := range models {
-		model = strings.TrimSpace(model)
-		if model != "" && !seen[model] {
-			seen[model] = true
-			cleaned = append(cleaned, model)
-		}
-	}
-	return cleaned
 }
 
 func keyHint(key secret.Secret) string {

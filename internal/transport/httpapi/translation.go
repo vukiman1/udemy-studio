@@ -24,7 +24,6 @@ func (server apiServer) PlanCourseTranslation(ctx context.Context, request gen.P
 		AlreadyTranslated: plan.AlreadyTranslated,
 		Characters:        plan.Characters,
 		EstimatedUsd:      plan.EstimatedUSD,
-		IsPriced:          plan.IsPriced,
 	}, nil
 }
 

@@ -26,7 +26,7 @@ func TestAIConfigIsStoredSealedAndReadsBack(t *testing.T) {
 	store := NewAIConfigStore(database, box)
 	saved := llm.Config{
 		Active:    llm.ProviderClaude,
-		Providers: map[llm.Provider]llm.ProviderSettings{llm.ProviderClaude: {APIKey: secret.New(storedKey), Models: []string{"claude-opus-5-5"}}},
+		Providers: map[llm.Provider]llm.ProviderSettings{llm.ProviderClaude: {APIKey: secret.New(storedKey)}},
 		IsEnabled: true,
 	}
 	if err := store.Save(t.Context(), saved); err != nil {

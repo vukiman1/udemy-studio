@@ -10,9 +10,12 @@ import (
 	"github.com/vukiman1/udemy-studio/internal/platform/secret"
 )
 
-func answering(t *testing.T, status int) Client {
+func answering(t *testing.T, status int, retryAfter string) Client {
 	t.Helper()
 	server := httptest.NewServer(http.HandlerFunc(func(writer http.ResponseWriter, _ *http.Request) {
+		if retryAfter != "" {
+			writer.Header().Set("Retry-After", retryAfter)
+		}
 		writer.WriteHeader(status)
 		_, _ = writer.Write([]byte(`{"error":{"message":"refused"}}`))
 	}))
@@ -20,16 +23,24 @@ func answering(t *testing.T, status int) Client {
 	return Client{http: server.Client(), baseURL: server.URL}
 }
 
-func TestAForbiddenModelLetsTheNextOneTryWhileAForbiddenKeyIsRejected(t *testing.T) {
-	client := answering(t, http.StatusForbidden)
-	_, err := client.Complete(t.Context(), secret.New("key"), "model", llm.Prompt{})
-	if err == nil || errors.Is(err, llm.ErrInvalidAPIKey) {
-		t.Errorf("Complete on 403 = %v; want a per-model failure, not a rejected key", err)
+func TestHowOpenAIRefusalsEndARun(t *testing.T) {
+	cases := []struct {
+		name       string
+		status     int
+		retryAfter string
+		want       error
+	}{
+		{"an unknown key is rejected", http.StatusUnauthorized, "", llm.ErrInvalidAPIKey},
+		{"a key barred from the model is rejected", http.StatusForbidden, "", llm.ErrInvalidAPIKey},
+		{"a short wait is worth another try", http.StatusTooManyRequests, "2", llm.ErrTemporary},
+		{"a long wait means the quota is spent", http.StatusTooManyRequests, "3600", llm.ErrQuotaExhausted},
 	}
-	if err := client.CheckKey(t.Context(), secret.New("key")); !errors.Is(err, llm.ErrInvalidAPIKey) {
-		t.Errorf("CheckKey on 403 = %v; want a rejected key", err)
-	}
-	if _, err := answering(t, http.StatusUnauthorized).Complete(t.Context(), secret.New("key"), "model", llm.Prompt{}); !errors.Is(err, llm.ErrInvalidAPIKey) {
-		t.Errorf("Complete on 401 = %v; want a rejected key", err)
+	for _, test := range cases {
+		t.Run(test.name, func(t *testing.T) {
+			_, err := answering(t, test.status, test.retryAfter).Complete(t.Context(), secret.New("key"), "model", llm.Prompt{})
+			if !errors.Is(err, test.want) {
+				t.Errorf("Complete = %v; want %v", err, test.want)
+			}
+		})
 	}
 }

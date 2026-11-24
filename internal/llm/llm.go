@@ -1,4 +1,4 @@
-// Package llm keeps which AI provider, key and models the app uses, and sends prompts to them, falling back model by model.
+// Package llm keeps which AI provider and key the app uses, and sends prompts to that provider's one model.
 package llm
 
 import (
@@ -13,15 +13,15 @@ type Provider string
 const (
 	ProviderClaude Provider = "claude"
 	ProviderOpenAI Provider = "openai"
-	ProviderGemini Provider = "gemini"
 )
 
 var (
 	ErrInvalidAPIKey   = errors.New("the API key was rejected")
 	ErrNotConfigured   = errors.New("no AI provider is configured and turned on")
 	ErrUnknownProvider = errors.New("unknown AI provider")
-	ErrNoModels        = errors.New("choose at least one model")
 	ErrNoKey           = errors.New("enter an API key for this provider")
+	// ErrQuotaExhausted means the provider will not answer again for a long while, so a run stops rather than fail lecture by lecture.
+	ErrQuotaExhausted = errors.New("the provider's quota is used up")
 	// ErrTemporary marks a failure worth trying the same model again for, such as an overloaded provider.
 	ErrTemporary = errors.New("the provider is temporarily unavailable")
 	// ErrProvider marks a failure reported by, or on the way to, the provider rather than by the app itself.
@@ -45,11 +45,8 @@ func (usage Usage) Plus(other Usage) Usage {
 }
 
 type Completion struct {
-	Text  string
-	Usage Usage
-	// Model is the one that answered, which differs from the first choice after a fallback.
-	Model string
-	// CostUSD is zero when the model's price is not known.
+	Text    string
+	Usage   Usage
 	CostUSD float64
 }
 
@@ -65,28 +62,23 @@ type Price struct {
 
 // Client talks to one provider; adapters implement it.
 type Client interface {
-	// CheckKey returns an error wrapping ErrInvalidAPIKey when the provider rejects the key.
-	CheckKey(ctx context.Context, key secret.Secret) error
-	ListModels(ctx context.Context, key secret.Secret) ([]ModelInfo, error)
 	// Complete returns an error wrapping ErrInvalidAPIKey when the provider rejects the key.
 	Complete(ctx context.Context, key secret.Secret, model string, prompt Prompt) (Completion, error)
 }
 
-// Profile is what the app knows about a provider without asking it: the models it can price, best first,
-// and the chain it recommends, the first model answering and the rest standing by.
+// Profile is a provider and the one model the app uses with it, chosen by measuring translations; there is no
+// fallback, so a failure never moves a run onto a pricier model.
 type Profile struct {
-	Provider    Provider
-	Label       string
-	Known       []ModelInfo
-	Recommended []string
-	Prices      map[string]Price
-	Client      Client
+	Provider Provider
+	Label    string
+	Model    ModelInfo
+	Price    Price
+	Client   Client
 }
 
-// ProviderSettings is one provider's key and model chain; each provider keeps its own when another is in use.
+// ProviderSettings is one provider's key; each provider keeps its own when another is in use.
 type ProviderSettings struct {
 	APIKey secret.Secret
-	Models []string
 }
 
 type Config struct {

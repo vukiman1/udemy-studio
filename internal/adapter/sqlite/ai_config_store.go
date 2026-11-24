@@ -22,8 +22,7 @@ type sealedAIConfig struct {
 }
 
 type sealedProvider struct {
-	APIKey string   `json:"apiKey"` //nolint:gosec // reason: the whole row is sealed before it is stored
-	Models []string `json:"models"`
+	APIKey string `json:"apiKey"` //nolint:gosec // reason: the whole row is sealed before it is stored
 }
 
 // AIConfigStore keeps the AI settings, keys included, sealed in one settings row; the sealing key lives outside the database.
@@ -54,7 +53,7 @@ func (store *AIConfigStore) Load(ctx context.Context) (llm.Config, bool, error) 
 	}
 	config := llm.Config{Active: stored.Active, IsEnabled: stored.IsEnabled, Providers: map[llm.Provider]llm.ProviderSettings{}}
 	for provider, saved := range stored.Providers {
-		config.Providers[provider] = llm.ProviderSettings{APIKey: secret.New(saved.APIKey), Models: saved.Models}
+		config.Providers[provider] = llm.ProviderSettings{APIKey: secret.New(saved.APIKey)}
 	}
 	return config, true, nil
 }
@@ -62,7 +61,7 @@ func (store *AIConfigStore) Load(ctx context.Context) (llm.Config, bool, error) 
 func (store *AIConfigStore) Save(ctx context.Context, config llm.Config) error {
 	stored := sealedAIConfig{Active: config.Active, IsEnabled: config.IsEnabled, Providers: map[llm.Provider]sealedProvider{}}
 	for provider, settings := range config.Providers {
-		stored.Providers[provider] = sealedProvider{APIKey: settings.APIKey.Reveal(), Models: settings.Models}
+		stored.Providers[provider] = sealedProvider{APIKey: settings.APIKey.Reveal()}
 	}
 	plain, err := json.Marshal(stored)
 	if err != nil {
