@@ -1,0 +1,27 @@
+{
+  "lecture": {
+    "id": 902,
+    "lecture_title": "008 Practice test",
+    "lecture_index": 8,
+    "_class": "quiz",
+    "data": {
+      "_class": "quiz",
+      "id": 902,
+      "title": "Practice test",
+      "object_index": 7,
+      "type": "simple-quiz",
+      "description": "<p>Mô tả</p>",
+      "pass_percent": 72
+    }
+  },
+  "assessments": [
+    {
+      "_class": "assessment",
+      "id": 3,
+      "assessment_type": "multiple-choice",
+      "prompt": {
+        "question": "Q"
+      }
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "lecture": {
+    "id": 903,
+    "lecture_title": "009 Coding exercise",
+    "lecture_index": 9,
+    "_class": "quiz",
+    "data": {
+      "_class": "quiz",
+      "id": 903,
+      "title": "Quiz 1: Cloud & \"AI\" <b>'Tiếng Việt'</b> 😀",
+      "object_index": 7,
+      "type": "simple-quiz"
+    }
+  },
+  "assessments": [
+    {
+      "_class": "assessment",
+      "id": 4,
+      "assessment_type": "coding-problem",
+      "prompt": {
+        "instructions": "<p>Write </script> a func</p>",
+        "test_files": [
+          {
+            "file_name": "test.py",
+            "content": "assert f() == 1\n"
+          }
+        ],
+        "solution_files": [
+          {
+            "file_name": "f.py",
+            "content": "def f():\n    return 1\n"
+          }
+        ]
+      }
+    }
+  ]
+}

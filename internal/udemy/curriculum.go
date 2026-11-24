@@ -1,5 +1,7 @@
 package udemy
 
+import "encoding/json"
+
 type Course struct {
 	ID     int64  `json:"id"`
 	Title  string `json:"title"`
@@ -8,12 +10,14 @@ type Course struct {
 }
 
 type CurriculumItem struct {
-	Class               string  `json:"_class"`
-	ID                  int64   `json:"id"`
-	ObjectIndex         int     `json:"object_index"`
-	Title               string  `json:"title"`
-	Asset               *Asset  `json:"asset"`
-	SupplementaryAssets []Asset `json:"supplementary_assets"`
+	Class               string          `json:"_class"`
+	ID                  int64           `json:"id"`
+	ObjectIndex         int             `json:"object_index"`
+	Title               string          `json:"title"`
+	Asset               *Asset          `json:"asset"`
+	SupplementaryAssets []Asset         `json:"supplementary_assets"`
+	Description         json.RawMessage `json:"description"`
+	PassPercent         json.RawMessage `json:"pass_percent"`
 }
 
 type Asset struct {

@@ -62,6 +62,7 @@ func (e JobStatus) Valid() bool {
 // Defines values for LectureKind.
 const (
 	Article     LectureKind = "article"
+	Quiz        LectureKind = "quiz"
 	Unavailable LectureKind = "unavailable"
 	Video       LectureKind = "video"
 )
@@ -70,6 +71,8 @@ const (
 func (e LectureKind) Valid() bool {
 	switch e {
 	case Article:
+		return true
+	case Quiz:
 		return true
 	case Unavailable:
 		return true

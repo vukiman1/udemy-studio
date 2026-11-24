@@ -22,7 +22,14 @@ export function LecturePage(): ReactElement {
     <article className="mx-auto grid max-w-[1100px] gap-3 p-4">
       <h2 className="text-[1.15rem] font-semibold">{lecture.title}</h2>
       {lecture.hasVideo && <VideoPlayer key={lecture.id} lecture={lecture} courseId={courseId} />}
-      {lecture.hasArticle && <ArticleFrame lectureId={lecture.id} title={lecture.title} />}
+      {lecture.hasArticle && (
+        <ArticleFrame
+          key={lecture.id}
+          lectureId={lecture.id}
+          title={lecture.title}
+          canRunScripts={lecture.kind === 'quiz'}
+        />
+      )}
       {lecture.kind === 'unavailable' && (
         <PageStatus
           tone="info"
@@ -39,5 +46,5 @@ export function LecturePage(): ReactElement {
 }
 
 function needsManualCompletion(lecture: LectureSummary): boolean {
-  return lecture.kind === 'article' && !lecture.hasVideo
+  return (lecture.kind === 'article' || lecture.kind === 'quiz') && !lecture.hasVideo
 }

@@ -309,7 +309,7 @@ export interface components {
             lectures: components["schemas"]["LectureSummary"][];
         };
         /** @enum {string} */
-        LectureKind: "video" | "article" | "unavailable";
+        LectureKind: "video" | "article" | "quiz" | "unavailable";
         LectureSummary: {
             id: string;
             number: number;

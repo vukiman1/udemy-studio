@@ -144,6 +144,15 @@ tasks:
     cmds:
       - '"{{.PYTHON_REPO}}/.venv/bin/python" tools/pyvttgolden/vtt_golden.py testdata/subtitle/vtt internal/subtitle/html_entities.json'
 
+  fixtures:quiz:
+    desc: Record Python's json.dumps output and the quiz pages the Python downloader writes for each quiz fixture
+    requires:
+      vars: [PYTHON_REPO]
+    env:
+      PYTHONPATH: "{{.PYTHON_REPO}}"
+    cmds:
+      - '"{{.PYTHON_REPO}}/.venv/bin/python" tools/pyquizgolden/quiz_golden.py testdata/pyjson/dumps_golden.json testdata/quiz'
+
   fixtures:subtitles:
     desc: Record pysrt digests of every SRT in a downloads/ tree
     requires:

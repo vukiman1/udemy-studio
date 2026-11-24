@@ -11,8 +11,14 @@ interface MarkCompleteButtonProps {
 
 const READ_THROUGH = { positionSeconds: 1, durationSeconds: 1, completed: true } as const
 
+const COMPLETION_TEXT = {
+  article: { done: 'Đã đọc xong bài này.', action: 'Đánh dấu đã đọc' },
+  quiz: { done: 'Đã làm xong bài này.', action: 'Đánh dấu đã làm' },
+} as const
+
 export function MarkCompleteButton({ lecture, courseId }: MarkCompleteButtonProps): ReactElement {
   const queryClient = useQueryClient()
+  const text = COMPLETION_TEXT[lecture.kind === 'quiz' ? 'quiz' : 'article']
   const markComplete = useMutation({
     mutationFn: () => saveProgress(lecture.id, READ_THROUGH, false),
     onSuccess: async () => {
@@ -28,7 +34,7 @@ export function MarkCompleteButton({ lecture, courseId }: MarkCompleteButtonProp
     return (
       <p className="inline-flex items-center gap-1 text-accent">
         <CheckIcon className="size-4.5" />
-        Đã đọc xong bài này.
+        {text.done}
       </p>
     )
   }
@@ -41,7 +47,7 @@ export function MarkCompleteButton({ lecture, courseId }: MarkCompleteButtonProp
           markComplete.mutate()
         }}
       >
-        Đánh dấu đã đọc
+        {text.action}
       </button>
       {markComplete.isError && <p role="alert">Không lưu được: {markComplete.error.message}</p>}
     </div>

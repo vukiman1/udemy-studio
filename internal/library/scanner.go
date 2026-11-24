@@ -39,7 +39,7 @@ func scanCourse(downloads fs.FS, courseDir string) (Course, error) {
 	if err != nil {
 		return Course{}, err
 	}
-	ids, err := lectureIDs(downloads, courseDir)
+	entries, err := manifestLectures(downloads, courseDir)
 	if err != nil {
 		return Course{}, err
 	}
@@ -50,7 +50,7 @@ func scanCourse(downloads fs.FS, courseDir string) (Course, error) {
 			continue
 		}
 		index, _ := strconv.Atoi(match[1])
-		lectures, err := scanChapter(downloads, path.Join(courseDir, chapterDir), ids)
+		lectures, err := scanChapter(downloads, path.Join(courseDir, chapterDir), entries)
 		if err != nil {
 			return Course{}, err
 		}
@@ -60,7 +60,7 @@ func scanCourse(downloads fs.FS, courseDir string) (Course, error) {
 	return course, nil
 }
 
-func scanChapter(downloads fs.FS, chapterDir string, ids map[string]int64) ([]Lecture, error) {
+func scanChapter(downloads fs.FS, chapterDir string, entries map[string]ManifestLecture) ([]Lecture, error) {
 	names, err := visibleEntries(downloads, chapterDir, false)
 	if err != nil {
 		return nil, err
@@ -79,11 +79,8 @@ func scanChapter(downloads fs.FS, chapterDir string, ids map[string]int64) ([]Le
 	for number, groupNames := range groups {
 		prefix := fmt.Sprintf("%03d ", number)
 		lecture := buildLecture(lectureGroup{chapterDir: chapterDir, prefix: prefix, names: groupNames}, number)
-		pathKey := path.Join(chapterDir, prefix+lecture.Title)
-		lecture.Key = lectureKey(lecture, pathKey, ids)
-		if lecture.Key != pathKey {
-			lecture.PathKey = pathKey
-		}
+		lecture.Key, lecture.PathKey = lectureKeys(lecture, path.Join(chapterDir, prefix+lecture.Title), entries)
+		lecture.Kind = lectureKind(lecture, entries)
 		lecture.ID = shortID("lecture", lecture.Key)
 		for position := range lecture.Attachments {
 			lecture.Attachments[position].ID = shortID("attachment", lecture.Attachments[position].Path)

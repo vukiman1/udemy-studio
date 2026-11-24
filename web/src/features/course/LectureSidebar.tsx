@@ -41,7 +41,7 @@ export function LectureSidebar({ course }: LectureSidebarProps): ReactElement {
                   <span className="wrap-anywhere">{lecture.title}</span>
                   {lecture.kind !== 'video' && (
                     <span className="rounded border border-line px-1 text-[0.75rem] text-muted">
-                      {kindLabel(lecture)}
+                      {KIND_LABELS[lecture.kind]}
                     </span>
                   )}
                 </NavLink>
@@ -54,6 +54,8 @@ export function LectureSidebar({ course }: LectureSidebarProps): ReactElement {
   )
 }
 
-function kindLabel(lecture: LectureSummary): string {
-  return lecture.kind === 'article' ? 'Bài viết' : 'DRM'
-}
+const KIND_LABELS = {
+  article: 'Bài viết',
+  quiz: 'Quiz',
+  unavailable: 'DRM',
+} as const satisfies Record<Exclude<LectureSummary['kind'], 'video'>, string>

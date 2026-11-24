@@ -7,6 +7,8 @@ import (
 	"io/fs"
 	"path"
 	"strconv"
+
+	"github.com/vukiman1/udemy-studio/internal/udemy"
 )
 
 const (
@@ -24,12 +26,13 @@ type Manifest struct {
 
 type ManifestLecture struct {
 	UdemyID    int64  `json:"udemy_id"`
+	Class      string `json:"class"`
 	ChapterDir string `json:"chapter_dir"`
 	File       string `json:"file"`
 }
 
-// lectureIDs maps each lecture file the manifest names, as a path under the downloads root, to its Udemy id.
-func lectureIDs(downloads fs.FS, courseDir string) (map[string]int64, error) {
+// manifestLectures maps each lecture file the manifest names, as a path under the downloads root, to its entry.
+func manifestLectures(downloads fs.FS, courseDir string) (map[string]ManifestLecture, error) {
 	raw, err := fs.ReadFile(downloads, path.Join(courseDir, ManifestFile))
 	if errors.Is(err, fs.ErrNotExist) {
 		return nil, nil
@@ -41,19 +44,34 @@ func lectureIDs(downloads fs.FS, courseDir string) (map[string]int64, error) {
 	if err := json.Unmarshal(raw, &manifest); err != nil {
 		return nil, fmt.Errorf("decode manifest of %q (delete it and download the course again to rewrite it): %w", courseDir, err)
 	}
-	ids := make(map[string]int64, len(manifest.Lectures))
+	entries := make(map[string]ManifestLecture, len(manifest.Lectures))
 	for _, lecture := range manifest.Lectures {
-		ids[path.Join(courseDir, lecture.ChapterDir, lecture.File)] = lecture.UdemyID
+		entries[path.Join(courseDir, lecture.ChapterDir, lecture.File)] = lecture
 	}
-	return ids, nil
+	return entries, nil
 }
 
-// lectureKey is the key progress is saved under: the Udemy id when the manifest knows the lecture's file, else its path.
-func lectureKey(lecture Lecture, pathKey string, ids map[string]int64) string {
+func manifestEntry(lecture Lecture, entries map[string]ManifestLecture) (ManifestLecture, bool) {
 	for _, file := range []string{lecture.ArticlePath, lecture.VideoPath} {
-		if id, ok := ids[file]; ok && file != "" {
-			return udemyKeyPrefix + strconv.FormatInt(id, 10)
+		if entry, ok := entries[file]; ok && file != "" {
+			return entry, true
 		}
 	}
-	return pathKey
+	return ManifestLecture{}, false
+}
+
+// lectureKeys returns the Udemy id key when the manifest knows the lecture's file, with the path key progress may still use.
+func lectureKeys(lecture Lecture, pathKey string, entries map[string]ManifestLecture) (string, string) {
+	entry, ok := manifestEntry(lecture, entries)
+	if !ok {
+		return pathKey, ""
+	}
+	return udemyKeyPrefix + strconv.FormatInt(entry.UdemyID, 10), pathKey
+}
+
+func lectureKind(lecture Lecture, entries map[string]ManifestLecture) LectureKind {
+	if lecture.ArticlePath != "" && entries[lecture.ArticlePath].Class == udemy.QuizClass {
+		return LectureKindQuiz
+	}
+	return lecture.Kind
 }

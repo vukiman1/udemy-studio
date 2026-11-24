@@ -38,7 +38,9 @@ func (run *courseDownload) mainFile(ctx context.Context, chapterDir string, lect
 		return run.video(ctx, chapterDir, lecture)
 	case udemy.KindDRM:
 		return run.recordFailure(ctx, lecture.Title, errDRMUnsupported)
-	case udemy.KindUnavailable, udemy.KindQuiz:
+	case udemy.KindQuiz:
+		return run.quiz(ctx, chapterDir, lecture)
+	case udemy.KindUnavailable:
 		return run.recordFailure(ctx, lecture.Title, errNoMedia)
 	}
 	return nil

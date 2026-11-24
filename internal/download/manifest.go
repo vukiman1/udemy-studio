@@ -14,7 +14,7 @@ func writeManifest(courseDir string, plan udemy.Plan) error {
 	manifest := library.Manifest{Format: library.ManifestFormat, Lectures: []library.ManifestLecture{}}
 	for _, chapter := range plan.Chapters {
 		for _, lecture := range chapter.Lectures {
-			manifest.Lectures = append(manifest.Lectures, library.ManifestLecture{UdemyID: lecture.ID, ChapterDir: chapter.Dir, File: lecture.File})
+			manifest.Lectures = append(manifest.Lectures, library.ManifestLecture{UdemyID: lecture.ID, Class: lecture.Class, ChapterDir: chapter.Dir, File: lecture.File})
 		}
 	}
 	encoded, err := json.MarshalIndent(manifest, "", "  ")
