@@ -49,8 +49,7 @@ func (server apiServer) CancelJob(ctx context.Context, request gen.CancelJobRequ
 	case errors.Is(err, jobs.ErrJobNotFound):
 		return gen.CancelJob404ApplicationProblemPlusJSONResponse{NotFoundApplicationProblemPlusJSONResponse: notFound(err.Error())}, nil
 	case errors.Is(err, jobs.ErrJobFinished):
-		conflict := gen.ConflictApplicationProblemPlusJSONResponse(problem(http.StatusConflict, err.Error()))
-		return gen.CancelJob409ApplicationProblemPlusJSONResponse{ConflictApplicationProblemPlusJSONResponse: conflict}, nil
+		return gen.CancelJob409ApplicationProblemPlusJSONResponse{ConflictApplicationProblemPlusJSONResponse: conflict(err)}, nil
 	case err != nil:
 		return nil, err
 	}

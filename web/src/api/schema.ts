@@ -193,6 +193,42 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/courses/{courseId}/compression/plan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** What compressing a course to H.265 would encode, and roughly how long it takes */
+        get: operations["planCourseCompression"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/courses/{courseId}/compression": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The latest compression of a course since the server started */
+        get: operations["getCourseCompression"];
+        put?: never;
+        /** Queue a course to have its H.264 videos re-encoded to H.265 in the background */
+        post: operations["startCourseCompression"];
+        /** Stop compressing a course; videos already compressed stay compressed */
+        delete: operations["cancelCourseCompression"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/media/{lectureId}": {
         parameters: {
             query?: never;
@@ -439,6 +475,55 @@ export interface components {
         NoteEdit: {
             body: string;
         };
+        CompressionPlan: {
+            /** @description H.264 videos that would be encoded */
+            files: number;
+            /** Format: int64 */
+            totalBytes: number;
+            /** Format: double */
+            totalSeconds: number;
+            /**
+             * Format: double
+             * @description Rough encode time on this machine
+             */
+            estimatedSeconds: number;
+            alreadyHevc: number;
+            /** @description Videos in neither H.264 nor H.265, left as they are */
+            otherCodec: number;
+            /** @description Videos an earlier run found not worth re-encoding */
+            notWorthIt: number;
+            /** @description Videos ffprobe cannot read, such as an unfinished download */
+            unreadable: number;
+        };
+        CompressionRun: {
+            /** @enum {string} */
+            state: "queued" | "running" | "done" | "cancelled";
+            total: number;
+            finished: number;
+            current?: components["schemas"]["CompressionCurrent"];
+            /**
+             * Format: int64
+             * @description Size of the videos replaced so far, before compression
+             */
+            bytesBefore: number;
+            /** Format: int64 */
+            bytesAfter: number;
+            skipped: components["schemas"]["CompressionOutcome"][];
+            failed: components["schemas"]["CompressionOutcome"][];
+        };
+        CompressionCurrent: {
+            lectureTitle: string;
+            /** Format: double */
+            encodedSeconds: number;
+            /** Format: double */
+            lengthSeconds: number;
+        };
+        CompressionOutcome: {
+            /** @description The video's path in the library */
+            path: string;
+            lectureTitle: string;
+            reason: string;
+        };
         SearchHit: {
             courseId: string;
             courseTitle: string;
@@ -510,6 +595,15 @@ export interface components {
     responses: {
         /** @description The server was started without a downloader configured */
         DownloadsUnavailable: {
+            headers: {
+                [name: string]: unknown;
+            };
+            content: {
+                "application/problem+json": components["schemas"]["Problem"];
+            };
+        };
+        /** @description ffmpeg or ffprobe was not found when the server started */
+        CompressionUnavailable: {
             headers: {
                 [name: string]: unknown;
             };
@@ -872,6 +966,107 @@ export interface operations {
                 };
             };
             404: components["responses"]["NotFound"];
+        };
+    };
+    planCourseCompression: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                courseId: components["parameters"]["CourseId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The videos that would be encoded */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompressionPlan"];
+                };
+            };
+            404: components["responses"]["NotFound"];
+            503: components["responses"]["CompressionUnavailable"];
+        };
+    };
+    getCourseCompression: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                courseId: components["parameters"]["CourseId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The compression run */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompressionRun"];
+                };
+            };
+            /** @description The course has not been compressed since the server started */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            503: components["responses"]["CompressionUnavailable"];
+        };
+    };
+    startCourseCompression: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                courseId: components["parameters"]["CourseId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Queued */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompressionRun"];
+                };
+            };
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            503: components["responses"]["CompressionUnavailable"];
+        };
+    };
+    cancelCourseCompression: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                courseId: components["parameters"]["CourseId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Cancelled */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            409: components["responses"]["Conflict"];
+            503: components["responses"]["CompressionUnavailable"];
         };
     };
     getLectureVideo: {

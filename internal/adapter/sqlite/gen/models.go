@@ -8,6 +8,12 @@ import (
 	"database/sql"
 )
 
+type CompressionSkip struct {
+	VideoPath string
+	SizeBytes int64
+	Reason    string
+}
+
 type CueIndex struct {
 	LectureKey string
 	Lang       string

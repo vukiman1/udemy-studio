@@ -9,8 +9,9 @@ import (
 )
 
 const (
-	problemContentType         = "application/problem+json"
-	downloadsUnavailableDetail = "downloads are not configured: start the server with --downloader go, or with --python and --python-repo"
+	problemContentType           = "application/problem+json"
+	downloadsUnavailableDetail   = "downloads are not configured: start the server with --downloader go, or with --python and --python-repo"
+	compressionUnavailableDetail = "compression needs ffmpeg and ffprobe; install them or pass their paths with --ffmpeg and --ffprobe"
 )
 
 func problem(status int, detail string) gen.Problem {
@@ -23,6 +24,14 @@ func notFound(detail string) gen.NotFoundApplicationProblemPlusJSONResponse {
 
 func downloadsUnavailable() gen.DownloadsUnavailableApplicationProblemPlusJSONResponse {
 	return gen.DownloadsUnavailableApplicationProblemPlusJSONResponse(problem(http.StatusServiceUnavailable, downloadsUnavailableDetail))
+}
+
+func compressionUnavailable() gen.CompressionUnavailableApplicationProblemPlusJSONResponse {
+	return gen.CompressionUnavailableApplicationProblemPlusJSONResponse(problem(http.StatusServiceUnavailable, compressionUnavailableDetail))
+}
+
+func conflict(err error) gen.ConflictApplicationProblemPlusJSONResponse {
+	return gen.ConflictApplicationProblemPlusJSONResponse(problem(http.StatusConflict, err.Error()))
 }
 
 func writeProblem(writer http.ResponseWriter, status int, detail string) {

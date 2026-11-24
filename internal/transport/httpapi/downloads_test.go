@@ -140,15 +140,15 @@ func TestJobLifecycleOverHTTP(t *testing.T) {
 	chapters := "4"
 	created := app.do(t, http.MethodPost, "/api/jobs", gen.JobRequest{CourseUrl: testCourseURL, Chapters: &chapters})
 	job := decode[gen.Job](t, created)
-	if created.status != http.StatusAccepted || job.Status != gen.Queued || job.Chapters == nil || *job.Chapters != "4" {
+	if created.status != http.StatusAccepted || job.Status != gen.JobStatusQueued || job.Chapters == nil || *job.Chapters != "4" {
 		t.Fatalf("create = %d %+v", created.status, job)
 	}
 
-	waitForJob(t, app, job.Id, gen.Running)
+	waitForJob(t, app, job.Id, gen.JobStatusRunning)
 	if result := app.do(t, http.MethodDelete, "/api/jobs/"+job.Id, nil); result.status != http.StatusNoContent {
 		t.Fatalf("cancel = %d %s", result.status, result.body)
 	}
-	waitForJob(t, app, job.Id, gen.Cancelled)
+	waitForJob(t, app, job.Id, gen.JobStatusCancelled)
 	assertProblem(t, app.do(t, http.MethodDelete, "/api/jobs/"+job.Id, nil), http.StatusConflict)
 	assertProblem(t, app.do(t, http.MethodDelete, "/api/jobs/missing", nil), http.StatusNotFound)
 }
@@ -182,7 +182,7 @@ func TestEventStreamSendsJobsAsTheyChange(t *testing.T) {
 		if err := json.Unmarshal([]byte(data), &job); err != nil {
 			t.Fatalf("decode event %q: %v", data, err)
 		}
-		if job.Id == created.Id && job.Status == gen.Running {
+		if job.Id == created.Id && job.Status == gen.JobStatusRunning {
 			return
 		}
 	}
