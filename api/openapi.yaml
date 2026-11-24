@@ -142,6 +142,101 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
 
+  /api/lectures/{lectureId}/notes:
+    get:
+      operationId: listLectureNotes
+      summary: The notes written on a lecture, in playback order
+      parameters:
+        - $ref: "#/components/parameters/LectureId"
+      responses:
+        "200":
+          description: Notes, earliest moment first
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Note"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    post:
+      operationId: addLectureNote
+      summary: Write a note at a moment of a lecture
+      parameters:
+        - $ref: "#/components/parameters/LectureId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NoteDraft"
+      responses:
+        "201":
+          description: The stored note
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Note"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/notes/{noteId}:
+    patch:
+      operationId: editNote
+      summary: Rewrite a note; its moment stays
+      parameters:
+        - $ref: "#/components/parameters/NoteId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NoteEdit"
+      responses:
+        "200":
+          description: The stored note
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Note"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      operationId: deleteNote
+      summary: Delete a note
+      parameters:
+        - $ref: "#/components/parameters/NoteId"
+      responses:
+        "204":
+          description: Deleted
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /api/courses/{courseId}/notes.md:
+    get:
+      operationId: exportCourseNotes
+      summary: Every note of a course as a Markdown file, in course order
+      parameters:
+        - $ref: "#/components/parameters/CourseId"
+      responses:
+        "200":
+          description: Markdown document, sent as a download
+          headers:
+            Content-Disposition:
+              required: true
+              schema:
+                type: string
+          content:
+            text/markdown; charset=utf-8:
+              schema:
+                type: string
+        "404":
+          $ref: "#/components/responses/NotFound"
+
   /media/{lectureId}:
     get:
       tags: [raw]
@@ -332,6 +427,13 @@ components:
       required: true
       schema:
         type: string
+    NoteId:
+      name: noteId
+      in: path
+      required: true
+      schema:
+        type: integer
+        format: int64
     Languages:
       name: langs
       in: query
@@ -514,6 +616,43 @@ components:
         positionSeconds:
           type: number
           format: double
+
+    Note:
+      type: object
+      required: [id, atSeconds, body, createdAt, updatedAt]
+      properties:
+        id:
+          type: integer
+          format: int64
+        atSeconds:
+          type: number
+          format: double
+        body:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    NoteDraft:
+      type: object
+      required: [atSeconds, body]
+      properties:
+        atSeconds:
+          type: number
+          format: double
+          description: The moment of the video the note is about; 0 for lectures without video
+        body:
+          type: string
+
+    NoteEdit:
+      type: object
+      required: [body]
+      properties:
+        body:
+          type: string
 
     SearchHit:
       type: object

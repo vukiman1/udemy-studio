@@ -140,6 +140,59 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/lectures/{lectureId}/notes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The notes written on a lecture, in playback order */
+        get: operations["listLectureNotes"];
+        put?: never;
+        /** Write a note at a moment of a lecture */
+        post: operations["addLectureNote"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/notes/{noteId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete a note */
+        delete: operations["deleteNote"];
+        options?: never;
+        head?: never;
+        /** Rewrite a note; its moment stays */
+        patch: operations["editNote"];
+        trace?: never;
+    };
+    "/api/courses/{courseId}/notes.md": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Every note of a course as a Markdown file, in course order */
+        get: operations["exportCourseNotes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/media/{lectureId}": {
         parameters: {
             query?: never;
@@ -364,6 +417,28 @@ export interface components {
             /** Format: double */
             positionSeconds: number;
         };
+        Note: {
+            /** Format: int64 */
+            id: number;
+            /** Format: double */
+            atSeconds: number;
+            body: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        NoteDraft: {
+            /**
+             * Format: double
+             * @description The moment of the video the note is about; 0 for lectures without video
+             */
+            atSeconds: number;
+            body: string;
+        };
+        NoteEdit: {
+            body: string;
+        };
         SearchHit: {
             courseId: string;
             courseTitle: string;
@@ -473,6 +548,7 @@ export interface components {
     parameters: {
         CourseId: string;
         LectureId: string;
+        NoteId: number;
         /** @description Subtitle languages in display order; all available languages when omitted */
         Languages: string[];
     };
@@ -671,6 +747,130 @@ export interface operations {
                 };
             };
             400: components["responses"]["BadRequest"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    listLectureNotes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                lectureId: components["parameters"]["LectureId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Notes, earliest moment first */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Note"][];
+                };
+            };
+            404: components["responses"]["NotFound"];
+        };
+    };
+    addLectureNote: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                lectureId: components["parameters"]["LectureId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NoteDraft"];
+            };
+        };
+        responses: {
+            /** @description The stored note */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Note"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    deleteNote: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                noteId: components["parameters"]["NoteId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            404: components["responses"]["NotFound"];
+        };
+    };
+    editNote: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                noteId: components["parameters"]["NoteId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["NoteEdit"];
+            };
+        };
+        responses: {
+            /** @description The stored note */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Note"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            404: components["responses"]["NotFound"];
+        };
+    };
+    exportCourseNotes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                courseId: components["parameters"]["CourseId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Markdown document, sent as a download */
+            200: {
+                headers: {
+                    "Content-Disposition": string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/markdown; charset=utf-8": string;
+                };
+            };
             404: components["responses"]["NotFound"];
         };
     };

@@ -14,6 +14,8 @@ import (
 	"time"
 
 	"github.com/vukiman1/udemy-studio/internal/library"
+	"github.com/vukiman1/udemy-studio/internal/notes"
+	"github.com/vukiman1/udemy-studio/internal/notes/notestest"
 	"github.com/vukiman1/udemy-studio/internal/progress"
 	"github.com/vukiman1/udemy-studio/internal/progress/progresstest"
 	"github.com/vukiman1/udemy-studio/internal/transport/httpapi/gen"
@@ -84,6 +86,7 @@ func newTestAppWithDeps(t *testing.T, files map[string]string, customize func(*D
 		Catalog:  catalog,
 		Media:    media.FS(),
 		Progress: progress.NewService(progresstest.NewMemoryStore(), now),
+		Notes:    notes.NewService(notestest.NewMemoryStore(), now),
 		Logger:   slog.New(slog.DiscardHandler),
 	}
 	customize(&deps)

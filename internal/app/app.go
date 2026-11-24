@@ -14,6 +14,7 @@ import (
 
 	"github.com/vukiman1/udemy-studio/internal/adapter/sqlite"
 	"github.com/vukiman1/udemy-studio/internal/library"
+	"github.com/vukiman1/udemy-studio/internal/notes"
 	"github.com/vukiman1/udemy-studio/internal/progress"
 	"github.com/vukiman1/udemy-studio/internal/search"
 	"github.com/vukiman1/udemy-studio/internal/transport/httpapi"
@@ -58,7 +59,8 @@ func Run(ctx context.Context, options Options, logger *slog.Logger) error {
 	}
 	defer database.Close()
 	progressService := progress.NewService(sqlite.NewProgressStore(database), time.Now)
-	if err := progressService.AdoptKeys(ctx, catalog.Current().KeyRenames()); err != nil {
+	notesService := notes.NewService(sqlite.NewNotesStore(database), time.Now)
+	if err := adoptLectureKeys(ctx, catalog, progressService, notesService); err != nil {
 		return err
 	}
 
@@ -74,6 +76,7 @@ func Run(ctx context.Context, options Options, logger *slog.Logger) error {
 		catalog:  catalog,
 		media:    media.FS(),
 		progress: progressService,
+		notes:    notesService,
 		search:   search.NewService(sqlite.NewCueIndex(database), logger),
 		logger:   logger,
 	}
@@ -88,6 +91,7 @@ func Run(ctx context.Context, options Options, logger *slog.Logger) error {
 		Media:    media.FS(),
 		Progress: progressService,
 		Search:   refresher.search,
+		Notes:    notesService,
 		Login:    downloads.login,
 		Jobs:     downloads.jobs,
 		Logger:   logger,

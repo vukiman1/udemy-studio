@@ -1,10 +1,11 @@
-import type { ReactElement } from 'react'
+import { useRef, type ReactElement } from 'react'
 import { useParams, useSearchParams } from 'react-router'
 import { useCourse } from '../../api/queries'
 import type { LectureSummary } from '../../api/types'
 import { PageStatus } from '../../app/PageStatus'
 import { START_SECONDS_PARAM } from '../../app/paths'
 import { findLecture, neighboursOf } from '../course/course-navigation'
+import { NotesPanel } from '../notes/NotesPanel'
 import { ArticleFrame } from './ArticleFrame'
 import { AttachmentList } from './AttachmentList'
 import { LectureNav } from './LectureNav'
@@ -16,6 +17,7 @@ export function LecturePage(): ReactElement {
   const [searchParams] = useSearchParams()
   const startAtSeconds = parseStartSeconds(searchParams.get(START_SECONDS_PARAM))
   const course = useCourse(courseId)
+  const videoRef = useRef<HTMLVideoElement | null>(null)
   if (course.data === undefined) return <PageStatus tone="info" message="Đang tải bài học…" />
   const lecture = findLecture(course.data, lectureId)
   if (lecture === undefined)
@@ -27,6 +29,7 @@ export function LecturePage(): ReactElement {
       {lecture.hasVideo && (
         <VideoPlayer
           key={`${lecture.id}@${String(startAtSeconds)}`}
+          videoRef={videoRef}
           lecture={lecture}
           courseId={courseId}
           startAtSeconds={startAtSeconds}
@@ -50,6 +53,11 @@ export function LecturePage(): ReactElement {
         <MarkCompleteButton lecture={lecture} courseId={courseId} />
       )}
       <AttachmentList attachments={lecture.attachments} />
+      <NotesPanel
+        lecture={lecture}
+        courseId={courseId}
+        videoRef={lecture.hasVideo ? videoRef : null}
+      />
       <LectureNav courseId={courseId} neighbours={neighboursOf(course.data, lecture.id)} />
     </article>
   )
