@@ -1,6 +1,6 @@
 import { I18nProvider } from '@videojs/react/i18n'
 import { Video } from '@videojs/react/video'
-import { useEffect, useRef, type ReactElement } from 'react'
+import { useEffect, type ReactElement, type RefObject } from 'react'
 import { subtitlesVttUrl, useCues, videoUrl } from '../../api/queries'
 import type { Cue, LectureSummary } from '../../api/types'
 import { Player } from './player'
@@ -23,6 +23,7 @@ import { usePlayerSettings } from './use-player-settings'
 import { useSettingsShortcuts } from './use-settings-shortcuts'
 
 interface VideoPlayerProps {
+  readonly videoRef: RefObject<HTMLVideoElement | null>
   readonly lecture: LectureSummary
   readonly courseId: string
   readonly startAtSeconds: number | undefined
@@ -31,8 +32,12 @@ interface VideoPlayerProps {
 const NO_CUES: readonly Cue[] = []
 const PLAYER_LOCALE = 'vi'
 
-export function VideoPlayer({ lecture, courseId, startAtSeconds }: VideoPlayerProps): ReactElement {
-  const videoRef = useRef<HTMLVideoElement | null>(null)
+export function VideoPlayer({
+  videoRef,
+  lecture,
+  courseId,
+  startAtSeconds,
+}: VideoPlayerProps): ReactElement {
   const [settings, updateSettings] = usePlayerSettings()
 
   const languages = languagesFor(settings.subtitleMode, lecture.subtitleLanguages)
@@ -47,7 +52,7 @@ export function VideoPlayer({ lecture, courseId, startAtSeconds }: VideoPlayerPr
     if (video === null) return
     video.defaultPlaybackRate = settings.playbackRate
     video.playbackRate = settings.playbackRate
-  }, [settings.playbackRate])
+  }, [videoRef, settings.playbackRate])
 
   useSettingsShortcuts({
     cycleSubtitles: () => {

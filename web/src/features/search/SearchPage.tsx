@@ -5,7 +5,7 @@ import type { SearchHit } from '../../api/types'
 import { PageStatus } from '../../app/PageStatus'
 import { SEARCH_QUERY_PARAM, lectureAtPath } from '../../app/paths'
 import { splitSnippet } from './snippet'
-import { MS_PER_SECOND, formatTimestamp } from './timestamp'
+import { MS_PER_SECOND, formatTimestamp } from '../../app/timestamp'
 import { useDebouncedValue } from './use-debounced-value'
 
 const TYPING_PAUSE_MS = 250
