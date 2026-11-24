@@ -9,6 +9,7 @@ import (
 	"github.com/vukiman1/udemy-studio/internal/library"
 	"github.com/vukiman1/udemy-studio/internal/login"
 	"github.com/vukiman1/udemy-studio/internal/progress"
+	"github.com/vukiman1/udemy-studio/internal/search"
 	"github.com/vukiman1/udemy-studio/internal/transport/httpapi/gen"
 )
 
@@ -18,6 +19,7 @@ type Deps struct {
 	Catalog  *library.Catalog
 	Media    fs.FS
 	Progress *progress.Service
+	Search   *search.Service
 	Login    *login.Service
 	Jobs     *jobs.Manager
 	Logger   *slog.Logger

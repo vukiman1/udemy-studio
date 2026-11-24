@@ -8,6 +8,14 @@ import (
 	"database/sql"
 )
 
+type CueIndex struct {
+	LectureKey string
+	Lang       string
+	StartMs    string
+	Text       string
+	SearchText string
+}
+
 type Job struct {
 	ID        string
 	Status    string

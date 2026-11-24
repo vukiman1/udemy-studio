@@ -12,6 +12,11 @@ type Library struct {
 	courses     map[string]Course
 	lectures    map[string]Lecture
 	attachments map[string]Attachment
+	byKey       map[string]lectureLocation
+}
+
+type lectureLocation struct {
+	courseID, lectureID string
 }
 
 func newLibrary(courses []Course) (*Library, error) {
@@ -20,6 +25,7 @@ func newLibrary(courses []Course) (*Library, error) {
 		courses:     map[string]Course{},
 		lectures:    map[string]Lecture{},
 		attachments: map[string]Attachment{},
+		byKey:       map[string]lectureLocation{},
 	}
 	for _, course := range courses {
 		if err := insertUnique(scanned.courses, course.ID, course, course.Title); err != nil {
@@ -30,6 +36,7 @@ func newLibrary(courses []Course) (*Library, error) {
 				if err := insertUnique(scanned.lectures, lecture.ID, lecture, lecture.Key); err != nil {
 					return nil, err
 				}
+				scanned.byKey[lecture.Key] = lectureLocation{courseID: course.ID, lectureID: lecture.ID}
 				for _, attachment := range lecture.Attachments {
 					if err := insertUnique(scanned.attachments, attachment.ID, attachment, attachment.Path); err != nil {
 						return nil, err
@@ -73,4 +80,13 @@ func (scanned *Library) KeyRenames() map[string]string {
 		}
 	}
 	return renames
+}
+
+// LectureByKey finds a lecture and its course by the key its progress and search entries are stored under.
+func (scanned *Library) LectureByKey(key string) (Course, Lecture, bool) {
+	location, ok := scanned.byKey[key]
+	if !ok {
+		return Course{}, Lecture{}, false
+	}
+	return scanned.courses[location.courseID], scanned.lectures[location.lectureID], true
 }

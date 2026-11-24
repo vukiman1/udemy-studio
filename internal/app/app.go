@@ -15,6 +15,7 @@ import (
 	"github.com/vukiman1/udemy-studio/internal/adapter/sqlite"
 	"github.com/vukiman1/udemy-studio/internal/library"
 	"github.com/vukiman1/udemy-studio/internal/progress"
+	"github.com/vukiman1/udemy-studio/internal/search"
 	"github.com/vukiman1/udemy-studio/internal/transport/httpapi"
 	"github.com/vukiman1/udemy-studio/web"
 )
@@ -69,7 +70,14 @@ func Run(ctx context.Context, options Options, logger *slog.Logger) error {
 		return fmt.Errorf("load embedded frontend: %w", err)
 	}
 
-	downloads, err := newDownloads(ctx, options.Downloads, options.DataDir, database, catalog, progressService, logger)
+	refresher := libraryRefresher{
+		catalog:  catalog,
+		media:    media.FS(),
+		progress: progressService,
+		search:   search.NewService(sqlite.NewCueIndex(database), logger),
+		logger:   logger,
+	}
+	downloads, err := newDownloads(ctx, options.Downloads, options.DataDir, database, refresher.afterDownload, logger)
 	if err != nil {
 		return err
 	}
@@ -79,6 +87,7 @@ func Run(ctx context.Context, options Options, logger *slog.Logger) error {
 		Catalog:  catalog,
 		Media:    media.FS(),
 		Progress: progressService,
+		Search:   refresher.search,
 		Login:    downloads.login,
 		Jobs:     downloads.jobs,
 		Logger:   logger,
@@ -101,7 +110,7 @@ func Run(ctx context.Context, options Options, logger *slog.Logger) error {
 		}
 	}
 	logger.Info("http server listening", "addr", listener.Addr().String(), "version", options.Version)
-	return serve(ctx, listener, handler, logger, shutdownGracePeriod, downloads.workers()...)
+	return serve(ctx, listener, handler, logger, shutdownGracePeriod, append(downloads.workers(), refresher.indexSubtitles)...)
 }
 
 func serve(
