@@ -25,19 +25,20 @@ import { useSettingsShortcuts } from './use-settings-shortcuts'
 interface VideoPlayerProps {
   readonly lecture: LectureSummary
   readonly courseId: string
+  readonly startAtSeconds: number | undefined
 }
 
 const NO_CUES: readonly Cue[] = []
 const PLAYER_LOCALE = 'vi'
 
-export function VideoPlayer({ lecture, courseId }: VideoPlayerProps): ReactElement {
+export function VideoPlayer({ lecture, courseId, startAtSeconds }: VideoPlayerProps): ReactElement {
   const videoRef = useRef<HTMLVideoElement | null>(null)
   const [settings, updateSettings] = usePlayerSettings()
 
   const languages = languagesFor(settings.subtitleMode, lecture.subtitleLanguages)
   const cuesQuery = useCues(lecture.id, languages)
   const activeLines = useActiveLines(videoRef, cuesQuery.data ?? NO_CUES, languages)
-  const { lastError } = useLectureProgress(videoRef, lecture, courseId)
+  const { lastError } = useLectureProgress(videoRef, lecture, courseId, startAtSeconds)
   const trackSource = languages.length > 0 ? subtitlesVttUrl(lecture.id, languages) : undefined
   useNativeFullscreenSubtitles(videoRef, trackSource, languages[0])
 

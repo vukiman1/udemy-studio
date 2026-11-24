@@ -1,7 +1,14 @@
 import { useQuery, type UseQueryResult } from '@tanstack/react-query'
 import { apiClient } from './client'
 import type { components } from './schema'
-import type { ContinueTarget, CourseDetail, CourseSummary, Cue, LectureProgress } from './types'
+import type {
+  ContinueTarget,
+  CourseDetail,
+  CourseSummary,
+  Cue,
+  LectureProgress,
+  SearchHit,
+} from './types'
 
 type ProgressReport = components['schemas']['ProgressReport']
 
@@ -27,6 +34,7 @@ export const QUERY_KEYS = {
   chromeProfiles: ['chrome-profiles'],
   loginStatus: ['login-status'],
   jobs: ['jobs'],
+  search: (query: string) => ['search', query],
 } as const
 
 export function useCourses(): UseQueryResult<CourseSummary[]> {
@@ -76,6 +84,20 @@ export function useCues(lectureId: string, languages: readonly string[]): UseQue
       })
       if (data === undefined)
         throw new ApiRequestError(`load cues of ${lectureId}`, response.status)
+      return data
+    },
+  })
+}
+
+export function useSubtitleSearch(query: string): UseQueryResult<SearchHit[]> {
+  return useQuery({
+    queryKey: QUERY_KEYS.search(query),
+    enabled: query !== '',
+    queryFn: async () => {
+      const { data, response } = await apiClient.GET('/api/search', {
+        params: { query: { q: query } },
+      })
+      if (data === undefined) throw new ApiRequestError(`search for ${query}`, response.status)
       return data
     },
   })

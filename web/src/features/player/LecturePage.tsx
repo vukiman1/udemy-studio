@@ -1,8 +1,9 @@
 import type { ReactElement } from 'react'
-import { useParams } from 'react-router'
+import { useParams, useSearchParams } from 'react-router'
 import { useCourse } from '../../api/queries'
 import type { LectureSummary } from '../../api/types'
 import { PageStatus } from '../../app/PageStatus'
+import { START_SECONDS_PARAM } from '../../app/paths'
 import { findLecture, neighboursOf } from '../course/course-navigation'
 import { ArticleFrame } from './ArticleFrame'
 import { AttachmentList } from './AttachmentList'
@@ -12,6 +13,8 @@ import { VideoPlayer } from './VideoPlayer'
 
 export function LecturePage(): ReactElement {
   const { courseId = '', lectureId = '' } = useParams()
+  const [searchParams] = useSearchParams()
+  const startAtSeconds = parseStartSeconds(searchParams.get(START_SECONDS_PARAM))
   const course = useCourse(courseId)
   if (course.data === undefined) return <PageStatus tone="info" message="Đang tải bài học…" />
   const lecture = findLecture(course.data, lectureId)
@@ -21,7 +24,14 @@ export function LecturePage(): ReactElement {
   return (
     <article className="mx-auto grid max-w-[1100px] gap-3 p-4">
       <h2 className="text-[1.15rem] font-semibold">{lecture.title}</h2>
-      {lecture.hasVideo && <VideoPlayer key={lecture.id} lecture={lecture} courseId={courseId} />}
+      {lecture.hasVideo && (
+        <VideoPlayer
+          key={`${lecture.id}@${String(startAtSeconds)}`}
+          lecture={lecture}
+          courseId={courseId}
+          startAtSeconds={startAtSeconds}
+        />
+      )}
       {lecture.hasArticle && (
         <ArticleFrame
           key={lecture.id}
@@ -47,4 +57,10 @@ export function LecturePage(): ReactElement {
 
 function needsManualCompletion(lecture: LectureSummary): boolean {
   return (lecture.kind === 'article' || lecture.kind === 'quiz') && !lecture.hasVideo
+}
+
+function parseStartSeconds(value: string | null): number | undefined {
+  if (value === null || value.trim() === '') return undefined
+  const seconds = Number(value)
+  return Number.isFinite(seconds) && seconds >= 0 ? seconds : undefined
 }

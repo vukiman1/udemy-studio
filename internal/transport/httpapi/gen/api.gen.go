@@ -241,6 +241,19 @@ type ProgressReport struct {
 	PositionSeconds float64 `json:"positionSeconds"`
 }
 
+// SearchHit defines model for SearchHit.
+type SearchHit struct {
+	CourseId     string `json:"courseId"`
+	CourseTitle  string `json:"courseTitle"`
+	Language     string `json:"language"`
+	LectureId    string `json:"lectureId"`
+	LectureTitle string `json:"lectureTitle"`
+
+	// Snippet The cue around the match; each match sits between U+E000 and U+E001
+	Snippet string `json:"snippet"`
+	StartMs int64  `json:"startMs"`
+}
+
 // CourseId defines model for CourseId.
 type CourseId = string
 
@@ -272,6 +285,11 @@ type GetLectureCuesParams struct {
 type GetLectureSubtitlesVttParams struct {
 	// Langs Subtitle languages in display order; all available languages when omitted
 	Langs *Languages `form:"langs,omitempty" json:"langs,omitempty"`
+}
+
+// SearchSubtitlesParams defines parameters for SearchSubtitles.
+type SearchSubtitlesParams struct {
+	Q string `form:"q" json:"q"`
 }
 
 // SelectChromeProfileJSONRequestBody defines body for SelectChromeProfile for application/json ContentType.
@@ -321,6 +339,9 @@ type ServerInterface interface {
 	// GetLectureSubtitlesVtt WebVTT with one line per language, for the native iOS fullscreen player
 	// (GET /api/lectures/{lectureId}/subtitles.vtt)
 	GetLectureSubtitlesVtt(w http.ResponseWriter, r *http.Request, lectureId LectureId, params GetLectureSubtitlesVttParams)
+	// SearchSubtitles Find the moments a phrase is said in any lecture, diacritics ignored and the last word matched as a prefix
+	// (GET /api/search)
+	SearchSubtitles(w http.ResponseWriter, r *http.Request, params SearchSubtitlesParams)
 	// GetHealth Liveness probe and build version
 	// (GET /healthz)
 	GetHealth(w http.ResponseWriter, r *http.Request)
@@ -595,6 +616,39 @@ func (siw *ServerInterfaceWrapper) GetLectureSubtitlesVtt(w http.ResponseWriter,
 	handler.ServeHTTP(w, r)
 }
 
+// SearchSubtitles operation middleware
+func (siw *ServerInterfaceWrapper) SearchSubtitles(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params SearchSubtitlesParams
+
+	// ------------- Required query parameter "q" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "q", r.URL.Query(), &params.Q, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		var requiredError *runtime.RequiredParameterError
+		if errors.As(err, &requiredError) {
+			siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "q"})
+		} else {
+			siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "q", Err: err})
+		}
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.SearchSubtitles(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
 // GetHealth operation middleware
 func (siw *ServerInterfaceWrapper) GetHealth(w http.ResponseWriter, r *http.Request) {
 
@@ -733,6 +787,7 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/courses", wrapper.ListCourses)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/courses/{courseId}", wrapper.GetCourse)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/continue", wrapper.GetContinue)
+	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/search", wrapper.SearchSubtitles)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/lectures/{lectureId}/cues", wrapper.GetLectureCues)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/lectures/{lectureId}/subtitles.vtt", wrapper.GetLectureSubtitlesVtt)
 	m.HandleFunc(http.MethodPut+" "+options.BaseURL+"/api/lectures/{lectureId}/progress", wrapper.PutLectureProgress)
@@ -1258,6 +1313,28 @@ func (response GetLectureSubtitlesVtt404ApplicationProblemPlusJSONResponse) Visi
 	return err
 }
 
+type SearchSubtitlesRequestObject struct {
+	Params SearchSubtitlesParams
+}
+
+type SearchSubtitlesResponseObject interface {
+	VisitSearchSubtitlesResponse(w http.ResponseWriter) error
+}
+
+type SearchSubtitles200JSONResponse []SearchHit
+
+func (response SearchSubtitles200JSONResponse) VisitSearchSubtitlesResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 type GetHealthRequestObject struct {
 }
 
@@ -1317,6 +1394,9 @@ type StrictServerInterface interface {
 	// GetLectureSubtitlesVtt WebVTT with one line per language, for the native iOS fullscreen player
 	// (GET /api/lectures/{lectureId}/subtitles.vtt)
 	GetLectureSubtitlesVtt(ctx context.Context, request GetLectureSubtitlesVttRequestObject) (GetLectureSubtitlesVttResponseObject, error)
+	// SearchSubtitles Find the moments a phrase is said in any lecture, diacritics ignored and the last word matched as a prefix
+	// (GET /api/search)
+	SearchSubtitles(ctx context.Context, request SearchSubtitlesRequestObject) (SearchSubtitlesResponseObject, error)
 	// GetHealth Liveness probe and build version
 	// (GET /healthz)
 	GetHealth(ctx context.Context, request GetHealthRequestObject) (GetHealthResponseObject, error)
@@ -1678,6 +1758,32 @@ func (sh *strictHandler) GetLectureSubtitlesVtt(w http.ResponseWriter, r *http.R
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(GetLectureSubtitlesVttResponseObject); ok {
 		if err := validResponse.VisitGetLectureSubtitlesVttResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// SearchSubtitles operation middleware
+func (sh *strictHandler) SearchSubtitles(w http.ResponseWriter, r *http.Request, params SearchSubtitlesParams) {
+	var request SearchSubtitlesRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error) {
+		return sh.ssi.SearchSubtitles(ctx, request.(SearchSubtitlesRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "SearchSubtitles")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(SearchSubtitlesResponseObject); ok {
+		if err := validResponse.VisitSearchSubtitlesResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

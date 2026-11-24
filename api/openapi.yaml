@@ -62,6 +62,26 @@ paths:
         "204":
           description: Nothing to continue yet
 
+  /api/search:
+    get:
+      operationId: searchSubtitles
+      summary: Find the moments a phrase is said in any lecture, diacritics ignored and the last word matched as a prefix
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Matching cues, best first
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/SearchHit"
+
   /api/lectures/{lectureId}/cues:
     get:
       operationId: getLectureCues
@@ -494,6 +514,27 @@ components:
         positionSeconds:
           type: number
           format: double
+
+    SearchHit:
+      type: object
+      required: [courseId, courseTitle, lectureId, lectureTitle, language, startMs, snippet]
+      properties:
+        courseId:
+          type: string
+        courseTitle:
+          type: string
+        lectureId:
+          type: string
+        lectureTitle:
+          type: string
+        language:
+          type: string
+        startMs:
+          type: integer
+          format: int64
+        snippet:
+          type: string
+          description: The cue around the match; each match sits between U+E000 and U+E001
 
     Cue:
       type: object

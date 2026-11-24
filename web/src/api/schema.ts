@@ -72,6 +72,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Find the moments a phrase is said in any lecture, diacritics ignored and the last word matched as a prefix */
+        get: operations["searchSubtitles"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/lectures/{lectureId}/cues": {
         parameters: {
             query?: never;
@@ -347,6 +364,17 @@ export interface components {
             /** Format: double */
             positionSeconds: number;
         };
+        SearchHit: {
+            courseId: string;
+            courseTitle: string;
+            lectureId: string;
+            lectureTitle: string;
+            language: string;
+            /** Format: int64 */
+            startMs: number;
+            /** @description The cue around the match; each match sits between U+E000 and U+E001 */
+            snippet: string;
+        };
         Cue: {
             startMs: number;
             endMs: number;
@@ -541,6 +569,28 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    searchSubtitles: {
+        parameters: {
+            query: {
+                q: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Matching cues, best first */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SearchHit"][];
+                };
             };
         };
     };
