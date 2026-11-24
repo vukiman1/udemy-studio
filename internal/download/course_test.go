@@ -3,6 +3,7 @@ package download
 import (
 	"context"
 	"errors"
+	"fmt"
 	"io/fs"
 	"log/slog"
 	"net/url"
@@ -17,6 +18,7 @@ import (
 
 	"github.com/vukiman1/udemy-studio/internal/jobs"
 	"github.com/vukiman1/udemy-studio/internal/library"
+	"github.com/vukiman1/udemy-studio/internal/platform/pyjson"
 	"github.com/vukiman1/udemy-studio/internal/udemy"
 )
 
@@ -25,6 +27,7 @@ const (
 	childPlaylist    = "#EXTM3U\n#EXT-X-ENDLIST\n"
 	failingURL       = "https://cdn.example/fails"
 	brokenCaptionURL = "https://cdn.example/broken.vtt"
+	failingQuizID    = 666
 	testFileMode     = 0o600
 	hlsPlaylistURL   = "https://example-portal.udemy.com/assets/77/files/hls/1080.m3u8"
 )
@@ -78,6 +81,14 @@ func (tools *fakeTools) FetchPlaylist(context.Context, string) (string, error) {
 	return childPlaylist, nil
 }
 
+func (tools *fakeTools) QuizAssessments(_ context.Context, quizID int64) ([]pyjson.Value, error) {
+	tools.fetched = append(tools.fetched, fmt.Sprintf("quiz %d", quizID))
+	if quizID == failingQuizID {
+		return nil, errFetchFailed
+	}
+	return []pyjson.Value{pyjson.NewObject().Set("_class", "assessment").Set("assessment_type", "multiple-choice")}, nil
+}
+
 func samplePlan() udemy.Plan {
 	videoLecture := udemy.LecturePlan{
 		Number: 1, ID: 101, Title: "001 Welcome", Kind: udemy.KindVideo, File: "001 Welcome.mp4",
@@ -108,7 +119,7 @@ func runCourse(t *testing.T, ctx context.Context, plan udemy.Plan, tools *fakeTo
 	t.Helper()
 	var events []jobs.Event
 	options := Options{OutputDir: outputDir, TempDir: t.TempDir(), Chapters: ChapterFilter{{first: 1, last: 1}}}
-	summary, err := Course(ctx, plan, Tools{Files: tools, Streams: tools, Playlists: tools}, options, slog.New(slog.DiscardHandler), func(event jobs.Event) {
+	summary, err := Course(ctx, plan, Tools{Files: tools, Streams: tools, Playlists: tools, Quizzes: tools}, options, slog.New(slog.DiscardHandler), func(event jobs.Event) {
 		events = append(events, event)
 	})
 	return summary, events, err
@@ -366,5 +377,34 @@ func TestCaptionLeftWithoutItsSRTIsConvertedWithoutDownloading(t *testing.T) {
 	}
 	if slices.Contains(tools.fetched, "001 Welcome_en.vtt") || !isFile(filepath.Join(chapterDir, "001 Welcome_en.srt")) {
 		t.Errorf("fetched %v; want the existing VTT converted to SRT without a download", tools.fetched)
+	}
+}
+
+func TestQuizIsSavedAsItsPageAndSkippedOnARerun(t *testing.T) {
+	plan := samplePlan()
+	quiz := udemy.LecturePlan{Number: 5, ID: 105, Class: udemy.QuizClass, Title: "005 Quiz", Kind: udemy.KindQuiz, File: "005 Quiz.html", Quiz: &udemy.QuizInfo{Title: "Quiz"}}
+	plan.Chapters[0].Lectures = []udemy.LecturePlan{quiz}
+	outputDir := t.TempDir()
+	summary, events, err := runCourse(t, t.Context(), plan, &fakeTools{}, outputDir)
+	if err != nil || summary.Downloaded != 1 || events[0].TotalLectures != 1 {
+		t.Fatalf("summary = %+v, total = %d, %v; want the quiz downloaded", summary, events[0].TotalLectures, err)
+	}
+	if !isFile(filepath.Join(outputDir, "backend-basics", "01 - Intro", "005 Quiz.html")) {
+		t.Error("quiz page was not written")
+	}
+	rerun := &fakeTools{}
+	if summary, _, _ := runCourse(t, t.Context(), plan, rerun, outputDir); summary.AlreadyPresent != 1 || len(rerun.fetched) != 0 {
+		t.Errorf("rerun summary = %+v, fetched %v; want the page left alone", summary, rerun.fetched)
+	}
+}
+
+func TestQuizThatCannotBeFetchedIsReportedAsAFailedQuiz(t *testing.T) {
+	plan := samplePlan()
+	plan.Chapters[0].Lectures = []udemy.LecturePlan{
+		{Number: 5, ID: failingQuizID, Class: udemy.QuizClass, Title: "005 Quiz", Kind: udemy.KindQuiz, File: "005 Quiz.html", Quiz: &udemy.QuizInfo{Title: "Quiz"}},
+	}
+	summary, _, err := runCourse(t, t.Context(), plan, &fakeTools{}, t.TempDir())
+	if err != nil || !slices.Equal(summary.Failed, []string{"005 Quiz (quiz)"}) {
+		t.Errorf("failed = %v, %v; want the quiz reported", summary.Failed, err)
 	}
 }

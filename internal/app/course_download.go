@@ -84,6 +84,7 @@ func downloadCourse(ctx context.Context, client *udemyapi.Client, request course
 		Files:     downloadtools.Aria2c{Binary: request.tools.Aria2c, Output: request.toolOutput},
 		Streams:   downloadtools.YTDLP{Binary: request.tools.YTDLP, Output: request.toolOutput},
 		Playlists: client,
+		Quizzes:   client,
 	}
 	options := download.Options{OutputDir: request.outputDir, TempDir: tempDir, Chapters: request.chapters}
 	return download.Course(ctx, plan, tools, options, logger, onEvent)

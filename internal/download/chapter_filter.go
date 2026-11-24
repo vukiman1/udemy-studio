@@ -61,7 +61,7 @@ func (filter ChapterFilter) lectureCount(plan udemy.Plan) int {
 			continue
 		}
 		for _, lecture := range chapter.Lectures {
-			if lecture.Kind != udemy.KindQuiz {
+			if isSupported(lecture) {
 				count++
 			}
 		}

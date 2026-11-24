@@ -17,7 +17,7 @@ import (
 
 const (
 	titlePlaceholder         = "__title_placeholder__"
-	bodyPlaceholder          = "__data_placeholder__"
+	dataPlaceholder          = "__data_placeholder__"
 	lectureNumberPrefixRunes = 4
 	internetShortcutFormat   = "[InternetShortcut]\nURL=%s"
 	externalLinksFile        = "external-links.txt"
@@ -59,7 +59,7 @@ func (run *courseDownload) attachment(ctx context.Context, chapterDir string, le
 func articlePage(lecture udemy.LecturePlan) string {
 	title := string([]rune(lecture.Title)[min(lectureNumberPrefixRunes, len([]rune(lecture.Title))):])
 	page := strings.ReplaceAll(articleTemplate, titlePlaceholder, title)
-	return strings.ReplaceAll(page, bodyPlaceholder, lecture.HTMLBody)
+	return strings.ReplaceAll(page, dataPlaceholder, lecture.HTMLBody)
 }
 
 func writeExternalLink(chapterDir string, asset udemy.AssetPlan) error {

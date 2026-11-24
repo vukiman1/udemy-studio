@@ -105,3 +105,19 @@ func TestCaptionsAreFilteredByLanguage(t *testing.T) {
 		}
 	}
 }
+
+func TestOnlyQuizzesCarryTheQuizPageData(t *testing.T) {
+	items := []CurriculumItem{
+		{Class: "chapter", ID: 1, ObjectIndex: 1, Title: "Intro"},
+		{Class: QuizClass, ID: 2, ObjectIndex: 2, Title: "Check yourself"},
+		{Class: "practice", ID: 3, ObjectIndex: 3, Title: "Build it"},
+	}
+	plan, err := BuildPlan(t.Context(), Course{Slug: "course"}, items, PlanOptions{}, fixturePlaylists{})
+	if err != nil {
+		t.Fatalf("BuildPlan: %v", err)
+	}
+	quiz, practice := plan.Chapters[0].Lectures[0], plan.Chapters[0].Lectures[1]
+	if quiz.Quiz == nil || quiz.Quiz.Title != "Check yourself" || practice.Quiz != nil {
+		t.Errorf("quiz info = %+v (quiz), %+v (practice); want it only on the quiz", quiz.Quiz, practice.Quiz)
+	}
+}

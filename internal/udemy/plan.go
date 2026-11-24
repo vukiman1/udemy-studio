@@ -2,6 +2,7 @@ package udemy
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"slices"
 )
@@ -16,7 +17,9 @@ const (
 	KindUnavailable LectureKind = "unavailable"
 )
 
-var quizLikeClasses = []string{"quiz", "practice", "role-play"}
+const QuizClass = "quiz"
+
+var quizLikeClasses = []string{QuizClass, "practice", "role-play"}
 
 type PlanOptions struct {
 	Quality           int
@@ -34,6 +37,12 @@ type Plan struct {
 	Warnings   []string      `json:"warnings,omitempty"`
 }
 
+type QuizInfo struct {
+	Title       string
+	Description json.RawMessage
+	PassPercent json.RawMessage
+}
+
 type ChapterPlan struct {
 	Index    int           `json:"index"`
 	ID       int64         `json:"id"`
@@ -49,6 +58,7 @@ type LecturePlan struct {
 	Kind     LectureKind   `json:"kind"`
 	File     string        `json:"file"`
 	HTMLBody string        `json:"-"`
+	Quiz     *QuizInfo     `json:"-"`
 	Video    *VideoChoice  `json:"video,omitempty"`
 	Captions []CaptionPlan `json:"captions,omitempty"`
 	Assets   []AssetPlan   `json:"assets,omitempty"`
@@ -90,6 +100,9 @@ func (planner lecturePlanner) plan(ctx context.Context, lecture Lecture) (Lectur
 	plan := LecturePlan{Number: lecture.Number, ID: lecture.Item.ID, Class: lecture.Item.Class, Title: lecture.Title}
 	if slices.Contains(quizLikeClasses, lecture.Item.Class) {
 		plan.Kind, plan.File = KindQuiz, quizFileName(lecture.Title)
+		if lecture.Item.Class == QuizClass {
+			plan.Quiz = &QuizInfo{Title: lecture.Item.Title, Description: lecture.Item.Description, PassPercent: lecture.Item.PassPercent}
+		}
 		return plan, nil
 	}
 	asset := lecture.Item.Asset

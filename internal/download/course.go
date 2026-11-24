@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 
 	"github.com/vukiman1/udemy-studio/internal/jobs"
+	"github.com/vukiman1/udemy-studio/internal/platform/pyjson"
 	"github.com/vukiman1/udemy-studio/internal/udemy"
 )
 
@@ -29,10 +30,15 @@ type HLSFetcher interface {
 	FetchHLS(ctx context.Context, playlistURL, outputTemplate string) error
 }
 
+type QuizFetcher interface {
+	QuizAssessments(ctx context.Context, quizID int64) ([]pyjson.Value, error)
+}
+
 type Tools struct {
 	Files     FileFetcher
 	Streams   HLSFetcher
 	Playlists udemy.PlaylistFetcher
+	Quizzes   QuizFetcher
 }
 
 type Options struct {
@@ -76,7 +82,7 @@ func Course(ctx context.Context, plan udemy.Plan, tools Tools, options Options, 
 			return run.summary, err
 		}
 		for _, lecture := range chapter.Lectures {
-			if lecture.Kind == udemy.KindQuiz {
+			if !isSupported(lecture) {
 				continue
 			}
 			if err := run.lecture(ctx, chapterDir, lecture); err != nil {
@@ -121,6 +127,11 @@ func (run *courseDownload) recordFailure(ctx context.Context, failure string, er
 	run.logger.Warn("download failed", "item", failure, "err", err)
 	run.summary.Failed = append(run.summary.Failed, failure)
 	return nil
+}
+
+// Practices and role plays have no page writer yet.
+func isSupported(lecture udemy.LecturePlan) bool {
+	return lecture.Kind != udemy.KindQuiz || lecture.Quiz != nil
 }
 
 func makeDir(parent, name string) (string, error) {
