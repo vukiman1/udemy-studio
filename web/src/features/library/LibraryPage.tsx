@@ -4,7 +4,7 @@ import { useContinueTarget, useCourses } from '../../api/queries'
 import type { CourseSummary } from '../../api/types'
 import { PageStatus } from '../../app/PageStatus'
 import { StaleDataNotice } from '../../app/StaleDataNotice'
-import { lecturePath } from '../../app/paths'
+import { SEARCH_PATH, lecturePath } from '../../app/paths'
 import { CourseCard } from './CourseCard'
 import { PlayIcon } from '@videojs/react/icons'
 
@@ -28,7 +28,10 @@ export function LibraryPage(): ReactElement {
     <main className="mx-auto max-w-[1100px] px-4 py-6">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold">Thư viện</h1>
-        <Link to="/downloads" className="ml-auto text-accent underline">
+        <Link to={SEARCH_PATH} className="ml-auto text-accent underline">
+          Tìm trong phụ đề
+        </Link>
+        <Link to="/downloads" className="text-accent underline">
           Tải khoá học
         </Link>
         {target !== null && resumeCourse !== undefined && (

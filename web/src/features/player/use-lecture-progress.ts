@@ -18,12 +18,14 @@ export function useLectureProgress(
   videoRef: RefObject<HTMLVideoElement | null>,
   lecture: LectureSummary,
   courseId: string,
+  startAtSeconds: number | undefined,
 ): ProgressSaveState {
   const queryClient = useQueryClient()
   const [lastError, setLastError] = useState<Error | undefined>(undefined)
   const lectureId = lecture.id
 
   const savedProgress = useEffectEvent(() => lecture.progress)
+  const startPosition = useEffectEvent(() => startAtSeconds ?? resumePosition(lecture.progress))
   const onSaved = useEffectEvent((isNewlyCompleted: boolean) => {
     setLastError(undefined)
     if (!isNewlyCompleted) return
@@ -45,7 +47,7 @@ export function useLectureProgress(
     }
 
     const restorePosition = (): void => {
-      video.currentTime = resumePosition(savedProgress())
+      video.currentTime = startPosition()
     }
     const report = (shouldKeepAlive: boolean, hasEnded: boolean): void => {
       const duration = video.duration

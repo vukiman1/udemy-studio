@@ -16,17 +16,35 @@ const LECTURE: LectureSummary = {
   attachments: [],
 }
 
-function Harness(): ReactElement {
+const SAVED_LECTURE: LectureSummary = {
+  ...LECTURE,
+  progress: {
+    positionSeconds: 42,
+    durationSeconds: 300,
+    completed: false,
+    updatedAt: '2026-11-24T08:00:00Z',
+  },
+}
+
+interface HarnessProps {
+  readonly lecture: LectureSummary
+  readonly startAtSeconds: number | undefined
+}
+
+function Harness({ lecture, startAtSeconds }: HarnessProps): ReactElement {
   const videoRef = useRef<HTMLVideoElement | null>(null)
-  useLectureProgress(videoRef, LECTURE, 'c1')
+  useLectureProgress(videoRef, lecture, 'c1', startAtSeconds)
   return <video ref={videoRef} data-testid="video" />
 }
 
-function renderHarness(): { video: HTMLVideoElement; unmount: () => void } {
+function renderHarness(
+  lecture: LectureSummary = LECTURE,
+  startAtSeconds?: number,
+): { video: HTMLVideoElement; unmount: () => void } {
   const client = new QueryClient()
   const { getByTestId, unmount } = render(
     <QueryClientProvider client={client}>
-      <Harness />
+      <Harness lecture={lecture} startAtSeconds={startAtSeconds} />
     </QueryClientProvider>,
   )
   const video = getByTestId('video') as HTMLVideoElement
@@ -54,6 +72,15 @@ afterEach(() => {
 })
 
 describe('useLectureProgress', () => {
+  it('starts at the requested second instead of where the lecture was left', () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(Response.json({}))
+    const { video, unmount } = renderHarness(SAVED_LECTURE, 528)
+    setPosition(video, 0)
+    video.dispatchEvent(new Event('loadedmetadata'))
+    expect(video.currentTime).toBe(528)
+    unmount()
+  })
+
   it('saves the position when the lecture is left mid-playback', async () => {
     const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(Response.json({}))
     const { video, unmount } = renderHarness()
