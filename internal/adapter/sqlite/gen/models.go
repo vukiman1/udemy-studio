@@ -31,6 +31,15 @@ type LectureProgress struct {
 	UpdatedAt       string
 }
 
+type Note struct {
+	ID         int64
+	LectureKey string
+	AtSeconds  float64
+	Body       string
+	CreatedAt  string
+	UpdatedAt  string
+}
+
 type Setting struct {
 	Key   string
 	Value string

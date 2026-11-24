@@ -8,6 +8,7 @@ import (
 	"github.com/vukiman1/udemy-studio/internal/jobs"
 	"github.com/vukiman1/udemy-studio/internal/library"
 	"github.com/vukiman1/udemy-studio/internal/login"
+	"github.com/vukiman1/udemy-studio/internal/notes"
 	"github.com/vukiman1/udemy-studio/internal/progress"
 	"github.com/vukiman1/udemy-studio/internal/search"
 	"github.com/vukiman1/udemy-studio/internal/transport/httpapi/gen"
@@ -20,6 +21,7 @@ type Deps struct {
 	Media    fs.FS
 	Progress *progress.Service
 	Search   *search.Service
+	Notes    *notes.Service
 	Login    *login.Service
 	Jobs     *jobs.Manager
 	Logger   *slog.Logger

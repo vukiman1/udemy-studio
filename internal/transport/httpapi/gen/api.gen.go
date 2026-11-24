@@ -221,6 +221,27 @@ type LoginStatus struct {
 	Profile *ChromeProfile `json:"profile,omitempty"`
 }
 
+// Note defines model for Note.
+type Note struct {
+	AtSeconds float64   `json:"atSeconds"`
+	Body      string    `json:"body"`
+	CreatedAt time.Time `json:"createdAt"`
+	Id        int64     `json:"id"`
+	UpdatedAt time.Time `json:"updatedAt"`
+}
+
+// NoteDraft defines model for NoteDraft.
+type NoteDraft struct {
+	// AtSeconds The moment of the video the note is about; 0 for lectures without video
+	AtSeconds float64 `json:"atSeconds"`
+	Body      string  `json:"body"`
+}
+
+// NoteEdit defines model for NoteEdit.
+type NoteEdit struct {
+	Body string `json:"body"`
+}
+
 // Problem RFC 9457 problem details
 type Problem struct {
 	Detail *string `json:"detail,omitempty"`
@@ -263,6 +284,9 @@ type Languages = []string
 // LectureId defines model for LectureId.
 type LectureId = string
 
+// NoteId defines model for NoteId.
+type NoteId = int64
+
 // BadRequest RFC 9457 problem details
 type BadRequest = Problem
 
@@ -298,8 +322,14 @@ type SelectChromeProfileJSONRequestBody = ProfileSelection
 // CreateJobJSONRequestBody defines body for CreateJob for application/json ContentType.
 type CreateJobJSONRequestBody = JobRequest
 
+// AddLectureNoteJSONRequestBody defines body for AddLectureNote for application/json ContentType.
+type AddLectureNoteJSONRequestBody = NoteDraft
+
 // PutLectureProgressJSONRequestBody defines body for PutLectureProgress for application/json ContentType.
 type PutLectureProgressJSONRequestBody = ProgressReport
+
+// EditNoteJSONRequestBody defines body for EditNote for application/json ContentType.
+type EditNoteJSONRequestBody = NoteEdit
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
@@ -312,6 +342,9 @@ type ServerInterface interface {
 	// GetCourse Chapter and lecture tree with per-lecture progress
 	// (GET /api/courses/{courseId})
 	GetCourse(w http.ResponseWriter, r *http.Request, courseId CourseId)
+	// ExportCourseNotes Every note of a course as a Markdown file, in course order
+	// (GET /api/courses/{courseId}/notes.md)
+	ExportCourseNotes(w http.ResponseWriter, r *http.Request, courseId CourseId)
 	// SelectChromeProfile Choose the Chrome profile whose Udemy login downloads use
 	// (PUT /api/downloads/profile)
 	SelectChromeProfile(w http.ResponseWriter, r *http.Request)
@@ -333,12 +366,24 @@ type ServerInterface interface {
 	// GetLectureCues Subtitle cues merged by timing for the bilingual overlay
 	// (GET /api/lectures/{lectureId}/cues)
 	GetLectureCues(w http.ResponseWriter, r *http.Request, lectureId LectureId, params GetLectureCuesParams)
+	// ListLectureNotes The notes written on a lecture, in playback order
+	// (GET /api/lectures/{lectureId}/notes)
+	ListLectureNotes(w http.ResponseWriter, r *http.Request, lectureId LectureId)
+	// AddLectureNote Write a note at a moment of a lecture
+	// (POST /api/lectures/{lectureId}/notes)
+	AddLectureNote(w http.ResponseWriter, r *http.Request, lectureId LectureId)
 	// PutLectureProgress Save the playback position and completion of a lecture
 	// (PUT /api/lectures/{lectureId}/progress)
 	PutLectureProgress(w http.ResponseWriter, r *http.Request, lectureId LectureId)
 	// GetLectureSubtitlesVtt WebVTT with one line per language, for the native iOS fullscreen player
 	// (GET /api/lectures/{lectureId}/subtitles.vtt)
 	GetLectureSubtitlesVtt(w http.ResponseWriter, r *http.Request, lectureId LectureId, params GetLectureSubtitlesVttParams)
+	// DeleteNote Delete a note
+	// (DELETE /api/notes/{noteId})
+	DeleteNote(w http.ResponseWriter, r *http.Request, noteId NoteId)
+	// EditNote Rewrite a note; its moment stays
+	// (PATCH /api/notes/{noteId})
+	EditNote(w http.ResponseWriter, r *http.Request, noteId NoteId)
 	// SearchSubtitles Find the moments a phrase is said in any lecture, diacritics ignored and the last word matched as a prefix
 	// (GET /api/search)
 	SearchSubtitles(w http.ResponseWriter, r *http.Request, params SearchSubtitlesParams)
@@ -401,6 +446,32 @@ func (siw *ServerInterfaceWrapper) GetCourse(w http.ResponseWriter, r *http.Requ
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.GetCourse(w, r, courseId)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ExportCourseNotes operation middleware
+func (siw *ServerInterfaceWrapper) ExportCourseNotes(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "courseId" -------------
+	var courseId CourseId
+
+	err = runtime.BindStyledParameterWithOptions("simple", "courseId", r.PathValue("courseId"), &courseId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "courseId", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ExportCourseNotes(w, r, courseId)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -548,6 +619,58 @@ func (siw *ServerInterfaceWrapper) GetLectureCues(w http.ResponseWriter, r *http
 	handler.ServeHTTP(w, r)
 }
 
+// ListLectureNotes operation middleware
+func (siw *ServerInterfaceWrapper) ListLectureNotes(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "lectureId" -------------
+	var lectureId LectureId
+
+	err = runtime.BindStyledParameterWithOptions("simple", "lectureId", r.PathValue("lectureId"), &lectureId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "lectureId", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListLectureNotes(w, r, lectureId)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// AddLectureNote operation middleware
+func (siw *ServerInterfaceWrapper) AddLectureNote(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "lectureId" -------------
+	var lectureId LectureId
+
+	err = runtime.BindStyledParameterWithOptions("simple", "lectureId", r.PathValue("lectureId"), &lectureId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "lectureId", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.AddLectureNote(w, r, lectureId)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
 // PutLectureProgress operation middleware
 func (siw *ServerInterfaceWrapper) PutLectureProgress(w http.ResponseWriter, r *http.Request) {
 
@@ -607,6 +730,58 @@ func (siw *ServerInterfaceWrapper) GetLectureSubtitlesVtt(w http.ResponseWriter,
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.GetLectureSubtitlesVtt(w, r, lectureId, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// DeleteNote operation middleware
+func (siw *ServerInterfaceWrapper) DeleteNote(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "noteId" -------------
+	var noteId NoteId
+
+	err = runtime.BindStyledParameterWithOptions("simple", "noteId", r.PathValue("noteId"), &noteId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "integer", Format: "int64", ValueIsUnescaped: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "noteId", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.DeleteNote(w, r, noteId)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// EditNote operation middleware
+func (siw *ServerInterfaceWrapper) EditNote(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "noteId" -------------
+	var noteId NoteId
+
+	err = runtime.BindStyledParameterWithOptions("simple", "noteId", r.PathValue("noteId"), &noteId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "integer", Format: "int64", ValueIsUnescaped: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "noteId", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.EditNote(w, r, noteId)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -791,6 +966,11 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/lectures/{lectureId}/cues", wrapper.GetLectureCues)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/lectures/{lectureId}/subtitles.vtt", wrapper.GetLectureSubtitlesVtt)
 	m.HandleFunc(http.MethodPut+" "+options.BaseURL+"/api/lectures/{lectureId}/progress", wrapper.PutLectureProgress)
+	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/lectures/{lectureId}/notes", wrapper.ListLectureNotes)
+	m.HandleFunc(http.MethodPost+" "+options.BaseURL+"/api/lectures/{lectureId}/notes", wrapper.AddLectureNote)
+	m.HandleFunc(http.MethodDelete+" "+options.BaseURL+"/api/notes/{noteId}", wrapper.DeleteNote)
+	m.HandleFunc(http.MethodPatch+" "+options.BaseURL+"/api/notes/{noteId}", wrapper.EditNote)
+	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/courses/{courseId}/notes.md", wrapper.ExportCourseNotes)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/downloads/profiles", wrapper.ListChromeProfiles)
 	m.HandleFunc(http.MethodPut+" "+options.BaseURL+"/api/downloads/profile", wrapper.SelectChromeProfile)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/downloads/status", wrapper.GetLoginStatus)
@@ -886,6 +1066,62 @@ type GetCourse404ApplicationProblemPlusJSONResponse struct {
 }
 
 func (response GetCourse404ApplicationProblemPlusJSONResponse) VisitGetCourseResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.NotFoundApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ExportCourseNotesRequestObject struct {
+	CourseId CourseId `json:"courseId"`
+}
+
+type ExportCourseNotesResponseObject interface {
+	VisitExportCourseNotesResponse(w http.ResponseWriter) error
+}
+
+type ExportCourseNotes200ResponseHeaders struct {
+	ContentDisposition string
+}
+
+type ExportCourseNotes200TextmarkdownCharsetUtf8Response struct {
+	Body          io.Reader
+	Headers       ExportCourseNotes200ResponseHeaders
+	ContentLength int64
+}
+
+func (response ExportCourseNotes200TextmarkdownCharsetUtf8Response) VisitExportCourseNotesResponse(w http.ResponseWriter) error {
+
+	w.Header().Set("Content-Type", "text/markdown; charset=utf-8")
+	if response.ContentLength != 0 {
+		w.Header().Set("Content-Length", fmt.Sprint(response.ContentLength))
+	}
+	{
+		v, err := runtime.StyleParamWithOptions("simple", false, "Content-Disposition", response.Headers.ContentDisposition, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationHeader, Type: "string", Format: ""})
+		if err != nil {
+			return fmt.Errorf("error styling response header Content-Disposition: %w", err)
+		}
+		w.Header().Set("Content-Disposition", v)
+	}
+	w.WriteHeader(200)
+
+	if closer, ok := response.Body.(io.ReadCloser); ok {
+		defer closer.Close()
+	}
+	_, err := io.Copy(w, response.Body)
+	return err
+}
+
+type ExportCourseNotes404ApplicationProblemPlusJSONResponse struct {
+	NotFoundApplicationProblemPlusJSONResponse
+}
+
+func (response ExportCourseNotes404ApplicationProblemPlusJSONResponse) VisitExportCourseNotesResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
 	if err := runtime.JSONMarshalWrite(&buf, response.NotFoundApplicationProblemPlusJSONResponse); err != nil {
@@ -1213,6 +1449,99 @@ func (response GetLectureCues404ApplicationProblemPlusJSONResponse) VisitGetLect
 	return err
 }
 
+type ListLectureNotesRequestObject struct {
+	LectureId LectureId `json:"lectureId"`
+}
+
+type ListLectureNotesResponseObject interface {
+	VisitListLectureNotesResponse(w http.ResponseWriter) error
+}
+
+type ListLectureNotes200JSONResponse []Note
+
+func (response ListLectureNotes200JSONResponse) VisitListLectureNotesResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type ListLectureNotes404ApplicationProblemPlusJSONResponse struct {
+	NotFoundApplicationProblemPlusJSONResponse
+}
+
+func (response ListLectureNotes404ApplicationProblemPlusJSONResponse) VisitListLectureNotesResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.NotFoundApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type AddLectureNoteRequestObject struct {
+	LectureId LectureId `json:"lectureId"`
+	Body      *AddLectureNoteJSONRequestBody
+}
+
+type AddLectureNoteResponseObject interface {
+	VisitAddLectureNoteResponse(w http.ResponseWriter) error
+}
+
+type AddLectureNote201JSONResponse Note
+
+func (response AddLectureNote201JSONResponse) VisitAddLectureNoteResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type AddLectureNote400ApplicationProblemPlusJSONResponse struct {
+	BadRequestApplicationProblemPlusJSONResponse
+}
+
+func (response AddLectureNote400ApplicationProblemPlusJSONResponse) VisitAddLectureNoteResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.BadRequestApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type AddLectureNote404ApplicationProblemPlusJSONResponse struct {
+	NotFoundApplicationProblemPlusJSONResponse
+}
+
+func (response AddLectureNote404ApplicationProblemPlusJSONResponse) VisitAddLectureNoteResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.NotFoundApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 type PutLectureProgressRequestObject struct {
 	LectureId LectureId `json:"lectureId"`
 	Body      *PutLectureProgressJSONRequestBody
@@ -1313,6 +1642,93 @@ func (response GetLectureSubtitlesVtt404ApplicationProblemPlusJSONResponse) Visi
 	return err
 }
 
+type DeleteNoteRequestObject struct {
+	NoteId NoteId `json:"noteId"`
+}
+
+type DeleteNoteResponseObject interface {
+	VisitDeleteNoteResponse(w http.ResponseWriter) error
+}
+
+type DeleteNote204Response struct {
+}
+
+func (response DeleteNote204Response) VisitDeleteNoteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type DeleteNote404ApplicationProblemPlusJSONResponse struct {
+	NotFoundApplicationProblemPlusJSONResponse
+}
+
+func (response DeleteNote404ApplicationProblemPlusJSONResponse) VisitDeleteNoteResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.NotFoundApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type EditNoteRequestObject struct {
+	NoteId NoteId `json:"noteId"`
+	Body   *EditNoteJSONRequestBody
+}
+
+type EditNoteResponseObject interface {
+	VisitEditNoteResponse(w http.ResponseWriter) error
+}
+
+type EditNote200JSONResponse Note
+
+func (response EditNote200JSONResponse) VisitEditNoteResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type EditNote400ApplicationProblemPlusJSONResponse struct {
+	BadRequestApplicationProblemPlusJSONResponse
+}
+
+func (response EditNote400ApplicationProblemPlusJSONResponse) VisitEditNoteResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.BadRequestApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type EditNote404ApplicationProblemPlusJSONResponse struct {
+	NotFoundApplicationProblemPlusJSONResponse
+}
+
+func (response EditNote404ApplicationProblemPlusJSONResponse) VisitEditNoteResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.NotFoundApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 type SearchSubtitlesRequestObject struct {
 	Params SearchSubtitlesParams
 }
@@ -1367,6 +1783,9 @@ type StrictServerInterface interface {
 	// GetCourse Chapter and lecture tree with per-lecture progress
 	// (GET /api/courses/{courseId})
 	GetCourse(ctx context.Context, request GetCourseRequestObject) (GetCourseResponseObject, error)
+	// ExportCourseNotes Every note of a course as a Markdown file, in course order
+	// (GET /api/courses/{courseId}/notes.md)
+	ExportCourseNotes(ctx context.Context, request ExportCourseNotesRequestObject) (ExportCourseNotesResponseObject, error)
 	// SelectChromeProfile Choose the Chrome profile whose Udemy login downloads use
 	// (PUT /api/downloads/profile)
 	SelectChromeProfile(ctx context.Context, request SelectChromeProfileRequestObject) (SelectChromeProfileResponseObject, error)
@@ -1388,12 +1807,24 @@ type StrictServerInterface interface {
 	// GetLectureCues Subtitle cues merged by timing for the bilingual overlay
 	// (GET /api/lectures/{lectureId}/cues)
 	GetLectureCues(ctx context.Context, request GetLectureCuesRequestObject) (GetLectureCuesResponseObject, error)
+	// ListLectureNotes The notes written on a lecture, in playback order
+	// (GET /api/lectures/{lectureId}/notes)
+	ListLectureNotes(ctx context.Context, request ListLectureNotesRequestObject) (ListLectureNotesResponseObject, error)
+	// AddLectureNote Write a note at a moment of a lecture
+	// (POST /api/lectures/{lectureId}/notes)
+	AddLectureNote(ctx context.Context, request AddLectureNoteRequestObject) (AddLectureNoteResponseObject, error)
 	// PutLectureProgress Save the playback position and completion of a lecture
 	// (PUT /api/lectures/{lectureId}/progress)
 	PutLectureProgress(ctx context.Context, request PutLectureProgressRequestObject) (PutLectureProgressResponseObject, error)
 	// GetLectureSubtitlesVtt WebVTT with one line per language, for the native iOS fullscreen player
 	// (GET /api/lectures/{lectureId}/subtitles.vtt)
 	GetLectureSubtitlesVtt(ctx context.Context, request GetLectureSubtitlesVttRequestObject) (GetLectureSubtitlesVttResponseObject, error)
+	// DeleteNote Delete a note
+	// (DELETE /api/notes/{noteId})
+	DeleteNote(ctx context.Context, request DeleteNoteRequestObject) (DeleteNoteResponseObject, error)
+	// EditNote Rewrite a note; its moment stays
+	// (PATCH /api/notes/{noteId})
+	EditNote(ctx context.Context, request EditNoteRequestObject) (EditNoteResponseObject, error)
 	// SearchSubtitles Find the moments a phrase is said in any lecture, diacritics ignored and the last word matched as a prefix
 	// (GET /api/search)
 	SearchSubtitles(ctx context.Context, request SearchSubtitlesRequestObject) (SearchSubtitlesResponseObject, error)
@@ -1511,6 +1942,32 @@ func (sh *strictHandler) GetCourse(w http.ResponseWriter, r *http.Request, cours
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(GetCourseResponseObject); ok {
 		if err := validResponse.VisitGetCourseResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ExportCourseNotes operation middleware
+func (sh *strictHandler) ExportCourseNotes(w http.ResponseWriter, r *http.Request, courseId CourseId) {
+	var request ExportCourseNotesRequestObject
+
+	request.CourseId = courseId
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error) {
+		return sh.ssi.ExportCourseNotes(ctx, request.(ExportCourseNotesRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ExportCourseNotes")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ExportCourseNotesResponseObject); ok {
+		if err := validResponse.VisitExportCourseNotesResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {
@@ -1705,6 +2162,65 @@ func (sh *strictHandler) GetLectureCues(w http.ResponseWriter, r *http.Request, 
 	}
 }
 
+// ListLectureNotes operation middleware
+func (sh *strictHandler) ListLectureNotes(w http.ResponseWriter, r *http.Request, lectureId LectureId) {
+	var request ListLectureNotesRequestObject
+
+	request.LectureId = lectureId
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error) {
+		return sh.ssi.ListLectureNotes(ctx, request.(ListLectureNotesRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListLectureNotes")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListLectureNotesResponseObject); ok {
+		if err := validResponse.VisitListLectureNotesResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// AddLectureNote operation middleware
+func (sh *strictHandler) AddLectureNote(w http.ResponseWriter, r *http.Request, lectureId LectureId) {
+	var request AddLectureNoteRequestObject
+
+	request.LectureId = lectureId
+
+	var body AddLectureNoteJSONRequestBody
+	if err := runtime.BindJSONBody(r, &body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error) {
+		return sh.ssi.AddLectureNote(ctx, request.(AddLectureNoteRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "AddLectureNote")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(AddLectureNoteResponseObject); ok {
+		if err := validResponse.VisitAddLectureNoteResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
 // PutLectureProgress operation middleware
 func (sh *strictHandler) PutLectureProgress(w http.ResponseWriter, r *http.Request, lectureId LectureId) {
 	var request PutLectureProgressRequestObject
@@ -1758,6 +2274,65 @@ func (sh *strictHandler) GetLectureSubtitlesVtt(w http.ResponseWriter, r *http.R
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(GetLectureSubtitlesVttResponseObject); ok {
 		if err := validResponse.VisitGetLectureSubtitlesVttResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// DeleteNote operation middleware
+func (sh *strictHandler) DeleteNote(w http.ResponseWriter, r *http.Request, noteId NoteId) {
+	var request DeleteNoteRequestObject
+
+	request.NoteId = noteId
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error) {
+		return sh.ssi.DeleteNote(ctx, request.(DeleteNoteRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "DeleteNote")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(DeleteNoteResponseObject); ok {
+		if err := validResponse.VisitDeleteNoteResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// EditNote operation middleware
+func (sh *strictHandler) EditNote(w http.ResponseWriter, r *http.Request, noteId NoteId) {
+	var request EditNoteRequestObject
+
+	request.NoteId = noteId
+
+	var body EditNoteJSONRequestBody
+	if err := runtime.BindJSONBody(r, &body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error) {
+		return sh.ssi.EditNote(ctx, request.(EditNoteRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "EditNote")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(EditNoteResponseObject); ok {
+		if err := validResponse.VisitEditNoteResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {
