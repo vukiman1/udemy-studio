@@ -5,7 +5,7 @@ import type { AIProvider, AIProviderId, AISavedProvider, AISettings } from '../.
 export interface AIDraftEditor {
   readonly draft: AIDraft
   readonly provider: AIProvider
-  // The draft provider's saved key and models, if it has any.
+  // The draft provider's saved key, if it has one.
   readonly saved: AISavedProvider | undefined
   readonly isInUse: boolean
   readonly isEditingKey: boolean
@@ -16,7 +16,6 @@ export interface AIDraftEditor {
   readonly typeKey: (apiKey: string) => void
   readonly startEditingKey: () => void
   readonly keepSavedKey: () => void
-  readonly chooseModels: (models: readonly string[]) => void
 }
 
 // The form edits a draft of one provider's settings; keys are only ever typed, never read back.
@@ -27,11 +26,7 @@ export function useAIDraft(
 ): AIDraftEditor {
   const savedOf = (id: AIProviderId): AISavedProvider | undefined =>
     settings.providers.find((saved) => saved.provider === id)
-  const draftFor = (provider: AIProvider): AIDraft => ({
-    provider: provider.id,
-    apiKey: '',
-    models: savedOf(provider.id)?.models ?? provider.recommended,
-  })
+  const draftFor = (provider: AIProvider): AIDraft => ({ provider: provider.id, apiKey: '' })
   const startProvider =
     providers.find((candidate) => candidate.id === settings.provider) ?? defaultProvider
   const [draft, setDraft] = useState<AIDraft>(draftFor(startProvider))
@@ -47,11 +42,7 @@ export function useAIDraft(
     isInUse,
     isEditingKey: saved === undefined || hasAskedForNewKey,
     canKeepSavedKey: saved !== undefined && hasAskedForNewKey,
-    isDirty:
-      !isInUse ||
-      saved === undefined ||
-      draft.apiKey.trim() !== '' ||
-      !sameModels(draft.models, saved.models),
+    isDirty: !isInUse || saved === undefined || draft.apiKey.trim() !== '',
     chooseProvider: (next) => {
       const nextProvider = providers.find((candidate) => candidate.id === next) ?? provider
       setDraft(draftFor(nextProvider))
@@ -67,12 +58,5 @@ export function useAIDraft(
       setHasAskedForNewKey(false)
       setDraft((current) => ({ ...current, apiKey: '' }))
     },
-    chooseModels: (models) => {
-      setDraft((current) => ({ ...current, models }))
-    },
   }
-}
-
-function sameModels(left: readonly string[], right: readonly string[]): boolean {
-  return left.length === right.length && left.every((model, position) => model === right[position])
 }

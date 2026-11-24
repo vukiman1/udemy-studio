@@ -16,7 +16,7 @@ var (
 // AI is the provider configured in the settings; *llm.Service satisfies it.
 type AI interface {
 	Complete(ctx context.Context, prompt llm.Prompt) (llm.Completion, error)
-	EstimateUSD(ctx context.Context, usage llm.Usage) (float64, bool, error)
+	EstimateUSD(ctx context.Context, usage llm.Usage) (float64, error)
 	IsReady(ctx context.Context) error
 }
 

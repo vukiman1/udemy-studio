@@ -1,7 +1,7 @@
 import { useQuery, type UseQueryResult } from '@tanstack/react-query'
 import { apiClient } from './client'
 import { ApiRequestError, QUERY_KEYS } from './queries'
-import type { AICheck, AIModel, AIProvider, AIProviderId, AISettings } from './types'
+import type { AICheck, AIProvider, AIProviderId, AISettings } from './types'
 
 export function useAIProviders(): UseQueryResult<AIProvider[]> {
   return useQuery({
@@ -30,7 +30,6 @@ export interface AIDraft {
   readonly provider: AIProviderId
   // Empty keeps the saved key of the same provider.
   readonly apiKey: string
-  readonly models: readonly string[]
 }
 
 function keyField(apiKey: string): { apiKey?: string } {
@@ -39,7 +38,7 @@ function keyField(apiKey: string): { apiKey?: string } {
 
 export async function saveAISettings(draft: AIDraft): Promise<AISettings> {
   const { data, error, response } = await apiClient.PUT('/api/ai/settings', {
-    body: { provider: draft.provider, models: [...draft.models], ...keyField(draft.apiKey) },
+    body: { provider: draft.provider, ...keyField(draft.apiKey) },
   })
   if (data === undefined)
     throw new ApiRequestError('save AI settings', response.status, error.detail)
@@ -62,24 +61,12 @@ export async function forgetAIProvider(provider: AIProviderId): Promise<void> {
   if (!response.ok) throw new ApiRequestError(`forget the ${provider} key`, response.status)
 }
 
-// With a model the check also calls it with a tiny prompt; without one it only checks the key.
-export async function checkAI(
-  provider: AIProviderId,
-  apiKey: string,
-  model: string | undefined,
-): Promise<AICheck> {
+// The check calls the provider's model with a tiny prompt.
+export async function checkAI(provider: AIProviderId, apiKey: string): Promise<AICheck> {
   const { data, error, response } = await apiClient.POST('/api/ai/check', {
-    body: { provider, ...keyField(apiKey), ...(model === undefined ? {} : { model }) },
+    body: { provider, ...keyField(apiKey) },
   })
   if (data === undefined)
     throw new ApiRequestError('check the API key', response.status, error.detail)
-  return data
-}
-
-export async function listAIModels(provider: AIProviderId, apiKey: string): Promise<AIModel[]> {
-  const { data, error, response } = await apiClient.POST('/api/ai/models', {
-    body: { provider, ...keyField(apiKey) },
-  })
-  if (data === undefined) throw new ApiRequestError('list models', response.status, error.detail)
   return data
 }

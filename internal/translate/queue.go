@@ -64,8 +64,6 @@ type Plan struct {
 	AlreadyTranslated int
 	Characters        int
 	EstimatedUSD      float64
-	// IsPriced is false when the first configured model's price is unknown, so EstimatedUSD means nothing.
-	IsPriced bool
 }
 
 type State string
@@ -122,14 +120,14 @@ func (queue *Queue) Plan(ctx context.Context, courseID string) (Plan, error) {
 	for _, candidate := range pending {
 		queue.addToPlan(&plan, candidate)
 	}
-	estimate, isPriced, err := queue.deps.AI.EstimateUSD(ctx, llm.Usage{
+	estimate, err := queue.deps.AI.EstimateUSD(ctx, llm.Usage{
 		InputTokens:  int64(float64(plan.Characters) * inputTokensPerCharacter),
 		OutputTokens: int64(float64(plan.Characters) * outputTokensPerCharacter),
 	})
 	if err != nil {
 		return Plan{}, err
 	}
-	plan.EstimatedUSD, plan.IsPriced = estimate, isPriced
+	plan.EstimatedUSD = estimate
 	return plan, nil
 }
 
@@ -252,7 +250,7 @@ func (queue *Queue) translateCourse(ctx context.Context, courseID string, plan P
 		switch {
 		case ctx.Err() != nil:
 			return
-		case errors.Is(err, llm.ErrInvalidAPIKey), errors.Is(err, llm.ErrNotConfigured):
+		case errors.Is(err, llm.ErrInvalidAPIKey), errors.Is(err, llm.ErrQuotaExhausted), errors.Is(err, llm.ErrNotConfigured):
 			queue.fail(courseID, err)
 			return
 		case err != nil:

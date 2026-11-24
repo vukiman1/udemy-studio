@@ -33,9 +33,6 @@ export function TranslationDialog({
   const cancel = useMutation({ mutationFn: () => cancelTranslation(courseId), onSuccess: refresh })
   const activeId = settings.data?.provider
   const provider = providers.data?.find((candidate) => candidate.id === activeId)
-  const firstModel = settings.data?.providers.find((saved) => saved.provider === activeId)
-    ?.models[0]
-  const modelLabel = provider?.models.find((model) => model.id === firstModel)?.label ?? firstModel
   const isReady = settings.data?.configured === true && settings.data.enabled
   const error = start.error ?? cancel.error
 
@@ -43,7 +40,7 @@ export function TranslationDialog({
     <Dialog title={`Dịch phụ đề · ${title}`} onClose={onClose}>
       <p className="m-0 text-[0.9rem] text-muted">
         {isReady
-          ? `Đang dùng ${provider?.label ?? ''} · ${modelLabel ?? ''}. `
+          ? `Đang dùng ${provider?.label ?? ''} · ${provider?.model.label ?? ''}. `
           : 'Chưa bật AI nào. '}
         <Link to={AI_SETTINGS_PATH} className="text-accent underline">
           Cài đặt AI

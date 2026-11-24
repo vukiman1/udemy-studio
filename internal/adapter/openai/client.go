@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -27,19 +26,14 @@ const (
 	messageItem      = "message"
 	outputTextPart   = "output_text"
 	refusalPart      = "refusal"
-	textModelPrefix  = "gpt-"
 	maxErrorBodySize = 4096
-	// Waits longer than this mean a spent quota, so the next model is tried instead.
+	// Waits longer than this mean a spent quota, so the run stops instead of waiting.
 	maxRetryAfterSeconds = 30
 )
 
 var (
-	// errForbidden is a key that may not use one model: a rejected key when checking it, but another model may still answer.
-	errForbidden  = errors.New("the key may not use this")
 	ErrRefused    = errors.New("the model declined to answer")
 	ErrIncomplete = errors.New("the model's reply did not complete")
-	// Model ids under gpt- that are not text models answering a prompt.
-	nonTextModelParts = []string{"audio", "realtime", "image", "tts", "transcribe", "search", "embedding"}
 )
 
 type Client struct {
@@ -52,51 +46,11 @@ func Profile() llm.Profile {
 	return llm.Profile{
 		Provider: llm.ProviderOpenAI,
 		Label:    "ChatGPT (OpenAI)",
-		Known: []llm.ModelInfo{
-			{ID: "gpt-6.2-astra", Label: "GPT-6.2 Astra"},
-			{ID: "gpt-6.2-sol", Label: "GPT-6.2 Sol"},
-			{ID: "gpt-6.1-terra", Label: "GPT-6.1 Terra"},
-			{ID: "gpt-6-luna", Label: "GPT-6 Luna"},
-		},
 		// Measured on a 303-cue lecture: Terra matched Sol's quality at half the cost.
-		Recommended: []string{"gpt-6.1-terra", "gpt-6.2-sol"},
-		Prices: map[string]llm.Price{
-			"gpt-6.2-astra": {InputUSDPerMillion: 8, OutputUSDPerMillion: 40},
-			"gpt-6.2-sol":   {InputUSDPerMillion: 2, OutputUSDPerMillion: 10},
-			"gpt-6.1-terra": {InputUSDPerMillion: 1, OutputUSDPerMillion: 5},
-			"gpt-6-luna":    {InputUSDPerMillion: 0.10, OutputUSDPerMillion: 0.50},
-		},
+		Model:  llm.ModelInfo{ID: "gpt-6.1-terra", Label: "GPT-6.1 Terra"},
+		Price:  llm.Price{InputUSDPerMillion: 1, OutputUSDPerMillion: 5},
 		Client: Client{http: &http.Client{Timeout: requestTimeout}, baseURL: apiURL},
 	}
-}
-
-type modelList struct {
-	Data []struct {
-		ID string `json:"id"`
-	} `json:"data"`
-}
-
-func (client Client) CheckKey(ctx context.Context, key secret.Secret) error {
-	_, err := client.ListModels(ctx, key)
-	if errors.Is(err, errForbidden) {
-		return fmt.Errorf("%w: %w", llm.ErrInvalidAPIKey, err)
-	}
-	return err
-}
-
-func (client Client) ListModels(ctx context.Context, key secret.Secret) ([]llm.ModelInfo, error) {
-	var listed modelList
-	if err := client.call(ctx, key, http.MethodGet, "/models", nil, &listed); err != nil {
-		return nil, fmt.Errorf("list OpenAI models: %w", err)
-	}
-	var models []llm.ModelInfo
-	for _, model := range listed.Data {
-		if isTextModel(model.ID) {
-			models = append(models, llm.ModelInfo{ID: model.ID, Label: model.ID})
-		}
-	}
-	slices.SortFunc(models, func(left, right llm.ModelInfo) int { return strings.Compare(left.ID, right.ID) })
-	return models, nil
 }
 
 type responseRequest struct {
@@ -193,14 +147,15 @@ func statusError(response *http.Response) error {
 	if json.Unmarshal(raw, &parsed) == nil && parsed.Error.Message != "" {
 		message = parsed.Error.Message
 	}
-	switch response.StatusCode {
-	case http.StatusUnauthorized:
+	// A key that may not use the model is as good as rejected, since the app uses no other.
+	if response.StatusCode == http.StatusUnauthorized || response.StatusCode == http.StatusForbidden {
 		return fmt.Errorf("%w by OpenAI (HTTP %d): %s", llm.ErrInvalidAPIKey, response.StatusCode, message)
-	case http.StatusForbidden:
-		return fmt.Errorf("%w (HTTP %d): %s", errForbidden, response.StatusCode, message)
 	}
 	if isTemporary(response) {
 		return fmt.Errorf("%w: OpenAI answered HTTP %d: %s", llm.ErrTemporary, response.StatusCode, message)
+	}
+	if response.StatusCode == http.StatusTooManyRequests {
+		return fmt.Errorf("%w: OpenAI answered HTTP %d: %s", llm.ErrQuotaExhausted, response.StatusCode, message)
 	}
 	return fmt.Errorf("OpenAI answered HTTP %d: %s", response.StatusCode, message)
 }
@@ -216,11 +171,4 @@ func isTemporary(response *http.Response) bool {
 		return err == nil && seconds <= maxRetryAfterSeconds
 	}
 	return false
-}
-
-func isTextModel(id string) bool {
-	if !strings.HasPrefix(id, textModelPrefix) {
-		return false
-	}
-	return !slices.ContainsFunc(nonTextModelParts, func(part string) bool { return strings.Contains(id, part) })
 }

@@ -324,25 +324,8 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Check a key and, given a model, call it with a tiny prompt and time the answer; empty key uses the saved one */
+        /** Call the provider's model with a tiny prompt and time the answer; an empty key uses the saved one */
         post: operations["checkAI"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/ai/models": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Every model the provider offers for text with this key; an empty key uses the saved one */
-        post: operations["listAIModels"];
         delete?: never;
         options?: never;
         head?: never;
@@ -703,12 +686,14 @@ export interface components {
         AIProvider: {
             id: components["schemas"]["AIProviderId"];
             label: string;
-            models: components["schemas"]["AIModel"][];
-            /** @description Model ids, first answering and the rest standing by */
-            recommended: string[];
+            model: components["schemas"]["AIModel"];
+            /** Format: double */
+            inputUsdPerMillion: number;
+            /** Format: double */
+            outputUsdPerMillion: number;
         };
         /** @enum {string} */
-        AIProviderId: "claude" | "openai" | "gemini";
+        AIProviderId: "claude" | "openai";
         AIModel: {
             id: string;
             label: string;
@@ -725,32 +710,23 @@ export interface components {
             provider: components["schemas"]["AIProviderId"];
             /** @description The key's first and last four characters, the rest masked */
             keyHint: string;
-            models: string[];
         };
         AISettingsDraft: {
             provider: components["schemas"]["AIProviderId"];
             /** @description A new key; leave out to keep the saved key of the same provider */
             apiKey?: string;
-            models: string[];
         };
         AIEnabled: {
             enabled: boolean;
         };
-        AIKeyProbe: {
-            provider: components["schemas"]["AIProviderId"];
-            apiKey?: string;
-        };
         AICheckRequest: {
             provider: components["schemas"]["AIProviderId"];
             apiKey?: string;
-            /** @description The model to call; leave out to check the key only */
-            model?: string;
         };
         AICheck: {
-            model?: string;
             /** Format: int64 */
-            latencyMs?: number;
-            reply?: string;
+            latencyMs: number;
+            reply: string;
         };
         TranslationPlan: {
             /** @description Lectures with English subtitles and no Vietnamese ones */
@@ -762,8 +738,6 @@ export interface components {
              * @description Rough cost, measured from earlier translations
              */
             estimatedUsd: number;
-            /** @description False when the first configured model's price is unknown, so there is no estimate */
-            isPriced: boolean;
         };
         TranslationRun: {
             /** @enum {string} */
@@ -1483,39 +1457,13 @@ export interface operations {
             };
         };
         responses: {
-            /** @description The key works, and the model answered when one was given */
+            /** @description The model answered with the key */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": components["schemas"]["AICheck"];
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            502: components["responses"]["ProviderUnreachable"];
-        };
-    };
-    listAIModels: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["AIKeyProbe"];
-            };
-        };
-        responses: {
-            /** @description Models */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AIModel"][];
                 };
             };
             400: components["responses"]["BadRequest"];

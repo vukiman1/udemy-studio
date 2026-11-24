@@ -16,75 +16,39 @@ import (
 )
 
 // A chunk of 120 cues replies in well under this; the rest is room for thinking.
-const maxReplyTokens = 16000
+const (
+	apiURL         = "https://api.anthropic.com"
+	maxReplyTokens = 16000
+)
 
 var (
-	// errForbidden is a key that may not use one model: a rejected key when checking it, but another model may still answer.
-	errForbidden = errors.New("the key may not use this")
 	ErrRefused   = errors.New("claude declined to answer")
 	ErrTruncated = errors.New("claude's reply was cut off before it ended")
 )
 
-// Server-side fallback re-serves a declined request with another model inside the same call; these models offer it.
-var modelsWithServerFallback = map[string]bool{"claude-opus-5-5": true, "claude-sonnet-5-5": true}
-
-type Client struct{}
+type Client struct {
+	baseURL string
+}
 
 func Profile() llm.Profile {
 	return llm.Profile{
 		Provider: llm.ProviderClaude,
 		Label:    "Claude (Anthropic)",
-		Known: []llm.ModelInfo{
-			{ID: "claude-opus-5-5", Label: "Claude Opus 5.5"},
-			{ID: "claude-sonnet-5-5", Label: "Claude Sonnet 5.5"},
-			{ID: "claude-haiku-5-5", Label: "Claude Haiku 5.5"},
-		},
-		// Measured on a 303-cue lecture: Haiku kept the cues and terms at 1/25 of Opus's cost; Opus stands by.
-		// Sonnet is left out of the chain: it merged lines and drifted 25 cues.
-		Recommended: []string{"claude-haiku-5-5", "claude-opus-5-5"},
-		Prices: map[string]llm.Price{
-			"claude-opus-5-5":   {InputUSDPerMillion: 4, OutputUSDPerMillion: 20},
-			"claude-sonnet-5-5": {InputUSDPerMillion: 2, OutputUSDPerMillion: 10},
-			"claude-haiku-5-5":  {InputUSDPerMillion: 0.10, OutputUSDPerMillion: 0.50},
-		},
-		Client: Client{},
+		// Measured on a 303-cue lecture: Haiku kept the cues and terms at 1/25 of Opus's cost, while Sonnet drifted 25 cues.
+		Model:  llm.ModelInfo{ID: "claude-haiku-5-5", Label: "Claude Haiku 5.5"},
+		Price:  llm.Price{InputUSDPerMillion: 0.10, OutputUSDPerMillion: 0.50},
+		Client: Client{baseURL: apiURL},
 	}
 }
 
-func (Client) CheckKey(ctx context.Context, key secret.Secret) error {
-	_, err := Client{}.ListModels(ctx, key)
-	if errors.Is(err, errForbidden) {
-		return fmt.Errorf("%w: %w", llm.ErrInvalidAPIKey, err)
-	}
-	return err
-}
-
-func (Client) ListModels(ctx context.Context, key secret.Secret) ([]llm.ModelInfo, error) {
-	client := anthropic.NewClient(option.WithAPIKey(key.Reveal()))
-	pages := client.Models.ListAutoPaging(ctx, anthropic.ModelListParams{})
-	var models []llm.ModelInfo
-	for pages.Next() {
-		model := pages.Current()
-		models = append(models, llm.ModelInfo{ID: model.ID, Label: model.DisplayName})
-	}
-	if err := pages.Err(); err != nil {
-		return nil, fmt.Errorf("list Claude models: %w", classify(err))
-	}
-	return models, nil
-}
-
-func (Client) Complete(ctx context.Context, key secret.Secret, model string, prompt llm.Prompt) (llm.Completion, error) {
-	client := anthropic.NewClient(option.WithAPIKey(key.Reveal()))
+func (claude Client) Complete(ctx context.Context, key secret.Secret, model string, prompt llm.Prompt) (llm.Completion, error) {
+	client := anthropic.NewClient(option.WithAPIKey(key.Reveal()), option.WithBaseURL(claude.baseURL))
 	params := anthropic.BetaMessageNewParams{
 		Model:        model,
 		MaxTokens:    maxReplyTokens,
 		System:       []anthropic.BetaTextBlockParam{{Text: prompt.System, CacheControl: anthropic.NewBetaCacheControlEphemeralParam()}},
 		Messages:     []anthropic.BetaMessageParam{anthropic.NewBetaUserMessage(anthropic.NewBetaTextBlock(prompt.User))},
 		OutputConfig: anthropic.BetaOutputConfigParam{Effort: anthropic.BetaOutputConfigEffortMedium},
-	}
-	if modelsWithServerFallback[model] {
-		params.Fallbacks = anthropic.BetaFallbacksParamOfDefault()
-		params.Betas = []anthropic.AnthropicBeta{anthropic.AnthropicBetaServerSideFallback2026_07_01}
 	}
 	message, err := client.Beta.Messages.New(ctx, params)
 	if err != nil {
@@ -109,17 +73,16 @@ func (Client) Complete(ctx context.Context, key secret.Secret, model string, pro
 	return llm.Completion{Text: text.String(), Usage: usage}, nil
 }
 
-// classify marks a rejected key, which stops a run, and an overloaded API, which is worth asking again.
+// classify marks a rejected key, which stops a run, and an overloaded API, which is worth asking again; a key that
+// may not use the model is as good as rejected, since the app uses no other.
 func classify(err error) error {
 	var apiErr *anthropic.Error
 	if !errors.As(err, &apiErr) {
 		return err
 	}
 	switch {
-	case apiErr.StatusCode == http.StatusUnauthorized:
+	case apiErr.StatusCode == http.StatusUnauthorized || apiErr.StatusCode == http.StatusForbidden:
 		return fmt.Errorf("%w by Claude (HTTP %d)", llm.ErrInvalidAPIKey, apiErr.StatusCode)
-	case apiErr.StatusCode == http.StatusForbidden:
-		return fmt.Errorf("%w (HTTP %d): %w", errForbidden, apiErr.StatusCode, err)
 	case apiErr.StatusCode == http.StatusTooManyRequests || apiErr.StatusCode >= http.StatusInternalServerError:
 		// The SDK has already retried this twice; marking it lets the next attempt wait longer.
 		return fmt.Errorf("%w: %w", llm.ErrTemporary, err)

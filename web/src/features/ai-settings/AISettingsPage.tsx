@@ -51,8 +51,6 @@ function AISettingsEditor({
 
 // A new version of the saved settings starts the form over from it.
 function settingsVersion(settings: AISettings): string {
-  const saved = settings.providers.map(
-    (provider) => `${provider.provider}:${provider.keyHint}:${provider.models.join(',')}`,
-  )
+  const saved = settings.providers.map((provider) => `${provider.provider}:${provider.keyHint}`)
   return [settings.provider, String(settings.enabled), ...saved].join('|')
 }

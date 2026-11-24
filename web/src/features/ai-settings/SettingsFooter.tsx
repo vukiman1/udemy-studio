@@ -24,10 +24,7 @@ export function SettingsFooter({ settings, editor }: SettingsFooterProps): React
   })
   const error = save.error ?? toggle.error ?? forget.error
   const canSave =
-    editor.isDirty &&
-    editor.draft.models.length > 0 &&
-    (!editor.isEditingKey || editor.draft.apiKey.trim() !== '') &&
-    !save.isPending
+    editor.isDirty && (!editor.isEditingKey || editor.draft.apiKey.trim() !== '') && !save.isPending
 
   return (
     <div className="grid gap-2 border-t border-line pt-5">

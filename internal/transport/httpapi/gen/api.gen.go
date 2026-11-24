@@ -20,7 +20,6 @@ import (
 // Defines values for AIProviderId.
 const (
 	Claude AIProviderId = "claude"
-	Gemini AIProviderId = "gemini"
 	Openai AIProviderId = "openai"
 )
 
@@ -28,8 +27,6 @@ const (
 func (e AIProviderId) Valid() bool {
 	switch e {
 	case Claude:
-		return true
-	case Gemini:
 		return true
 	case Openai:
 		return true
@@ -157,29 +154,19 @@ func (e TranslationRunState) Valid() bool {
 
 // AICheck defines model for AICheck.
 type AICheck struct {
-	LatencyMs *int64  `json:"latencyMs,omitempty"`
-	Model     *string `json:"model,omitempty"`
-	Reply     *string `json:"reply,omitempty"`
+	LatencyMs int64  `json:"latencyMs"`
+	Reply     string `json:"reply"`
 }
 
 // AICheckRequest defines model for AICheckRequest.
 type AICheckRequest struct {
-	ApiKey *string `json:"apiKey,omitempty"`
-
-	// Model The model to call; leave out to check the key only
-	Model    *string      `json:"model,omitempty"`
+	ApiKey   *string      `json:"apiKey,omitempty"`
 	Provider AIProviderId `json:"provider"`
 }
 
 // AIEnabled defines model for AIEnabled.
 type AIEnabled struct {
 	Enabled bool `json:"enabled"`
-}
-
-// AIKeyProbe defines model for AIKeyProbe.
-type AIKeyProbe struct {
-	ApiKey   *string      `json:"apiKey,omitempty"`
-	Provider AIProviderId `json:"provider"`
 }
 
 // AIModel defines model for AIModel.
@@ -190,12 +177,11 @@ type AIModel struct {
 
 // AIProvider defines model for AIProvider.
 type AIProvider struct {
-	Id     AIProviderId `json:"id"`
-	Label  string       `json:"label"`
-	Models []AIModel    `json:"models"`
-
-	// Recommended Model ids, first answering and the rest standing by
-	Recommended []string `json:"recommended"`
+	Id                  AIProviderId `json:"id"`
+	InputUsdPerMillion  float64      `json:"inputUsdPerMillion"`
+	Label               string       `json:"label"`
+	Model               AIModel      `json:"model"`
+	OutputUsdPerMillion float64      `json:"outputUsdPerMillion"`
 }
 
 // AIProviderId defines model for AIProviderId.
@@ -205,7 +191,6 @@ type AIProviderId string
 type AISavedProvider struct {
 	// KeyHint The key's first and last four characters, the rest masked
 	KeyHint  string       `json:"keyHint"`
-	Models   []string     `json:"models"`
 	Provider AIProviderId `json:"provider"`
 }
 
@@ -224,7 +209,6 @@ type AISettings struct {
 type AISettingsDraft struct {
 	// ApiKey A new key; leave out to keep the saved key of the same provider
 	ApiKey   *string      `json:"apiKey,omitempty"`
-	Models   []string     `json:"models"`
 	Provider AIProviderId `json:"provider"`
 }
 
@@ -508,9 +492,6 @@ type TranslationPlan struct {
 	// EstimatedUsd Rough cost, measured from earlier translations
 	EstimatedUsd float64 `json:"estimatedUsd"`
 
-	// IsPriced False when the first configured model's price is unknown, so there is no estimate
-	IsPriced bool `json:"isPriced"`
-
 	// Lectures Lectures with English subtitles and no Vietnamese ones
 	Lectures int `json:"lectures"`
 }
@@ -592,9 +573,6 @@ type SearchSubtitlesParams struct {
 // CheckAIJSONRequestBody defines body for CheckAI for application/json ContentType.
 type CheckAIJSONRequestBody = AICheckRequest
 
-// ListAIModelsJSONRequestBody defines body for ListAIModels for application/json ContentType.
-type ListAIModelsJSONRequestBody = AIKeyProbe
-
 // SaveAISettingsJSONRequestBody defines body for SaveAISettings for application/json ContentType.
 type SaveAISettingsJSONRequestBody = AISettingsDraft
 
@@ -618,12 +596,9 @@ type EditNoteJSONRequestBody = NoteEdit
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
-	// CheckAI Check a key and, given a model, call it with a tiny prompt and time the answer; empty key uses the saved one
+	// CheckAI Call the provider's model with a tiny prompt and time the answer; an empty key uses the saved one
 	// (POST /api/ai/check)
 	CheckAI(w http.ResponseWriter, r *http.Request)
-	// ListAIModels Every model the provider offers for text with this key; an empty key uses the saved one
-	// (POST /api/ai/models)
-	ListAIModels(w http.ResponseWriter, r *http.Request)
 	// ListAIProviders The AI providers the app can use, with the models it knows and recommends for each
 	// (GET /api/ai/providers)
 	ListAIProviders(w http.ResponseWriter, r *http.Request)
@@ -739,20 +714,6 @@ func (siw *ServerInterfaceWrapper) CheckAI(w http.ResponseWriter, r *http.Reques
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.CheckAI(w, r)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r)
-}
-
-// ListAIModels operation middleware
-func (siw *ServerInterfaceWrapper) ListAIModels(w http.ResponseWriter, r *http.Request) {
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.ListAIModels(w, r)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -1647,7 +1608,6 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 	m.HandleFunc(http.MethodDelete+" "+options.BaseURL+"/api/ai/settings/providers/{provider}", wrapper.ForgetAIProvider)
 	m.HandleFunc(http.MethodPut+" "+options.BaseURL+"/api/ai/settings/enabled", wrapper.SetAIEnabled)
 	m.HandleFunc(http.MethodPost+" "+options.BaseURL+"/api/ai/check", wrapper.CheckAI)
-	m.HandleFunc(http.MethodPost+" "+options.BaseURL+"/api/ai/models", wrapper.ListAIModels)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/courses/{courseId}/translation/plan", wrapper.PlanCourseTranslation)
 	m.HandleFunc(http.MethodDelete+" "+options.BaseURL+"/api/courses/{courseId}/translation", wrapper.CancelCourseTranslation)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/courses/{courseId}/translation", wrapper.GetCourseTranslation)
@@ -1717,60 +1677,6 @@ type CheckAI502ApplicationProblemPlusJSONResponse struct {
 }
 
 func (response CheckAI502ApplicationProblemPlusJSONResponse) VisitCheckAIResponse(w http.ResponseWriter) error {
-
-	var buf bytes.Buffer
-	if err := runtime.JSONMarshalWrite(&buf, response.ProviderUnreachableApplicationProblemPlusJSONResponse); err != nil {
-		return err
-	}
-	w.Header().Set("Content-Type", "application/problem+json")
-	w.WriteHeader(502)
-	_, err := buf.WriteTo(w)
-	return err
-}
-
-type ListAIModelsRequestObject struct {
-	Body *ListAIModelsJSONRequestBody
-}
-
-type ListAIModelsResponseObject interface {
-	VisitListAIModelsResponse(w http.ResponseWriter) error
-}
-
-type ListAIModels200JSONResponse []AIModel
-
-func (response ListAIModels200JSONResponse) VisitListAIModelsResponse(w http.ResponseWriter) error {
-
-	var buf bytes.Buffer
-	if err := runtime.JSONMarshalWrite(&buf, response); err != nil {
-		return err
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
-	_, err := buf.WriteTo(w)
-	return err
-}
-
-type ListAIModels400ApplicationProblemPlusJSONResponse struct {
-	BadRequestApplicationProblemPlusJSONResponse
-}
-
-func (response ListAIModels400ApplicationProblemPlusJSONResponse) VisitListAIModelsResponse(w http.ResponseWriter) error {
-
-	var buf bytes.Buffer
-	if err := runtime.JSONMarshalWrite(&buf, response.BadRequestApplicationProblemPlusJSONResponse); err != nil {
-		return err
-	}
-	w.Header().Set("Content-Type", "application/problem+json")
-	w.WriteHeader(400)
-	_, err := buf.WriteTo(w)
-	return err
-}
-
-type ListAIModels502ApplicationProblemPlusJSONResponse struct {
-	ProviderUnreachableApplicationProblemPlusJSONResponse
-}
-
-func (response ListAIModels502ApplicationProblemPlusJSONResponse) VisitListAIModelsResponse(w http.ResponseWriter) error {
 
 	var buf bytes.Buffer
 	if err := runtime.JSONMarshalWrite(&buf, response.ProviderUnreachableApplicationProblemPlusJSONResponse); err != nil {
@@ -3142,12 +3048,9 @@ func (response GetHealth200JSONResponse) VisitGetHealthResponse(w http.ResponseW
 
 // StrictServerInterface represents all server handlers.
 type StrictServerInterface interface {
-	// CheckAI Check a key and, given a model, call it with a tiny prompt and time the answer; empty key uses the saved one
+	// CheckAI Call the provider's model with a tiny prompt and time the answer; an empty key uses the saved one
 	// (POST /api/ai/check)
 	CheckAI(ctx context.Context, request CheckAIRequestObject) (CheckAIResponseObject, error)
-	// ListAIModels Every model the provider offers for text with this key; an empty key uses the saved one
-	// (POST /api/ai/models)
-	ListAIModels(ctx context.Context, request ListAIModelsRequestObject) (ListAIModelsResponseObject, error)
 	// ListAIProviders The AI providers the app can use, with the models it knows and recommends for each
 	// (GET /api/ai/providers)
 	ListAIProviders(ctx context.Context, request ListAIProvidersRequestObject) (ListAIProvidersResponseObject, error)
@@ -3315,37 +3218,6 @@ func (sh *strictHandler) CheckAI(w http.ResponseWriter, r *http.Request) {
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(CheckAIResponseObject); ok {
 		if err := validResponse.VisitCheckAIResponse(w); err != nil {
-			sh.options.ResponseErrorHandlerFunc(w, r, err)
-		}
-	} else if response != nil {
-		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
-	}
-}
-
-// ListAIModels operation middleware
-func (sh *strictHandler) ListAIModels(w http.ResponseWriter, r *http.Request) {
-	var request ListAIModelsRequestObject
-
-	var body ListAIModelsJSONRequestBody
-	if err := runtime.BindJSONBody(r, &body); err != nil {
-		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
-		return
-	}
-	request.Body = &body
-
-	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error) {
-		return sh.ssi.ListAIModels(ctx, request.(ListAIModelsRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "ListAIModels")
-	}
-
-	response, err := handler(r.Context(), w, r, request)
-
-	if err != nil {
-		sh.options.ResponseErrorHandlerFunc(w, r, err)
-	} else if validResponse, ok := response.(ListAIModelsResponseObject); ok {
-		if err := validResponse.VisitListAIModelsResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

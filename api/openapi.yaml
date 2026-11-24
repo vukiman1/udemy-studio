@@ -400,7 +400,7 @@ paths:
   /api/ai/check:
     post:
       operationId: checkAI
-      summary: Check a key and, given a model, call it with a tiny prompt and time the answer; empty key uses the saved one
+      summary: Call the provider's model with a tiny prompt and time the answer; an empty key uses the saved one
       requestBody:
         required: true
         content:
@@ -409,7 +409,7 @@ paths:
               $ref: "#/components/schemas/AICheckRequest"
       responses:
         "200":
-          description: The key works, and the model answered when one was given
+          description: The model answered with the key
           content:
             application/json:
               schema:
@@ -419,29 +419,6 @@ paths:
         "502":
           $ref: "#/components/responses/ProviderUnreachable"
 
-  /api/ai/models:
-    post:
-      operationId: listAIModels
-      summary: Every model the provider offers for text with this key; an empty key uses the saved one
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/AIKeyProbe"
-      responses:
-        "200":
-          description: Models
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/AIModel"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "502":
-          $ref: "#/components/responses/ProviderUnreachable"
 
   /api/courses/{courseId}/translation/plan:
     get:
@@ -1058,25 +1035,24 @@ components:
 
     AIProvider:
       type: object
-      required: [id, label, models, recommended]
+      required: [id, label, model, inputUsdPerMillion, outputUsdPerMillion]
       properties:
         id:
           $ref: "#/components/schemas/AIProviderId"
         label:
           type: string
-        models:
-          type: array
-          items:
-            $ref: "#/components/schemas/AIModel"
-        recommended:
-          type: array
-          description: Model ids, first answering and the rest standing by
-          items:
-            type: string
+        model:
+          $ref: "#/components/schemas/AIModel"
+        inputUsdPerMillion:
+          type: number
+          format: double
+        outputUsdPerMillion:
+          type: number
+          format: double
 
     AIProviderId:
       type: string
-      enum: [claude, openai, gemini]
+      enum: [claude, openai]
 
     AIModel:
       type: object
@@ -1106,40 +1082,15 @@ components:
 
     AISavedProvider:
       type: object
-      required: [provider, keyHint, models]
+      required: [provider, keyHint]
       properties:
         provider:
           $ref: "#/components/schemas/AIProviderId"
         keyHint:
           type: string
           description: The key's first and last four characters, the rest masked
-        models:
-          type: array
-          items:
-            type: string
 
     AISettingsDraft:
-      type: object
-      required: [provider, models]
-      properties:
-        provider:
-          $ref: "#/components/schemas/AIProviderId"
-        apiKey:
-          type: string
-          description: A new key; leave out to keep the saved key of the same provider
-        models:
-          type: array
-          items:
-            type: string
-
-    AIEnabled:
-      type: object
-      required: [enabled]
-      properties:
-        enabled:
-          type: boolean
-
-    AIKeyProbe:
       type: object
       required: [provider]
       properties:
@@ -1147,6 +1098,14 @@ components:
           $ref: "#/components/schemas/AIProviderId"
         apiKey:
           type: string
+          description: A new key; leave out to keep the saved key of the same provider
+
+    AIEnabled:
+      type: object
+      required: [enabled]
+      properties:
+        enabled:
+          type: boolean
 
     AICheckRequest:
       type: object
@@ -1156,15 +1115,11 @@ components:
           $ref: "#/components/schemas/AIProviderId"
         apiKey:
           type: string
-        model:
-          type: string
-          description: The model to call; leave out to check the key only
 
     AICheck:
       type: object
+      required: [latencyMs, reply]
       properties:
-        model:
-          type: string
         latencyMs:
           type: integer
           format: int64
@@ -1173,7 +1128,7 @@ components:
 
     TranslationPlan:
       type: object
-      required: [lectures, alreadyTranslated, characters, estimatedUsd, isPriced]
+      required: [lectures, alreadyTranslated, characters, estimatedUsd]
       properties:
         lectures:
           type: integer
@@ -1186,9 +1141,6 @@ components:
           type: number
           format: double
           description: Rough cost, measured from earlier translations
-        isPriced:
-          type: boolean
-          description: False when the first configured model's price is unknown, so there is no estimate
 
     TranslationRun:
       type: object

@@ -1,7 +1,7 @@
 import type { ReactElement } from 'react'
 import type { AIProvider, AISettings } from '../../api/types'
 import { ApiKeyField } from './ApiKeyField'
-import { ModelPicker } from './ModelPicker'
+import { ProviderModel } from './ProviderModel'
 import { SettingsCard } from './SettingsCard'
 import { SettingsFooter } from './SettingsFooter'
 import type { AIDraftEditor } from './use-ai-draft'
@@ -32,10 +32,10 @@ export function AIConfigCard({ providers, saved, editor }: AIConfigCardProps): R
           ))}
         </select>
       </label>
-      <ApiKeyField editor={editor} />
-      <ModelPicker editor={editor} />
-      {/* Keyed by provider so a delete confirmation never carries over to another provider's key. */}
-      <SettingsFooter key={editor.draft.provider} settings={saved} editor={editor} />
+      {/* Keyed by provider so a check result or delete confirmation never carries over to another provider. */}
+      <ApiKeyField key={`key-${editor.draft.provider}`} editor={editor} />
+      <ProviderModel provider={editor.provider} />
+      <SettingsFooter key={`footer-${editor.draft.provider}`} settings={saved} editor={editor} />
     </SettingsCard>
   )
 }

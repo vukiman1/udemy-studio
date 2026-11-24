@@ -24,13 +24,13 @@ export function TranslationPlanSummary({
     )
   if (plan.data === undefined) return <p className="m-0 text-muted">Đang đọc phụ đề…</p>
 
-  const { lectures, alreadyTranslated, estimatedUsd, isPriced } = plan.data
+  const { lectures, alreadyTranslated, estimatedUsd } = plan.data
   return (
     <div className="grid gap-2">
       <p className="m-0">
         {lectures === 0
           ? 'Không còn bài nào cần dịch.'
-          : `Sẽ dịch ${String(lectures)} bài, ${isPriced ? `ước tính khoảng ${formatUsd(estimatedUsd)}` : 'chưa rõ giá của model này'}.`}
+          : `Sẽ dịch ${String(lectures)} bài, ước tính khoảng ${formatUsd(estimatedUsd)}.`}
       </p>
       {alreadyTranslated > 0 && (
         <p className="m-0 text-[0.9rem] text-muted">
