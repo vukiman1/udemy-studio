@@ -6,7 +6,6 @@ interface EmptyStateProps {
   readonly title: string
   readonly body?: string
   readonly action?: ReactNode
-  // An error is announced to screen readers as soon as it appears; anything else waits its turn.
   readonly isError?: boolean
 }
 

@@ -11,7 +11,6 @@ interface CompressionPlanSummaryProps {
   readonly isStarting: boolean
   readonly onStart: () => void
   readonly onDismiss: () => void
-  // What the dialog shows above the plan, such as the last run's result.
   readonly children: ReactNode
 }
 

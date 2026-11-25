@@ -16,8 +16,6 @@ var (
 
 var headEnd = []byte("</head>")
 
-// withPageTheme dresses a downloaded article or quiz page in the app's colours. The style goes last in the head so it
-// overrides the page's own, and stays inline because the pages' sandbox policy allows no stylesheet from the app.
 func withPageTheme(page []byte, themeCSS string) []byte {
 	style := []byte("<style>" + paletteCSS + themeCSS + "</style>")
 	position := bytes.Index(bytes.ToLower(page), headEnd)

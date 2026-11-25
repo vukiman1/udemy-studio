@@ -70,7 +70,6 @@ interface LoadFailureProps {
   readonly onRetry: () => void
 }
 
-// The server answered with an error, or there is no server to answer at all.
 function LoadFailure({ error, onRetry }: LoadFailureProps): ReactElement {
   const isUnreachable = !(error instanceof ApiRequestError)
   return (

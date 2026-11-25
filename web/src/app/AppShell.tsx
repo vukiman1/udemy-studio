@@ -19,7 +19,6 @@ const NAV_ITEMS: readonly NavItem[] = [
 const SIDEBAR_LINK = 'flex h-[46px] items-center gap-[13px] rounded-[10px] px-[15px] text-sm'
 const TAB_LINK = 'grid justify-items-center gap-1 py-2 text-[11px]'
 
-// Every page but the lesson player sits beside the sidebar; on phones the sidebar becomes a tab bar.
 export function AppShell(): ReactElement {
   return (
     <div className="min-h-dvh md:grid md:grid-cols-[232px_minmax(0,1fr)]">

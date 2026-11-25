@@ -10,7 +10,6 @@ import { isSubmitShortcut } from './submit-shortcut'
 interface NoteComposerProps {
   readonly lectureId: string
   readonly videoRef: RefObject<HTMLVideoElement | null> | null
-  // Extra links for the header, beside the save button.
   readonly children?: ReactNode
 }
 

@@ -5,7 +5,6 @@ interface SettingsCardProps {
   readonly children: ReactNode
 }
 
-// The design shows no card heading, so the title is kept for screen readers only.
 export function SettingsCard({ title, children }: SettingsCardProps): ReactElement {
   return (
     <section

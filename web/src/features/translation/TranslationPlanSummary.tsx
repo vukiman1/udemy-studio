@@ -11,7 +11,6 @@ interface TranslationPlanSummaryProps {
   readonly isStarting: boolean
   readonly onStart: () => void
   readonly onDismiss: () => void
-  // What the dialog shows above the plan, such as the AI in use or the last run.
   readonly children: ReactNode
 }
 

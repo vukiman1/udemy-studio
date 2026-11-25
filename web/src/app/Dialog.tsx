@@ -6,11 +6,9 @@ interface DialogProps {
   readonly title: string
   readonly subtitle: string
   readonly onClose: () => void
-  // A DialogBody, then a DialogFooter with the actions.
   readonly children: ReactNode
 }
 
-// A native modal dialog: the browser handles focus, Escape and the backdrop. On phones it rises as a bottom sheet.
 export function Dialog({
   icon: Icon,
   title,

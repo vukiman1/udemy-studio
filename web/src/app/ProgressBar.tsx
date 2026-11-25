@@ -3,7 +3,6 @@ import type { ReactElement } from 'react'
 interface ProgressBarProps {
   readonly completed: number
   readonly total: number
-  // Height and rounding, which differ between the library rows and the lesson header.
   readonly className?: string
 }
 

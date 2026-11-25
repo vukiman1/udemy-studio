@@ -20,7 +20,6 @@ const VARIANT_CLASSES: Readonly<Record<ButtonVariant, string>> = {
   [ButtonVariant.Secondary]: 'bg-button text-ink enabled:hover:brightness-125',
   [ButtonVariant.Ghost]: 'bg-transparent text-ink enabled:hover:bg-ink/7',
   [ButtonVariant.Danger]: 'bg-danger-soft text-danger enabled:hover:brightness-110',
-  // Done is disabled because nothing is left to do, so it keeps its full colour.
   [ButtonVariant.Done]: 'bg-success-soft text-ink disabled:opacity-100 [&_svg]:text-success',
 }
 
@@ -30,7 +29,6 @@ const SIZE_CLASSES: Readonly<Record<ButtonSize, string>> = {
   [ButtonSize.Large]: 'h-12 gap-2 rounded-xl px-5 text-[15px] [&_svg]:size-[18px]',
 }
 
-// Shared by <Button> and links that look like buttons, such as "Tiếp tục".
 export function buttonClass(variant: ButtonVariant, size: ButtonSize): string {
   return `inline-flex shrink-0 items-center justify-center font-semibold whitespace-nowrap ${VARIANT_CLASSES[variant]} ${SIZE_CLASSES[size]}`
 }

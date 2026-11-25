@@ -1,7 +1,6 @@
 import type { CSSProperties, ReactElement } from 'react'
 import type { CourseSummary } from '../../api/types'
 
-// The five tile hues of the design's "Course avatar"; a course keeps the same one on every visit.
 const TILE_HUES = ['#8b6cff', '#4f8cff', '#e26ba8', '#2fc4b2', '#f2a93b'] as const
 const INITIALS = 2
 
@@ -36,7 +35,6 @@ function tileHue(courseId: string): string {
   return TILE_HUES[sum % TILE_HUES.length] ?? TILE_HUES[0]
 }
 
-// "React & TypeScript" → "RT": the first letter of each of the first two words, skipping symbols.
 function initials(title: string): string {
   return title
     .split(/[^\p{L}\p{N}]+/u)
