@@ -5,11 +5,17 @@ interface SettingsCardProps {
   readonly children: ReactNode
 }
 
+// The design shows no card heading, so the title is kept for screen readers only.
 export function SettingsCard({ title, children }: SettingsCardProps): ReactElement {
   return (
-    <section className="rounded-xl border border-line bg-surface">
-      <h2 className="border-b border-line px-6 py-4 text-lg font-semibold">{title}</h2>
-      <div className="grid gap-6 px-6 py-5">{children}</div>
+    <section
+      className="grid gap-5 rounded-[20px] bg-card px-5 pt-7 pb-6 md:px-[30px]"
+      aria-labelledby="settings-card-title"
+    >
+      <h2 id="settings-card-title" className="sr-only">
+        {title}
+      </h2>
+      {children}
     </section>
   )
 }

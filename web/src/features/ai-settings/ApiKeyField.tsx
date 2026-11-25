@@ -1,11 +1,16 @@
 import { useMutation } from '@tanstack/react-query'
 import type { ReactElement } from 'react'
+import { CircleCheck, Eye, LoaderCircle } from 'lucide-react'
 import { checkAI } from '../../api/ai-queries'
+import { Button, ButtonVariant } from '../../ui/Button'
+import { TEXT_FIELD } from '../../ui/text-field'
+import { SETTINGS_LABEL, SETTINGS_ROW } from './settings-row'
 import type { AIDraftEditor } from './use-ai-draft'
 
 const MS_PER_SECOND = 1000
 const SECONDS_FORMAT = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 1 })
-const CLOCK_FORMAT = new Intl.DateTimeFormat('vi-VN', { timeStyle: 'medium' })
+const CLOCK_FORMAT = new Intl.DateTimeFormat('vi-VN', { timeStyle: 'short' })
+const CHECKING_ICON_CLASS = '[&_svg]:animate-spin'
 
 interface ApiKeyFieldProps {
   readonly editor: AIDraftEditor
@@ -22,16 +27,18 @@ export function ApiKeyField({ editor }: ApiKeyFieldProps): ReactElement {
   const canCheck = !check.isPending && (!isEditingKey || draft.apiKey.trim() !== '')
 
   return (
-    <div className="grid gap-2">
-      <span className="font-semibold">Khoá API</span>
-      <div className="flex rounded-lg border border-line bg-page">
-        {isEditingKey ? (
-          <span className="flex min-w-0 flex-1 items-center gap-3 pr-3">
+    <div className="grid gap-3">
+      <div className={SETTINGS_ROW}>
+        <span className={SETTINGS_LABEL} id="api-key-label">
+          Khoá API
+        </span>
+        <div className="flex flex-wrap items-center gap-2.5">
+          {isEditingKey ? (
             <input
-              className="min-w-0 flex-1 rounded-l-lg bg-transparent px-3 py-2.5"
+              className={`${TEXT_FIELD} min-w-0 flex-1 basis-60`}
               type="password"
               autoComplete="off"
-              aria-label={`Khoá API ${provider.label}`}
+              aria-labelledby="api-key-label"
               placeholder={`Dán khoá ${provider.label}`}
               value={draft.apiKey}
               onChange={(event) => {
@@ -39,46 +46,47 @@ export function ApiKeyField({ editor }: ApiKeyFieldProps): ReactElement {
                 check.reset()
               }}
             />
-            {editor.canKeepSavedKey && (
-              <button
-                type="button"
-                className="link-button"
-                onClick={() => {
-                  editor.keepSavedKey()
-                  check.reset()
-                }}
-              >
-                Huỷ
-              </button>
-            )}
-          </span>
-        ) : (
-          <span className="flex min-w-0 flex-1 items-center justify-between gap-3 px-3 py-2.5">
-            <span className="truncate font-mono">{editor.saved?.keyHint}</span>
-            <button type="button" className="link-button" onClick={editor.startEditingKey}>
+          ) : (
+            <span className="flex h-12 min-w-0 flex-1 basis-60 items-center truncate rounded-xl border border-line bg-input px-4 font-mono text-[13px] text-muted">
+              {editor.saved?.keyHint}
+            </span>
+          )}
+          {isEditingKey && editor.canKeepSavedKey && (
+            <Button
+              variant={ButtonVariant.Ghost}
+              onClick={() => {
+                editor.keepSavedKey()
+                check.reset()
+              }}
+            >
+              Huỷ
+            </Button>
+          )}
+          {!isEditingKey && (
+            <Button icon={Eye} onClick={editor.startEditingKey}>
               Đổi khoá
-            </button>
-          </span>
-        )}
-        <button
-          type="button"
-          className="border-l border-line px-4"
-          disabled={!canCheck}
-          onClick={() => {
-            check.mutate()
-          }}
-        >
-          {check.isPending ? 'Đang kiểm tra…' : 'Kiểm tra'}
-        </button>
+            </Button>
+          )}
+          <Button
+            icon={check.isPending ? LoaderCircle : CircleCheck}
+            className={check.isPending ? CHECKING_ICON_CLASS : ''}
+            disabled={!canCheck}
+            onClick={() => {
+              check.mutate()
+            }}
+          >
+            {check.isPending ? 'Đang kiểm tra…' : 'Kiểm tra'}
+          </Button>
+        </div>
       </div>
       {check.isSuccess && (
-        <p className="m-0 text-[0.9rem]">
-          <span className="text-accent">● Khoá dùng được.</span>
+        <p className="text-[13px] text-muted">
+          <span className="text-accent-soft">● Khoá dùng được.</span>
           {` ${provider.model.label} trả lời sau ${SECONDS_FORMAT.format(check.data.result.latencyMs / MS_PER_SECOND)} giây, lúc ${CLOCK_FORMAT.format(check.data.at)}.`}
         </p>
       )}
       {check.isError && (
-        <p className="m-0 text-[0.9rem] text-danger" role="alert">
+        <p className="text-[13px] text-danger" role="alert">
           {check.error.message}
         </p>
       )}
