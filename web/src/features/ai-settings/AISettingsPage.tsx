@@ -1,6 +1,4 @@
-import { ChevronIcon } from '@videojs/react/icons'
 import type { ReactElement } from 'react'
-import { Link } from 'react-router'
 import { useAIProviders, useAISettings } from '../../api/ai-queries'
 import type { AIProvider, AISettings } from '../../api/types'
 import { PageStatus } from '../../app/PageStatus'
@@ -15,11 +13,7 @@ export function AISettingsPage(): ReactElement {
   return (
     <main className="mx-auto grid max-w-[760px] gap-4 px-4 py-6">
       <header className="flex items-center gap-3">
-        <Link to="/" className="inline-flex items-center gap-1 text-muted">
-          <ChevronIcon className="size-4.5 -scale-x-100" />
-          Thư viện
-        </Link>
-        <h1 className="text-2xl font-bold">Cài đặt AI</h1>
+        <h1 className="text-[30px] font-semibold">Cài đặt AI</h1>
       </header>
       {error !== null && <PageStatus tone="error" message={error.message} />}
       {providers.data?.[0] !== undefined && settings.data !== undefined && (

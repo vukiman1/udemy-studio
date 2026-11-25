@@ -66,7 +66,7 @@ export function CourseCard({ course, tools }: CourseCardProps): ReactElement {
         </div>
       )}
       {running !== undefined && (
-        <div className="absolute inset-x-0 bottom-0 h-1 bg-surface-strong" aria-hidden="true">
+        <div className="absolute inset-x-0 bottom-0 h-1 bg-surface-raised" aria-hidden="true">
           <div
             className="h-full bg-accent"
             style={{ width: `${String(Math.round(running.progress * PERCENT))}%` }}
@@ -103,7 +103,7 @@ function CourseCover({ course }: CourseCoverProps): ReactElement {
   if (course.coverUrl === undefined)
     return (
       <div
-        className={`${frame} grid place-items-center bg-linear-135 from-accent/25 to-surface-strong text-4xl font-semibold text-accent/80`}
+        className={`${frame} grid place-items-center bg-linear-135 from-accent/25 to-surface-raised text-4xl font-semibold text-accent/80`}
         aria-hidden="true"
       >
         {course.title.slice(0, 1).toUpperCase()}

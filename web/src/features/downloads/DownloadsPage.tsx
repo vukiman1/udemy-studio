@@ -1,6 +1,4 @@
-import { ChevronIcon } from '@videojs/react/icons'
 import type { ReactElement } from 'react'
-import { Link } from 'react-router'
 import { DOWNLOADS_UNAVAILABLE_STATUS, useJobs } from '../../api/download-queries'
 import { ApiRequestError } from '../../api/queries'
 import { PageStatus } from '../../app/PageStatus'
@@ -21,11 +19,7 @@ export function DownloadsPage(): ReactElement {
   return (
     <main className="mx-auto grid max-w-[900px] gap-4 px-4 py-6">
       <header className="flex items-center gap-3">
-        <Link to="/" className="inline-flex items-center gap-1 text-muted">
-          <ChevronIcon className="size-4.5 -scale-x-100" />
-          Thư viện
-        </Link>
-        <h1 className="text-2xl font-bold">Tải khoá học</h1>
+        <h1 className="text-[30px] font-semibold">Tải khoá học</h1>
       </header>
       {unavailable !== undefined ? (
         <PageStatus tone="error" message={unavailable.message} />

@@ -18,12 +18,7 @@ export function SearchPage(): ReactElement {
 
   return (
     <main className="mx-auto grid max-w-[900px] gap-4 px-4 py-6">
-      <header className="flex flex-wrap items-center gap-3">
-        <Link to="/" className="text-accent underline">
-          ← Thư viện
-        </Link>
-        <h1 className="text-2xl font-bold">Tìm trong phụ đề</h1>
-      </header>
+      <h1 className="text-[30px] font-semibold">Tìm trong phụ đề</h1>
       <input
         className="rounded-md border border-line bg-page px-3 py-2"
         type="search"
