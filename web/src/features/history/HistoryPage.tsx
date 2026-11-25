@@ -28,7 +28,7 @@ export function HistoryPage(): ReactElement {
         />
       )}
       {history.data !== undefined && history.data.length > 0 && (
-        <ol className="grid gap-5">
+        <ol className="stagger-children grid gap-5">
           {history.data.map((entry) => (
             <li key={`${entry.courseId}/${entry.lectureId}`}>
               <HistoryCard entry={entry} />

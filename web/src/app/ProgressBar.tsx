@@ -22,7 +22,10 @@ export function ProgressBar({
       aria-valuemax={PERCENT}
       aria-valuenow={percent}
     >
-      <div className="h-full bg-accent" style={{ width: `${String(percent)}%` }} />
+      <div
+        className="h-full bg-accent transition-[width] duration-700 ease-soft"
+        style={{ width: `${String(percent)}%` }}
+      />
     </div>
   )
 }

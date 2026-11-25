@@ -55,7 +55,7 @@ export function LectureSidebar({ course }: LectureSidebarProps): ReactElement {
                 <NavLink
                   ref={lecture.id === lectureId ? activeRef : undefined}
                   to={lecturePath(course.id, lecture.id)}
-                  className="group/row flex items-center gap-2.5 px-4 py-[13px] text-[13.5px] hover:bg-ink/5 aria-[current=page]:bg-selected aria-[current=page]:font-semibold"
+                  className="group/row flex items-center gap-2.5 px-4 py-[13px] text-[13.5px] transition-[translate,background-color] duration-200 ease-soft hover:bg-ink/5 aria-[current=page]:bg-selected aria-[current=page]:font-semibold motion-safe:hover:translate-x-0.5"
                 >
                   <LectureStatusIcon status={lectureStatus(lecture)} />
                   <span className="w-[30px] shrink-0 text-[13px] font-medium text-muted tabular-nums group-aria-[current=page]/row:text-ink">

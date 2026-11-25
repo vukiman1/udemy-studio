@@ -1,6 +1,6 @@
 import { Book, Download, History, Search, Settings, type LucideIcon } from 'lucide-react'
 import type { ReactElement } from 'react'
-import { NavLink, Outlet } from 'react-router'
+import { NavLink, Outlet, useLocation } from 'react-router'
 import { AI_SETTINGS_PATH, DOWNLOADS_PATH, HISTORY_PATH, LIBRARY_PATH, SEARCH_PATH } from './paths'
 
 interface NavItem {
@@ -17,10 +17,12 @@ const NAV_ITEMS: readonly NavItem[] = [
   { to: AI_SETTINGS_PATH, label: 'Cài đặt AI', icon: Settings },
 ]
 
-const SIDEBAR_LINK = 'flex h-[46px] items-center gap-[13px] rounded-[10px] px-[15px] text-sm'
+const SIDEBAR_LINK =
+  'flex h-[46px] items-center gap-[13px] rounded-[10px] px-[15px] text-sm transition-[translate,background-color] duration-200 ease-soft motion-safe:hover:translate-x-1'
 const TAB_LINK = 'grid justify-items-center gap-1 py-2 text-[11px]'
 
 export function AppShell(): ReactElement {
+  const { pathname } = useLocation()
   return (
     <div className="min-h-dvh md:grid md:grid-cols-[232px_minmax(0,1fr)]">
       <aside className="hidden border-r border-sidebar-edge bg-sidebar md:sticky md:top-0 md:flex md:h-dvh md:flex-col md:gap-12 md:rounded-r-2xl md:px-5 md:py-8">
@@ -44,7 +46,7 @@ export function AppShell(): ReactElement {
           </ul>
         </nav>
       </aside>
-      <div className="pb-20 md:pb-0">
+      <div key={pathname} className="pb-20 motion-safe:animate-page-enter md:pb-0">
         <Outlet />
       </div>
       <nav
