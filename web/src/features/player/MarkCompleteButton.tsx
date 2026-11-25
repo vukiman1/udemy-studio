@@ -2,7 +2,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { ReactElement } from 'react'
 import { QUERY_KEYS, saveProgress } from '../../api/queries'
 import type { LectureSummary } from '../../api/types'
-import { CheckIcon } from '@videojs/react/icons'
+import { CircleCheck } from 'lucide-react'
+import { Button, ButtonSize, ButtonVariant } from '../../ui/Button'
 
 interface MarkCompleteButtonProps {
   readonly lecture: LectureSummary
@@ -31,24 +32,30 @@ export function MarkCompleteButton({ lecture, courseId }: MarkCompleteButtonProp
 
   if (lecture.progress?.completed === true) {
     return (
-      <p className="inline-flex items-center gap-1 text-accent">
-        <CheckIcon className="size-4.5" />
+      <p className="inline-flex items-center gap-1.5 text-[13px] font-medium text-accent-soft">
+        <CircleCheck className="size-4" aria-hidden="true" />
         {text.done}
       </p>
     )
   }
   return (
-    <div>
-      <button
-        type="button"
+    <div className="flex flex-wrap items-center gap-3">
+      <Button
+        variant={ButtonVariant.Ghost}
+        size={ButtonSize.Small}
+        icon={CircleCheck}
         disabled={markComplete.isPending}
         onClick={() => {
           markComplete.mutate()
         }}
       >
         {text.action}
-      </button>
-      {markComplete.isError && <p role="alert">Không lưu được: {markComplete.error.message}</p>}
+      </Button>
+      {markComplete.isError && (
+        <p className="text-[13px] text-danger" role="alert">
+          Không lưu được: {markComplete.error.message}
+        </p>
+      )}
     </div>
   )
 }

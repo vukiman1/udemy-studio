@@ -13,7 +13,7 @@ const QUIZ_SANDBOX = 'allow-scripts'
 export function ArticleFrame({ lectureId, title, canRunScripts }: ArticleFrameProps): ReactElement {
   return (
     <iframe
-      className="h-[70dvh] w-full rounded-lg border border-line bg-white"
+      className="h-[70dvh] w-full rounded-2xl bg-white"
       src={articleUrl(lectureId)}
       title={title}
       sandbox={canRunScripts ? QUIZ_SANDBOX : ''}

@@ -50,7 +50,7 @@ interface StudioSkinProps {
 
 export function StudioSkin(props: StudioSkinProps): ReactElement {
   return (
-    <Container className="@container relative block overflow-hidden rounded-[10px] bg-black text-white [--subtitle-offset:6%] has-[[data-slot=controls][data-visible]]:[--subtitle-offset:76px] [&_video]:block [&_video]:max-h-[75dvh] [&_video]:w-full [&_video]:bg-black [&:fullscreen]:rounded-none [&:fullscreen_video]:h-dvh [&:fullscreen_video]:max-h-none">
+    <Container className="@container relative block overflow-hidden rounded-2xl bg-black text-white [--subtitle-offset:6%] has-[[data-slot=controls][data-visible]]:[--subtitle-offset:76px] [&_video]:block [&_video]:max-h-[75dvh] [&_video]:w-full [&_video]:bg-black [&:fullscreen]:rounded-none [&:fullscreen_video]:h-dvh [&:fullscreen_video]:max-h-none">
       {props.children}
       {props.overlay}
       <BufferingIndicator
