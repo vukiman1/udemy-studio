@@ -396,6 +396,17 @@ type Health struct {
 // HealthStatus defines model for Health.Status.
 type HealthStatus string
 
+// HistoryEntry defines model for HistoryEntry.
+type HistoryEntry struct {
+	Completed       bool      `json:"completed"`
+	CourseId        string    `json:"courseId"`
+	CourseTitle     string    `json:"courseTitle"`
+	LectureId       string    `json:"lectureId"`
+	LectureTitle    string    `json:"lectureTitle"`
+	PositionSeconds float64   `json:"positionSeconds"`
+	UpdatedAt       time.Time `json:"updatedAt"`
+}
+
 // HostLogin defines model for HostLogin.
 type HostLogin struct {
 	ExpiresAt *time.Time `json:"expiresAt,omitempty"`
@@ -735,6 +746,9 @@ type ServerInterface interface {
 	// ForgetPastedLogin Forget the token pasted for a portal
 	// (DELETE /api/downloads/tokens/{host})
 	ForgetPastedLogin(w http.ResponseWriter, r *http.Request, host string)
+	// ListHistory The lectures most recently watched, newest first
+	// (GET /api/history)
+	ListHistory(w http.ResponseWriter, r *http.Request)
 	// ListJobs Download jobs, newest first
 	// (GET /api/jobs)
 	ListJobs(w http.ResponseWriter, r *http.Request)
@@ -1265,6 +1279,20 @@ func (siw *ServerInterfaceWrapper) ForgetPastedLogin(w http.ResponseWriter, r *h
 	handler.ServeHTTP(w, r)
 }
 
+// ListHistory operation middleware
+func (siw *ServerInterfaceWrapper) ListHistory(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListHistory(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
 // ListJobs operation middleware
 func (siw *ServerInterfaceWrapper) ListJobs(w http.ResponseWriter, r *http.Request) {
 
@@ -1718,6 +1746,7 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/courses", wrapper.ListCourses)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/courses/{courseId}", wrapper.GetCourse)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/continue", wrapper.GetContinue)
+	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/history", wrapper.ListHistory)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/search", wrapper.SearchSubtitles)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/lectures/{lectureId}/cues", wrapper.GetLectureCues)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/lectures/{lectureId}/subtitles.vtt", wrapper.GetLectureSubtitlesVtt)
@@ -2780,6 +2809,27 @@ func (response ForgetPastedLogin503ApplicationProblemPlusJSONResponse) VisitForg
 	return err
 }
 
+type ListHistoryRequestObject struct {
+}
+
+type ListHistoryResponseObject interface {
+	VisitListHistoryResponse(w http.ResponseWriter) error
+}
+
+type ListHistory200JSONResponse []HistoryEntry
+
+func (response ListHistory200JSONResponse) VisitListHistoryResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 type ListJobsRequestObject struct {
 }
 
@@ -3392,6 +3442,9 @@ type StrictServerInterface interface {
 	// ForgetPastedLogin Forget the token pasted for a portal
 	// (DELETE /api/downloads/tokens/{host})
 	ForgetPastedLogin(ctx context.Context, request ForgetPastedLoginRequestObject) (ForgetPastedLoginResponseObject, error)
+	// ListHistory The lectures most recently watched, newest first
+	// (GET /api/history)
+	ListHistory(ctx context.Context, request ListHistoryRequestObject) (ListHistoryResponseObject, error)
 	// ListJobs Download jobs, newest first
 	// (GET /api/jobs)
 	ListJobs(ctx context.Context, request ListJobsRequestObject) (ListJobsResponseObject, error)
@@ -4103,6 +4156,30 @@ func (sh *strictHandler) ForgetPastedLogin(w http.ResponseWriter, r *http.Reques
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(ForgetPastedLoginResponseObject); ok {
 		if err := validResponse.VisitForgetPastedLoginResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ListHistory operation middleware
+func (sh *strictHandler) ListHistory(w http.ResponseWriter, r *http.Request) {
+	var request ListHistoryRequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error) {
+		return sh.ssi.ListHistory(ctx, request.(ListHistoryRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListHistory")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListHistoryResponseObject); ok {
+		if err := validResponse.VisitListHistoryResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

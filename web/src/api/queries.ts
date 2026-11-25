@@ -1,7 +1,14 @@
 import { useQuery, type UseQueryResult } from '@tanstack/react-query'
 import { apiClient } from './client'
 import type { components } from './schema'
-import type { CourseDetail, CourseSummary, Cue, LectureProgress, SearchHit } from './types'
+import type {
+  CourseDetail,
+  CourseSummary,
+  Cue,
+  HistoryEntry,
+  LectureProgress,
+  SearchHit,
+} from './types'
 
 type ProgressReport = components['schemas']['ProgressReport']
 
@@ -28,6 +35,7 @@ export const QUERY_KEYS = {
   pastedLogins: ['pasted-logins'],
   jobs: ['jobs'],
   search: (query: string) => ['search', query],
+  history: ['history'],
   notes: (lectureId: string) => ['notes', lectureId],
   compressionPlan: (courseId: string) => ['compression-plan', courseId],
   aiProviders: ['ai-providers'],
@@ -71,6 +79,17 @@ export function useCues(lectureId: string, languages: readonly string[]): UseQue
       })
       if (data === undefined)
         throw new ApiRequestError(`load cues of ${lectureId}`, response.status)
+      return data
+    },
+  })
+}
+
+export function useHistory(): UseQueryResult<HistoryEntry[]> {
+  return useQuery({
+    queryKey: QUERY_KEYS.history,
+    queryFn: async () => {
+      const { data, response } = await apiClient.GET('/api/history')
+      if (data === undefined) throw new ApiRequestError('list history', response.status)
       return data
     },
   })
