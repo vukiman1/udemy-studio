@@ -1,0 +1,16 @@
+name: udemy-studio-v2
+
+services:
+  udemy-studio:
+    image: ghcr.io/vukiman1/udemy-studio:v2-dev
+    ports:
+      - "127.0.0.1:8766:8765"
+    volumes:
+      - type: bind
+        source: ${LIBRARY_DIR:?set LIBRARY_DIR to the folder of downloaded courses}
+        target: /library
+        read_only: true
+        bind:
+          create_host_path: false
+      - ${DATA_DIR:-./data}:/data
+    restart: unless-stopped
