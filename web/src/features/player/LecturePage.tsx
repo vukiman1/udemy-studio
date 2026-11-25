@@ -1,5 +1,6 @@
 import { useRef, type ReactElement } from 'react'
 import { useParams, useSearchParams } from 'react-router'
+import { Info } from 'lucide-react'
 import { useCourse } from '../../api/queries'
 import type { LectureSummary } from '../../api/types'
 import { PageStatus } from '../../app/PageStatus'
@@ -24,8 +25,8 @@ export function LecturePage(): ReactElement {
     return <PageStatus tone="error" message="Không tìm thấy bài học này trong khoá." />
 
   return (
-    <article className="mx-auto grid max-w-[1100px] gap-3 p-4">
-      <h2 className="text-[1.15rem] font-semibold">{lecture.title}</h2>
+    <article className="grid content-start gap-4 px-5 pt-6 pb-10 md:px-10">
+      <h2 className="text-xl font-semibold">{lecture.title}</h2>
       {lecture.hasVideo && (
         <VideoPlayer
           key={`${lecture.id}@${String(startAtSeconds)}`}
@@ -44,21 +45,21 @@ export function LecturePage(): ReactElement {
         />
       )}
       {lecture.kind === 'unavailable' && (
-        <PageStatus
-          tone="info"
-          message="Bài này có DRM nên không tải được video; chỉ có phụ đề hoặc tài liệu kèm theo."
-        />
+        <p className="flex items-center gap-2.5 rounded-2xl bg-card p-5 text-sm" role="status">
+          <Info className="size-4 shrink-0 text-muted" aria-hidden="true" />
+          Bài này có DRM nên không tải được video; chỉ có phụ đề hoặc tài liệu kèm theo.
+        </p>
       )}
       {needsManualCompletion(lecture) && (
         <MarkCompleteButton lecture={lecture} courseId={courseId} />
       )}
+      <LectureNav courseId={courseId} neighbours={neighboursOf(course.data, lecture.id)} />
       <AttachmentList attachments={lecture.attachments} />
       <NotesPanel
         lecture={lecture}
         courseId={courseId}
         videoRef={lecture.hasVideo ? videoRef : null}
       />
-      <LectureNav courseId={courseId} neighbours={neighboursOf(course.data, lecture.id)} />
     </article>
   )
 }

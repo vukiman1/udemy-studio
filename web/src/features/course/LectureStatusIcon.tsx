@@ -1,27 +1,25 @@
-import { CheckIcon } from '@videojs/react/icons'
 import type { ReactElement } from 'react'
+import { Check, Circle, CircleDot, type LucideIcon } from 'lucide-react'
 import { LECTURE_STATUS_LABELS, LectureStatus } from './lecture-status'
 
 interface LectureStatusIconProps {
   readonly status: LectureStatus
 }
 
-const DOT = 'inline-block size-3 rounded-full border-2'
+const STATUS_ICONS: Readonly<Record<LectureStatus, LucideIcon>> = {
+  [LectureStatus.Completed]: Check,
+  [LectureStatus.InProgress]: CircleDot,
+  [LectureStatus.NotStarted]: Circle,
+}
 
 export function LectureStatusIcon({ status }: LectureStatusIconProps): ReactElement {
+  const Icon = STATUS_ICONS[status]
   return (
-    <span
-      className="inline-grid size-4.5 place-items-center text-accent"
+    <Icon
+      className="size-3.5 shrink-0 text-accent-soft"
+      strokeWidth={status === LectureStatus.Completed ? 3 : 2}
       role="img"
       aria-label={LECTURE_STATUS_LABELS[status]}
-    >
-      {status === LectureStatus.Completed && <CheckIcon className="size-4.5" />}
-      {status === LectureStatus.InProgress && (
-        <span
-          className={`${DOT} border-accent bg-[linear-gradient(90deg,var(--accent)_50%,transparent_50%)]`}
-        />
-      )}
-      {status === LectureStatus.NotStarted && <span className={`${DOT} border-line`} />}
-    </span>
+    />
   )
 }

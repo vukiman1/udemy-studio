@@ -4,6 +4,7 @@ import { deleteNote, editNote } from '../../api/note-queries'
 import { QUERY_KEYS } from '../../api/queries'
 import type { Note } from '../../api/types'
 import { MS_PER_SECOND, formatTimestamp } from '../../app/timestamp'
+import { Button, ButtonSize, ButtonVariant } from '../../ui/Button'
 import { isSubmitShortcut } from './submit-shortcut'
 
 interface NoteItemProps {
@@ -12,6 +13,10 @@ interface NoteItemProps {
   // Undefined for lectures without video: their notes have no moment to jump to.
   readonly onSeek: ((seconds: number) => void) | undefined
 }
+
+const TEXT_ACTION = 'rounded-none bg-transparent p-0 text-[13px] font-medium'
+const QUIET_ACTION = `${TEXT_ACTION} text-muted hover:text-ink`
+const DANGER_ACTION = `${TEXT_ACTION} text-danger`
 
 export function NoteItem({ note, lectureId, onSeek }: NoteItemProps): ReactElement {
   const queryClient = useQueryClient()
@@ -38,106 +43,114 @@ export function NoteItem({ note, lectureId, onSeek }: NoteItemProps): ReactEleme
   }
 
   return (
-    <li className="grid gap-1.5 rounded-lg border border-line bg-page p-3">
-      <div className="flex flex-wrap items-center gap-3 text-[0.85rem]">
-        {onSeek !== undefined && (
-          <button
-            type="button"
-            className="font-semibold text-accent"
-            onClick={() => {
-              onSeek(note.atSeconds)
-            }}
-          >
-            {formatTimestamp(note.atSeconds * MS_PER_SECOND)}
-          </button>
-        )}
-        <span className="ml-auto flex gap-3">
-          {editedBody === undefined && (
-            <button
-              type="button"
-              onClick={() => {
-                setEditedBody(note.body)
-              }}
-            >
-              Sửa
-            </button>
-          )}
-          {isConfirmingDelete ? (
-            <>
-              <button
-                type="button"
-                className="text-danger"
-                disabled={remove.isPending}
-                onClick={() => {
-                  remove.mutate()
-                }}
-              >
-                Xoá hẳn
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setIsConfirmingDelete(false)
-                  remove.reset()
-                }}
-              >
-                Giữ lại
-              </button>
-            </>
-          ) : (
-            <button
-              type="button"
-              onClick={() => {
-                setIsConfirmingDelete(true)
-              }}
-            >
-              Xoá
-            </button>
-          )}
-        </span>
-      </div>
-      {editedBody === undefined ? (
-        <p className="m-0 whitespace-pre-wrap">{note.body}</p>
-      ) : (
-        <form
-          className="grid gap-2"
-          onSubmit={(event) => {
-            event.preventDefault()
-            saveEdit()
+    <li className="flex items-start gap-3 border-b border-line py-2.5 last:border-b-0">
+      {onSeek !== undefined && (
+        <button
+          type="button"
+          className="rounded-none bg-transparent p-0 text-[13px] leading-5 font-semibold text-accent-soft tabular-nums"
+          onClick={() => {
+            onSeek(note.atSeconds)
           }}
         >
-          <textarea
-            className="min-h-20 rounded-md border border-line bg-surface px-2.5 py-1.5"
-            autoFocus
-            value={editedBody}
-            onFocus={(event) => {
-              const end = event.currentTarget.value.length
-              event.currentTarget.setSelectionRange(end, end)
-            }}
-            onChange={(event) => {
-              setEditedBody(event.target.value)
-            }}
-            onKeyDown={(event) => {
-              if (!isSubmitShortcut(event)) return
+          {formatTimestamp(note.atSeconds * MS_PER_SECOND)}
+        </button>
+      )}
+      <div className="grid min-w-0 flex-1 gap-2 text-sm leading-5">
+        {editedBody === undefined ? (
+          <p className="wrap-anywhere whitespace-pre-wrap">{note.body}</p>
+        ) : (
+          <form
+            className="grid gap-2"
+            onSubmit={(event) => {
               event.preventDefault()
               saveEdit()
             }}
-          />
-          <div className="flex gap-3">
-            <button type="submit" disabled={!canSave}>
-              Lưu
+          >
+            <textarea
+              className="min-h-20 rounded-xl px-3 py-2.5"
+              autoFocus
+              value={editedBody}
+              onFocus={(event) => {
+                const end = event.currentTarget.value.length
+                event.currentTarget.setSelectionRange(end, end)
+              }}
+              onChange={(event) => {
+                setEditedBody(event.target.value)
+              }}
+              onKeyDown={(event) => {
+                if (!isSubmitShortcut(event)) return
+                event.preventDefault()
+                saveEdit()
+              }}
+            />
+            <div className="flex gap-2">
+              <Button
+                type="submit"
+                variant={ButtonVariant.Primary}
+                size={ButtonSize.Small}
+                disabled={!canSave}
+              >
+                Lưu
+              </Button>
+              <Button variant={ButtonVariant.Ghost} size={ButtonSize.Small} onClick={stopEditing}>
+                Huỷ
+              </Button>
+            </div>
+          </form>
+        )}
+        {error !== null && (
+          <p className="text-[13px] text-danger" role="alert">
+            {error.message}
+          </p>
+        )}
+      </div>
+      <span className="flex shrink-0 gap-3.5 leading-5">
+        {editedBody === undefined && (
+          <button
+            type="button"
+            className={QUIET_ACTION}
+            onClick={() => {
+              setEditedBody(note.body)
+            }}
+          >
+            Sửa
+          </button>
+        )}
+        {isConfirmingDelete ? (
+          <>
+            <button
+              type="button"
+              className={DANGER_ACTION}
+              disabled={remove.isPending}
+              onClick={() => {
+                remove.mutate()
+              }}
+            >
+              Xoá hẳn
             </button>
-            <button type="button" onClick={stopEditing}>
-              Huỷ
+            <button
+              type="button"
+              className={QUIET_ACTION}
+              onClick={() => {
+                setIsConfirmingDelete(false)
+                remove.reset()
+              }}
+            >
+              Giữ lại
             </button>
-          </div>
-        </form>
-      )}
-      {error !== null && (
-        <p className="m-0 text-[0.9rem] text-danger" role="alert">
-          {error.message}
-        </p>
-      )}
+          </>
+        ) : (
+          <button
+            type="button"
+            className={QUIET_ACTION}
+            onClick={() => {
+              setIsConfirmingDelete(true)
+            }}
+          >
+            Xoá
+          </button>
+        )}
+      </span>
     </li>
   )
 }

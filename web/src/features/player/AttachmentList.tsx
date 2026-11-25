@@ -1,4 +1,5 @@
 import type { ReactElement } from 'react'
+import { FileText } from 'lucide-react'
 import { attachmentUrl } from '../../api/queries'
 import type { LectureSummary } from '../../api/types'
 
@@ -9,12 +10,19 @@ interface AttachmentListProps {
 export function AttachmentList({ attachments }: AttachmentListProps): ReactElement | null {
   if (attachments.length === 0) return null
   return (
-    <section>
-      <h3 className="my-2 text-[0.95rem] font-semibold">Tài liệu kèm theo</h3>
-      <ul className="grid list-disc gap-1 pl-5 wrap-anywhere">
+    <section className="grid gap-2 rounded-2xl bg-card p-4" aria-labelledby="attachments-title">
+      <h3 id="attachments-title" className="text-sm font-semibold">
+        Tài liệu kèm theo
+      </h3>
+      <ul className="grid list-none text-[13px] text-accent-soft">
         {attachments.map((attachment) => (
           <li key={attachment.id}>
-            <a className="text-accent underline" href={attachmentUrl(attachment.id)} download>
+            <a
+              className="flex items-center gap-2 rounded-lg px-2 py-1.5 wrap-anywhere hover:bg-ink/5"
+              href={attachmentUrl(attachment.id)}
+              download
+            >
+              <FileText className="size-4 shrink-0" aria-hidden="true" />
               {attachment.name}
             </a>
           </li>
