@@ -29,7 +29,7 @@ export function LectureSidebar({ course }: LectureSidebarProps): ReactElement {
     <nav className="grid gap-3.5" aria-labelledby="lecture-list-title">
       <h2
         id="lecture-list-title"
-        className="sticky top-0 z-10 flex items-center gap-3 bg-sidebar px-2 pt-6 pb-2 text-lg font-semibold max-lg:static"
+        className="sticky top-0 z-10 flex items-center gap-3 bg-sidebar px-2 py-4 text-lg font-semibold max-lg:static"
       >
         <List className="size-5" aria-hidden="true" />
         Nội dung
