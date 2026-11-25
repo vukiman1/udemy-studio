@@ -874,7 +874,10 @@ export interface components {
             progress: components["schemas"]["JobProgress"];
             failures: string[];
             error?: string;
+            errorKind?: components["schemas"]["JobErrorKind"];
         };
+        /** @enum {string} */
+        JobErrorKind: "login" | "course_not_found" | "blocked" | "chrome_access" | "interrupted" | "other";
         JobProgress: {
             courseTitle: string;
             totalLectures: number;

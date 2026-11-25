@@ -23,6 +23,17 @@ func (status Status) IsFinished() bool {
 	return status == StatusSucceeded || status == StatusFailed || status == StatusCancelled
 }
 
+type ErrorKind string
+
+const (
+	ErrorKindLogin          ErrorKind = "login"
+	ErrorKindCourseNotFound ErrorKind = "course_not_found"
+	ErrorKindBlocked        ErrorKind = "blocked"
+	ErrorKindChromeAccess   ErrorKind = "chrome_access"
+	ErrorKindInterrupted    ErrorKind = "interrupted"
+	ErrorKindOther          ErrorKind = "other"
+)
+
 var (
 	ErrInvalidRequest = errors.New("invalid download request")
 	ErrJobNotFound    = errors.New("job not found")
@@ -76,6 +87,7 @@ type Job struct {
 	Progress   Progress
 	Failures   []string
 	Error      string
+	ErrorKind  ErrorKind
 }
 
 type EventKind string
@@ -114,7 +126,7 @@ func (job *Job) apply(event Event) {
 	}
 }
 
-func (job *Job) finish(status Status, errMessage string, at *time.Time) {
-	job.Status, job.Error, job.FinishedAt = status, errMessage, at
+func (job *Job) finish(status Status, errMessage string, kind ErrorKind, at *time.Time) {
+	job.Status, job.Error, job.ErrorKind, job.FinishedAt = status, errMessage, kind, at
 	job.Progress.CurrentLecture = ""
 }

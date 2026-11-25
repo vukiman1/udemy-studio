@@ -4,6 +4,7 @@ import { cancelJob } from '../../api/download-queries'
 import type { Job } from '../../api/types'
 import { ProgressBar } from '../../app/ProgressBar'
 import { Button, ButtonSize, ButtonVariant } from '../../ui/Button'
+import { jobErrorText } from './job-error'
 import { JOB_STATUS_LABELS, isActive } from './job-list'
 
 const TIME_FORMAT = new Intl.DateTimeFormat('vi-VN', { dateStyle: 'short', timeStyle: 'short' })
@@ -65,7 +66,9 @@ export function JobCard({ job }: JobCardProps): ReactElement {
         <p className="text-[13px] wrap-anywhere">Đang xử lý: {progress.currentLecture}</p>
       )}
       {job.error !== undefined && (
-        <p className="text-[13px] wrap-anywhere text-danger">{job.error}</p>
+        <p className="text-[13px] wrap-anywhere text-danger" title={job.error}>
+          {jobErrorText(job)}
+        </p>
       )}
       {cancel.isError && (
         <p className="text-[13px] text-danger" role="alert">
