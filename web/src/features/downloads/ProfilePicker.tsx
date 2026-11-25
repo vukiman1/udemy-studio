@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { ReactElement } from 'react'
 import { selectChromeProfile, useChromeProfiles, useLoginStatus } from '../../api/download-queries'
 import { QUERY_KEYS } from '../../api/queries'
+import { TEXT_FIELD } from '../../ui/text-field'
 
 const DATE_FORMAT = new Intl.DateTimeFormat('vi-VN', { dateStyle: 'medium' })
 
@@ -23,10 +24,11 @@ export function ProfilePicker(): ReactElement | null {
   if (profiles.data?.length === 0) return null
 
   return (
-    <div className="grid gap-3">
-      <label className="grid gap-1 text-[0.9rem]">
+    <div className="grid gap-4 border-b border-line pb-4">
+      <label className="grid gap-2 text-sm font-semibold">
         Đọc đăng nhập từ profile Chrome
         <select
+          className={`${TEXT_FIELD} font-normal`}
           value={selected?.dir ?? ''}
           disabled={profiles.data === undefined || select.isPending}
           onChange={(event) => {
@@ -44,14 +46,33 @@ export function ProfilePicker(): ReactElement | null {
           ))}
         </select>
       </label>
-      {profiles.isError && <p className="text-danger">{profiles.error.message}</p>}
-      {select.isError && <p className="text-danger">{select.error.message}</p>}
-      {status.data?.problem !== undefined && <p className="text-danger">{status.data.problem}</p>}
+      {profiles.isError && (
+        <p className="text-[13px] text-danger" role="alert">
+          {profiles.error.message}
+        </p>
+      )}
+      {select.isError && (
+        <p className="text-[13px] text-danger" role="alert">
+          {select.error.message}
+        </p>
+      )}
+      {status.data?.problem !== undefined && (
+        <p className="text-[13px] text-danger" role="alert">
+          {status.data.problem}
+        </p>
+      )}
       {status.data !== undefined && status.data.hosts.length > 0 && (
-        <ul className="grid gap-1 text-[0.9rem]">
+        <ul className="grid list-none gap-1.5 text-[13px]">
           {status.data.hosts.map((host) => (
-            <li key={host.host} className={host.isExpired ? 'text-danger' : 'text-muted'}>
-              {host.host}:{' '}
+            <li
+              key={host.host}
+              className={`flex items-start gap-2 ${host.isExpired ? 'text-danger' : 'text-muted'}`}
+            >
+              <span
+                className={`mt-[5px] size-2 shrink-0 rounded-full ${host.isExpired ? 'bg-danger' : 'bg-success'}`}
+                aria-hidden="true"
+              />
+              {host.host} —{' '}
               {host.isExpired
                 ? 'đăng nhập đã hết hạn, hãy đăng nhập lại trong Chrome'
                 : `đăng nhập còn hạn${host.expiresAt === undefined ? '' : ` tới ${DATE_FORMAT.format(new Date(host.expiresAt))}`}`}
