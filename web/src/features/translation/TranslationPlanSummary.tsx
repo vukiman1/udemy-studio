@@ -1,5 +1,9 @@
-import type { ReactElement } from 'react'
+import type { ReactElement, ReactNode } from 'react'
+import { Languages } from 'lucide-react'
 import { useTranslationPlan } from '../../api/translation-queries'
+import { DialogBody, DialogFooter } from '../../app/Dialog'
+import { Button, ButtonVariant } from '../../ui/Button'
+import { StatTile } from '../../ui/StatTile'
 import { formatUsd } from './format-usd'
 
 interface TranslationPlanSummaryProps {
@@ -7,6 +11,8 @@ interface TranslationPlanSummaryProps {
   readonly isStarting: boolean
   readonly onStart: () => void
   readonly onDismiss: () => void
+  // What the dialog shows above the plan, such as the AI in use or the last run.
+  readonly children: ReactNode
 }
 
 export function TranslationPlanSummary({
@@ -14,39 +20,51 @@ export function TranslationPlanSummary({
   isStarting,
   onStart,
   onDismiss,
+  children,
 }: TranslationPlanSummaryProps): ReactElement {
   const plan = useTranslationPlan(courseId)
-  if (plan.isError)
-    return (
-      <p className="m-0 text-danger" role="alert">
-        Không lập được kế hoạch dịch ({plan.error.message}).
-      </p>
-    )
-  if (plan.data === undefined) return <p className="m-0 text-muted">Đang đọc phụ đề…</p>
+  const lectures = plan.data?.lectures ?? 0
 
-  const { lectures, alreadyTranslated, estimatedUsd } = plan.data
   return (
-    <div className="grid gap-2">
-      <p className="m-0">
-        {lectures === 0
-          ? 'Không còn bài nào cần dịch.'
-          : `Sẽ dịch ${String(lectures)} bài, ước tính khoảng ${formatUsd(estimatedUsd)}.`}
-      </p>
-      {alreadyTranslated > 0 && (
-        <p className="m-0 text-[0.9rem] text-muted">
-          Bỏ qua {alreadyTranslated} bài đã có phụ đề tiếng Việt.
-        </p>
-      )}
-      <div className="flex gap-3">
-        {lectures > 0 && (
-          <button type="button" disabled={isStarting} onClick={onStart}>
-            Bắt đầu dịch
-          </button>
+    <>
+      <DialogBody>
+        {children}
+        {plan.isError && (
+          <p className="text-danger" role="alert">
+            Không lập được kế hoạch dịch ({plan.error.message}).
+          </p>
         )}
-        <button type="button" onClick={onDismiss}>
-          Thôi
-        </button>
-      </div>
-    </div>
+        {plan.isPending && <p className="text-muted">Đang đọc phụ đề…</p>}
+        {plan.data !== undefined &&
+          (lectures === 0 ? (
+            <p>Không còn bài nào cần dịch.</p>
+          ) : (
+            <div className="flex flex-wrap gap-3">
+              <StatTile label="Bài sẽ dịch" value={String(lectures)} />
+              <StatTile label="Bỏ qua (đã có TV)" value={String(plan.data.alreadyTranslated)} />
+              <StatTile label="Ước tính chi phí" value={`≈ ${formatUsd(plan.data.estimatedUsd)}`} />
+            </div>
+          ))}
+      </DialogBody>
+      <DialogFooter>
+        {lectures > 0 ? (
+          <>
+            <Button onClick={onDismiss}>Thôi</Button>
+            <Button
+              variant={ButtonVariant.Primary}
+              icon={Languages}
+              disabled={isStarting}
+              onClick={onStart}
+            >
+              Bắt đầu dịch
+            </Button>
+          </>
+        ) : (
+          <Button variant={ButtonVariant.Primary} onClick={onDismiss}>
+            Đóng
+          </Button>
+        )}
+      </DialogFooter>
+    </>
   )
 }
