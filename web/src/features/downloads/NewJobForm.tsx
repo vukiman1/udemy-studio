@@ -1,8 +1,11 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState, type ReactElement } from 'react'
+import { Download } from 'lucide-react'
 import { createJob } from '../../api/download-queries'
 import { QUERY_KEYS } from '../../api/queries'
 import type { Job } from '../../api/types'
+import { Button, ButtonSize, ButtonVariant } from '../../ui/Button'
+import { TEXT_FIELD } from '../../ui/text-field'
 import { upsertJob } from './job-list'
 
 const COURSE_URL_PLACEHOLDER = 'https://<portal>.udemy.com/course/<tên-khoá>/'
@@ -30,43 +33,53 @@ export function NewJobForm(): ReactElement {
 
   return (
     <form
-      className="grid gap-3 rounded-xl border border-line bg-surface p-4"
+      className="grid gap-[18px] rounded-[20px] bg-card p-6"
       onSubmit={(event) => {
         event.preventDefault()
         submitForm()
       }}
     >
-      <h2 className="font-semibold">Tải khoá học mới</h2>
-      <label className="grid gap-1 text-[0.9rem]">
-        Link khoá học
-        <input
-          className="rounded-md border border-line bg-page px-2.5 py-1.5"
-          type="url"
-          required
-          placeholder={COURSE_URL_PLACEHOLDER}
-          value={courseUrl}
-          onChange={(event) => {
-            setCourseUrl(event.target.value)
-          }}
-        />
-      </label>
-      <label className="grid gap-1 text-[0.9rem]">
-        Chỉ tải chapter (để trống để tải hết), ví dụ 1,3-5
-        <input
-          className="rounded-md border border-line bg-page px-2.5 py-1.5"
-          inputMode="numeric"
-          value={chapters}
-          onChange={(event) => {
-            setChapters(event.target.value)
-          }}
-        />
-      </label>
-      <div className="flex items-center gap-3">
-        <button type="submit" disabled={submit.isPending}>
+      <h2 className="text-base font-semibold">Tải khoá học mới</h2>
+      <div className="flex flex-wrap items-end gap-3">
+        <label className="grid min-w-64 flex-1 gap-2 text-sm font-semibold">
+          Link khoá học
+          <input
+            className={`${TEXT_FIELD} font-normal`}
+            type="url"
+            required
+            placeholder={COURSE_URL_PLACEHOLDER}
+            value={courseUrl}
+            onChange={(event) => {
+              setCourseUrl(event.target.value)
+            }}
+          />
+        </label>
+        <label className="grid w-full gap-2 text-sm font-semibold sm:w-[280px]">
+          Chương cần tải
+          <input
+            className={`${TEXT_FIELD} font-normal`}
+            placeholder="Để trống để tải hết · ví dụ: 1,3-5"
+            value={chapters}
+            onChange={(event) => {
+              setChapters(event.target.value)
+            }}
+          />
+        </label>
+        <Button
+          type="submit"
+          variant={ButtonVariant.Primary}
+          size={ButtonSize.Large}
+          icon={Download}
+          disabled={submit.isPending}
+        >
           Bắt đầu tải
-        </button>
-        {submit.isError && <p className="text-danger">{submit.error.message}</p>}
+        </Button>
       </div>
+      {submit.isError && (
+        <p className="text-[13px] text-danger" role="alert">
+          {submit.error.message}
+        </p>
+      )}
     </form>
   )
 }

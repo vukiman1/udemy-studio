@@ -2,10 +2,10 @@ import { useQuery, type UseQueryResult } from '@tanstack/react-query'
 import { apiClient } from './client'
 import type { components } from './schema'
 import type {
-  ContinueTarget,
   CourseDetail,
   CourseSummary,
   Cue,
+  HistoryEntry,
   LectureProgress,
   SearchHit,
 } from './types'
@@ -25,7 +25,6 @@ export class ApiRequestError extends Error {
 export const QUERY_KEYS = {
   courses: ['courses'],
   course: (courseId: string) => ['course', courseId],
-  continueTarget: ['continue'],
   cues: (lectureId: string, languages: readonly string[]) => [
     'cues',
     lectureId,
@@ -36,6 +35,7 @@ export const QUERY_KEYS = {
   pastedLogins: ['pasted-logins'],
   jobs: ['jobs'],
   search: (query: string) => ['search', query],
+  history: ['history'],
   notes: (lectureId: string) => ['notes', lectureId],
   compressionPlan: (courseId: string) => ['compression-plan', courseId],
   aiProviders: ['ai-providers'],
@@ -68,18 +68,6 @@ export function useCourse(courseId: string): UseQueryResult<CourseDetail> {
   })
 }
 
-export function useContinueTarget(): UseQueryResult<ContinueTarget | null> {
-  return useQuery({
-    queryKey: QUERY_KEYS.continueTarget,
-    queryFn: async () => {
-      const { data, response } = await apiClient.GET('/api/continue')
-      if (response.status === 204) return null
-      if (data === undefined) throw new ApiRequestError('load continue target', response.status)
-      return data
-    },
-  })
-}
-
 export function useCues(lectureId: string, languages: readonly string[]): UseQueryResult<Cue[]> {
   return useQuery({
     queryKey: QUERY_KEYS.cues(lectureId, languages),
@@ -91,6 +79,17 @@ export function useCues(lectureId: string, languages: readonly string[]): UseQue
       })
       if (data === undefined)
         throw new ApiRequestError(`load cues of ${lectureId}`, response.status)
+      return data
+    },
+  })
+}
+
+export function useHistory(): UseQueryResult<HistoryEntry[]> {
+  return useQuery({
+    queryKey: QUERY_KEYS.history,
+    queryFn: async () => {
+      const { data, response } = await apiClient.GET('/api/history')
+      if (data === undefined) throw new ApiRequestError('list history', response.status)
       return data
     },
   })

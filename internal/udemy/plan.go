@@ -31,10 +31,13 @@ type PlanOptions struct {
 }
 
 type Plan struct {
-	CourseName string        `json:"course_name"`
-	CourseDir  string        `json:"course_dir"`
-	Chapters   []ChapterPlan `json:"chapters"`
-	Warnings   []string      `json:"warnings,omitempty"`
+	// CourseID is left out of the JSON, which matches what the Python downloader records.
+	CourseID    int64         `json:"-"`
+	CourseTitle string        `json:"-"`
+	CourseName  string        `json:"course_name"`
+	CourseDir   string        `json:"course_dir"`
+	Chapters    []ChapterPlan `json:"chapters"`
+	Warnings    []string      `json:"warnings,omitempty"`
 }
 
 type QuizInfo struct {
@@ -66,7 +69,7 @@ type LecturePlan struct {
 
 // BuildPlan decides, without downloading anything, which files a course becomes and where each one comes from.
 func BuildPlan(ctx context.Context, course Course, items []CurriculumItem, options PlanOptions, playlists PlaylistFetcher) (Plan, error) {
-	plan := Plan{CourseName: courseName(course, options.IDAsCourseName), CourseDir: courseDirName(course, options.IDAsCourseName), Chapters: []ChapterPlan{}}
+	plan := Plan{CourseID: course.ID, CourseTitle: course.Title, CourseName: courseName(course, options.IDAsCourseName), CourseDir: courseDirName(course, options.IDAsCourseName), Chapters: []ChapterPlan{}}
 	planner := lecturePlanner{
 		options: options,
 		sources: sourceCollector{playlists: playlists, skipHLS: options.SkipHLS, warn: plan.warn},

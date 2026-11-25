@@ -10,12 +10,17 @@ const (
 	LectureKindQuiz LectureKind = "quiz"
 )
 
+// CoverFileName is the course's cover image, kept beside its chapter folders.
+const CoverFileName = "cover.jpg"
+
 type Course struct {
 	ID    string
 	Title string
 	// Dir is the course's folder in the library, holding everything downloaded with it.
-	Dir      string
-	Chapters []Chapter
+	Dir string
+	// CoverPath is empty when the course was downloaded without a cover.
+	CoverPath string
+	Chapters  []Chapter
 }
 
 type Chapter struct {

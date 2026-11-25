@@ -2,6 +2,7 @@
 package download
 
 import (
+	"cmp"
 	"context"
 	"errors"
 	"fmt"
@@ -46,6 +47,8 @@ type Options struct {
 	// TempDir holds the HLS playlists yt-dlp reads; the caller removes it.
 	TempDir  string
 	Chapters ChapterFilter
+	// CoverURL is the course's cover image; empty skips it.
+	CoverURL string
 }
 
 type Summary struct {
@@ -72,7 +75,10 @@ func Course(ctx context.Context, plan udemy.Plan, tools Tools, options Options, 
 		return Summary{}, err
 	}
 	run := &courseDownload{tools: tools, options: options, logger: logger, onEvent: onEvent}
-	onEvent(jobs.Event{Kind: jobs.EventCourseStarted, CourseTitle: plan.CourseName, TotalLectures: options.Chapters.lectureCount(plan)})
+	if err := run.cover(ctx, courseDir); err != nil {
+		return Summary{}, err
+	}
+	onEvent(jobs.Event{Kind: jobs.EventCourseStarted, CourseTitle: cmp.Or(plan.CourseTitle, plan.CourseName), TotalLectures: options.Chapters.lectureCount(plan)})
 	for _, chapter := range plan.Chapters {
 		if !options.Chapters.includes(chapter.Index) {
 			continue

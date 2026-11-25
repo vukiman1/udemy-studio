@@ -1,9 +1,12 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { ReactElement } from 'react'
+import { Archive, Pause } from 'lucide-react'
 import { cancelCompression, isCompressing, startCompression } from '../../api/compression-queries'
 import { QUERY_KEYS } from '../../api/queries'
 import type { CompressionRun } from '../../api/types'
-import { Dialog } from '../../app/Dialog'
+import { Dialog, DialogBody, DialogFooter } from '../../app/Dialog'
+import { RunInBackgroundButton } from '../../app/RunInBackgroundButton'
+import { Button, ButtonVariant } from '../../ui/Button'
 import { CompressionPlanSummary } from './CompressionPlanSummary'
 import { CompressionProgress } from './CompressionProgress'
 import { CompressionResult } from './CompressionResult'
@@ -27,35 +30,46 @@ export function CompressionDialog({
   const start = useMutation({ mutationFn: () => startCompression(courseId), onSuccess: refresh })
   const cancel = useMutation({ mutationFn: () => cancelCompression(courseId), onSuccess: refresh })
   const error = start.error ?? cancel.error
+  const errorNote = error !== null && (
+    <p className="text-[13px] text-danger" role="alert">
+      {error.message}
+    </p>
+  )
 
   return (
-    <Dialog title={`Nén video (H.265) · ${title}`} onClose={onClose}>
+    <Dialog icon={Archive} title="Nén video (H.265)" subtitle={title} onClose={onClose}>
       {run !== undefined && isCompressing(run) ? (
-        <CompressionProgress
-          run={run}
-          isCancelling={cancel.isPending}
-          onCancel={() => {
-            cancel.mutate()
-          }}
-          onRunInBackground={onClose}
-        />
-      ) : (
         <>
-          {run !== undefined && <CompressionResult run={run} />}
-          <CompressionPlanSummary
-            courseId={courseId}
-            isStarting={start.isPending}
-            onStart={() => {
-              start.mutate()
-            }}
-            onDismiss={onClose}
-          />
+          <DialogBody>
+            <CompressionProgress run={run} />
+            {errorNote}
+          </DialogBody>
+          <DialogFooter>
+            <Button
+              variant={ButtonVariant.Ghost}
+              icon={Pause}
+              disabled={cancel.isPending}
+              onClick={() => {
+                cancel.mutate()
+              }}
+            >
+              Dừng nén
+            </Button>
+            <RunInBackgroundButton onClick={onClose} />
+          </DialogFooter>
         </>
-      )}
-      {error !== null && (
-        <p className="m-0 text-[0.9rem] text-danger" role="alert">
-          {error.message}
-        </p>
+      ) : (
+        <CompressionPlanSummary
+          courseId={courseId}
+          isStarting={start.isPending}
+          onStart={() => {
+            start.mutate()
+          }}
+          onDismiss={onClose}
+        >
+          {run !== undefined && <CompressionResult run={run} />}
+          {errorNote}
+        </CompressionPlanSummary>
       )}
     </Dialog>
   )

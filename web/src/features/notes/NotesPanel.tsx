@@ -21,28 +21,23 @@ export function NotesPanel({ lecture, courseId, videoRef }: NotesPanelProps): Re
         }
 
   return (
-    <section
-      className="grid gap-3 rounded-xl border border-line bg-surface p-4"
-      aria-label="Ghi chú"
-    >
-      <header className="flex flex-wrap items-center gap-3">
-        <h3 className="font-semibold">Ghi chú</h3>
+    <section className="grid gap-3" aria-label="Ghi chú">
+      <NoteComposer key={lecture.id} lectureId={lecture.id} videoRef={videoRef}>
         <a
           href={courseNotesUrl(courseId)}
           download
-          className="ml-auto text-[0.9rem] text-accent underline"
+          className="text-[13px] font-medium text-muted hover:text-ink"
         >
           Tải ghi chú cả khoá (.md)
         </a>
-      </header>
-      <NoteComposer key={lecture.id} lectureId={lecture.id} videoRef={videoRef} />
+      </NoteComposer>
       {notes.isError && (
-        <p className="m-0 text-danger" role="alert">
+        <p className="text-sm text-danger" role="alert">
           Không tải được ghi chú ({notes.error.message}).
         </p>
       )}
       {notes.data !== undefined && notes.data.length > 0 && (
-        <ol className="grid gap-2">
+        <ol className="grid list-none">
           {notes.data.map((note) => (
             <NoteItem key={note.id} note={note} lectureId={lecture.id} onSeek={seekTo} />
           ))}

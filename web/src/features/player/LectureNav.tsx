@@ -1,39 +1,36 @@
 import type { ReactElement } from 'react'
 import { Link } from 'react-router'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { lecturePath } from '../../app/paths'
 import type { LectureNeighbours } from '../course/course-navigation'
-import { ChevronIcon } from '@videojs/react/icons'
 
 interface LectureNavProps {
   readonly courseId: string
   readonly neighbours: LectureNeighbours
 }
 
+const NEIGHBOUR_LINK =
+  'inline-flex items-center gap-1.5 wrap-break-word [&_svg]:size-[18px] [&_svg]:shrink-0'
+
 export function LectureNav({ courseId, neighbours }: LectureNavProps): ReactElement {
   const { previous, next } = neighbours
   return (
     <nav
-      className="flex justify-between gap-4 border-t border-line py-3 text-accent"
+      className="flex justify-between gap-4 border-t border-line pt-4 text-[15px] font-medium text-accent-soft"
       aria-label="Chuyển bài"
     >
       {previous !== undefined ? (
-        <Link
-          className="inline-flex items-center gap-1 wrap-anywhere"
-          to={lecturePath(courseId, previous.id)}
-        >
-          <ChevronIcon className="size-4.5 -scale-x-100" />
+        <Link className={NEIGHBOUR_LINK} to={lecturePath(courseId, previous.id)}>
+          <ChevronLeft aria-hidden="true" />
           {previous.title}
         </Link>
       ) : (
         <span />
       )}
       {next !== undefined && (
-        <Link
-          className="inline-flex items-center gap-1 text-right wrap-anywhere"
-          to={lecturePath(courseId, next.id)}
-        >
+        <Link className={`${NEIGHBOUR_LINK} text-right`} to={lecturePath(courseId, next.id)}>
           {next.title}
-          <ChevronIcon className="size-4.5" />
+          <ChevronRight aria-hidden="true" />
         </Link>
       )}
     </nav>

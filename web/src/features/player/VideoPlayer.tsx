@@ -50,6 +50,7 @@ export function VideoPlayer({
   useEffect(() => {
     const video = videoRef.current
     if (video === null) return
+    video.preservesPitch = true
     video.defaultPlaybackRate = settings.playbackRate
     video.playbackRate = settings.playbackRate
   }, [videoRef, settings.playbackRate])

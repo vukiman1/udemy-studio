@@ -33,12 +33,13 @@ type Store interface {
 }
 
 type Deps struct {
-	Downloader  Downloader
-	Tokens      TokenSource
-	Store       Store
-	Logger      *slog.Logger
-	Now         func() time.Time
-	OnSucceeded func(ctx context.Context, job Job)
+	Downloader    Downloader
+	Tokens        TokenSource
+	Store         Store
+	Logger        *slog.Logger
+	Now           func() time.Time
+	OnSucceeded   func(ctx context.Context, job Job)
+	ClassifyError func(err error) ErrorKind
 }
 
 type Manager struct {
@@ -68,7 +69,7 @@ func (manager *Manager) Restore(ctx context.Context) error {
 	for _, job := range stored {
 		switch job.Status {
 		case StatusRunning:
-			job.finish(StatusFailed, interruptedMessage, manager.now())
+			job.finish(StatusFailed, interruptedMessage, ErrorKindInterrupted, manager.now())
 			if err := manager.deps.Store.Save(ctx, job); err != nil {
 				return fmt.Errorf("mark job %s interrupted: %w", job.ID, err)
 			}
@@ -117,7 +118,7 @@ func (manager *Manager) Cancel(ctx context.Context, id string) error {
 		cancel()
 		return nil
 	}
-	job.finish(StatusCancelled, "", manager.now())
+	job.finish(StatusCancelled, "", "", manager.now())
 	cancelled := cloneJob(job)
 	manager.mutex.Unlock()
 	if err := manager.deps.Store.Save(ctx, cancelled); err != nil {
@@ -212,13 +213,13 @@ func (manager *Manager) run(ctx context.Context, id string) {
 	finishedAt := manager.now()
 	switch {
 	case err == nil:
-		job.finish(StatusSucceeded, "", finishedAt)
+		job.finish(StatusSucceeded, "", "", finishedAt)
 	case ctx.Err() != nil:
-		job.finish(StatusFailed, interruptedMessage, finishedAt)
+		job.finish(StatusFailed, interruptedMessage, ErrorKindInterrupted, finishedAt)
 	case jobCtx.Err() != nil:
-		job.finish(StatusCancelled, "", finishedAt)
+		job.finish(StatusCancelled, "", "", finishedAt)
 	default:
-		job.finish(StatusFailed, err.Error(), finishedAt)
+		job.finish(StatusFailed, err.Error(), manager.classify(err), finishedAt)
 	}
 	finished := cloneJob(job)
 	manager.mutex.Unlock()
@@ -226,6 +227,13 @@ func (manager *Manager) run(ctx context.Context, id string) {
 	if finished.Status == StatusSucceeded && manager.deps.OnSucceeded != nil {
 		manager.deps.OnSucceeded(ctx, finished)
 	}
+}
+
+func (manager *Manager) classify(err error) ErrorKind {
+	if manager.deps.ClassifyError == nil {
+		return ErrorKindOther
+	}
+	return manager.deps.ClassifyError(err)
 }
 
 func (manager *Manager) download(ctx context.Context, job Job) error {

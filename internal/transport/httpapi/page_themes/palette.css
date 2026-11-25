@@ -1,0 +1,30 @@
+:root {
+  color-scheme: light dark;
+  --studio-page: #f6f5fb;
+  --studio-card: #fff;
+  --studio-raised: #f1eff8;
+  --studio-code: #f1eff8;
+  --studio-line: #e2deef;
+  --studio-ink: #1a1730;
+  --studio-muted: #5e5a7a;
+  --studio-accent: #6e4ff0;
+  --studio-link: #6e4ff0;
+  --studio-accent-tint: #e7e1ff;
+  --studio-track: #e4e1f0;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --studio-page: #101023;
+    --studio-card: #1c1936;
+    --studio-raised: #232947;
+    --studio-code: #141329;
+    --studio-line: #433963;
+    --studio-ink: #f6f3ff;
+    --studio-muted: #aaa7c9;
+    --studio-accent: #8b6cff;
+    --studio-link: #a994ff;
+    --studio-accent-tint: #4f4278;
+    --studio-track: #45405e;
+  }
+}

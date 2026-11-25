@@ -1,69 +1,105 @@
+import { Book, Download, WifiOff } from 'lucide-react'
 import type { ReactElement } from 'react'
 import { Link } from 'react-router'
 import { useCourseTools } from '../../api/library-tools-queries'
-import { useContinueTarget, useCourses } from '../../api/queries'
-import type { CourseSummary } from '../../api/types'
-import { PageStatus } from '../../app/PageStatus'
+import { ApiRequestError, useCourses } from '../../api/queries'
+import { DOWNLOADS_PATH } from '../../app/paths'
 import { StaleDataNotice } from '../../app/StaleDataNotice'
-import { AI_SETTINGS_PATH, SEARCH_PATH, lecturePath } from '../../app/paths'
+import { Button, ButtonSize, ButtonVariant, buttonClass } from '../../ui/Button'
+import { EmptyState } from '../../ui/EmptyState'
 import { CourseCard } from './CourseCard'
-import { PlayIcon } from '@videojs/react/icons'
+
+const SKELETON_ROWS = ['first', 'second', 'third'] as const
 
 export function LibraryPage(): ReactElement {
   const courses = useCourses()
   const tools = useCourseTools()
-  const continueTarget = useContinueTarget()
-
-  if (courses.data === undefined) {
-    return courses.isError ? (
-      <PageStatus tone="error" message={`Không tải được thư viện: ${courses.error.message}`} />
-    ) : (
-      <PageStatus tone="info" message="Đang tải thư viện…" />
-    )
-  }
-
-  const target = continueTarget.data ?? null
-  const resumeCourse =
-    target === null ? undefined : courses.data.find((course) => course.id === target.courseId)
 
   return (
-    <main className="mx-auto max-w-[1100px] px-4 py-6">
-      <header className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-bold">Thư viện</h1>
-        <Link to={SEARCH_PATH} className="ml-auto text-accent underline">
-          Tìm trong phụ đề
-        </Link>
-        <Link to="/downloads" className="text-accent underline">
-          Tải khoá học
-        </Link>
-        <Link to={AI_SETTINGS_PATH} className="text-accent underline">
-          Cài đặt AI
-        </Link>
-        {target !== null && resumeCourse !== undefined && (
-          <Link
-            className="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2.5 font-semibold text-on-accent"
-            to={lecturePath(target.courseId, target.lectureId)}
-          >
-            <PlayIcon className="size-4.5" />
-            Tiếp tục học · {resumeCourse.title}
-          </Link>
-        )}
-      </header>
-      {courses.isError && <StaleDataNotice error={courses.error} />}
-      {courses.data.length === 0 ? (
-        <PageStatus tone="info" message="Chưa có khoá học nào trong thư mục downloads/." />
+    <main className="grid gap-7 px-5 py-8 md:px-10 md:py-10">
+      <h1 className="m-0 text-[30px] font-semibold">Thư viện</h1>
+      {courses.data === undefined ? (
+        courses.isError ? (
+          <LoadFailure
+            error={courses.error}
+            onRetry={() => {
+              void courses.refetch()
+            }}
+          />
+        ) : (
+          <LibrarySkeleton />
+        )
       ) : (
-        <ul className="mt-6 grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-4">
-          {courses.data.map((course: CourseSummary) => (
-            <li key={course.id}>
-              <CourseCard
-                course={course}
-                tools={tools.data?.find((entry) => entry.courseId === course.id)}
-              />
-            </li>
-          ))}
-        </ul>
+        <>
+          {courses.isError && <StaleDataNotice error={courses.error} />}
+          {courses.data.length === 0 ? (
+            <EmptyState
+              icon={Book}
+              title="Chưa có khoá học nào"
+              body="Tải một khoá học về để bắt đầu học."
+              action={
+                <Link
+                  className={buttonClass(ButtonVariant.Primary, ButtonSize.Medium)}
+                  to={DOWNLOADS_PATH}
+                >
+                  <Download aria-hidden="true" />
+                  Tải khoá học
+                </Link>
+              }
+            />
+          ) : (
+            <ul className="stagger-children m-0 grid list-none gap-[22px] p-0">
+              {courses.data.map((course) => (
+                <li key={course.id}>
+                  <CourseCard
+                    course={course}
+                    tools={tools.data?.find((entry) => entry.courseId === course.id)}
+                  />
+                </li>
+              ))}
+            </ul>
+          )}
+        </>
       )}
     </main>
+  )
+}
+
+interface LoadFailureProps {
+  readonly error: Error
+  readonly onRetry: () => void
+}
+
+function LoadFailure({ error, onRetry }: LoadFailureProps): ReactElement {
+  const isUnreachable = !(error instanceof ApiRequestError)
+  return (
+    <EmptyState
+      icon={WifiOff}
+      isError
+      title={isUnreachable ? 'Không kết nối được udemy-studio' : 'Không tải được thư viện'}
+      body={isUnreachable ? 'Kiểm tra server còn chạy, rồi tải lại trang.' : error.message}
+      action={
+        <Button variant={ButtonVariant.Primary} onClick={onRetry}>
+          Tải lại
+        </Button>
+      }
+    />
+  )
+}
+
+function LibrarySkeleton(): ReactElement {
+  return (
+    <ul className="m-0 grid list-none gap-[22px] p-0" aria-label="Đang tải thư viện…">
+      {SKELETON_ROWS.map((row) => (
+        <li key={row} className="flex animate-pulse items-center gap-5 rounded-2xl bg-card p-3">
+          <div className="aspect-video w-24 rounded-[10px] bg-surface-raised md:w-40" />
+          <div className="grid flex-1 gap-3">
+            <div className="h-4 w-2/5 rounded bg-surface-raised" />
+            <div className="h-2 rounded bg-surface-raised" />
+            <div className="h-3 w-1/4 rounded bg-surface-raised" />
+          </div>
+        </li>
+      ))}
+    </ul>
   )
 }

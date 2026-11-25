@@ -63,6 +63,10 @@ func toCourseSummary(overview learning.CourseOverview, sizeBytes int64) gen.Cour
 		CompletedLectures: overview.CompletedLectures,
 		SizeBytes:         sizeBytes,
 	}
+	if overview.Course.CoverPath != "" {
+		coverURL := coversPrefix + overview.Course.ID
+		summary.CoverUrl = &coverURL
+	}
 	if overview.Resume != nil {
 		target := toContinueTarget(*overview.Resume)
 		summary.Resume = &target
@@ -78,6 +82,7 @@ func toCourseDetail(overview learning.CourseOverview, records map[string]progres
 		PlayableLectures:  summary.PlayableLectures,
 		CompletedLectures: summary.CompletedLectures,
 		SizeBytes:         summary.SizeBytes,
+		CoverUrl:          summary.CoverUrl,
 		Resume:            summary.Resume,
 		Chapters:          make([]gen.Chapter, 0, len(overview.Course.Chapters)),
 	}

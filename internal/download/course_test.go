@@ -109,7 +109,7 @@ func samplePlan() udemy.Plan {
 	}
 	drm := udemy.LecturePlan{Number: 4, Title: "004 Locked", Kind: udemy.KindDRM, File: "004 Locked.mp4"}
 	quiz := udemy.LecturePlan{Number: 5, Title: "005 Quiz", Kind: udemy.KindQuiz, File: "005 Quiz.html"}
-	return udemy.Plan{CourseName: "backend-basics", CourseDir: "backend-basics", Chapters: []udemy.ChapterPlan{
+	return udemy.Plan{CourseTitle: "Backend Basics", CourseName: "backend-basics", CourseDir: "backend-basics", Chapters: []udemy.ChapterPlan{
 		{Index: 1, Dir: "01 - Intro", Lectures: []udemy.LecturePlan{videoLecture, hlsLecture, article, drm, quiz}},
 		{Index: 2, Dir: "02 - Skipped", Lectures: []udemy.LecturePlan{{Number: 1, Title: "001 Other", Kind: udemy.KindHTML, File: "001 Other.html", HTMLBody: "x"}}},
 	}}
@@ -269,6 +269,20 @@ func TestLibraryKeysDownloadedLecturesByTheirUdemyID(t *testing.T) {
 	renames := scanned.KeyRenames()
 	if renames["backend-basics/01 - Intro/001 Welcome"] != "udemy-lecture:101" {
 		t.Errorf("KeyRenames = %v, want the path key of Welcome moved to its id", renames)
+	}
+}
+
+func TestLibraryShowsADownloadedCourseUnderItsUdemyTitle(t *testing.T) {
+	outputDir := t.TempDir()
+	if _, _, err := runCourse(t, t.Context(), samplePlan(), &fakeTools{}, outputDir); err != nil {
+		t.Fatalf("Course: %v", err)
+	}
+	scanned, err := library.Scan(os.DirFS(outputDir))
+	if err != nil {
+		t.Fatalf("Scan: %v", err)
+	}
+	if course := scanned.Courses[0]; course.Title != "Backend Basics" || course.Dir != "backend-basics" {
+		t.Errorf("course title=%q dir=%q, want the Udemy title over the folder it keeps", course.Title, course.Dir)
 	}
 }
 

@@ -39,11 +39,15 @@ func scanCourse(downloads fs.FS, courseDir string) (Course, error) {
 	if err != nil {
 		return Course{}, err
 	}
-	entries, err := manifestLectures(downloads, courseDir)
+	manifest, err := readManifest(downloads, courseDir)
 	if err != nil {
 		return Course{}, err
 	}
-	course := Course{ID: shortID("course", courseDir), Title: courseDir, Dir: courseDir}
+	entries := manifestLectures(manifest, courseDir)
+	course := Course{ID: shortID("course", courseDir), Title: cmp.Or(manifest.Title, courseDir), Dir: courseDir}
+	if cover := path.Join(courseDir, CoverFileName); isFile(downloads, cover) {
+		course.CoverPath = cover
+	}
 	for _, chapterDir := range chapterDirs {
 		match := chapterDirName.FindStringSubmatch(chapterDir)
 		if match == nil {
@@ -104,4 +108,9 @@ func visibleEntries(downloads fs.FS, dir string, wantDirs bool) ([]string, error
 		names = append(names, entry.Name())
 	}
 	return names, nil
+}
+
+func isFile(downloads fs.FS, name string) bool {
+	info, err := fs.Stat(downloads, name)
+	return err == nil && !info.IsDir()
 }

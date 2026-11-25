@@ -5,17 +5,38 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>udemy-studio · Mã truy cập</title>
 <style>
-  body { font: 16px/1.5 system-ui, -apple-system, sans-serif; display: grid; place-items: center; min-height: 100vh; margin: 0; }
-  form { display: grid; gap: 12px; width: min(320px, 90vw); }
-  input, button { font: inherit; padding: 10px 12px; border-radius: 8px; border: 1px solid #8884; }
-  button { cursor: pointer; }
+  :root {
+    color-scheme: light dark;
+    --page: #f6f5fb; --card: #fff; --input: #fff; --line: #e2deef;
+    --ink: #1a1730; --muted: #5e5a7a; --accent: #6e4ff0; --on-accent: #fff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page: #101023; --card: #1c1936; --input: #141329; --line: #433963;
+      --ink: #f6f3ff; --muted: #aaa7c9; --accent: #8b6cff;
+    }
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    font: 15px/1.5 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: var(--page); color: var(--ink);
+    display: grid; place-items: center; min-height: 100vh; padding: 20px;
+  }
+  form { display: grid; gap: 14px; width: min(400px, 100%); padding: 28px; border-radius: 20px; background: var(--card); }
+  h1 { font-size: 22px; font-weight: 600; }
+  p { font-size: 13px; color: var(--muted); }
+  input, button { font: inherit; font-size: 14px; height: 48px; border-radius: 12px; }
+  input { padding: 0 16px; border: 1px solid var(--line); background: var(--input); color: var(--ink); }
+  input:focus-visible { outline: none; border-color: var(--accent); }
+  button { border: 0; background: var(--accent); color: var(--on-accent); font-weight: 600; cursor: pointer; }
+  button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 </style>
 </head>
 <body>
 <form method="get">
   <h1>udemy-studio</h1>
   <p>Nhập mã truy cập hiện trong terminal của máy chạy server, hoặc quét mã QR.</p>
-  <input name="code" autocomplete="one-time-code" autocapitalize="characters" required autofocus>
+  <input name="code" aria-label="Mã truy cập" placeholder="Mã truy cập" autocomplete="one-time-code" autocapitalize="characters" required autofocus>
   <button type="submit">Vào thư viện</button>
 </form>
 </body>

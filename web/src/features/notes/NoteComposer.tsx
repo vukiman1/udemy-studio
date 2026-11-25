@@ -1,18 +1,21 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useState, type ReactElement, type RefObject } from 'react'
+import { useState, type ReactElement, type ReactNode, type RefObject } from 'react'
+import { Save } from 'lucide-react'
 import { addNote } from '../../api/note-queries'
 import { QUERY_KEYS } from '../../api/queries'
 import { MS_PER_SECOND, formatTimestamp } from '../../app/timestamp'
+import { Button, ButtonSize, ButtonVariant } from '../../ui/Button'
 import { isSubmitShortcut } from './submit-shortcut'
 
 interface NoteComposerProps {
   readonly lectureId: string
   readonly videoRef: RefObject<HTMLVideoElement | null> | null
+  readonly children?: ReactNode
 }
 
 const LECTURE_START_SECONDS = 0
 
-export function NoteComposer({ lectureId, videoRef }: NoteComposerProps): ReactElement {
+export function NoteComposer({ lectureId, videoRef, children }: NoteComposerProps): ReactElement {
   const queryClient = useQueryClient()
   const [draft, setDraft] = useState('')
   // The moment is taken at the first keystroke, not at saving, since the video keeps playing meanwhile.
@@ -28,14 +31,29 @@ export function NoteComposer({ lectureId, videoRef }: NoteComposerProps): ReactE
 
   return (
     <form
-      className="grid gap-2"
+      className="grid gap-3"
       onSubmit={(event) => {
         event.preventDefault()
         if (canSave) save.mutate()
       }}
     >
+      <div className="flex flex-wrap items-center gap-3">
+        <h3 className="mr-auto text-[15px] font-semibold text-muted">Ghi chú</h3>
+        {children}
+        <Button
+          type="submit"
+          variant={ButtonVariant.Primary}
+          size={ButtonSize.Small}
+          icon={Save}
+          disabled={!canSave}
+        >
+          {videoRef === null || draft === ''
+            ? 'Lưu ghi chú'
+            : `Lưu ghi chú tại ${formatTimestamp(atSeconds * MS_PER_SECOND)}`}
+        </Button>
+      </div>
       <textarea
-        className="min-h-20 rounded-md border border-line bg-page px-2.5 py-1.5"
+        className="min-h-24 rounded-xl px-4 py-3.5 text-sm placeholder:text-muted"
         placeholder="Viết ghi chú… (⌘/Ctrl + Enter để lưu)"
         value={draft}
         readOnly={save.isPending}
@@ -49,14 +67,11 @@ export function NoteComposer({ lectureId, videoRef }: NoteComposerProps): ReactE
           save.mutate()
         }}
       />
-      <div className="flex items-center gap-3">
-        <button type="submit" disabled={!canSave}>
-          {videoRef === null || draft === ''
-            ? 'Lưu ghi chú'
-            : `Lưu ghi chú tại ${formatTimestamp(atSeconds * MS_PER_SECOND)}`}
-        </button>
-        {save.isError && <p className="m-0 text-danger">{save.error.message}</p>}
-      </div>
+      {save.isError && (
+        <p className="text-sm text-danger" role="alert">
+          {save.error.message}
+        </p>
+      )}
     </form>
   )
 }

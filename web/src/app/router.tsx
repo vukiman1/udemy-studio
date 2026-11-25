@@ -6,14 +6,23 @@ import { LibraryPage } from '../features/library/LibraryPage'
 import { LecturePage } from '../features/player/LecturePage'
 import { SearchPage } from '../features/search/SearchPage'
 import { AISettingsPage } from '../features/ai-settings/AISettingsPage'
+import { HistoryPage } from '../features/history/HistoryPage'
+import { AppShell } from './AppShell'
 import { NotFoundPage } from './NotFoundPage'
-import { AI_SETTINGS_PATH, SEARCH_PATH } from './paths'
+import { AI_SETTINGS_PATH, DOWNLOADS_PATH, HISTORY_PATH, LIBRARY_PATH, SEARCH_PATH } from './paths'
 
 export const router = createBrowserRouter([
-  { path: '/', element: <LibraryPage /> },
-  { path: '/downloads', element: <DownloadsPage /> },
-  { path: SEARCH_PATH, element: <SearchPage /> },
-  { path: AI_SETTINGS_PATH, element: <AISettingsPage /> },
+  {
+    element: <AppShell />,
+    children: [
+      { path: LIBRARY_PATH, element: <LibraryPage /> },
+      { path: DOWNLOADS_PATH, element: <DownloadsPage /> },
+      { path: SEARCH_PATH, element: <SearchPage /> },
+      { path: HISTORY_PATH, element: <HistoryPage /> },
+      { path: AI_SETTINGS_PATH, element: <AISettingsPage /> },
+      { path: '*', element: <NotFoundPage /> },
+    ],
+  },
   {
     path: '/courses/:courseId',
     element: <CourseLayout />,
@@ -22,5 +31,4 @@ export const router = createBrowserRouter([
       { path: 'lectures/:lectureId', element: <LecturePage /> },
     ],
   },
-  { path: '*', element: <NotFoundPage /> },
 ])

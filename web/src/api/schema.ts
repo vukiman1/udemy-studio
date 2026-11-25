@@ -72,6 +72,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The lectures most recently watched, newest first */
+        get: operations["listHistory"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/search": {
         parameters: {
             query?: never;
@@ -583,6 +600,8 @@ export interface components {
              * @description Every file in the course's folder, measured when asked
              */
             sizeBytes: number;
+            /** @description Where the course's cover image is served; absent when it was downloaded without one */
+            coverUrl?: string;
             resume?: components["schemas"]["ContinueTarget"];
         };
         CourseDetail: components["schemas"]["CourseSummary"] & {
@@ -631,6 +650,17 @@ export interface components {
             lectureId: string;
             /** Format: double */
             positionSeconds: number;
+        };
+        HistoryEntry: {
+            courseId: string;
+            courseTitle: string;
+            lectureId: string;
+            lectureTitle: string;
+            /** Format: double */
+            positionSeconds: number;
+            completed: boolean;
+            /** Format: date-time */
+            updatedAt: string;
         };
         Note: {
             /** Format: int64 */
@@ -872,7 +902,10 @@ export interface components {
             progress: components["schemas"]["JobProgress"];
             failures: string[];
             error?: string;
+            errorKind?: components["schemas"]["JobErrorKind"];
         };
+        /** @enum {string} */
+        JobErrorKind: "login" | "course_not_found" | "blocked" | "chrome_access" | "interrupted" | "other";
         JobProgress: {
             courseTitle: string;
             totalLectures: number;
@@ -1036,6 +1069,26 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    listHistory: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Watched lectures still in the library, newest first */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HistoryEntry"][];
+                };
             };
         };
     };

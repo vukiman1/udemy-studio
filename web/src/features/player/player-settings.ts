@@ -1,4 +1,6 @@
-export const PLAYBACK_RATES = [0.75, 1, 1.25, 1.5, 1.75, 2] as const
+export const PLAYBACK_RATES = [
+  0.5, 0.6, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 1, 1.1, 1.25, 1.5, 1.75, 2,
+] as const
 export const FONT_SCALES = [0.8, 1, 1.2, 1.4, 1.7] as const
 export const TEXT_OPACITIES = [0.25, 0.5, 0.75, 1] as const
 export const BACKGROUND_OPACITIES = [0, 0.25, 0.5, 0.75, 1] as const

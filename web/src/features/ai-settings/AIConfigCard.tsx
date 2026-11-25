@@ -4,6 +4,7 @@ import { ApiKeyField } from './ApiKeyField'
 import { ProviderModel } from './ProviderModel'
 import { SettingsCard } from './SettingsCard'
 import { SettingsFooter } from './SettingsFooter'
+import { SETTINGS_LABEL, SETTINGS_ROW } from './settings-row'
 import type { AIDraftEditor } from './use-ai-draft'
 
 interface AIConfigCardProps {
@@ -15,10 +16,10 @@ interface AIConfigCardProps {
 export function AIConfigCard({ providers, saved, editor }: AIConfigCardProps): ReactElement {
   return (
     <SettingsCard title="Cấu hình">
-      <label className="grid gap-2">
-        <span className="font-semibold">Loại AI</span>
+      <label className={SETTINGS_ROW}>
+        <span className={SETTINGS_LABEL}>Loại AI</span>
         <select
-          className="rounded-lg border border-line bg-page px-3 py-2.5"
+          className="h-[50px] rounded-[11px] border-line-strong pr-4 pl-[18px] text-sm font-semibold"
           value={editor.draft.provider}
           onChange={(event) => {
             const chosen = providers.find((provider) => provider.id === event.target.value)

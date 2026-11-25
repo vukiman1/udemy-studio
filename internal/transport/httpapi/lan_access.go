@@ -19,7 +19,7 @@ const (
 	lanCookieHMACLabel = "udemy-studio lan access"
 )
 
-var protectedDataPrefixes = []string{apiPrefix, mediaPrefix, articlesPrefix, attachmentsPrefix, healthPath}
+var protectedDataPrefixes = []string{apiPrefix, mediaPrefix, articlesPrefix, attachmentsPrefix, coversPrefix, healthPath}
 
 //go:embed lan_login.html
 var lanLoginPage []byte
