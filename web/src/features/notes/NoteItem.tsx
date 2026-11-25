@@ -43,7 +43,7 @@ export function NoteItem({ note, lectureId, onSeek }: NoteItemProps): ReactEleme
   }
 
   return (
-    <li className="flex items-start gap-3 border-b border-line py-2.5 last:border-b-0">
+    <li className="flex items-start gap-3 border-b border-line py-2.5 last:border-b-0 motion-safe:animate-rise">
       {onSeek !== undefined && (
         <button
           type="button"

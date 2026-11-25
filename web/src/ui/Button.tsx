@@ -30,7 +30,7 @@ const SIZE_CLASSES: Readonly<Record<ButtonSize, string>> = {
 }
 
 export function buttonClass(variant: ButtonVariant, size: ButtonSize): string {
-  return `inline-flex shrink-0 items-center justify-center font-semibold whitespace-nowrap ${VARIANT_CLASSES[variant]} ${SIZE_CLASSES[size]}`
+  return `inline-flex shrink-0 items-center justify-center font-semibold whitespace-nowrap transition-[translate,scale,background-color,filter] duration-200 ease-soft motion-safe:enabled:hover:-translate-y-0.5 motion-safe:enabled:active:translate-y-0 motion-safe:enabled:active:scale-[0.97] ${VARIANT_CLASSES[variant]} ${SIZE_CLASSES[size]}`
 }
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {

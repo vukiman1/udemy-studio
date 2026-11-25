@@ -86,7 +86,7 @@ function SearchResults({ query, hits, error }: SearchResultsProps): ReactElement
       <p className="text-[13px] text-muted" role="status">
         {resultCountText(hits.length, query)}
       </p>
-      <ol className="grid gap-2.5">
+      <ol className="stagger-children grid gap-2.5">
         {hits.map((hit) => (
           <li key={`${hit.lectureId}-${hit.language}-${String(hit.startMs)}-${hit.snippet}`}>
             <SearchHitCard hit={hit} />

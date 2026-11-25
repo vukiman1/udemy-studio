@@ -25,7 +25,10 @@ export function LecturePage(): ReactElement {
     return <PageStatus tone="error" message="Không tìm thấy bài học này trong khoá." />
 
   return (
-    <article className="grid content-start gap-4 px-5 pt-6 pb-10 md:px-10">
+    <article
+      key={lecture.id}
+      className="grid content-start gap-4 px-5 pt-6 pb-10 motion-safe:animate-page-enter md:px-10"
+    >
       <h2 className="text-xl font-semibold">{lecture.title}</h2>
       {lecture.hasVideo && (
         <VideoPlayer

@@ -26,7 +26,7 @@ export function Dialog({
       ref={dialogRef}
       onClose={onClose}
       aria-labelledby="dialog-title"
-      className="m-auto w-[min(560px,92vw)] overflow-hidden rounded-[20px] bg-card p-0 text-ink shadow-[0_30px_106px_rgba(0,0,0,0.6)] backdrop:bg-black/50 max-md:mb-0 max-md:w-full max-md:max-w-none max-md:rounded-b-none"
+      className="m-auto w-[min(560px,92vw)] overflow-hidden rounded-[20px] bg-card p-0 text-ink shadow-[0_30px_106px_rgba(0,0,0,0.6)] backdrop:bg-black/50 motion-safe:animate-dialog-in motion-safe:backdrop:animate-fade-in max-md:mb-0 max-md:w-full max-md:max-w-none max-md:rounded-b-none max-md:motion-safe:animate-sheet-up"
     >
       <header className="flex items-center gap-3.5 border-b border-line py-5 pr-4 pl-6">
         <span className="grid size-10 shrink-0 place-items-center rounded-[10px] bg-accent/20">

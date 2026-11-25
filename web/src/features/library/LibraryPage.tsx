@@ -48,7 +48,7 @@ export function LibraryPage(): ReactElement {
               }
             />
           ) : (
-            <ul className="m-0 grid list-none gap-[22px] p-0">
+            <ul className="stagger-children m-0 grid list-none gap-[22px] p-0">
               {courses.data.map((course) => (
                 <li key={course.id}>
                   <CourseCard
