@@ -32,7 +32,7 @@ export function LectureSidebar({ course }: LectureSidebarProps): ReactElement {
                 <NavLink
                   ref={lecture.id === lectureId ? activeRef : undefined}
                   to={lecturePath(course.id, lecture.id)}
-                  className="grid grid-cols-[1.2em_2.4em_1fr_auto] items-center gap-1.5 px-4 py-2 text-[0.92rem] hover:bg-surface aria-[current=page]:bg-surface-strong aria-[current=page]:font-semibold"
+                  className="grid grid-cols-[1.2em_2.4em_1fr_auto] items-center gap-1.5 px-4 py-2 text-[0.92rem] hover:bg-surface aria-[current=page]:bg-surface-raised aria-[current=page]:font-semibold"
                 >
                   <LectureStatusIcon status={lectureStatus(lecture)} />
                   <span className="text-muted tabular-nums">

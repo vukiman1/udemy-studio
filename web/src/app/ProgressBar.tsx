@@ -11,7 +11,7 @@ export function ProgressBar({ completed, total }: ProgressBarProps): ReactElemen
   const percent = total === 0 ? 0 : Math.round((completed / total) * PERCENT)
   return (
     <div
-      className="h-1.5 overflow-hidden rounded-full bg-surface-strong"
+      className="h-1.5 overflow-hidden rounded-full bg-surface-raised"
       role="progressbar"
       aria-valuemin={0}
       aria-valuemax={PERCENT}
