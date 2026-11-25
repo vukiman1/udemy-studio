@@ -1,5 +1,4 @@
 import {
-  BufferingIndicator,
   Container,
   Controls,
   ErrorDialog,
@@ -20,11 +19,11 @@ import {
   FullscreenExitIcon,
   PauseIcon,
   PlayIcon,
-  SpinnerIcon,
   VolumeHighIcon,
   VolumeOffIcon,
 } from '@videojs/react/icons'
 import type { ReactElement, ReactNode } from 'react'
+import { PlayerCenterState } from './PlayerCenterState'
 
 const SHORT_SEEK_SECONDS = 5
 const LONG_SEEK_SECONDS = 10
@@ -50,17 +49,10 @@ interface StudioSkinProps {
 
 export function StudioSkin(props: StudioSkinProps): ReactElement {
   return (
-    <Container className="@container relative block overflow-hidden rounded-2xl bg-black text-white [--subtitle-offset:6%] has-[[data-slot=controls][data-visible]]:[--subtitle-offset:76px] [&_video]:block [&_video]:max-h-[75dvh] [&_video]:w-full [&_video]:bg-black [&:fullscreen]:rounded-none [&:fullscreen_video]:h-dvh [&:fullscreen_video]:max-h-none">
+    <Container className="@container relative block overflow-hidden rounded-2xl bg-black text-white [--subtitle-offset:6%] has-[[data-slot=controls][data-visible]]:[--subtitle-offset:76px] [&_video]:block [&_video]:aspect-video [&_video]:max-h-[75dvh] [&_video]:w-full [&_video]:bg-black [&:fullscreen]:rounded-none [&:fullscreen_video]:h-dvh [&:fullscreen_video]:max-h-none">
       {props.children}
       {props.overlay}
-      <BufferingIndicator
-        className="pointer-events-none absolute inset-0 grid place-items-center not-data-visible:hidden"
-        render={(attributes) => (
-          <div {...attributes}>
-            <SpinnerIcon className="size-12 animate-spin" />
-          </div>
-        )}
-      />
+      <PlayerCenterState />
 
       <Controls.Root>
         <Controls.Backdrop className="pointer-events-none absolute inset-x-0 bottom-0 h-2/5 bg-linear-to-t from-black/70 to-transparent transition-opacity duration-300 not-data-visible:opacity-0" />
@@ -172,7 +164,7 @@ export function StudioSkin(props: StudioSkinProps): ReactElement {
         value={LONG_SEEK_SECONDS}
       />
 
-      <StatusAnnouncer />
+      <StatusAnnouncer className="pointer-events-none absolute top-1/2 left-1/2 mt-12 -translate-x-1/2 rounded-full bg-black/60 px-3 py-1 text-[13px] whitespace-nowrap backdrop-blur-sm has-[[data-status-announcer-content]:empty]:hidden" />
       <ErrorDialog.Root>
         <ErrorDialog.Popup className="absolute inset-0 grid place-content-center gap-2 bg-black/80 p-6 text-center">
           <ErrorDialog.Title />

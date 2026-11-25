@@ -145,7 +145,12 @@ function SettingsSubmenu({ label, value, choices, onSelect }: SettingsSubmenuPro
           <ChevronIcon className="size-3.5 -scale-x-100" />
           {label}
         </Menu.Item>
-        <Menu.RadioGroup value={value} onValueChange={onSelect} aria-label={label}>
+        <Menu.RadioGroup
+          className="grid max-h-[min(16rem,36cqw)] overflow-y-auto"
+          value={value}
+          onValueChange={onSelect}
+          aria-label={label}
+        >
           {choices.map((choice) => (
             <Menu.RadioItem key={choice.value} value={choice.value} className={MENU_ITEM}>
               <span>{choice.label}</span>
