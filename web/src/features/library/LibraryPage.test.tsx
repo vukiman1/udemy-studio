@@ -1,9 +1,9 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import type { ReactElement } from 'react'
 import { MemoryRouter } from 'react-router'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import type { ContinueTarget, CourseSummary } from '../../api/types'
+import type { CourseSummary } from '../../api/types'
 import { LibraryPage } from './LibraryPage'
 
 const COURSE: CourseSummary = {
@@ -40,40 +40,46 @@ afterEach(() => {
 
 describe('LibraryPage', () => {
   it('lists courses with their completion and size', async () => {
-    respondWith({
-      '/api/courses': () => Response.json([COURSE]),
-      '/api/continue': () => new Response(null, { status: 204 }),
-    })
+    respondWith({ '/api/courses': () => Response.json([COURSE]) })
     renderPage()
     expect(await screen.findByText('Backend Fundamentals')).toBeInTheDocument()
-    expect(screen.getByText('1/4 bài đã học · 15,8 GB')).toBeInTheDocument()
-    expect(screen.queryByText(/Tiếp tục học/)).not.toBeInTheDocument()
+    expect(screen.getByText('1 / 4 bài đã học · 15,8 GB')).toBeInTheDocument()
   })
 
-  it('offers to continue where the learner left off', async () => {
-    const target: ContinueTarget = { courseId: 'c1', lectureId: 'l7', positionSeconds: 12 }
-    respondWith({
-      '/api/courses': () => Response.json([COURSE]),
-      '/api/continue': () => Response.json(target),
-    })
+  it('continues each course where the learner left it', async () => {
+    const resumed: CourseSummary = {
+      ...COURSE,
+      id: 'c2',
+      title: 'Resumed',
+      resume: { courseId: 'c2', lectureId: 'l7', positionSeconds: 12 },
+    }
+    respondWith({ '/api/courses': () => Response.json([COURSE, resumed]) })
     renderPage()
-    const link = await screen.findByRole('link', { name: /Tiếp tục học/ })
-    expect(link).toHaveAttribute('href', '/courses/c1/lectures/l7')
+    const links = await screen.findAllByRole('link', { name: 'Tiếp tục' })
+    expect(links.map((link) => link.getAttribute('href'))).toEqual([
+      '/courses/c1',
+      '/courses/c2/lectures/l7',
+    ])
   })
 
-  it('explains when the library cannot be loaded', async () => {
-    respondWith({ '/api/continue': () => new Response(null, { status: 204 }) })
+  it('explains when the server cannot list the library, and loads it again on retry', async () => {
+    let isServerBack = false
+    respondWith({
+      '/api/courses': () =>
+        isServerBack ? Response.json([COURSE]) : new Response(null, { status: 500 }),
+    })
     renderPage()
     expect(await screen.findByRole('alert')).toHaveTextContent('Không tải được thư viện')
+    isServerBack = true
+    fireEvent.click(screen.getByRole('button', { name: 'Tải lại' }))
+    expect(await screen.findByText('Backend Fundamentals')).toBeInTheDocument()
   })
 
-  it('says so when the downloads folder is empty', async () => {
-    respondWith({
-      '/api/courses': () => Response.json([]),
-      '/api/continue': () => new Response(null, { status: 204 }),
-    })
+  it('points to the downloads page when the library is empty', async () => {
+    respondWith({ '/api/courses': () => Response.json([]) })
     renderPage()
-    expect(await screen.findByText(/Chưa có khoá học nào/)).toBeInTheDocument()
+    expect(await screen.findByText('Chưa có khoá học nào')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Tải khoá học' })).toHaveAttribute('href', '/downloads')
   })
 })
 
@@ -83,7 +89,6 @@ describe('LibraryPage after a failed background refresh', () => {
     let failNext = false
     vi.spyOn(globalThis, 'fetch').mockImplementation((input) => {
       const path = new URL(input instanceof Request ? input.url : String(input)).pathname
-      if (path === '/api/continue') return Promise.resolve(new Response(null, { status: 204 }))
       if (path === '/api/library/tools') return Promise.resolve(Response.json([]))
       return Promise.resolve(
         failNext ? new Response(null, { status: 503 }) : Response.json([COURSE]),

@@ -23,6 +23,7 @@ describe('translationStatus', () => {
     const status = translationStatus({ lectures: 10, pending: 6, run: translationRun('running') })
     expect(status.state).toBe(ToolState.Running)
     expect(status.progress).toBeCloseTo(0.4)
+    expect(status.label).toBe('Đang dịch 4/10')
   })
 
   it('is done once every lecture has Vietnamese subtitles, whatever the last run did', () => {
