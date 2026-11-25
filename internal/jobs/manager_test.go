@@ -86,15 +86,21 @@ type harness struct {
 
 func start(t *testing.T, downloader Downloader, tokenErr error) harness {
 	t.Helper()
+	return startClassifying(t, downloader, tokenErr, nil)
+}
+
+func startClassifying(t *testing.T, downloader Downloader, tokenErr error, classify func(error) ErrorKind) harness {
+	t.Helper()
 	store := &memoryStore{jobs: map[string]Job{}}
 	succeeded := make(chan Job, 1)
 	manager := NewManager(Deps{
-		Downloader:  downloader,
-		Tokens:      tokens{err: tokenErr},
-		Store:       store,
-		Logger:      slog.New(slog.DiscardHandler),
-		Now:         time.Now,
-		OnSucceeded: func(_ context.Context, job Job) { succeeded <- job },
+		Downloader:    downloader,
+		Tokens:        tokens{err: tokenErr},
+		Store:         store,
+		Logger:        slog.New(slog.DiscardHandler),
+		Now:           time.Now,
+		OnSucceeded:   func(_ context.Context, job Job) { succeeded <- job },
+		ClassifyError: classify,
 	})
 	ctx, cancel := context.WithCancel(t.Context())
 	done := make(chan struct{})
@@ -180,6 +186,28 @@ func TestJobFailsWithTheDownloaderOrLoginError(t *testing.T) {
 	}
 }
 
+func TestAFailedJobRecordsWhatKindOfErrorStoppedIt(t *testing.T) {
+	cases := map[string]struct {
+		classify func(error) ErrorKind
+		want     ErrorKind
+	}{
+		"as the app classifies it":      {classify: func(error) ErrorKind { return ErrorKindLogin }, want: ErrorKindLogin},
+		"as other without a classifier": {want: ErrorKindOther},
+	}
+	for name, testCase := range cases {
+		t.Run(name, func(t *testing.T) {
+			h := startClassifying(t, &scriptedDownloader{err: errors.New("udemy returned HTTP 401")}, nil, testCase.classify)
+			job, err := h.manager.Submit(t.Context(), Request{CourseURL: validCourseURL})
+			if err != nil {
+				t.Fatalf("Submit: %v", err)
+			}
+			if failed := waitForStatus(t, h.manager, job.ID, StatusFailed); failed.ErrorKind != testCase.want {
+				t.Errorf("error kind = %q, want %q", failed.ErrorKind, testCase.want)
+			}
+		})
+	}
+}
+
 func TestCancellingARunningJobStopsTheDownload(t *testing.T) {
 	downloader := &scriptedDownloader{blockUntil: true, started: make(chan struct{})}
 	h := start(t, downloader, nil)
@@ -240,8 +268,8 @@ func TestRestoreMarksInterruptedJobsAndRequeuesWaitingOnes(t *testing.T) {
 	ctx, cancel := context.WithCancel(t.Context())
 	defer cancel()
 	go func() { _ = manager.Run(ctx) }()
-	if job := waitForStatus(t, manager, "interrupted", StatusFailed); job.Error != interruptedMessage {
-		t.Errorf("interrupted job error = %q", job.Error)
+	if job := waitForStatus(t, manager, "interrupted", StatusFailed); job.Error != interruptedMessage || job.ErrorKind != ErrorKindInterrupted {
+		t.Errorf("interrupted job error = %q, kind %q", job.Error, job.ErrorKind)
 	}
 	waitForStatus(t, manager, "waiting", StatusSucceeded)
 }

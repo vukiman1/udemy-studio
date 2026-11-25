@@ -83,5 +83,9 @@ func toJob(job jobs.Job) gen.Job {
 	if job.Error != "" {
 		response.Error = &job.Error
 	}
+	if job.ErrorKind != "" {
+		kind := gen.JobErrorKind(job.ErrorKind)
+		response.ErrorKind = &kind
+	}
 	return response
 }

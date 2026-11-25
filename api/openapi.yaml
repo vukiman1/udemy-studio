@@ -1395,6 +1395,12 @@ components:
             type: string
         error:
           type: string
+        errorKind:
+          $ref: "#/components/schemas/JobErrorKind"
+
+    JobErrorKind:
+      type: string
+      enum: [login, course_not_found, blocked, chrome_access, interrupted, other]
 
     JobProgress:
       type: object

@@ -74,6 +74,36 @@ func (e HealthStatus) Valid() bool {
 	}
 }
 
+// Defines values for JobErrorKind.
+const (
+	Blocked        JobErrorKind = "blocked"
+	ChromeAccess   JobErrorKind = "chrome_access"
+	CourseNotFound JobErrorKind = "course_not_found"
+	Interrupted    JobErrorKind = "interrupted"
+	Login          JobErrorKind = "login"
+	Other          JobErrorKind = "other"
+)
+
+// Valid indicates whether the value is a known member of the JobErrorKind enum.
+func (e JobErrorKind) Valid() bool {
+	switch e {
+	case Blocked:
+		return true
+	case ChromeAccess:
+		return true
+	case CourseNotFound:
+		return true
+	case Interrupted:
+		return true
+	case Login:
+		return true
+	case Other:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for JobStatus.
 const (
 	JobStatusCancelled JobStatus = "cancelled"
@@ -375,17 +405,21 @@ type HostLogin struct {
 
 // Job defines model for Job.
 type Job struct {
-	Chapters   *string     `json:"chapters,omitempty"`
-	CourseUrl  string      `json:"courseUrl"`
-	CreatedAt  time.Time   `json:"createdAt"`
-	Error      *string     `json:"error,omitempty"`
-	Failures   []string    `json:"failures"`
-	FinishedAt *time.Time  `json:"finishedAt,omitempty"`
-	Id         string      `json:"id"`
-	Progress   JobProgress `json:"progress"`
-	StartedAt  *time.Time  `json:"startedAt,omitempty"`
-	Status     JobStatus   `json:"status"`
+	Chapters   *string       `json:"chapters,omitempty"`
+	CourseUrl  string        `json:"courseUrl"`
+	CreatedAt  time.Time     `json:"createdAt"`
+	Error      *string       `json:"error,omitempty"`
+	ErrorKind  *JobErrorKind `json:"errorKind,omitempty"`
+	Failures   []string      `json:"failures"`
+	FinishedAt *time.Time    `json:"finishedAt,omitempty"`
+	Id         string        `json:"id"`
+	Progress   JobProgress   `json:"progress"`
+	StartedAt  *time.Time    `json:"startedAt,omitempty"`
+	Status     JobStatus     `json:"status"`
 }
+
+// JobErrorKind defines model for JobErrorKind.
+type JobErrorKind string
 
 // JobProgress defines model for JobProgress.
 type JobProgress struct {

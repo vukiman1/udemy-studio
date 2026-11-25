@@ -56,11 +56,12 @@ func newDownloads(ctx context.Context, config DownloadOptions, dataDir string, d
 	}
 	loginService := newLoginService(config.ChromeDataDir, database, box, logger)
 	manager := jobs.NewManager(jobs.Deps{
-		Downloader: downloader,
-		Tokens:     loginService,
-		Store:      sqlite.NewJobStore(database),
-		Logger:     logger,
-		Now:        time.Now,
+		Downloader:    downloader,
+		Tokens:        loginService,
+		Store:         sqlite.NewJobStore(database),
+		Logger:        logger,
+		Now:           time.Now,
+		ClassifyError: classifyDownloadError,
 		OnSucceeded: func(ctx context.Context, job jobs.Job) {
 			if err := onDownloaded(ctx); err != nil {
 				logger.Error("refresh the library after a download", "job", job.ID, "err", err)

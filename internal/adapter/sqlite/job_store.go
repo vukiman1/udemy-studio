@@ -33,6 +33,7 @@ type storedJob struct {
 	CurrentLecture string     `json:"current_lecture"`
 	Failures       []string   `json:"failures"`
 	Error          string     `json:"error"`
+	ErrorKind      string     `json:"error_kind,omitempty"`
 }
 
 func (store *JobStore) Save(ctx context.Context, job jobs.Job) error {
@@ -41,7 +42,7 @@ func (store *JobStore) Save(ctx context.Context, job jobs.Job) error {
 		CreatedAt: job.CreatedAt, StartedAt: job.StartedAt, FinishedAt: job.FinishedAt,
 		CourseTitle: job.Progress.CourseTitle, TotalLectures: job.Progress.TotalLectures,
 		FinishedCount: job.Progress.FinishedCount, CurrentLecture: job.Progress.CurrentLecture,
-		Failures: job.Failures, Error: job.Error,
+		Failures: job.Failures, Error: job.Error, ErrorKind: string(job.ErrorKind),
 	})
 	if err != nil {
 		return fmt.Errorf("encode job %s: %w", job.ID, err)
@@ -76,8 +77,9 @@ func (store *JobStore) List(ctx context.Context) ([]jobs.Job, error) {
 				CourseTitle: stored.CourseTitle, TotalLectures: stored.TotalLectures,
 				FinishedCount: stored.FinishedCount, CurrentLecture: stored.CurrentLecture,
 			},
-			Failures: stored.Failures,
-			Error:    stored.Error,
+			Failures:  stored.Failures,
+			Error:     stored.Error,
+			ErrorKind: jobs.ErrorKind(stored.ErrorKind),
 		})
 	}
 	return list, nil

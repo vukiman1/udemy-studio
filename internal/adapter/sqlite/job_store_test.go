@@ -32,7 +32,7 @@ func TestJobStoreRoundTripsAndUpdatesJobs(t *testing.T) {
 			t.Fatalf("Save %s: %v", job.ID, err)
 		}
 	}
-	older.Status, older.Error = jobs.StatusFailed, "boom"
+	older.Status, older.Error, older.ErrorKind = jobs.StatusFailed, "boom", jobs.ErrorKindLogin
 	if err := store.Save(t.Context(), older); err != nil {
 		t.Fatalf("update: %v", err)
 	}
