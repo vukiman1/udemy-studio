@@ -63,7 +63,8 @@ describe('mode and rate stepping', () => {
     expect(nextSubtitleMode(SubtitleMode.Off)).toBe(SubtitleMode.Bilingual)
   })
   it('steps through a list and stops at the ends', () => {
-    expect(stepThrough(PLAYBACK_RATES, 1, 1)).toBe(1.25)
+    expect(stepThrough(PLAYBACK_RATES, 1, 1)).toBe(1.1)
+    expect(stepThrough(PLAYBACK_RATES, 1, -1)).toBe(0.95)
     expect(stepThrough(PLAYBACK_RATES, 2, 1)).toBe(2)
     expect(stepThrough(FONT_SCALES, 0.8, -1)).toBe(0.8)
   })

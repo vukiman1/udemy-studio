@@ -29,7 +29,7 @@ export function LectureSidebar({ course }: LectureSidebarProps): ReactElement {
     <nav className="grid gap-3.5" aria-labelledby="lecture-list-title">
       <h2
         id="lecture-list-title"
-        className="flex items-center gap-3 px-2 py-1 text-lg font-semibold"
+        className="sticky top-0 z-10 flex items-center gap-3 bg-sidebar px-2 pt-6 pb-2 text-lg font-semibold max-lg:static"
       >
         <List className="size-5" aria-hidden="true" />
         Nội dung
@@ -37,7 +37,7 @@ export function LectureSidebar({ course }: LectureSidebarProps): ReactElement {
       {course.chapters.map((chapter) => (
         <details
           key={`${String(chapter.index)}-${chapter.title}`}
-          className="group overflow-hidden rounded-[14px] bg-card"
+          className="group overflow-hidden bg-card"
           open
         >
           <summary className="flex cursor-pointer list-none items-center gap-2.5 bg-card-header py-2.5 pr-3 pl-3.5 text-[13px] font-bold tracking-[0.02em] uppercase [&::-webkit-details-marker]:hidden">
