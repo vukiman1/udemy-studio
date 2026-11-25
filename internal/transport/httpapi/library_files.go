@@ -1,6 +1,7 @@
 package httpapi
 
 import (
+	"bytes"
 	"errors"
 	"io"
 	"io/fs"
@@ -8,6 +9,7 @@ import (
 	"mime"
 	"net/http"
 	"path"
+	"time"
 
 	"github.com/vukiman1/udemy-studio/internal/library"
 )
@@ -20,6 +22,8 @@ const (
 	articleSandboxCSP  = "sandbox; default-src 'none'; img-src https: data:; style-src 'unsafe-inline' https:; font-src https: data:"
 	// A quiz page runs its own inline scripts, still in a sandbox with an opaque origin and nothing it can fetch.
 	quizSandboxCSP = "sandbox allow-scripts; default-src 'none'; script-src 'unsafe-inline'; img-src https: data:; style-src 'unsafe-inline' https:; font-src https: data:"
+	// Articles are read whole to be themed; a quiz page with its questions is well under a megabyte.
+	maxArticleBytes = 32 << 20
 )
 
 type libraryFiles struct {
@@ -43,14 +47,27 @@ func (files libraryFiles) serveArticle(writer http.ResponseWriter, request *http
 		writeProblem(writer, http.StatusNotFound, "no article for lecture "+request.PathValue("lectureId"))
 		return
 	}
-	policy := articleSandboxCSP
+	policy, themeCSS := articleSandboxCSP, articleThemeCSS
 	if lecture.Kind == library.LectureKindQuiz {
-		policy = quizSandboxCSP
+		policy, themeCSS = quizSandboxCSP, quizThemeCSS
 	}
-	files.serve(writer, request, lecture.ArticlePath, http.Header{
+	file, _, ok := files.open(writer, lecture.ArticlePath)
+	if !ok {
+		return
+	}
+	defer file.Close()
+	page, err := io.ReadAll(io.LimitReader(file, maxArticleBytes+1))
+	if err != nil || len(page) > maxArticleBytes {
+		files.logger.Error("article page unreadable", "path", lecture.ArticlePath, "bytes", len(page), "err", err)
+		writeProblem(writer, http.StatusInternalServerError, "article cannot be read")
+		return
+	}
+	setFileHeaders(writer, http.Header{
 		"Content-Type":            {articleContentType},
 		"Content-Security-Policy": {policy},
 	})
+	// No modification time: a cached copy would keep an older theme after the app is upgraded.
+	http.ServeContent(writer, request, "", time.Time{}, bytes.NewReader(withPageTheme(page, themeCSS)))
 }
 
 func (files libraryFiles) serveAttachment(writer http.ResponseWriter, request *http.Request) {
@@ -79,29 +96,43 @@ func (files libraryFiles) serveCover(writer http.ResponseWriter, request *http.R
 }
 
 func (files libraryFiles) serve(writer http.ResponseWriter, request *http.Request, filePath string, headers http.Header) {
-	file, err := files.media.Open(filePath)
-	if err != nil {
-		if !errors.Is(err, fs.ErrNotExist) {
-			files.logger.Warn("library file refused", "path", filePath, "err", err)
-		}
-		writeProblem(writer, http.StatusNotFound, "file is not available")
+	file, info, ok := files.open(writer, filePath)
+	if !ok {
 		return
 	}
 	defer file.Close()
-	info, err := file.Stat()
-	if err != nil || info.IsDir() {
-		writeProblem(writer, http.StatusNotFound, "file is not available")
-		return
-	}
 	seeker, ok := file.(io.ReadSeeker)
 	if !ok {
 		files.logger.Error("library file is not seekable", "path", filePath)
 		writeProblem(writer, http.StatusInternalServerError, "file cannot be streamed")
 		return
 	}
+	setFileHeaders(writer, headers)
+	http.ServeContent(writer, request, "", info.ModTime(), seeker)
+}
+
+// open answers 404 itself when the file is missing, refused or a directory; the caller closes what it returns.
+func (files libraryFiles) open(writer http.ResponseWriter, filePath string) (fs.File, fs.FileInfo, bool) {
+	file, err := files.media.Open(filePath)
+	if err != nil {
+		if !errors.Is(err, fs.ErrNotExist) {
+			files.logger.Warn("library file refused", "path", filePath, "err", err)
+		}
+		writeProblem(writer, http.StatusNotFound, "file is not available")
+		return nil, nil, false
+	}
+	info, err := file.Stat()
+	if err != nil || info.IsDir() {
+		_ = file.Close()
+		writeProblem(writer, http.StatusNotFound, "file is not available")
+		return nil, nil, false
+	}
+	return file, info, true
+}
+
+func setFileHeaders(writer http.ResponseWriter, headers http.Header) {
 	for name, values := range headers {
 		writer.Header()[name] = values
 	}
 	writer.Header().Set("X-Content-Type-Options", "nosniff")
-	http.ServeContent(writer, request, "", info.ModTime(), seeker)
 }

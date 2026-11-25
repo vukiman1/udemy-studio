@@ -1,0 +1,139 @@
+body,
+.score-ring-inner,
+.modal-stat {
+  background: var(--studio-page) !important;
+  color: var(--studio-ink) !important;
+}
+.header {
+  background: var(--studio-card) !important;
+  border-bottom-color: var(--studio-line) !important;
+}
+.header h1,
+.start-screen h2,
+.modal-title,
+.mode-card h3,
+.filter-dropdown-item.active {
+  color: var(--studio-ink) !important;
+}
+.quiz-content,
+.modal-card,
+.mode-card,
+.info-panel .info-desc,
+.info-meta-item,
+.filter-dropdown-menu,
+.explanation {
+  background: var(--studio-card) !important;
+  border-color: var(--studio-line) !important;
+}
+.answer,
+.q-dot,
+.quick-stat,
+.nav-chip {
+  background: var(--studio-raised) !important;
+  border-color: transparent !important;
+}
+.answer:hover:not(.locked),
+.q-dot:hover {
+  border-color: var(--studio-accent) !important;
+}
+.answer.selected,
+.q-dot.current {
+  background: var(--studio-accent-tint) !important;
+  border-color: var(--studio-accent) !important;
+}
+.answer.correct {
+  background: rgba(16, 185, 129, 0.12) !important;
+  border-color: #10b981 !important;
+}
+.answer.incorrect {
+  background: rgba(239, 68, 68, 0.12) !important;
+  border-color: #ef4444 !important;
+}
+.answer.missed {
+  background: rgba(245, 158, 11, 0.12) !important;
+  border-color: #f59e0b !important;
+}
+.question-text,
+.answer-text,
+.explanation-body,
+.info-panel .info-desc,
+.section-row .sec-name,
+.attempts-table td,
+.filter-dropdown-item {
+  color: var(--studio-ink) !important;
+}
+.q-number,
+.progress-counter,
+.score-label,
+.score-stat .lbl,
+.score-trend,
+.start-screen .subtitle,
+.quick-stat,
+.mode-card p,
+.info-meta-item .meta-lbl,
+.attempts-header h3,
+.attempts-table th,
+.no-attempts,
+.modal-body,
+.nav-chip,
+.btn-ghost {
+  color: var(--studio-muted) !important;
+}
+.timer:not(.urgent, .critical),
+.q-section,
+.btn-outline,
+.quick-stat .qs-val:not(.pass, .fail),
+.info-meta-item .meta-val,
+.modal-stat.s-answered,
+.attempt-mode.exam,
+.mode-badge.exam,
+.explanation h3,
+.explanation-body a {
+  color: var(--studio-link) !important;
+}
+.btn-primary,
+.btn-check,
+.filter-dropdown-btn,
+.q-dot.answered,
+.nav-chip .chip-dot.c-answered {
+  background: var(--studio-accent) !important;
+  border-color: var(--studio-accent) !important;
+  color: #fff !important;
+}
+.btn-outline,
+.answer.selected .answer-indicator {
+  border-color: var(--studio-accent) !important;
+}
+.btn-ghost,
+.nav,
+.attempts-table th,
+.attempts-table td,
+.section-row {
+  border-color: var(--studio-line) !important;
+}
+.progress-bar,
+.section-bar,
+.nav-chip .chip-dot.c-remaining {
+  background: var(--studio-track) !important;
+}
+.answer:not(.correct, .incorrect, .missed) .answer-indicator .dot {
+  background: var(--studio-accent) !important;
+}
+.progress-fill {
+  background: var(--studio-accent) !important;
+}
+.answer-text code {
+  background: var(--studio-code) !important;
+  border-color: var(--studio-line) !important;
+  color: var(--studio-link) !important;
+}
+.bookmark-btn svg {
+  stroke: var(--studio-muted) !important;
+}
+.bookmark-btn:hover svg,
+.bookmark-btn.bookmarked svg {
+  stroke: var(--studio-ink) !important;
+}
+.bookmark-btn.bookmarked svg {
+  fill: var(--studio-ink) !important;
+}
