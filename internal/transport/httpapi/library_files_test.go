@@ -56,6 +56,24 @@ func TestQuizPageRunsItsScriptsInASandbox(t *testing.T) {
 	}
 }
 
+func TestArticleAndQuizPagesWearTheAppsTheme(t *testing.T) {
+	page := "<html><head><title>t</title></HEAD><body><h1>article</h1></body></html>"
+	cases := map[library.LectureKind]string{library.LectureKindArticle: articleThemeCSS, library.LectureKindQuiz: quizThemeCSS}
+	for kind, themeCSS := range cases {
+		t.Run(string(kind), func(t *testing.T) {
+			files := maps.Clone(libraryFixture)
+			files["course/01 - Intro/002 Read me.html"] = page
+			files["course/"+library.ManifestFile] = `{"format": 1, "lectures": [{"udemy_id": 7, "class": "` + string(kind) + `", "chapter_dir": "01 - Intro", "file": "002 Read me.html"}]}`
+			app := newTestAppWith(t, files)
+			body := string(app.do(t, http.MethodGet, "/articles/"+app.lectureID(t, 2), nil).body)
+			want := "<title>t</title><style>" + paletteCSS + themeCSS + "</style></HEAD><body><h1>article</h1>"
+			if !strings.Contains(body, want) {
+				t.Errorf("page = %.200q…, want the %s theme at the end of its head and the page kept", body, kind)
+			}
+		})
+	}
+}
+
 func TestAttachmentDownloadsUnderItsOwnName(t *testing.T) {
 	app := newTestApp(t)
 	lecture, _ := app.library.Lecture(app.lectureID(t, 2))
