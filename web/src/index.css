@@ -1,7 +1,5 @@
 @import 'tailwindcss';
 
-/* Names follow the Figma Color/Dark and Color/Light collections: bg/card → card, text/primary → ink,
-   text/secondary → muted, border/default → line, bg/danger → danger-soft, status/success-bg → success-soft. */
 @theme inline {
   --color-page: var(--page);
   --color-sidebar: var(--sidebar);
@@ -97,7 +95,6 @@
     @apply bg-page font-sans text-ink antialiased;
   }
 
-  /* Buttons are borderless fills; keyboard focus still shows, through the ring below. */
   button {
     @apply cursor-pointer rounded-[10px] bg-button px-3 py-1.5 text-ink;
   }

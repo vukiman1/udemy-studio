@@ -15,7 +15,6 @@ export interface ToolStatus {
   readonly state: ToolState
   // Share of the running job done, from 0 to 1; zero when nothing runs.
   readonly progress: number
-  // Short enough for the button; detail is the full sentence for its tooltip.
   readonly label: string
   readonly detail: string
 }

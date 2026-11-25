@@ -21,8 +21,7 @@ const (
 	coverContentType   = "image/jpeg"
 	articleSandboxCSP  = "sandbox; default-src 'none'; img-src https: data:; style-src 'unsafe-inline' https:; font-src https: data:"
 	// A quiz page runs its own inline scripts, still in a sandbox with an opaque origin and nothing it can fetch.
-	quizSandboxCSP = "sandbox allow-scripts; default-src 'none'; script-src 'unsafe-inline'; img-src https: data:; style-src 'unsafe-inline' https:; font-src https: data:"
-	// Articles are read whole to be themed; a quiz page with its questions is well under a megabyte.
+	quizSandboxCSP  = "sandbox allow-scripts; default-src 'none'; script-src 'unsafe-inline'; img-src https: data:; style-src 'unsafe-inline' https:; font-src https: data:"
 	maxArticleBytes = 32 << 20
 )
 
@@ -66,7 +65,6 @@ func (files libraryFiles) serveArticle(writer http.ResponseWriter, request *http
 		"Content-Type":            {articleContentType},
 		"Content-Security-Policy": {policy},
 	})
-	// No modification time: a cached copy would keep an older theme after the app is upgraded.
 	http.ServeContent(writer, request, "", time.Time{}, bytes.NewReader(withPageTheme(page, themeCSS)))
 }
 
@@ -111,7 +109,6 @@ func (files libraryFiles) serve(writer http.ResponseWriter, request *http.Reques
 	http.ServeContent(writer, request, "", info.ModTime(), seeker)
 }
 
-// open answers 404 itself when the file is missing, refused or a directory; the caller closes what it returns.
 func (files libraryFiles) open(writer http.ResponseWriter, filePath string) (fs.File, fs.FileInfo, bool) {
 	file, err := files.media.Open(filePath)
 	if err != nil {
