@@ -2,6 +2,7 @@
 package download
 
 import (
+	"cmp"
 	"context"
 	"errors"
 	"fmt"
@@ -77,7 +78,7 @@ func Course(ctx context.Context, plan udemy.Plan, tools Tools, options Options, 
 	if err := run.cover(ctx, courseDir); err != nil {
 		return Summary{}, err
 	}
-	onEvent(jobs.Event{Kind: jobs.EventCourseStarted, CourseTitle: plan.CourseName, TotalLectures: options.Chapters.lectureCount(plan)})
+	onEvent(jobs.Event{Kind: jobs.EventCourseStarted, CourseTitle: cmp.Or(plan.CourseTitle, plan.CourseName), TotalLectures: options.Chapters.lectureCount(plan)})
 	for _, chapter := range plan.Chapters {
 		if !options.Chapters.includes(chapter.Index) {
 			continue
