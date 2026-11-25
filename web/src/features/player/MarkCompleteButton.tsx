@@ -25,7 +25,6 @@ export function MarkCompleteButton({ lecture, courseId }: MarkCompleteButtonProp
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: QUERY_KEYS.course(courseId) }),
         queryClient.invalidateQueries({ queryKey: QUERY_KEYS.courses }),
-        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.continueTarget }),
       ])
     },
   })

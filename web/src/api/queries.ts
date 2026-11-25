@@ -1,14 +1,7 @@
 import { useQuery, type UseQueryResult } from '@tanstack/react-query'
 import { apiClient } from './client'
 import type { components } from './schema'
-import type {
-  ContinueTarget,
-  CourseDetail,
-  CourseSummary,
-  Cue,
-  LectureProgress,
-  SearchHit,
-} from './types'
+import type { CourseDetail, CourseSummary, Cue, LectureProgress, SearchHit } from './types'
 
 type ProgressReport = components['schemas']['ProgressReport']
 
@@ -25,7 +18,6 @@ export class ApiRequestError extends Error {
 export const QUERY_KEYS = {
   courses: ['courses'],
   course: (courseId: string) => ['course', courseId],
-  continueTarget: ['continue'],
   cues: (lectureId: string, languages: readonly string[]) => [
     'cues',
     lectureId,
@@ -63,18 +55,6 @@ export function useCourse(courseId: string): UseQueryResult<CourseDetail> {
         params: { path: { courseId } },
       })
       if (data === undefined) throw new ApiRequestError(`load course ${courseId}`, response.status)
-      return data
-    },
-  })
-}
-
-export function useContinueTarget(): UseQueryResult<ContinueTarget | null> {
-  return useQuery({
-    queryKey: QUERY_KEYS.continueTarget,
-    queryFn: async () => {
-      const { data, response } = await apiClient.GET('/api/continue')
-      if (response.status === 204) return null
-      if (data === undefined) throw new ApiRequestError('load continue target', response.status)
       return data
     },
   })

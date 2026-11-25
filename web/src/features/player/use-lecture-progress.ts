@@ -31,7 +31,6 @@ export function useLectureProgress(
     if (!isNewlyCompleted) return
     void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.course(courseId) })
     void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.courses })
-    void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.continueTarget })
   })
   const onSaveFailed = useEffectEvent((error: unknown) => {
     setLastError(error instanceof Error ? error : new Error(String(error)))
