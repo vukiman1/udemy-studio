@@ -62,6 +62,20 @@ paths:
         "204":
           description: Nothing to continue yet
 
+  /api/history:
+    get:
+      operationId: listHistory
+      summary: The lectures most recently watched, newest first
+      responses:
+        "200":
+          description: Watched lectures still in the library, newest first
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/HistoryEntry"
+
   /api/search:
     get:
       operationId: searchSubtitles
@@ -934,6 +948,27 @@ components:
         positionSeconds:
           type: number
           format: double
+
+    HistoryEntry:
+      type: object
+      required: [courseId, courseTitle, lectureId, lectureTitle, positionSeconds, completed, updatedAt]
+      properties:
+        courseId:
+          type: string
+        courseTitle:
+          type: string
+        lectureId:
+          type: string
+        lectureTitle:
+          type: string
+        positionSeconds:
+          type: number
+          format: double
+        completed:
+          type: boolean
+        updatedAt:
+          type: string
+          format: date-time
 
     Note:
       type: object

@@ -1,7 +1,7 @@
-import { Book, Download, Search, Settings, type LucideIcon } from 'lucide-react'
+import { Book, Download, History, Search, Settings, type LucideIcon } from 'lucide-react'
 import type { ReactElement } from 'react'
 import { NavLink, Outlet } from 'react-router'
-import { AI_SETTINGS_PATH, DOWNLOADS_PATH, LIBRARY_PATH, SEARCH_PATH } from './paths'
+import { AI_SETTINGS_PATH, DOWNLOADS_PATH, HISTORY_PATH, LIBRARY_PATH, SEARCH_PATH } from './paths'
 
 interface NavItem {
   readonly to: string
@@ -13,6 +13,7 @@ const NAV_ITEMS: readonly NavItem[] = [
   { to: LIBRARY_PATH, label: 'Thư viện', icon: Book },
   { to: SEARCH_PATH, label: 'Tìm phụ đề', icon: Search },
   { to: DOWNLOADS_PATH, label: 'Tải khoá học', icon: Download },
+  { to: HISTORY_PATH, label: 'Lịch sử', icon: History },
   { to: AI_SETTINGS_PATH, label: 'Cài đặt AI', icon: Settings },
 ]
 
@@ -50,7 +51,7 @@ export function AppShell(): ReactElement {
         aria-label="Điều hướng chính"
         className="fixed inset-x-0 bottom-0 border-t border-line bg-sidebar md:hidden"
       >
-        <ul className="m-0 grid list-none grid-cols-4 p-0">
+        <ul className="m-0 grid list-none grid-cols-5 p-0">
           {NAV_ITEMS.map((item) => (
             <li key={item.to}>
               <NavLink
