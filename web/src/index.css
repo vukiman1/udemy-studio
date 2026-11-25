@@ -122,9 +122,3 @@
     @apply border-accent outline-none;
   }
 }
-
-@layer components {
-  .link-button {
-    @apply rounded-none bg-transparent p-0 text-accent;
-  }
-}
