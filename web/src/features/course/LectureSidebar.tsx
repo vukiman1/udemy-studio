@@ -32,7 +32,7 @@ export function LectureSidebar({ course }: LectureSidebarProps): ReactElement {
         className="sticky top-0 z-10 flex items-center gap-3 bg-sidebar px-2 py-4 text-lg font-semibold max-lg:static"
       >
         <List className="size-5" aria-hidden="true" />
-        Nội dung
+        Contents
       </h2>
       {course.chapters.map((chapter) => (
         <details
@@ -78,7 +78,7 @@ export function LectureSidebar({ course }: LectureSidebarProps): ReactElement {
 }
 
 const KIND_LABELS = {
-  article: 'Bài viết',
+  article: 'Article',
   quiz: 'Quiz',
   unavailable: 'DRM',
 } as const satisfies Record<Exclude<LectureSummary['kind'], 'video'>, string>

@@ -40,7 +40,7 @@ export function SettingsFooter({ settings, editor }: SettingsFooterProps): React
             save.mutate()
           }}
         >
-          {save.isPending ? 'Đang kiểm tra & lưu…' : 'Lưu'}
+          {save.isPending ? 'Checking & saving…' : 'Save'}
         </Button>
         {editor.isInUse && (
           <Button
@@ -51,7 +51,7 @@ export function SettingsFooter({ settings, editor }: SettingsFooterProps): React
               toggle.mutate()
             }}
           >
-            {settings.enabled ? 'Dừng' : 'Dùng lại'}
+            {settings.enabled ? 'Pause' : 'Resume'}
           </Button>
         )}
         {editor.saved !== undefined && (
@@ -64,7 +64,7 @@ export function SettingsFooter({ settings, editor }: SettingsFooterProps): React
               else setIsConfirmingDelete(true)
             }}
           >
-            {isConfirmingDelete ? 'Xoá hẳn khoá?' : 'Xoá'}
+            {isConfirmingDelete ? 'Delete key?' : 'Delete'}
           </Button>
         )}
       </div>
@@ -87,7 +87,7 @@ function FooterStatus({ settings, editor }: FooterStatusProps): ReactElement {
     return (
       <span className="mr-auto flex items-center gap-1.5 text-xs font-semibold text-success">
         <span className="size-2 rounded-full bg-success" aria-hidden="true" />
-        Đang sử dụng
+        In use
       </span>
     )
   return <span className="mr-auto text-xs text-muted">{statusText(settings, editor)}</span>
@@ -97,8 +97,8 @@ function statusText(settings: AISettings, editor: AIDraftEditor): string {
   const label = editor.provider.label
   const hasOnlySwitched =
     !editor.isInUse && editor.saved !== undefined && editor.draft.apiKey.trim() === ''
-  if (editor.isInUse && !editor.isDirty && !settings.enabled) return `Đang ngừng dùng ${label}.`
-  if (hasOnlySwitched) return `Đã lưu khoá ${label}; bấm Lưu để chuyển sang dùng ${label}.`
-  if (!settings.configured && editor.saved === undefined) return 'Chưa cấu hình AI nào.'
-  return 'Có thay đổi chưa lưu.'
+  if (editor.isInUse && !editor.isDirty && !settings.enabled) return `${label} is paused.`
+  if (hasOnlySwitched) return `${label} key saved; Save to switch to ${label}.`
+  if (!settings.configured && editor.saved === undefined) return 'No AI configured.'
+  return 'Unsaved changes.'
 }

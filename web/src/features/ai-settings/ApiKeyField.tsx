@@ -6,10 +6,11 @@ import { Button, ButtonVariant } from '../../ui/Button'
 import { TEXT_FIELD } from '../../ui/text-field'
 import { SETTINGS_LABEL, SETTINGS_ROW } from '../../ui/settings-row'
 import type { AIDraftEditor } from './use-ai-draft'
+import { DISPLAY_LOCALE } from '../../app/display-locale'
 
 const MS_PER_SECOND = 1000
-const SECONDS_FORMAT = new Intl.NumberFormat('vi-VN', { maximumFractionDigits: 1 })
-const CLOCK_FORMAT = new Intl.DateTimeFormat('vi-VN', { timeStyle: 'short' })
+const SECONDS_FORMAT = new Intl.NumberFormat(DISPLAY_LOCALE, { maximumFractionDigits: 1 })
+const CLOCK_FORMAT = new Intl.DateTimeFormat(DISPLAY_LOCALE, { timeStyle: 'short' })
 const CHECKING_ICON_CLASS = '[&_svg]:animate-spin'
 
 interface ApiKeyFieldProps {
@@ -30,7 +31,7 @@ export function ApiKeyField({ editor }: ApiKeyFieldProps): ReactElement {
     <div className="grid gap-3">
       <div className={SETTINGS_ROW}>
         <span className={SETTINGS_LABEL} id="api-key-label">
-          Khoá API
+          API key
         </span>
         <div className="flex flex-wrap items-center gap-2.5">
           {isEditingKey ? (
@@ -39,7 +40,7 @@ export function ApiKeyField({ editor }: ApiKeyFieldProps): ReactElement {
               type="password"
               autoComplete="off"
               aria-labelledby="api-key-label"
-              placeholder={`Dán khoá ${provider.label}`}
+              placeholder={`Paste a ${provider.label} key`}
               value={draft.apiKey}
               onChange={(event) => {
                 editor.typeKey(event.target.value)
@@ -59,12 +60,12 @@ export function ApiKeyField({ editor }: ApiKeyFieldProps): ReactElement {
                 check.reset()
               }}
             >
-              Huỷ
+              Cancel
             </Button>
           )}
           {!isEditingKey && (
             <Button icon={Eye} onClick={editor.startEditingKey}>
-              Đổi khoá
+              Change key
             </Button>
           )}
           <Button
@@ -75,14 +76,14 @@ export function ApiKeyField({ editor }: ApiKeyFieldProps): ReactElement {
               check.mutate()
             }}
           >
-            {check.isPending ? 'Đang kiểm tra…' : 'Kiểm tra'}
+            {check.isPending ? 'Checking…' : 'Check'}
           </Button>
         </div>
       </div>
       {check.isSuccess && (
         <p className="text-[13px] text-muted">
-          <span className="text-accent-soft">● Khoá dùng được.</span>
-          {` ${provider.model.label} trả lời sau ${SECONDS_FORMAT.format(check.data.result.latencyMs / MS_PER_SECOND)} giây, lúc ${CLOCK_FORMAT.format(check.data.at)}.`}
+          <span className="text-accent-soft">● Key works.</span>
+          {` ${provider.model.label} answered in ${SECONDS_FORMAT.format(check.data.result.latencyMs / MS_PER_SECOND)} s at ${CLOCK_FORMAT.format(check.data.at)}.`}
         </p>
       )}
       {check.isError && (

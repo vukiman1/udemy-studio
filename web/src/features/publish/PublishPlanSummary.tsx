@@ -1,13 +1,13 @@
 import { useState, type ReactElement, type ReactNode } from 'react'
-import { CircleAlert, CloudUpload } from 'lucide-react'
+import { CircleAlert, Cloud, CloudUpload } from 'lucide-react'
 import { usePublishPlan } from '../../api/publish-queries'
 import type { PublishPlan } from '../../api/types'
 import { DialogBody, DialogFooter } from '../../app/Dialog'
 import { Button, ButtonVariant } from '../../ui/Button'
+import { ChapterPicker } from '../../ui/ChapterPicker'
 import { StatTile } from '../../ui/StatTile'
 import { formatBytes } from '../compression/format'
-import { ChapterPicker } from './ChapterPicker'
-import { initialSelection, selectedBytes } from './chapter-selection'
+import { hasChanges, initialSelection, selectedBytes } from './chapter-selection'
 
 const NOTE = 'flex gap-2.5 rounded-xl bg-page px-4 py-3 text-[13px]'
 const NOTE_ICON = 'mt-0.5 size-4 shrink-0'
@@ -51,10 +51,10 @@ export function PublishPlanSummary({
             {plan.error.message}
           </p>
         ) : (
-          <p className="text-muted">Đang tải…</p>
+          <p className="text-muted">Loading…</p>
         )}
       </DialogBody>
-      <PlanFooter canStart={false} onStart={onDismiss} onDismiss={onDismiss} />
+      <PlanFooter startLabel="Publish" canStart={false} onStart={onDismiss} onDismiss={onDismiss} />
     </>
   )
 }
@@ -81,30 +81,45 @@ function PublishPlanForm({
         {children}
         <div className="flex flex-wrap gap-3">
           <StatTile
-            label="Chương"
+            label="Chapters"
             value={`${String(selected.size)}/${String(plan.chapters.length)}`}
           />
           <StatTile
-            label={`Dung lượng (≤ ${formatBytes(plan.limitBytes)})`}
+            label={`Size (≤ ${formatBytes(plan.limitBytes)})`}
             value={formatBytes(totalBytes)}
           />
         </div>
-        <ChapterPicker chapters={plan.chapters} selected={selected} onChange={setSelected} />
+        <ChapterPicker
+          chapters={plan.chapters.map((chapter) => ({
+            dir: chapter.dir,
+            detail: (
+              <>
+                {chapter.published && (
+                  <Cloud className="size-3.5 text-accent-soft" aria-label="On R2" />
+                )}
+                {formatBytes(chapter.sizeBytes)}
+              </>
+            ),
+          }))}
+          selected={selected}
+          onChange={setSelected}
+        />
         {!fits && (
           <p className={`${NOTE} text-danger`} role="alert">
             <CircleAlert className={NOTE_ICON} aria-hidden="true" />
-            Vượt hạn mức
+            Over the limit
           </p>
         )}
         {plan.replaces && plan.published !== undefined && (
           <p className={`${NOTE} text-muted`}>
             <CircleAlert className={`${NOTE_ICON} text-danger`} aria-hidden="true" />
-            Thay «{plan.published.title}» trên R2
+            Replaces «{plan.published.title}» on R2
           </p>
         )}
       </DialogBody>
       <PlanFooter
-        canStart={fits && selected.size > 0 && !isStarting}
+        startLabel={plan.published?.courseId === courseId ? 'Update' : 'Publish'}
+        canStart={fits && selected.size > 0 && !isStarting && hasChanges(plan, courseId, selected)}
         onStart={() => {
           onStart(plan.chapters.map((chapter) => chapter.dir).filter((dir) => selected.has(dir)))
         }}
@@ -115,22 +130,23 @@ function PublishPlanForm({
 }
 
 interface PlanFooterProps {
+  readonly startLabel: string
   readonly canStart: boolean
   readonly onStart: () => void
   readonly onDismiss: () => void
 }
 
-function PlanFooter({ canStart, onStart, onDismiss }: PlanFooterProps): ReactElement {
+function PlanFooter({ startLabel, canStart, onStart, onDismiss }: PlanFooterProps): ReactElement {
   return (
     <DialogFooter>
-      <Button onClick={onDismiss}>Thôi</Button>
+      <Button onClick={onDismiss}>Cancel</Button>
       <Button
         variant={ButtonVariant.Primary}
         icon={CloudUpload}
         disabled={!canStart}
         onClick={onStart}
       >
-        Đưa lên R2
+        {startLabel}
       </Button>
     </DialogFooter>
   )

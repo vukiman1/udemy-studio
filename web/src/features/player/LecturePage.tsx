@@ -19,10 +19,10 @@ export function LecturePage(): ReactElement {
   const startAtSeconds = parseStartSeconds(searchParams.get(START_SECONDS_PARAM))
   const course = useCourse(courseId)
   const videoRef = useRef<HTMLVideoElement | null>(null)
-  if (course.data === undefined) return <PageStatus tone="info" message="Đang tải bài học…" />
+  if (course.data === undefined) return <PageStatus tone="info" message="Loading lecture…" />
   const lecture = findLecture(course.data, lectureId)
   if (lecture === undefined)
-    return <PageStatus tone="error" message="Không tìm thấy bài học này trong khoá." />
+    return <PageStatus tone="error" message="Lecture not found in this course." />
 
   return (
     <article
@@ -50,7 +50,7 @@ export function LecturePage(): ReactElement {
       {lecture.kind === 'unavailable' && (
         <p className="flex items-center gap-2.5 rounded-2xl bg-card p-5 text-sm" role="status">
           <Info className="size-4 shrink-0 text-muted" aria-hidden="true" />
-          Bài này có DRM nên không tải được video; chỉ có phụ đề hoặc tài liệu kèm theo.
+          DRM-protected: no video, only subtitles or attachments.
         </p>
       )}
       {needsManualCompletion(lecture) && (

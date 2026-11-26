@@ -15,13 +15,13 @@ export function StorageKeysField({ editor }: StorageKeysFieldProps): ReactElemen
   if (!editor.isEditingKeys)
     return (
       <div className={SETTINGS_ROW}>
-        <span className={SETTINGS_LABEL}>Khoá truy cập</span>
+        <span className={SETTINGS_LABEL}>Access key</span>
         <div className="flex flex-wrap items-center gap-2.5">
           <span className="flex h-12 min-w-0 flex-1 basis-60 items-center truncate rounded-xl border border-line bg-input px-4 font-mono text-[13px] text-muted">
             {editor.saved.accessKeyIdHint}
           </span>
           <Button icon={Eye} onClick={editor.startEditingKeys}>
-            Đổi khoá
+            Change key
           </Button>
         </div>
       </div>
@@ -36,7 +36,7 @@ export function StorageKeysField({ editor }: StorageKeysFieldProps): ReactElemen
           type="text"
           autoComplete="off"
           spellCheck={false}
-          placeholder="Dán Access Key ID"
+          placeholder="Paste the Access Key ID"
           value={editor.draft.accessKeyId}
           onChange={(event) => {
             editor.typeAccessKeyId(event.target.value)
@@ -53,7 +53,7 @@ export function StorageKeysField({ editor }: StorageKeysFieldProps): ReactElemen
             type="password"
             autoComplete="off"
             aria-labelledby="secret-access-key-label"
-            placeholder="Dán Secret Access Key"
+            placeholder="Paste the Secret Access Key"
             value={editor.draft.secretAccessKey}
             onChange={(event) => {
               editor.typeSecretAccessKey(event.target.value)
@@ -61,7 +61,7 @@ export function StorageKeysField({ editor }: StorageKeysFieldProps): ReactElemen
           />
           {editor.canKeepSavedKeys && (
             <Button variant={ButtonVariant.Ghost} onClick={editor.keepSavedKeys}>
-              Huỷ
+              Cancel
             </Button>
           )}
         </div>

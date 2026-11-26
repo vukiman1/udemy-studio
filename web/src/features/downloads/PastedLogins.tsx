@@ -5,8 +5,9 @@ import { forgetPastedLogin, savePastedLogin, usePastedLogins } from '../../api/d
 import { QUERY_KEYS } from '../../api/queries'
 import { Button, ButtonSize, ButtonVariant } from '../../ui/Button'
 import { TEXT_FIELD } from '../../ui/text-field'
+import { DISPLAY_LOCALE } from '../../app/display-locale'
 
-const DATE_FORMAT = new Intl.DateTimeFormat('vi-VN', { dateStyle: 'medium' })
+const DATE_FORMAT = new Intl.DateTimeFormat(DISPLAY_LOCALE, { dateStyle: 'medium' })
 
 // A token pasted by hand stands in for Chrome where the app cannot read it, such as in Docker.
 export function PastedLogins(): ReactElement {
@@ -28,7 +29,7 @@ export function PastedLogins(): ReactElement {
 
   return (
     <div className="grid gap-3">
-      <h3 className="text-sm font-semibold">Token dán tay</h3>
+      <h3 className="text-sm font-semibold">Pasted tokens</h3>
       {logins.isError && (
         <p className="text-[13px] text-danger" role="alert">
           {logins.error.message}
@@ -39,7 +40,7 @@ export function PastedLogins(): ReactElement {
           {logins.data.map((saved) => (
             <li key={saved.host} className="flex items-center justify-between gap-3">
               <span className="wrap-anywhere">
-                {saved.host} · {saved.userName} · dán ngày{' '}
+                {saved.host} · {saved.userName} · pasted{' '}
                 {DATE_FORMAT.format(new Date(saved.savedAt))}
               </span>
               <button
@@ -50,7 +51,7 @@ export function PastedLogins(): ReactElement {
                   forget.mutate(saved.host)
                 }}
               >
-                Xoá
+                Delete
               </button>
             </li>
           ))}
@@ -65,7 +66,7 @@ export function PastedLogins(): ReactElement {
       >
         <input
           className={TEXT_FIELD}
-          aria-label="Trang Udemy"
+          aria-label="Udemy site"
           placeholder="tencongty.udemy.com"
           value={host}
           onChange={(event) => {
@@ -77,7 +78,7 @@ export function PastedLogins(): ReactElement {
           type="password"
           autoComplete="off"
           aria-label="Token access_token"
-          placeholder="Dán giá trị access_token"
+          placeholder="Paste the access_token value"
           value={token}
           onChange={(event) => {
             setToken(event.target.value)
@@ -90,7 +91,7 @@ export function PastedLogins(): ReactElement {
           icon={Save}
           disabled={!canSave}
         >
-          {save.isPending ? 'Đang kiểm tra…' : 'Lưu token'}
+          {save.isPending ? 'Checking…' : 'Save token'}
         </Button>
       </form>
       {save.isError && (
@@ -104,9 +105,7 @@ export function PastedLogins(): ReactElement {
         </p>
       )}
       <p className="text-xs text-muted">
-        Lấy trong Chrome: mở trang Udemy, bấm F12, vào Application → Cookies, chép giá trị dòng
-        access_token. Token dùng được khoảng 30 ngày; khi hết hạn, lượt tải sẽ báo lỗi đăng nhập và
-        chỉ cần dán token mới.
+        In Chrome on Udemy: F12 → Application → Cookies → copy access_token. Lasts about 30 days.
       </p>
     </div>
   )

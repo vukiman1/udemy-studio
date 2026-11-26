@@ -7,9 +7,9 @@ export enum LectureStatus {
 }
 
 export const LECTURE_STATUS_LABELS: Readonly<Record<LectureStatus, string>> = {
-  [LectureStatus.Completed]: 'Đã học',
-  [LectureStatus.InProgress]: 'Đang học',
-  [LectureStatus.NotStarted]: 'Chưa học',
+  [LectureStatus.Completed]: 'Completed',
+  [LectureStatus.InProgress]: 'In progress',
+  [LectureStatus.NotStarted]: 'Not started',
 }
 
 export function lectureStatus(lecture: LectureSummary): LectureStatus {

@@ -70,7 +70,7 @@ export function StudioSkin(props: StudioSkinProps): ReactElement {
 
           <Controls.Group
             className="pointer-events-auto flex items-center gap-0.5"
-            aria-label="Điều khiển phát"
+            aria-label="Playback controls"
           >
             <PlayButton
               className={CONTROL_BUTTON}
@@ -112,7 +112,7 @@ export function StudioSkin(props: StudioSkinProps): ReactElement {
               type="button"
               className={CONTROL_BUTTON}
               aria-pressed={props.areSubtitlesOn}
-              aria-label={props.areSubtitlesOn ? 'Tắt phụ đề' : 'Bật phụ đề'}
+              aria-label={props.areSubtitlesOn ? 'Hide subtitles' : 'Show subtitles'}
               onClick={props.onToggleSubtitles}
             >
               {props.areSubtitlesOn ? (

@@ -10,8 +10,8 @@ import type { StorageDraftEditor } from './use-storage-draft'
 const CHECKING_ICON_CLASS = '[&_svg]:animate-spin'
 
 const ACCESS_TEXT: Readonly<Record<StorageAccess, string>> = {
-  'read-write': 'Đọc–ghi: bản trên Mac đẩy khoá học lên bucket này được.',
-  'read-only': 'Chỉ đọc: hợp với bản học trên VPS, không đẩy khoá lên được.',
+  'read-write': 'Read-write: can publish courses here.',
+  'read-only': 'Read-only: for the cloud copy; cannot publish.',
 }
 
 interface StorageCheckFieldProps {
@@ -34,7 +34,7 @@ export function StorageCheckField({ editor }: StorageCheckFieldProps): ReactElem
             check.mutate(editor.draft)
           }}
         >
-          {check.isPending ? 'Đang kiểm tra…' : 'Kiểm tra kết nối'}
+          {check.isPending ? 'Checking…' : 'Check connection'}
         </Button>
         {isForCurrentDraft && check.isSuccess && <CheckResult result={check.data} />}
         {isForCurrentDraft && check.isError && (
@@ -54,9 +54,9 @@ interface CheckResultProps {
 function CheckResult({ result }: CheckResultProps): ReactElement {
   return (
     <p className="text-[13px] text-muted">
-      <span className="text-accent-soft">● Kết nối được.</span>
+      <span className="text-accent-soft">● Connected.</span>
       {` ${ACCESS_TEXT[result.access]} `}
-      {result.hasCourse ? 'Bucket đang có một khoá học.' : 'Bucket chưa có khoá học nào.'}
+      {result.hasCourse ? 'Bucket holds a course.' : 'Bucket is empty.'}
     </p>
   )
 }

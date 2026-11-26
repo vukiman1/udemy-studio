@@ -8,6 +8,13 @@ import (
 	"database/sql"
 )
 
+type CompressionSaving struct {
+	VideoPath   string
+	CourseDir   string
+	BytesBefore int64
+	BytesAfter  int64
+}
+
 type CompressionSkip struct {
 	VideoPath string
 	SizeBytes int64

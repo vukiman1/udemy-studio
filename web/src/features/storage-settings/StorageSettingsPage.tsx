@@ -1,7 +1,8 @@
 import type { ReactElement } from 'react'
-import { useStorageSettings } from '../../api/storage-queries'
+import { useStorageSettings, useStorageUsage } from '../../api/storage-queries'
 import type { StorageSettings } from '../../api/types'
 import { PageStatus } from '../../app/PageStatus'
+import { StorageUsageMeter } from '../../app/StorageUsageMeter'
 import { SettingsCard } from '../../ui/SettingsCard'
 import { SETTINGS_LABEL, SETTINGS_ROW } from '../../ui/settings-row'
 import { TEXT_FIELD } from '../../ui/text-field'
@@ -17,12 +18,7 @@ export function StorageSettingsPage(): ReactElement {
 
   return (
     <main className="grid max-w-[1160px] content-start gap-7 px-5 py-8 md:px-10 md:py-10">
-      <div className="grid gap-2">
-        <h1 className="text-[30px] font-semibold">Lưu trữ đám mây</h1>
-        <p className="text-sm text-muted">
-          Kết nối một bucket Cloudflare R2 (hoặc S3) để đưa khoá đang học lên và học ở mọi nơi.
-        </p>
-      </div>
+      <h1 className="text-[30px] font-semibold">Cloud storage</h1>
       {settings.isError && <PageStatus tone="error" message={settings.error.message} />}
       {settings.data !== undefined && (
         <StorageEditor key={settingsVersion(settings.data)} saved={settings.data} />
@@ -38,7 +34,7 @@ interface StorageEditorProps {
 function StorageEditor({ saved }: StorageEditorProps): ReactElement {
   const editor = useStorageDraft(saved)
   return (
-    <SettingsCard title="Kết nối">
+    <SettingsCard title="Connection">
       <label className={SETTINGS_ROW}>
         <span className={SETTINGS_LABEL}>S3 API URL</span>
         <input
@@ -55,8 +51,20 @@ function StorageEditor({ saved }: StorageEditorProps): ReactElement {
       </label>
       <StorageKeysField editor={editor} />
       <StorageCheckField editor={editor} />
+      {saved.configured && <UsageField />}
       <StorageFooter editor={editor} />
     </SettingsCard>
+  )
+}
+
+function UsageField(): ReactElement | null {
+  const usage = useStorageUsage(true)
+  if (usage.data == null) return null
+  return (
+    <div className={SETTINGS_ROW}>
+      <span className={SETTINGS_LABEL}>Usage</span>
+      <StorageUsageMeter {...usage.data} />
+    </div>
   )
 }
 

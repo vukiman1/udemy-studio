@@ -12,7 +12,7 @@ export function AISettingsPage(): ReactElement {
 
   return (
     <main className="grid max-w-[1160px] content-start gap-7 px-5 py-8 md:px-10 md:py-10">
-      <h1 className="text-[30px] font-semibold">Cài đặt AI</h1>
+      <h1 className="text-[30px] font-semibold">AI settings</h1>
       {error !== null && <PageStatus tone="error" message={error.message} />}
       {providers.data?.[0] !== undefined && settings.data !== undefined && (
         <AISettingsEditor

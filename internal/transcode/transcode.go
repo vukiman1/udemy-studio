@@ -74,10 +74,9 @@ type Plan struct {
 	OtherCodec int
 	NotWorthIt int
 	// Unreadable counts videos ffprobe cannot read, such as a download left unfinished.
-	Unreadable   int
-	TotalBytes   int64
-	TotalLength  time.Duration
-	EstimatedFor time.Duration
+	Unreadable int
+	// ShareAfter is how much of the size earlier encodes kept; zero until one is recorded.
+	ShareAfter float64
 }
 
 type State string

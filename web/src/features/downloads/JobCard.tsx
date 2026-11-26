@@ -6,8 +6,12 @@ import { ProgressBar } from '../../app/ProgressBar'
 import { Button, ButtonSize, ButtonVariant } from '../../ui/Button'
 import { jobErrorText } from './job-error'
 import { JOB_STATUS_LABELS, isActive } from './job-list'
+import { DISPLAY_LOCALE } from '../../app/display-locale'
 
-const TIME_FORMAT = new Intl.DateTimeFormat('vi-VN', { dateStyle: 'short', timeStyle: 'short' })
+const TIME_FORMAT = new Intl.DateTimeFormat(DISPLAY_LOCALE, {
+  dateStyle: 'short',
+  timeStyle: 'short',
+})
 
 const STATUS_PILLS: Readonly<Record<Job['status'], string>> = {
   queued: 'bg-button text-muted',
@@ -45,7 +49,7 @@ export function JobCard({ job }: JobCardProps): ReactElement {
               cancel.mutate(job.id)
             }}
           >
-            Huỷ
+            Cancel
           </Button>
         )}
       </header>
@@ -53,7 +57,7 @@ export function JobCard({ job }: JobCardProps): ReactElement {
         {TIME_FORMAT.format(new Date(job.createdAt))}
         {job.chapters === undefined ? '' : ` · chapter ${job.chapters}`}
         {progress.totalLectures > 0 &&
-          ` · ${String(progress.finishedCount)}/${String(progress.totalLectures)} bài`}
+          ` · ${String(progress.finishedCount)}/${String(progress.totalLectures)} lectures`}
       </p>
       {isActive(job) && progress.totalLectures > 0 && (
         <ProgressBar
@@ -63,7 +67,7 @@ export function JobCard({ job }: JobCardProps): ReactElement {
         />
       )}
       {progress.currentLecture !== undefined && (
-        <p className="text-[13px] wrap-anywhere">Đang xử lý: {progress.currentLecture}</p>
+        <p className="text-[13px] wrap-anywhere">{progress.currentLecture}</p>
       )}
       {job.error !== undefined && (
         <p className="text-[13px] wrap-anywhere text-danger" title={job.error}>
@@ -72,14 +76,14 @@ export function JobCard({ job }: JobCardProps): ReactElement {
       )}
       {cancel.isError && (
         <p className="text-[13px] text-danger" role="alert">
-          Không huỷ được: {cancel.error.message}
+          Could not cancel: {cancel.error.message}
         </p>
       )}
       {job.failures.length > 0 && (
         <details className="group text-[13px]">
           <summary className="cursor-pointer list-none font-medium text-danger [&::-webkit-details-marker]:hidden">
             <span className="inline-block transition-transform group-open:rotate-90">▸</span>{' '}
-            {job.failures.length} mục lỗi, tải lại để thử lại
+            {job.failures.length} failed; download again to retry
           </summary>
           <ul className="mt-1.5 grid list-disc gap-1 pl-5 wrap-anywhere">
             {job.failures.map((failure) => (

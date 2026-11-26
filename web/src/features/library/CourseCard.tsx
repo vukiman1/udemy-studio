@@ -4,7 +4,7 @@ import { Link } from 'react-router'
 import type { CourseSummary, CourseTools, PublishRun } from '../../api/types'
 import { coursePath, lecturePath } from '../../app/paths'
 import { ProgressBar } from '../../app/ProgressBar'
-import { ButtonSize, ButtonVariant, buttonClass } from '../../ui/Button'
+import { Button, ButtonVariant } from '../../ui/Button'
 import { CompressionDialog } from '../compression/CompressionDialog'
 import { formatBytes } from '../compression/format'
 import { PublishDialog } from '../publish/PublishDialog'
@@ -50,12 +50,9 @@ export function CourseCard({ course, tools, publish }: CourseCardProps): ReactEl
   }
 
   return (
-    <article className="group/card relative flex flex-wrap items-start gap-x-5 gap-y-3 overflow-hidden rounded-2xl bg-card p-3 transition-[translate] duration-300 ease-soft motion-safe:hover:-translate-y-1 md:flex-nowrap md:items-center md:pr-5">
+    <article className="relative flex flex-wrap items-start gap-x-5 gap-y-3 overflow-hidden rounded-2xl bg-card p-3 md:flex-nowrap md:items-center md:pr-5">
       <Link to={coursePath(course.id)} tabIndex={-1} aria-hidden="true">
-        <CourseThumb
-          course={course}
-          className="block aspect-video w-24 rounded-[10px] transition-[scale] duration-300 ease-soft motion-safe:group-hover/card:scale-[1.04] md:w-40"
-        />
+        <CourseThumb course={course} className="block aspect-video w-24 rounded-[10px] md:w-40" />
       </Link>
       <div className="grid min-w-0 flex-1 gap-3.5 py-1.5">
         <h2 className="m-0 text-[17px] leading-snug font-semibold wrap-anywhere">
@@ -68,7 +65,7 @@ export function CourseCard({ course, tools, publish }: CourseCardProps): ReactEl
             className="h-2 rounded"
           />
           <span className="flex flex-wrap items-center gap-x-2 text-[13px] text-muted">
-            {course.completedLectures} / {course.playableLectures} bài đã học ·{' '}
+            {course.completedLectures} / {course.playableLectures} lectures ·{' '}
             {formatBytes(course.sizeBytes)}
             {publish?.isPublished === true && (
               <span className="inline-flex items-center gap-1 rounded-full bg-accent/15 px-2 py-0.5 text-xs font-semibold text-accent-soft">
@@ -80,10 +77,9 @@ export function CourseCard({ course, tools, publish }: CourseCardProps): ReactEl
         </div>
       </div>
       <div className="flex basis-full flex-wrap gap-2 md:basis-auto md:flex-nowrap">
-        <Link className={buttonClass(ButtonVariant.Primary, ButtonSize.Medium)} to={resumeTo}>
-          <Play aria-hidden="true" />
-          Tiếp tục
-        </Link>
+        <Button to={resumeTo} variant={ButtonVariant.Primary} icon={Play}>
+          Continue
+        </Button>
         {translation !== undefined && (
           <CourseToolButton
             icon={Languages}

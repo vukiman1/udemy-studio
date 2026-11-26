@@ -18,6 +18,8 @@ const (
 
 const IndexKey = "studio.json"
 
+const FreeQuotaBytes int64 = 10_000_000_000
+
 var (
 	ErrInvalidURL       = errors.New("invalid S3 API URL")
 	ErrNoCredentials    = errors.New("enter both the access key ID and the secret access key")

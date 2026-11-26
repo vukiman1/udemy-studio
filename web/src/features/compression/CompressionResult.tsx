@@ -22,23 +22,23 @@ export function CompressionResult({ run }: CompressionResultProps): ReactElement
         />
         <div className="grid gap-0.5">
           <p className={`text-[15px] font-semibold ${isCancelled ? '' : 'text-success'}`}>
-            {isCancelled ? 'Đã dừng' : 'Nén xong'} {compressed}/{run.total} video
+            {isCancelled ? 'Stopped' : 'Done'} {compressed}/{run.total} videos
           </p>
           <p>
             {compressed > 0
-              ? `${formatBytes(run.bytesBefore)} → ${formatBytes(run.bytesAfter)} · tiết kiệm ${formatBytes(run.bytesBefore - run.bytesAfter)}`
-              : 'Chưa có video nào được thay.'}
+              ? `${formatBytes(run.bytesBefore)} → ${formatBytes(run.bytesAfter)} · saved ${formatBytes(run.bytesBefore - run.bytesAfter)}`
+              : 'No video replaced yet.'}
           </p>
         </div>
       </div>
       {run.skipped.map((outcome) => (
         <p key={outcome.path} className="text-muted">
-          Giữ bản gốc: {outcome.lectureTitle} ({outcome.reason})
+          Kept original: {outcome.lectureTitle} ({outcome.reason})
         </p>
       ))}
       {run.failed.map((outcome) => (
         <p key={outcome.path} className="text-danger">
-          Lỗi: {outcome.lectureTitle} ({outcome.reason})
+          Failed: {outcome.lectureTitle} ({outcome.reason})
         </p>
       ))}
     </div>

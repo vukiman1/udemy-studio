@@ -35,7 +35,7 @@ export function PublishDialog({ courseId, title, run, onClose }: PublishDialogPr
   )
 
   return (
-    <Dialog label={`Đưa lên R2: ${title}`} onClose={onClose}>
+    <Dialog label={`Publish to R2: ${title}`} onClose={onClose}>
       {run !== undefined && isPublishing(run) ? (
         <>
           <DialogBody>
@@ -51,7 +51,7 @@ export function PublishDialog({ courseId, title, run, onClose }: PublishDialogPr
                 cancel.mutate()
               }}
             >
-              Dừng
+              Stop
             </Button>
             <RunInBackgroundButton onClick={onClose} />
           </DialogFooter>

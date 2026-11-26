@@ -1,28 +1,40 @@
-import type { ReactElement, ReactNode } from 'react'
-import { Archive, Info } from 'lucide-react'
+import { useState, type ReactElement, type ReactNode } from 'react'
+import { Archive } from 'lucide-react'
 import { useCompressionPlan } from '../../api/compression-queries'
+import type { CompressionPlan } from '../../api/types'
 import { DialogBody, DialogFooter } from '../../app/Dialog'
 import { Button, ButtonVariant } from '../../ui/Button'
+import { ChapterPicker } from '../../ui/ChapterPicker'
 import { StatTile } from '../../ui/StatTile'
 import { formatBytes, formatRoughDuration } from './format'
+import { estimatedSizeAfter, selectionTotals, type SizeEstimate } from './selection-totals'
+
+const NOTHING_SELECTED = '—'
 
 interface CompressionPlanSummaryProps {
   readonly courseId: string
   readonly isStarting: boolean
-  readonly onStart: () => void
+  readonly onStart: (chapters: readonly string[]) => void
   readonly onDismiss: () => void
   readonly children: ReactNode
 }
 
 export function CompressionPlanSummary({
   courseId,
-  isStarting,
-  onStart,
-  onDismiss,
   children,
+  ...actions
 }: CompressionPlanSummaryProps): ReactElement {
   const plan = useCompressionPlan(courseId)
-  const files = plan.data?.files ?? 0
+  if (plan.data !== undefined && plan.data.chapters.length > 0)
+    return (
+      <CompressionPlanForm
+        key={plan.data.chapters.map((chapter) => chapter.dir).join('|')}
+        plan={plan.data}
+        {...actions}
+      >
+        {children}
+      </CompressionPlanForm>
+    )
 
   return (
     <>
@@ -30,56 +42,102 @@ export function CompressionPlanSummary({
         {children}
         {plan.isError && (
           <p className="text-danger" role="alert">
-            Không kiểm tra được video ({plan.error.message}).
+            Could not check the videos ({plan.error.message}).
           </p>
         )}
-        {plan.isPending && <p className="text-muted">Đang kiểm tra các video…</p>}
+        {plan.isPending && <p className="text-muted">Checking videos…</p>}
         {plan.data !== undefined && (
           <>
-            {files === 0 ? (
-              <p>Không còn video nào cần nén.</p>
-            ) : (
-              <>
-                <div className="flex flex-wrap gap-3">
-                  <StatTile label="Video sẽ nén" value={String(files)} />
-                  <StatTile label="Dung lượng hiện tại" value={formatBytes(plan.data.totalBytes)} />
-                  <StatTile
-                    label="Thời gian ước tính"
-                    value={`~ ${formatRoughDuration(plan.data.estimatedSeconds)}`}
-                  />
-                </div>
-                <p className="flex gap-2.5 rounded-xl bg-page px-4 py-3 text-[13px] text-muted">
-                  <Info className="mt-0.5 size-4 shrink-0 text-accent-soft" aria-hidden="true" />
-                  Trong lúc nén vẫn học được. Bài đang được nén có thể giật một lần lúc file được
-                  thay, tải lại trang là hết.
-                </p>
-              </>
-            )}
+            <p>Nothing left to compress.</p>
             <SkippedVideos {...plan.data} />
           </>
         )}
       </DialogBody>
       <DialogFooter>
-        {files > 0 ? (
-          <>
-            <Button onClick={onDismiss}>Thôi</Button>
-            <Button
-              variant={ButtonVariant.Primary}
-              icon={Archive}
-              disabled={isStarting}
-              onClick={onStart}
-            >
-              Bắt đầu nén
-            </Button>
-          </>
-        ) : (
-          <Button variant={ButtonVariant.Primary} onClick={onDismiss}>
-            Đóng
-          </Button>
-        )}
+        <Button variant={ButtonVariant.Primary} onClick={actions.onDismiss}>
+          Close
+        </Button>
       </DialogFooter>
     </>
   )
+}
+
+interface CompressionPlanFormProps extends Omit<CompressionPlanSummaryProps, 'courseId'> {
+  readonly plan: CompressionPlan
+}
+
+function CompressionPlanForm({
+  plan,
+  isStarting,
+  onStart,
+  onDismiss,
+  children,
+}: CompressionPlanFormProps): ReactElement {
+  const [selected, setSelected] = useState<ReadonlySet<string>>(
+    () => new Set(plan.chapters.map((chapter) => chapter.dir)),
+  )
+  const totals = selectionTotals(plan.chapters, selected)
+  const after = estimatedSizeAfter(totals.totalBytes, plan.expectedShareAfter)
+
+  return (
+    <>
+      <DialogBody>
+        {children}
+        <div className="flex flex-wrap gap-3">
+          <StatTile label="Videos" value={String(totals.videos)} />
+          <StatTile label="Current size" value={formatBytes(totals.totalBytes)} />
+          <SizeAfterTile estimate={after} hasSelection={totals.videos > 0} />
+          <StatTile
+            label="Estimated time"
+            value={
+              totals.videos > 0
+                ? `~ ${formatRoughDuration(totals.estimatedSeconds)}`
+                : NOTHING_SELECTED
+            }
+          />
+        </div>
+        <ChapterPicker
+          chapters={plan.chapters.map((chapter) => ({
+            dir: chapter.dir,
+            detail: `${videoCount(chapter.videos)} · ${formatBytes(chapter.totalBytes)}`,
+          }))}
+          selected={selected}
+          onChange={setSelected}
+        />
+        <SkippedVideos {...plan} />
+      </DialogBody>
+      <DialogFooter>
+        <Button onClick={onDismiss}>Cancel</Button>
+        <Button
+          variant={ButtonVariant.Primary}
+          icon={Archive}
+          disabled={isStarting || selected.size === 0}
+          onClick={() => {
+            onStart([...selected])
+          }}
+        >
+          Compress
+        </Button>
+      </DialogFooter>
+    </>
+  )
+}
+
+function videoCount(videos: number): string {
+  return videos === 1 ? '1 video' : `${String(videos)} videos`
+}
+
+interface SizeAfterTileProps {
+  readonly estimate: SizeEstimate
+  readonly hasSelection: boolean
+}
+
+function SizeAfterTile({ estimate, hasSelection }: SizeAfterTileProps): ReactElement {
+  const label = 'Size after (estimate)'
+  if (!hasSelection) return <StatTile label={label} value={NOTHING_SELECTED} />
+  const range = `${formatBytes(estimate.lowBytes)} – ${formatBytes(estimate.highBytes)}`
+  if (estimate.likelyBytes === undefined) return <StatTile label={label} value={range} />
+  return <StatTile label={label} value={`≈ ${formatBytes(estimate.likelyBytes)}`} note={range} />
 }
 
 interface SkippedVideosProps {
@@ -96,11 +154,11 @@ function SkippedVideos({
   unreadable,
 }: SkippedVideosProps): ReactElement | null {
   const leftAlone = [
-    alreadyHevc > 0 ? `${String(alreadyHevc)} video đã là H.265` : '',
-    otherCodec > 0 ? `${String(otherCodec)} video mã hoá khác` : '',
-    notWorthIt > 0 ? `${String(notWorthIt)} video lần trước nén không lợi hơn` : '',
-    unreadable > 0 ? `${String(unreadable)} video không đọc được (có thể tải chưa xong)` : '',
+    alreadyHevc > 0 ? `${String(alreadyHevc)} already H.265` : '',
+    otherCodec > 0 ? `${String(otherCodec)} other codec` : '',
+    notWorthIt > 0 ? `${String(notWorthIt)} not smaller last time` : '',
+    unreadable > 0 ? `${String(unreadable)} unreadable (maybe still downloading)` : '',
   ].filter((part) => part !== '')
   if (leftAlone.length === 0) return null
-  return <p className="text-xs text-muted">Bỏ qua: {leftAlone.join(', ')}.</p>
+  return <p className="text-xs text-muted">Skipped: {leftAlone.join(', ')}.</p>
 }

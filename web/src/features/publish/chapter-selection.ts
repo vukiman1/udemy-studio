@@ -14,9 +14,14 @@ export function selectedBytes(plan: PublishPlan, selected: ReadonlySet<string>):
     .reduce((total, chapter) => total + chapter.sizeBytes, plan.sharedBytes)
 }
 
-export function toggled(selected: ReadonlySet<string>, dir: string): ReadonlySet<string> {
-  const next = new Set(selected)
-  if (next.has(dir)) next.delete(dir)
-  else next.add(dir)
-  return next
+export function hasChanges(
+  plan: PublishPlan,
+  courseId: string,
+  selected: ReadonlySet<string>,
+): boolean {
+  if (plan.published?.courseId !== courseId || plan.sharedChanged) return true
+  return plan.chapters.some((chapter) => {
+    const isSelected = selected.has(chapter.dir)
+    return isSelected !== chapter.published || (isSelected && chapter.changed)
+  })
 }

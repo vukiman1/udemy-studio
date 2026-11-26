@@ -30,37 +30,37 @@ export function TranslationPlanSummary({
         {children}
         {plan.isError && (
           <p className="text-danger" role="alert">
-            Không lập được kế hoạch dịch ({plan.error.message}).
+            Could not plan the translation ({plan.error.message}).
           </p>
         )}
-        {plan.isPending && <p className="text-muted">Đang đọc phụ đề…</p>}
+        {plan.isPending && <p className="text-muted">Reading subtitles…</p>}
         {plan.data !== undefined &&
           (lectures === 0 ? (
-            <p>Không còn bài nào cần dịch.</p>
+            <p>Nothing left to translate.</p>
           ) : (
             <div className="flex flex-wrap gap-3">
-              <StatTile label="Bài sẽ dịch" value={String(lectures)} />
-              <StatTile label="Bỏ qua (đã có TV)" value={String(plan.data.alreadyTranslated)} />
-              <StatTile label="Ước tính chi phí" value={`≈ ${formatUsd(plan.data.estimatedUsd)}`} />
+              <StatTile label="To translate" value={String(lectures)} />
+              <StatTile label="Already translated" value={String(plan.data.alreadyTranslated)} />
+              <StatTile label="Estimated cost" value={`≈ ${formatUsd(plan.data.estimatedUsd)}`} />
             </div>
           ))}
       </DialogBody>
       <DialogFooter>
         {lectures > 0 ? (
           <>
-            <Button onClick={onDismiss}>Thôi</Button>
+            <Button onClick={onDismiss}>Cancel</Button>
             <Button
               variant={ButtonVariant.Primary}
               icon={Languages}
               disabled={isStarting}
               onClick={onStart}
             >
-              Bắt đầu dịch
+              Translate
             </Button>
           </>
         ) : (
           <Button variant={ButtonVariant.Primary} onClick={onDismiss}>
-            Đóng
+            Close
           </Button>
         )}
       </DialogFooter>
