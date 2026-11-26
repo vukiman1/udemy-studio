@@ -687,6 +687,11 @@ export interface components {
             /** @enum {string} */
             status: "ok";
             version: string;
+            /**
+             * @description library holds the downloaded courses; cloud only reads the course published to cloud storage
+             * @enum {string}
+             */
+            role: "library" | "cloud";
         };
         /** @description RFC 9457 problem details */
         Problem: {

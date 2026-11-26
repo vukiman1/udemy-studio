@@ -59,6 +59,24 @@ func (e CompressionRunState) Valid() bool {
 	}
 }
 
+// Defines values for HealthRole.
+const (
+	Cloud   HealthRole = "cloud"
+	Library HealthRole = "library"
+)
+
+// Valid indicates whether the value is a known member of the HealthRole enum.
+func (e HealthRole) Valid() bool {
+	switch e {
+	case Cloud:
+		return true
+	case Library:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for HealthStatus.
 const (
 	Ok HealthStatus = "ok"
@@ -431,9 +449,14 @@ type CueLine struct {
 
 // Health defines model for Health.
 type Health struct {
+	// Role library holds the downloaded courses; cloud only reads the course published to cloud storage
+	Role    HealthRole   `json:"role"`
 	Status  HealthStatus `json:"status"`
 	Version string       `json:"version"`
 }
+
+// HealthRole library holds the downloaded courses; cloud only reads the course published to cloud storage
+type HealthRole string
 
 // HealthStatus defines model for Health.Status.
 type HealthStatus string
