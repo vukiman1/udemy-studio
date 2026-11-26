@@ -50,12 +50,9 @@ export function CourseCard({ course, tools, publish }: CourseCardProps): ReactEl
   }
 
   return (
-    <article className="group/card relative flex flex-wrap items-start gap-x-5 gap-y-3 overflow-hidden rounded-2xl bg-card p-3 transition-[translate] duration-300 ease-soft motion-safe:hover:-translate-y-1 md:flex-nowrap md:items-center md:pr-5">
+    <article className="relative flex flex-wrap items-start gap-x-5 gap-y-3 overflow-hidden rounded-2xl bg-card p-3 md:flex-nowrap md:items-center md:pr-5">
       <Link to={coursePath(course.id)} tabIndex={-1} aria-hidden="true">
-        <CourseThumb
-          course={course}
-          className="block aspect-video w-24 rounded-[10px] transition-[scale] duration-300 ease-soft motion-safe:group-hover/card:scale-[1.04] md:w-40"
-        />
+        <CourseThumb course={course} className="block aspect-video w-24 rounded-[10px] md:w-40" />
       </Link>
       <div className="grid min-w-0 flex-1 gap-3.5 py-1.5">
         <h2 className="m-0 text-[17px] leading-snug font-semibold wrap-anywhere">
