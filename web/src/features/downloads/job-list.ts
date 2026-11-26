@@ -5,7 +5,7 @@ const ACTIVE_STATUSES: readonly JobStatus[] = ['queued', 'running']
 export const JOB_STATUS_LABELS: Readonly<Record<JobStatus, string>> = {
   queued: 'Queued',
   running: 'Downloading',
-  succeeded: 'Xong',
+  succeeded: 'Done',
   failed: 'Failed',
   cancelled: 'Cancelled',
 }

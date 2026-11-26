@@ -66,7 +66,7 @@ export function PastedLogins(): ReactElement {
       >
         <input
           className={TEXT_FIELD}
-          aria-label="Trang Udemy"
+          aria-label="Udemy site"
           placeholder="tencongty.udemy.com"
           value={host}
           onChange={(event) => {

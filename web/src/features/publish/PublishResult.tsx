@@ -16,7 +16,7 @@ const RESULT_LOOKS: Readonly<Record<FinishedState, ResultLook>> = {
     icon: CircleCheck,
     box: 'bg-success-soft',
     accent: 'text-success',
-    heading: 'Xong',
+    heading: 'Done',
   },
   cancelled: { icon: CircleStop, box: 'bg-page', accent: 'text-muted', heading: 'Stopped' },
   failed: {
