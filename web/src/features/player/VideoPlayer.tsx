@@ -21,6 +21,7 @@ import { useLectureProgress } from './use-lecture-progress'
 import { useNativeFullscreenSubtitles } from './use-native-fullscreen-subtitles'
 import { usePlayerSettings } from './use-player-settings'
 import { useSettingsShortcuts } from './use-settings-shortcuts'
+import { useVideoRelink } from './use-video-relink'
 
 interface VideoPlayerProps {
   readonly videoRef: RefObject<HTMLVideoElement | null>
@@ -44,6 +45,7 @@ export function VideoPlayer({
   const cuesQuery = useCues(lecture.id, languages)
   const activeLines = useActiveLines(videoRef, cuesQuery.data ?? NO_CUES, languages)
   const { lastError } = useLectureProgress(videoRef, lecture, courseId, startAtSeconds)
+  useVideoRelink(videoRef)
   const trackSource = languages.length > 0 ? subtitlesVttUrl(lecture.id, languages) : undefined
   useNativeFullscreenSubtitles(videoRef, trackSource, languages[0])
 
