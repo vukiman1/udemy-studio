@@ -416,3 +416,34 @@ func TestThePlanMarksSharedChangesForACourseFile(t *testing.T) {
 		t.Error("a removed cover is not marked as a shared change")
 	}
 }
+
+func TestRemoveEmptiesTheCourseAndItsIndexOnly(t *testing.T) {
+	bucket := newMemoryBucket()
+	service := newTestService(t, courseTree(), bucket)
+	publish(t, service, firstCourseDir)
+	bucket.objects["other.txt"] = objectstore.Object{Key: "other.txt"}
+
+	if err := service.Remove(t.Context()); err != nil {
+		t.Fatalf("Remove: %v", err)
+	}
+	if len(bucket.objects) != 1 || bucket.deleteKeys[0] != objectstore.IndexKey {
+		t.Errorf("objects = %v, deletes = %v; want only the foreign object left and the index removed first", bucket.objects, bucket.deleteKeys)
+	}
+}
+
+func TestRemoveIsRefusedWhileACourseIsBeingPublished(t *testing.T) {
+	bucket := newMemoryBucket()
+	service := newTestService(t, courseTree(), bucket)
+	removed := make(chan error, 1)
+	bucket.onPut = func(ctx context.Context, _ string) error {
+		select {
+		case removed <- service.Remove(ctx):
+		default:
+		}
+		return nil
+	}
+	publish(t, service, firstCourseDir)
+	if err := <-removed; !errors.Is(err, ErrBusy) {
+		t.Errorf("Remove error = %v, want ErrBusy", err)
+	}
+}

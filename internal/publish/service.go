@@ -85,6 +85,7 @@ type Service struct {
 	mutex         sync.Mutex
 	run           *Run
 	cancelRunning context.CancelFunc
+	isRemoving    bool
 }
 
 func NewService(deps Deps) *Service {
@@ -120,6 +121,9 @@ func (service *Service) Start(ctx context.Context, courseID string, chapters []s
 	defer service.mutex.Unlock()
 	if service.run != nil && service.run.State == StateRunning {
 		return Run{}, fmt.Errorf("%w: %s", ErrBusy, service.run.Title)
+	}
+	if service.isRemoving {
+		return Run{}, fmt.Errorf("%w: removing the course from storage", ErrBusy)
 	}
 	service.run = &Run{CourseID: courseID, Title: plan.Course.Title, State: StateRunning, TotalFiles: len(selection.Files), TotalBytes: selection.TotalBytes}
 	service.requests <- pushRequest{run: service.run, plan: plan, selection: selection, bucket: bucket}

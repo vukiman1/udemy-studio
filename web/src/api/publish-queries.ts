@@ -57,6 +57,12 @@ export function usePublishPlan(courseId: string): UseQueryResult<PublishPlan> {
   })
 }
 
+export async function removePublishedCourse(): Promise<void> {
+  const { error, response } = await apiClient.DELETE('/api/publish/published')
+  if (!response.ok)
+    throw new ApiRequestError('remove the course from R2', response.status, error?.detail)
+}
+
 export async function startPublish(
   courseId: string,
   chapters: readonly string[],

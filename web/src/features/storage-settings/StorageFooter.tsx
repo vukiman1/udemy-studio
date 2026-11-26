@@ -18,6 +18,7 @@ export function StorageFooter({ editor }: StorageFooterProps): ReactElement {
     mutationFn: saveStorageSettings,
     onSuccess: (saved: StorageSettings) => {
       queryClient.setQueryData(QUERY_KEYS.storageSettings, saved)
+      void queryClient.invalidateQueries({ queryKey: QUERY_KEYS.storageUsage })
     },
   })
   const forget = useMutation({
