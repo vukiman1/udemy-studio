@@ -6,7 +6,7 @@ import { useAIProviders, useAISettings } from '../../api/ai-queries'
 import { QUERY_KEYS } from '../../api/queries'
 import { cancelTranslation, isTranslating, startTranslation } from '../../api/translation-queries'
 import type { AIProvider, TranslationRun } from '../../api/types'
-import { Dialog, DialogBody, DialogFooter } from '../../app/Dialog'
+import { Dialog, DialogBody, DialogFooter, DialogHeader } from '../../app/Dialog'
 import { AI_SETTINGS_PATH } from '../../app/paths'
 import { RunInBackgroundButton } from '../../app/RunInBackgroundButton'
 import { Button, ButtonSize, ButtonVariant, buttonClass } from '../../ui/Button'
@@ -43,7 +43,8 @@ export function TranslationDialog({
   )
 
   return (
-    <Dialog icon={Languages} title="Dịch phụ đề" subtitle={title} onClose={onClose}>
+    <Dialog label="Dịch phụ đề" onClose={onClose}>
+      <DialogHeader icon={Languages} title="Dịch phụ đề" subtitle={title} />
       {run !== undefined && isTranslating(run) ? (
         <>
           <DialogBody>
