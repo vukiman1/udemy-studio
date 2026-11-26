@@ -6,7 +6,6 @@ export enum ButtonVariant {
   Secondary = 'secondary',
   Ghost = 'ghost',
   Danger = 'danger',
-  Done = 'done',
 }
 
 export enum ButtonSize {
@@ -20,7 +19,6 @@ const VARIANT_CLASSES: Readonly<Record<ButtonVariant, string>> = {
   [ButtonVariant.Secondary]: 'bg-button text-ink enabled:hover:brightness-125',
   [ButtonVariant.Ghost]: 'bg-transparent text-ink enabled:hover:bg-ink/7',
   [ButtonVariant.Danger]: 'bg-danger-soft text-danger enabled:hover:brightness-110',
-  [ButtonVariant.Done]: 'bg-success-soft text-ink disabled:opacity-100 [&_svg]:text-success',
 }
 
 const SIZE_CLASSES: Readonly<Record<ButtonSize, string>> = {

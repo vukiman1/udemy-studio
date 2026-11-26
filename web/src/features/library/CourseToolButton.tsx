@@ -12,7 +12,7 @@ interface CourseToolButtonProps {
 const STATE_VARIANTS: Readonly<Record<ToolState, ButtonVariant>> = {
   [ToolState.Idle]: ButtonVariant.Secondary,
   [ToolState.Running]: ButtonVariant.Secondary,
-  [ToolState.Done]: ButtonVariant.Done,
+  [ToolState.Done]: ButtonVariant.Secondary,
   [ToolState.Failed]: ButtonVariant.Danger,
   [ToolState.Checking]: ButtonVariant.Secondary,
   [ToolState.Unavailable]: ButtonVariant.Secondary,
@@ -32,17 +32,30 @@ function stateIcon(status: ToolStatus, icon: LucideIcon): LucideIcon {
 
 export function CourseToolButton({ icon, status, onOpen }: CourseToolButtonProps): ReactElement {
   const isBusy = status.state === ToolState.Running || status.state === ToolState.Checking
-  return (
+  const isDisabled = CLOSED_STATES.has(status.state)
+  const button = (
     <Button
       variant={STATE_VARIANTS[status.state]}
       icon={stateIcon(status, icon)}
       className={isBusy ? '[&_svg]:animate-spin' : ''}
-      title={status.detail}
+      title={isDisabled ? undefined : status.detail}
       aria-label={`${status.label}: ${status.detail}`}
-      disabled={CLOSED_STATES.has(status.state)}
+      disabled={isDisabled}
       onClick={onOpen}
     >
       {status.label}
     </Button>
+  )
+  if (!isDisabled) return button
+  return (
+    <span className="group/tip relative inline-flex">
+      {button}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute right-0 bottom-full z-10 mb-2 rounded-lg bg-ink px-2.5 py-1.5 text-xs whitespace-nowrap text-page opacity-0 transition-opacity group-hover/tip:opacity-100"
+      >
+        {status.detail}
+      </span>
+    </span>
   )
 }
