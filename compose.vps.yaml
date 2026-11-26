@@ -2,7 +2,7 @@ name: udemy-studio-v2
 
 services:
   udemy-studio:
-    image: ghcr.io/vukiman1/udemy-studio:v2-dev
+    image: ghcr.io/vukiman1/udemy-studio:latest
     ports:
       - "127.0.0.1:8765:8765"
     volumes:
