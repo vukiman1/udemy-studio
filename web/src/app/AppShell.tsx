@@ -61,7 +61,7 @@ export function AppShell(): ReactElement {
         aria-label="Điều hướng chính"
         className="fixed inset-x-0 bottom-0 border-t border-line bg-sidebar md:hidden"
       >
-        <ul className="m-0 grid list-none grid-cols-5 p-0">
+        <ul className="m-0 grid list-none auto-cols-fr grid-flow-col p-0">
           {NAV_ITEMS.map((item) => (
             <li key={item.to}>
               <NavLink
