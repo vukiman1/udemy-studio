@@ -14,13 +14,15 @@ services:
       - ./data:/data
     environment:
       UDEMY_STUDIO_PUBLIC_HOST: ${PUBLIC_HOST:?set PUBLIC_HOST to the tunnel hostname, such as learn-dev.example.com}
+    mem_limit: 384m
     restart: unless-stopped
 
   cloudflared:
     image: cloudflare/cloudflared:latest
-    command: tunnel --no-autoupdate run
+    command: tunnel --no-autoupdate --protocol http2 run
     environment:
       TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN:?set CLOUDFLARE_TUNNEL_TOKEN to the VPS tunnel token}
     depends_on:
       - udemy-studio
+    mem_limit: 128m
     restart: unless-stopped
