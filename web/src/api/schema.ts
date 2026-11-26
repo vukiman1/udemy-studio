@@ -411,7 +411,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Publish a course to cloud storage, replacing the one there */
+        /** Publish chosen chapters of a course to cloud storage, replacing what is there */
         post: operations["startCoursePublish"];
         delete?: never;
         options?: never;
@@ -925,6 +925,10 @@ export interface components {
             hasCourse: boolean;
         };
         PublishedCourse: {
+            /** @description Chapters in the bucket */
+            chapters: number;
+            /** @description Chapters the course had when published; 0 when the index predates chapter selection */
+            totalChapters: number;
             /** @description The library course in the same folder, when this library has it */
             courseId?: string;
             dir: string;
@@ -934,13 +938,26 @@ export interface components {
             /** Format: date-time */
             publishedAt: string;
         };
-        PublishPlan: {
+        PublishRequest: {
+            /** @description Chapter folders to publish; anything else of the course in the bucket is removed */
+            chapters: string[];
+        };
+        PublishChapter: {
+            dir: string;
             files: number;
             /** Format: int64 */
-            totalBytes: number;
+            sizeBytes: number;
+            published: boolean;
+        };
+        PublishPlan: {
+            /**
+             * Format: int64
+             * @description Files outside chapter folders, such as the cover, sent with any chapter
+             */
+            sharedBytes: number;
             /** Format: int64 */
             limitBytes: number;
-            fits: boolean;
+            chapters: components["schemas"]["PublishChapter"][];
             /** @description Whether another course in the bucket will be removed first */
             replaces: boolean;
             published?: components["schemas"]["PublishedCourse"];
@@ -1867,7 +1884,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PublishRequest"];
+            };
+        };
         responses: {
             /** @description Started */
             202: {

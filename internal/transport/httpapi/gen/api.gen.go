@@ -581,16 +581,31 @@ type ProgressReport struct {
 	PositionSeconds float64 `json:"positionSeconds"`
 }
 
+// PublishChapter defines model for PublishChapter.
+type PublishChapter struct {
+	Dir       string `json:"dir"`
+	Files     int    `json:"files"`
+	Published bool   `json:"published"`
+	SizeBytes int64  `json:"sizeBytes"`
+}
+
 // PublishPlan defines model for PublishPlan.
 type PublishPlan struct {
-	Files      int              `json:"files"`
-	Fits       bool             `json:"fits"`
+	Chapters   []PublishChapter `json:"chapters"`
 	LimitBytes int64            `json:"limitBytes"`
 	Published  *PublishedCourse `json:"published,omitempty"`
 
 	// Replaces Whether another course in the bucket will be removed first
-	Replaces   bool  `json:"replaces"`
-	TotalBytes int64 `json:"totalBytes"`
+	Replaces bool `json:"replaces"`
+
+	// SharedBytes Files outside chapter folders, such as the cover, sent with any chapter
+	SharedBytes int64 `json:"sharedBytes"`
+}
+
+// PublishRequest defines model for PublishRequest.
+type PublishRequest struct {
+	// Chapters Chapter folders to publish; anything else of the course in the bucket is removed
+	Chapters []string `json:"chapters"`
 }
 
 // PublishRun defines model for PublishRun.
@@ -616,12 +631,18 @@ type PublishRunState string
 
 // PublishedCourse defines model for PublishedCourse.
 type PublishedCourse struct {
+	// Chapters Chapters in the bucket
+	Chapters int `json:"chapters"`
+
 	// CourseId The library course in the same folder, when this library has it
 	CourseId    *string   `json:"courseId,omitempty"`
 	Dir         string    `json:"dir"`
 	PublishedAt time.Time `json:"publishedAt"`
 	SizeBytes   int64     `json:"sizeBytes"`
 	Title       string    `json:"title"`
+
+	// TotalChapters Chapters the course had when published; 0 when the index predates chapter selection
+	TotalChapters int `json:"totalChapters"`
 }
 
 // SearchHit defines model for SearchHit.
@@ -770,6 +791,9 @@ type SaveAISettingsJSONRequestBody = AISettingsDraft
 // SetAIEnabledJSONRequestBody defines body for SetAIEnabled for application/json ContentType.
 type SetAIEnabledJSONRequestBody = AIEnabled
 
+// StartCoursePublishJSONRequestBody defines body for StartCoursePublish for application/json ContentType.
+type StartCoursePublishJSONRequestBody = PublishRequest
+
 // SelectChromeProfileJSONRequestBody defines body for SelectChromeProfile for application/json ContentType.
 type SelectChromeProfileJSONRequestBody = ProfileSelection
 
@@ -838,7 +862,7 @@ type ServerInterface interface {
 	// ExportCourseNotes Every note of a course as a Markdown file, in course order
 	// (GET /api/courses/{courseId}/notes.md)
 	ExportCourseNotes(w http.ResponseWriter, r *http.Request, courseId CourseId)
-	// StartCoursePublish Publish a course to cloud storage, replacing the one there
+	// StartCoursePublish Publish chosen chapters of a course to cloud storage, replacing what is there
 	// (POST /api/courses/{courseId}/publish)
 	StartCoursePublish(w http.ResponseWriter, r *http.Request, courseId CourseId)
 	// PlanCoursePublish What publishing a course to cloud storage would send, and what it would replace
@@ -2672,6 +2696,7 @@ func (response ExportCourseNotes404ApplicationProblemPlusJSONResponse) VisitExpo
 
 type StartCoursePublishRequestObject struct {
 	CourseId CourseId `json:"courseId"`
+	Body     *StartCoursePublishJSONRequestBody
 }
 
 type StartCoursePublishResponseObject interface {
@@ -4141,7 +4166,7 @@ type StrictServerInterface interface {
 	// ExportCourseNotes Every note of a course as a Markdown file, in course order
 	// (GET /api/courses/{courseId}/notes.md)
 	ExportCourseNotes(ctx context.Context, request ExportCourseNotesRequestObject) (ExportCourseNotesResponseObject, error)
-	// StartCoursePublish Publish a course to cloud storage, replacing the one there
+	// StartCoursePublish Publish chosen chapters of a course to cloud storage, replacing what is there
 	// (POST /api/courses/{courseId}/publish)
 	StartCoursePublish(ctx context.Context, request StartCoursePublishRequestObject) (StartCoursePublishResponseObject, error)
 	// PlanCoursePublish What publishing a course to cloud storage would send, and what it would replace
@@ -4660,6 +4685,13 @@ func (sh *strictHandler) StartCoursePublish(w http.ResponseWriter, r *http.Reque
 	var request StartCoursePublishRequestObject
 
 	request.CourseId = courseId
+
+	var body StartCoursePublishJSONRequestBody
+	if err := runtime.BindJSONBody(r, &body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
 
 	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error) {
 		return sh.ssi.StartCoursePublish(ctx, request.(StartCoursePublishRequestObject))

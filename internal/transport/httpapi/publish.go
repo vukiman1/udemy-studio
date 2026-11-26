@@ -24,21 +24,20 @@ func (server apiServer) PlanCoursePublish(ctx context.Context, request gen.PlanC
 		return nil, err
 	}
 	response := gen.PlanCoursePublish200JSONResponse{
-		Files:      len(plan.Files),
-		TotalBytes: plan.TotalBytes,
-		LimitBytes: plan.LimitBytes,
-		Fits:       plan.Fits(),
-		Replaces:   plan.Replaces(),
+		SharedBytes: plan.SharedBytes(),
+		LimitBytes:  plan.LimitBytes,
+		Chapters:    toPublishChapters(plan.Chapters()),
+		Replaces:    plan.Replaces(),
 	}
 	if plan.Published != nil {
-		published := server.publishedCourse(publish.Index{Course: *plan.Published})
+		published := server.publishedCourse(*plan.Published)
 		response.Published = &published
 	}
 	return response, nil
 }
 
 func (server apiServer) StartCoursePublish(ctx context.Context, request gen.StartCoursePublishRequestObject) (gen.StartCoursePublishResponseObject, error) {
-	run, err := server.deps.Publish.Start(ctx, request.CourseId)
+	run, err := server.deps.Publish.Start(ctx, request.CourseId, request.Body.Chapters)
 	switch {
 	case err == nil:
 		return gen.StartCoursePublish202JSONResponse(toPublishRun(run)), nil
@@ -46,7 +45,7 @@ func (server apiServer) StartCoursePublish(ctx context.Context, request gen.Star
 		return gen.StartCoursePublish404ApplicationProblemPlusJSONResponse{NotFoundApplicationProblemPlusJSONResponse: notFound(err.Error())}, nil
 	case errors.Is(err, objectstore.ErrNotConfigured), errors.Is(err, publish.ErrBusy), errors.Is(err, publish.ErrTooLarge):
 		return gen.StartCoursePublish409ApplicationProblemPlusJSONResponse{ConflictApplicationProblemPlusJSONResponse: conflict(err)}, nil
-	case isBadStorageRequest(err):
+	case isBadStorageRequest(err), errors.Is(err, publish.ErrNoChapters), errors.Is(err, publish.ErrUnknownChapter):
 		return gen.StartCoursePublish400ApplicationProblemPlusJSONResponse{BadRequestApplicationProblemPlusJSONResponse: badRequest(err)}, nil
 	case errors.Is(err, objectstore.ErrUnreachable):
 		return gen.StartCoursePublish502ApplicationProblemPlusJSONResponse{ProviderUnreachableApplicationProblemPlusJSONResponse: providerUnreachable(err)}, nil
@@ -89,10 +88,12 @@ func (server apiServer) GetPublishedCourse(ctx context.Context, _ gen.GetPublish
 
 func (server apiServer) publishedCourse(index publish.Index) gen.PublishedCourse {
 	published := gen.PublishedCourse{
-		Dir:         index.Course.Dir,
-		Title:       index.Course.Title,
-		SizeBytes:   index.Course.SizeBytes,
-		PublishedAt: index.PublishedAt,
+		Dir:           index.Course.Dir,
+		Title:         index.Course.Title,
+		SizeBytes:     index.Course.SizeBytes,
+		PublishedAt:   index.PublishedAt,
+		Chapters:      index.PublishedChapters(),
+		TotalChapters: index.Course.ChapterCount,
 	}
 	for _, course := range server.deps.Catalog.Current().Courses {
 		if course.Dir == index.Course.Dir {
@@ -119,6 +120,14 @@ func toPublishRun(run publish.Run) gen.PublishRun {
 	}
 	if run.Failure != "" {
 		converted.Failure = &run.Failure
+	}
+	return converted
+}
+
+func toPublishChapters(chapters []publish.ChapterPlan) []gen.PublishChapter {
+	converted := make([]gen.PublishChapter, len(chapters))
+	for position, chapter := range chapters {
+		converted[position] = gen.PublishChapter{Dir: chapter.Dir, Files: chapter.Files, SizeBytes: chapter.SizeBytes, Published: chapter.IsPublished}
 	}
 	return converted
 }

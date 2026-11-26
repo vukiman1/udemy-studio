@@ -1,10 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { ReactElement } from 'react'
-import { CloudUpload, Pause } from 'lucide-react'
+import { Pause } from 'lucide-react'
 import { cancelPublish, isPublishing, startPublish } from '../../api/publish-queries'
 import { QUERY_KEYS } from '../../api/queries'
 import type { PublishRun } from '../../api/types'
-import { Dialog, DialogBody, DialogFooter, DialogHeader } from '../../app/Dialog'
+import { Dialog, DialogBody, DialogFooter } from '../../app/Dialog'
 import { RunInBackgroundButton } from '../../app/RunInBackgroundButton'
 import { Button, ButtonVariant } from '../../ui/Button'
 import { PublishPlanSummary } from './PublishPlanSummary'
@@ -22,7 +22,10 @@ export function PublishDialog({ courseId, title, run, onClose }: PublishDialogPr
   const queryClient = useQueryClient()
   const refresh = (): Promise<void> =>
     queryClient.invalidateQueries({ queryKey: QUERY_KEYS.publishRun })
-  const start = useMutation({ mutationFn: () => startPublish(courseId), onSuccess: refresh })
+  const start = useMutation({
+    mutationFn: (chapters: readonly string[]) => startPublish(courseId, chapters),
+    onSuccess: refresh,
+  })
   const cancel = useMutation({ mutationFn: cancelPublish, onSuccess: refresh })
   const error = start.error ?? cancel.error
   const errorNote = error !== null && (
@@ -32,8 +35,7 @@ export function PublishDialog({ courseId, title, run, onClose }: PublishDialogPr
   )
 
   return (
-    <Dialog label="Đưa lên R2" onClose={onClose}>
-      <DialogHeader icon={CloudUpload} title="Đưa lên R2" subtitle={title} />
+    <Dialog label={`Đưa lên R2: ${title}`} onClose={onClose}>
       {run !== undefined && isPublishing(run) ? (
         <>
           <DialogBody>
@@ -58,8 +60,8 @@ export function PublishDialog({ courseId, title, run, onClose }: PublishDialogPr
         <PublishPlanSummary
           courseId={courseId}
           isStarting={start.isPending}
-          onStart={() => {
-            start.mutate()
+          onStart={(chapters) => {
+            start.mutate(chapters)
           }}
           onDismiss={onClose}
         >
