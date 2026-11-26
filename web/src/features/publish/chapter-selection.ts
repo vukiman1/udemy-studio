@@ -13,3 +13,15 @@ export function selectedBytes(plan: PublishPlan, selected: ReadonlySet<string>):
     .filter((chapter) => selected.has(chapter.dir))
     .reduce((total, chapter) => total + chapter.sizeBytes, plan.sharedBytes)
 }
+
+export function hasChanges(
+  plan: PublishPlan,
+  courseId: string,
+  selected: ReadonlySet<string>,
+): boolean {
+  if (plan.published?.courseId !== courseId || plan.sharedChanged) return true
+  return plan.chapters.some((chapter) => {
+    const isSelected = selected.has(chapter.dir)
+    return isSelected !== chapter.published || (isSelected && chapter.changed)
+  })
+}

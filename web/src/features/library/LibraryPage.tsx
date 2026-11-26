@@ -27,7 +27,9 @@ export function LibraryPage(): ReactElement {
         <h1 className="m-0 text-[30px] font-semibold">Library</h1>
         {isCloudCopy && <RefreshLibraryButton />}
       </div>
-      {publishing.isConfigured && <PublishedCourseBanner published={publishing.published} />}
+      {publishing.isConfigured && (
+        <PublishedCourseBanner published={publishing.published} usage={publishing.usage} />
+      )}
       {courses.data === undefined ? (
         courses.isError ? (
           <LoadFailure

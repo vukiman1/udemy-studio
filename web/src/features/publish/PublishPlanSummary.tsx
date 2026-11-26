@@ -7,7 +7,7 @@ import { Button, ButtonVariant } from '../../ui/Button'
 import { ChapterPicker } from '../../ui/ChapterPicker'
 import { StatTile } from '../../ui/StatTile'
 import { formatBytes } from '../compression/format'
-import { initialSelection, selectedBytes } from './chapter-selection'
+import { hasChanges, initialSelection, selectedBytes } from './chapter-selection'
 
 const NOTE = 'flex gap-2.5 rounded-xl bg-page px-4 py-3 text-[13px]'
 const NOTE_ICON = 'mt-0.5 size-4 shrink-0'
@@ -54,7 +54,7 @@ export function PublishPlanSummary({
           <p className="text-muted">Loading…</p>
         )}
       </DialogBody>
-      <PlanFooter canStart={false} onStart={onDismiss} onDismiss={onDismiss} />
+      <PlanFooter startLabel="Publish" canStart={false} onStart={onDismiss} onDismiss={onDismiss} />
     </>
   )
 }
@@ -118,7 +118,8 @@ function PublishPlanForm({
         )}
       </DialogBody>
       <PlanFooter
-        canStart={fits && selected.size > 0 && !isStarting}
+        startLabel={plan.published?.courseId === courseId ? 'Update' : 'Publish'}
+        canStart={fits && selected.size > 0 && !isStarting && hasChanges(plan, courseId, selected)}
         onStart={() => {
           onStart(plan.chapters.map((chapter) => chapter.dir).filter((dir) => selected.has(dir)))
         }}
@@ -129,12 +130,13 @@ function PublishPlanForm({
 }
 
 interface PlanFooterProps {
+  readonly startLabel: string
   readonly canStart: boolean
   readonly onStart: () => void
   readonly onDismiss: () => void
 }
 
-function PlanFooter({ canStart, onStart, onDismiss }: PlanFooterProps): ReactElement {
+function PlanFooter({ startLabel, canStart, onStart, onDismiss }: PlanFooterProps): ReactElement {
   return (
     <DialogFooter>
       <Button onClick={onDismiss}>Cancel</Button>
@@ -144,7 +146,7 @@ function PlanFooter({ canStart, onStart, onDismiss }: PlanFooterProps): ReactEle
         disabled={!canStart}
         onClick={onStart}
       >
-        Publish
+        {startLabel}
       </Button>
     </DialogFooter>
   )

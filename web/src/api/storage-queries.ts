@@ -1,7 +1,9 @@
 import { useQuery, type UseQueryResult } from '@tanstack/react-query'
 import { apiClient } from './client'
 import { ApiRequestError, QUERY_KEYS } from './queries'
-import type { StorageCheck, StorageSettings } from './types'
+import type { StorageCheck, StorageSettings, StorageUsage } from './types'
+
+const NO_CONTENT = 204
 
 export interface StorageDraft {
   readonly url: string
@@ -28,6 +30,20 @@ export function useStorageSettings(): UseQueryResult<StorageSettings> {
     queryFn: async () => {
       const { data, response } = await apiClient.GET('/api/storage')
       if (data === undefined) throw new ApiRequestError('load storage settings', response.status)
+      return data
+    },
+  })
+}
+
+export function useStorageUsage(isEnabled: boolean): UseQueryResult<StorageUsage | null> {
+  return useQuery({
+    queryKey: QUERY_KEYS.storageUsage,
+    enabled: isEnabled,
+    queryFn: async () => {
+      const { data, error, response } = await apiClient.GET('/api/storage/usage')
+      if (response.status === NO_CONTENT) return null
+      if (data === undefined)
+        throw new ApiRequestError('measure storage', response.status, error?.detail)
       return data
     },
   })

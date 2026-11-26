@@ -622,6 +622,8 @@ type ProgressReport struct {
 
 // PublishChapter defines model for PublishChapter.
 type PublishChapter struct {
+	// Changed Whether publishing the chapter again would send or remove files
+	Changed   bool   `json:"changed"`
 	Dir       string `json:"dir"`
 	Files     int    `json:"files"`
 	Published bool   `json:"published"`
@@ -639,6 +641,9 @@ type PublishPlan struct {
 
 	// SharedBytes Files outside chapter folders, such as the cover, sent with any chapter
 	SharedBytes int64 `json:"sharedBytes"`
+
+	// SharedChanged Whether files outside chapters, or of chapters gone from disk, differ from the bucket
+	SharedChanged bool `json:"sharedChanged"`
 }
 
 // PublishRequest defines model for PublishRequest.
@@ -726,6 +731,12 @@ type StorageSettings struct {
 
 	// Url The S3 API URL, bucket included
 	Url *string `json:"url,omitempty"`
+}
+
+// StorageUsage defines model for StorageUsage.
+type StorageUsage struct {
+	QuotaBytes int64 `json:"quotaBytes"`
+	UsedBytes  int64 `json:"usedBytes"`
 }
 
 // TranslationOutcome defines model for TranslationOutcome.
@@ -985,6 +996,9 @@ type ServerInterface interface {
 	// GetPublishRun The latest publish since the server started
 	// (GET /api/publish)
 	GetPublishRun(w http.ResponseWriter, r *http.Request)
+	// RemovePublishedCourse Delete the published course and its index from cloud storage
+	// (DELETE /api/publish/published)
+	RemovePublishedCourse(w http.ResponseWriter, r *http.Request)
 	// GetPublishedCourse The course the cloud storage index lists, if storage is set up and holds one
 	// (GET /api/publish/published)
 	GetPublishedCourse(w http.ResponseWriter, r *http.Request)
@@ -1003,6 +1017,9 @@ type ServerInterface interface {
 	// CheckStorage Read and write a tiny object to learn what the keys may do; empty keys use the saved ones
 	// (POST /api/storage/check)
 	CheckStorage(w http.ResponseWriter, r *http.Request)
+	// GetStorageUsage Bytes the connected bucket holds, against the free tier
+	// (GET /api/storage/usage)
+	GetStorageUsage(w http.ResponseWriter, r *http.Request)
 	// GetHealth Liveness probe and build version
 	// (GET /healthz)
 	GetHealth(w http.ResponseWriter, r *http.Request)
@@ -1887,6 +1904,20 @@ func (siw *ServerInterfaceWrapper) GetPublishRun(w http.ResponseWriter, r *http.
 	handler.ServeHTTP(w, r)
 }
 
+// RemovePublishedCourse operation middleware
+func (siw *ServerInterfaceWrapper) RemovePublishedCourse(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.RemovePublishedCourse(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
 // GetPublishedCourse operation middleware
 func (siw *ServerInterfaceWrapper) GetPublishedCourse(w http.ResponseWriter, r *http.Request) {
 
@@ -1981,6 +2012,20 @@ func (siw *ServerInterfaceWrapper) CheckStorage(w http.ResponseWriter, r *http.R
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.CheckStorage(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetStorageUsage operation middleware
+func (siw *ServerInterfaceWrapper) GetStorageUsage(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetStorageUsage(w, r)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -2153,11 +2198,13 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 	m.HandleFunc(http.MethodDelete+" "+options.BaseURL+"/api/storage", wrapper.ForgetStorageSettings)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/storage", wrapper.GetStorageSettings)
 	m.HandleFunc(http.MethodPut+" "+options.BaseURL+"/api/storage", wrapper.SaveStorageSettings)
+	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/storage/usage", wrapper.GetStorageUsage)
 	m.HandleFunc(http.MethodPost+" "+options.BaseURL+"/api/storage/check", wrapper.CheckStorage)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/courses/{courseId}/publish/plan", wrapper.PlanCoursePublish)
 	m.HandleFunc(http.MethodPost+" "+options.BaseURL+"/api/courses/{courseId}/publish", wrapper.StartCoursePublish)
 	m.HandleFunc(http.MethodDelete+" "+options.BaseURL+"/api/publish", wrapper.CancelPublish)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/publish", wrapper.GetPublishRun)
+	m.HandleFunc(http.MethodDelete+" "+options.BaseURL+"/api/publish/published", wrapper.RemovePublishedCourse)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/publish/published", wrapper.GetPublishedCourse)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/courses/{courseId}/translation/plan", wrapper.PlanCourseTranslation)
 	m.HandleFunc(http.MethodDelete+" "+options.BaseURL+"/api/courses/{courseId}/translation", wrapper.CancelCourseTranslation)
@@ -4014,6 +4061,69 @@ func (response GetPublishRun204Response) VisitGetPublishRunResponse(w http.Respo
 	return nil
 }
 
+type RemovePublishedCourseRequestObject struct {
+}
+
+type RemovePublishedCourseResponseObject interface {
+	VisitRemovePublishedCourseResponse(w http.ResponseWriter) error
+}
+
+type RemovePublishedCourse204Response struct {
+}
+
+func (response RemovePublishedCourse204Response) VisitRemovePublishedCourseResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type RemovePublishedCourse400ApplicationProblemPlusJSONResponse struct {
+	BadRequestApplicationProblemPlusJSONResponse
+}
+
+func (response RemovePublishedCourse400ApplicationProblemPlusJSONResponse) VisitRemovePublishedCourseResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.BadRequestApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type RemovePublishedCourse409ApplicationProblemPlusJSONResponse struct {
+	ConflictApplicationProblemPlusJSONResponse
+}
+
+func (response RemovePublishedCourse409ApplicationProblemPlusJSONResponse) VisitRemovePublishedCourseResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.ConflictApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(409)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type RemovePublishedCourse502ApplicationProblemPlusJSONResponse struct {
+	ProviderUnreachableApplicationProblemPlusJSONResponse
+}
+
+func (response RemovePublishedCourse502ApplicationProblemPlusJSONResponse) VisitRemovePublishedCourseResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.ProviderUnreachableApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(502)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 type GetPublishedCourseRequestObject struct {
 }
 
@@ -4225,6 +4335,51 @@ func (response CheckStorage502ApplicationProblemPlusJSONResponse) VisitCheckStor
 	return err
 }
 
+type GetStorageUsageRequestObject struct {
+}
+
+type GetStorageUsageResponseObject interface {
+	VisitGetStorageUsageResponse(w http.ResponseWriter) error
+}
+
+type GetStorageUsage200JSONResponse StorageUsage
+
+func (response GetStorageUsage200JSONResponse) VisitGetStorageUsageResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetStorageUsage204Response struct {
+}
+
+func (response GetStorageUsage204Response) VisitGetStorageUsageResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type GetStorageUsage502ApplicationProblemPlusJSONResponse struct {
+	ProviderUnreachableApplicationProblemPlusJSONResponse
+}
+
+func (response GetStorageUsage502ApplicationProblemPlusJSONResponse) VisitGetStorageUsageResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.ProviderUnreachableApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(502)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 type GetHealthRequestObject struct {
 }
 
@@ -4371,6 +4526,9 @@ type StrictServerInterface interface {
 	// GetPublishRun The latest publish since the server started
 	// (GET /api/publish)
 	GetPublishRun(ctx context.Context, request GetPublishRunRequestObject) (GetPublishRunResponseObject, error)
+	// RemovePublishedCourse Delete the published course and its index from cloud storage
+	// (DELETE /api/publish/published)
+	RemovePublishedCourse(ctx context.Context, request RemovePublishedCourseRequestObject) (RemovePublishedCourseResponseObject, error)
 	// GetPublishedCourse The course the cloud storage index lists, if storage is set up and holds one
 	// (GET /api/publish/published)
 	GetPublishedCourse(ctx context.Context, request GetPublishedCourseRequestObject) (GetPublishedCourseResponseObject, error)
@@ -4389,6 +4547,9 @@ type StrictServerInterface interface {
 	// CheckStorage Read and write a tiny object to learn what the keys may do; empty keys use the saved ones
 	// (POST /api/storage/check)
 	CheckStorage(ctx context.Context, request CheckStorageRequestObject) (CheckStorageResponseObject, error)
+	// GetStorageUsage Bytes the connected bucket holds, against the free tier
+	// (GET /api/storage/usage)
+	GetStorageUsage(ctx context.Context, request GetStorageUsageRequestObject) (GetStorageUsageResponseObject, error)
 	// GetHealth Liveness probe and build version
 	// (GET /healthz)
 	GetHealth(ctx context.Context, request GetHealthRequestObject) (GetHealthResponseObject, error)
@@ -5543,6 +5704,30 @@ func (sh *strictHandler) GetPublishRun(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// RemovePublishedCourse operation middleware
+func (sh *strictHandler) RemovePublishedCourse(w http.ResponseWriter, r *http.Request) {
+	var request RemovePublishedCourseRequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error) {
+		return sh.ssi.RemovePublishedCourse(ctx, request.(RemovePublishedCourseRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "RemovePublishedCourse")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(RemovePublishedCourseResponseObject); ok {
+		if err := validResponse.VisitRemovePublishedCourseResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
 // GetPublishedCourse operation middleware
 func (sh *strictHandler) GetPublishedCourse(w http.ResponseWriter, r *http.Request) {
 	var request GetPublishedCourseRequestObject
@@ -5696,6 +5881,30 @@ func (sh *strictHandler) CheckStorage(w http.ResponseWriter, r *http.Request) {
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(CheckStorageResponseObject); ok {
 		if err := validResponse.VisitCheckStorageResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetStorageUsage operation middleware
+func (sh *strictHandler) GetStorageUsage(w http.ResponseWriter, r *http.Request) {
+	var request GetStorageUsageRequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error) {
+		return sh.ssi.GetStorageUsage(ctx, request.(GetStorageUsageRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetStorageUsage")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetStorageUsageResponseObject); ok {
+		if err := validResponse.VisitGetStorageUsageResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

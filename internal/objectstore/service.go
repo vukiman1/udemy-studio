@@ -92,6 +92,22 @@ func (service *Service) Bucket(ctx context.Context) (Bucket, error) {
 	return service.open(connection), nil
 }
 
+func (service *Service) UsedBytes(ctx context.Context) (int64, error) {
+	bucket, err := service.Bucket(ctx)
+	if err != nil {
+		return 0, err
+	}
+	objects, err := bucket.List(ctx, "")
+	if err != nil {
+		return 0, err
+	}
+	var used int64
+	for _, object := range objects {
+		used += object.SizeBytes
+	}
+	return used, nil
+}
+
 func (service *Service) Forget(ctx context.Context) error {
 	return service.store.Delete(ctx)
 }

@@ -491,6 +491,22 @@ paths:
         "204":
           description: Forgotten
 
+  /api/storage/usage:
+    get:
+      operationId: getStorageUsage
+      summary: Bytes the connected bucket holds, against the free tier
+      responses:
+        "200":
+          description: Usage
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StorageUsage"
+        "204":
+          description: No storage is set up
+        "502":
+          $ref: "#/components/responses/ProviderUnreachable"
+
   /api/storage/check:
     post:
       operationId: checkStorage
@@ -599,6 +615,18 @@ paths:
                 $ref: "#/components/schemas/PublishedCourse"
         "204":
           description: No storage is set up or it holds no course
+        "502":
+          $ref: "#/components/responses/ProviderUnreachable"
+    delete:
+      operationId: removePublishedCourse
+      summary: Delete the published course and its index from cloud storage
+      responses:
+        "204":
+          description: Removed
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "409":
+          $ref: "#/components/responses/Conflict"
         "502":
           $ref: "#/components/responses/ProviderUnreachable"
 
@@ -1430,6 +1458,17 @@ components:
           type: string
           description: The access key ID's first and last four characters, the rest masked
 
+    StorageUsage:
+      type: object
+      required: [usedBytes, quotaBytes]
+      properties:
+        usedBytes:
+          type: integer
+          format: int64
+        quotaBytes:
+          type: integer
+          format: int64
+
     StorageDraft:
       type: object
       required: [url]
@@ -1494,7 +1533,7 @@ components:
 
     PublishChapter:
       type: object
-      required: [dir, files, sizeBytes, published]
+      required: [dir, files, sizeBytes, published, changed]
       properties:
         dir:
           type: string
@@ -1505,11 +1544,17 @@ components:
           format: int64
         published:
           type: boolean
+        changed:
+          type: boolean
+          description: Whether publishing the chapter again would send or remove files
 
     PublishPlan:
       type: object
-      required: [sharedBytes, limitBytes, chapters, replaces]
+      required: [sharedBytes, limitBytes, chapters, replaces, sharedChanged]
       properties:
+        sharedChanged:
+          type: boolean
+          description: Whether files outside chapters, or of chapters gone from disk, differ from the bucket
         sharedBytes:
           type: integer
           format: int64

@@ -41,6 +41,7 @@ export const QUERY_KEYS = {
   aiProviders: ['ai-providers'],
   aiSettings: ['ai-settings'],
   storageSettings: ['storage-settings'],
+  storageUsage: ['storage-settings', 'usage'],
   server: ['server'],
   publishPlan: (courseId: string) => ['publish-plan', courseId],
   publishRun: ['publish-run'],

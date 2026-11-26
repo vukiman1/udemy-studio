@@ -1,7 +1,8 @@
 import type { ReactElement } from 'react'
-import { useStorageSettings } from '../../api/storage-queries'
+import { useStorageSettings, useStorageUsage } from '../../api/storage-queries'
 import type { StorageSettings } from '../../api/types'
 import { PageStatus } from '../../app/PageStatus'
+import { StorageUsageMeter } from '../../app/StorageUsageMeter'
 import { SettingsCard } from '../../ui/SettingsCard'
 import { SETTINGS_LABEL, SETTINGS_ROW } from '../../ui/settings-row'
 import { TEXT_FIELD } from '../../ui/text-field'
@@ -50,8 +51,20 @@ function StorageEditor({ saved }: StorageEditorProps): ReactElement {
       </label>
       <StorageKeysField editor={editor} />
       <StorageCheckField editor={editor} />
+      {saved.configured && <UsageField />}
       <StorageFooter editor={editor} />
     </SettingsCard>
+  )
+}
+
+function UsageField(): ReactElement | null {
+  const usage = useStorageUsage(true)
+  if (usage.data == null) return null
+  return (
+    <div className={SETTINGS_ROW}>
+      <span className={SETTINGS_LABEL}>Usage</span>
+      <StorageUsageMeter {...usage.data} />
+    </div>
   )
 }
 

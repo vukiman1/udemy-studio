@@ -52,6 +52,7 @@ type Plan struct {
 	Files      []courseFile
 	LimitBytes int64
 	Published  *Index
+	Remote     map[string]objectstore.Object
 }
 
 func (plan Plan) Replaces() bool {
@@ -84,6 +85,7 @@ type Service struct {
 	mutex         sync.Mutex
 	run           *Run
 	cancelRunning context.CancelFunc
+	isRemoving    bool
 }
 
 func NewService(deps Deps) *Service {
@@ -119,6 +121,9 @@ func (service *Service) Start(ctx context.Context, courseID string, chapters []s
 	defer service.mutex.Unlock()
 	if service.run != nil && service.run.State == StateRunning {
 		return Run{}, fmt.Errorf("%w: %s", ErrBusy, service.run.Title)
+	}
+	if service.isRemoving {
+		return Run{}, fmt.Errorf("%w: removing the course from storage", ErrBusy)
 	}
 	service.run = &Run{CourseID: courseID, Title: plan.Course.Title, State: StateRunning, TotalFiles: len(selection.Files), TotalBytes: selection.TotalBytes}
 	service.requests <- pushRequest{run: service.run, plan: plan, selection: selection, bucket: bucket}
@@ -177,10 +182,28 @@ func (service *Service) plan(ctx context.Context, courseID string) (Plan, object
 	if err != nil {
 		return Plan{}, nil, err
 	}
-	if found {
-		plan.Published = &index
+	if !found {
+		return plan, bucket, nil
+	}
+	plan.Published = &index
+	if index.Course.Dir == course.Dir {
+		if plan.Remote, err = listObjects(ctx, bucket, ObjectKey(course.Dir, "")+"/"); err != nil {
+			return Plan{}, nil, err
+		}
 	}
 	return plan, bucket, nil
+}
+
+func listObjects(ctx context.Context, bucket objectstore.Bucket, prefix string) (map[string]objectstore.Object, error) {
+	listed, err := bucket.List(ctx, prefix)
+	if err != nil {
+		return nil, err
+	}
+	objects := make(map[string]objectstore.Object, len(listed))
+	for _, object := range listed {
+		objects[object.Key] = object
+	}
+	return objects, nil
 }
 
 func (service *Service) push(ctx context.Context, request pushRequest) {

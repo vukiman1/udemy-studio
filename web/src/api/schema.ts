@@ -385,6 +385,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/storage/usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Bytes the connected bucket holds, against the free tier */
+        get: operations["getStorageUsage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/storage/check": {
         parameters: {
             query?: never;
@@ -465,7 +482,8 @@ export interface paths {
         get: operations["getPublishedCourse"];
         put?: never;
         post?: never;
-        delete?: never;
+        /** Delete the published course and its index from cloud storage */
+        delete: operations["removePublishedCourse"];
         options?: never;
         head?: never;
         patch?: never;
@@ -944,6 +962,12 @@ export interface components {
             /** @description The access key ID's first and last four characters, the rest masked */
             accessKeyIdHint?: string;
         };
+        StorageUsage: {
+            /** Format: int64 */
+            usedBytes: number;
+            /** Format: int64 */
+            quotaBytes: number;
+        };
         StorageDraft: {
             /** @description The S3 API URL, such as https://<account-id>.r2.cloudflarestorage.com/<bucket> */
             url: string;
@@ -982,8 +1006,12 @@ export interface components {
             /** Format: int64 */
             sizeBytes: number;
             published: boolean;
+            /** @description Whether publishing the chapter again would send or remove files */
+            changed: boolean;
         };
         PublishPlan: {
+            /** @description Whether files outside chapters, or of chapters gone from disk, differ from the bucket */
+            sharedChanged: boolean;
             /**
              * Format: int64
              * @description Files outside chapter folders, such as the cover, sent with any chapter
@@ -1882,6 +1910,34 @@ export interface operations {
             };
         };
     };
+    getStorageUsage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Usage */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StorageUsage"];
+                };
+            };
+            /** @description No storage is set up */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            502: components["responses"]["ProviderUnreachable"];
+        };
+    };
     checkStorage: {
         parameters: {
             query?: never;
@@ -2035,6 +2091,27 @@ export interface operations {
                 };
                 content?: never;
             };
+            502: components["responses"]["ProviderUnreachable"];
+        };
+    };
+    removePublishedCourse: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Removed */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            400: components["responses"]["BadRequest"];
+            409: components["responses"]["Conflict"];
             502: components["responses"]["ProviderUnreachable"];
         };
     };

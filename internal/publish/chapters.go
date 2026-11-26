@@ -17,6 +17,7 @@ type ChapterPlan struct {
 	Files       int
 	SizeBytes   int64
 	IsPublished bool
+	HasChanges  bool
 }
 
 type Selection struct {
@@ -41,7 +42,7 @@ func (plan Plan) Chapters() []ChapterPlan {
 			continue
 		}
 		if len(chapters) == 0 || chapters[len(chapters)-1].Dir != dir {
-			chapters = append(chapters, ChapterPlan{Dir: dir, IsPublished: plan.isChapterPublished(dir)})
+			chapters = append(chapters, ChapterPlan{Dir: dir, IsPublished: plan.isChapterPublished(dir), HasChanges: plan.hasChanges(dir)})
 		}
 		chapters[len(chapters)-1].Files++
 		chapters[len(chapters)-1].SizeBytes += file.SizeBytes

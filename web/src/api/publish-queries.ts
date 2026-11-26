@@ -42,6 +42,7 @@ export function usePublishedCourse(isEnabled: boolean): UseQueryResult<Published
 export function usePublishPlan(courseId: string): UseQueryResult<PublishPlan> {
   return useQuery({
     queryKey: QUERY_KEYS.publishPlan(courseId),
+    gcTime: 0,
     queryFn: async () => {
       const { data, error, response } = await apiClient.GET(
         '/api/courses/{courseId}/publish/plan',
@@ -54,6 +55,12 @@ export function usePublishPlan(courseId: string): UseQueryResult<PublishPlan> {
       return data
     },
   })
+}
+
+export async function removePublishedCourse(): Promise<void> {
+  const { error, response } = await apiClient.DELETE('/api/publish/published')
+  if (!response.ok)
+    throw new ApiRequestError('remove the course from R2', response.status, error?.detail)
 }
 
 export async function startPublish(
