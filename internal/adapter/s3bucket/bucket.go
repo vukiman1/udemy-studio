@@ -52,6 +52,18 @@ func (bucket *Bucket) Open(ctx context.Context, key string) (io.ReadCloser, erro
 	return output.Body, nil
 }
 
+func (bucket *Bucket) Link(ctx context.Context, request objectstore.LinkRequest) (string, error) {
+	input := &s3.GetObjectInput{Bucket: aws.String(bucket.name), Key: aws.String(request.Key)}
+	if request.ContentDisposition != "" {
+		input.ResponseContentDisposition = aws.String(request.ContentDisposition)
+	}
+	signed, err := s3.NewPresignClient(bucket.client).PresignGetObject(ctx, input, s3.WithPresignExpires(request.ExpiresIn))
+	if err != nil {
+		return "", fmt.Errorf("sign a link to %s: %w", request.Key, err)
+	}
+	return signed.URL, nil
+}
+
 func (bucket *Bucket) Put(ctx context.Context, upload objectstore.Upload) error {
 	_, err := bucket.client.PutObject(ctx, &s3.PutObjectInput{
 		Bucket:        aws.String(bucket.name),

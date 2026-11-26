@@ -52,6 +52,10 @@ func (bucket *fakeBucket) Put(_ context.Context, upload objectstore.Upload) erro
 	return err
 }
 
+func (*fakeBucket) Link(context.Context, objectstore.LinkRequest) (string, error) {
+	return "", nil
+}
+
 func (*fakeBucket) List(context.Context, string) ([]objectstore.Object, error) {
 	return nil, nil
 }

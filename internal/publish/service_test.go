@@ -87,6 +87,10 @@ func (bucket *memoryBucket) Delete(_ context.Context, key string) error {
 	return nil
 }
 
+func (*memoryBucket) Link(context.Context, objectstore.LinkRequest) (string, error) {
+	return "", nil
+}
+
 func (bucket *memoryBucket) List(_ context.Context, prefix string) ([]objectstore.Object, error) {
 	bucket.mutex.Lock()
 	defer bucket.mutex.Unlock()
