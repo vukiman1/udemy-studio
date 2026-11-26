@@ -1,6 +1,7 @@
 package objectstore
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -13,10 +14,11 @@ import (
 )
 
 const (
-	probeKey     = ".studio-probe"
-	checkTimeout = 20 * time.Second
-	keyHintEdge  = 4
-	keyHintMask  = "••••••••"
+	probeKey         = ".studio-probe"
+	probeContentType = "text/plain"
+	checkTimeout     = 20 * time.Second
+	keyHintEdge      = 4
+	keyHintMask      = "••••••••"
 )
 
 var probeBody = []byte("udemy-studio write check")
@@ -79,6 +81,17 @@ func (service *Service) Check(ctx context.Context, draft Draft) (Check, error) {
 	return service.check(ctx, connection)
 }
 
+func (service *Service) Bucket(ctx context.Context) (Bucket, error) {
+	connection, found, err := service.load(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if !found {
+		return nil, ErrNotConfigured
+	}
+	return service.open(connection), nil
+}
+
 func (service *Service) Forget(ctx context.Context) error {
 	return service.store.Delete(ctx)
 }
@@ -113,7 +126,7 @@ func hasObject(ctx context.Context, bucket Bucket, key string) (bool, error) {
 }
 
 func probeWrite(ctx context.Context, bucket Bucket) (Access, error) {
-	err := bucket.Put(ctx, probeKey, probeBody)
+	err := bucket.Put(ctx, Upload{Key: probeKey, Body: bytes.NewReader(probeBody), SizeBytes: int64(len(probeBody)), ContentType: probeContentType})
 	if errors.Is(err, ErrAccessDenied) {
 		return AccessReadOnly, nil
 	}

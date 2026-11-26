@@ -1,7 +1,6 @@
 package s3bucket
 
 import (
-	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -53,14 +52,30 @@ func (bucket *Bucket) Open(ctx context.Context, key string) (io.ReadCloser, erro
 	return output.Body, nil
 }
 
-func (bucket *Bucket) Put(ctx context.Context, key string, body []byte) error {
+func (bucket *Bucket) Put(ctx context.Context, upload objectstore.Upload) error {
 	_, err := bucket.client.PutObject(ctx, &s3.PutObjectInput{
 		Bucket:        aws.String(bucket.name),
-		Key:           aws.String(key),
-		Body:          bytes.NewReader(body),
-		ContentLength: aws.Int64(int64(len(body))),
+		Key:           aws.String(upload.Key),
+		Body:          upload.Body,
+		ContentLength: aws.Int64(upload.SizeBytes),
+		ContentType:   aws.String(upload.ContentType),
 	})
-	return classify(err, "write "+key)
+	return classify(err, "write "+upload.Key)
+}
+
+func (bucket *Bucket) List(ctx context.Context, prefix string) ([]objectstore.Object, error) {
+	var objects []objectstore.Object
+	pages := s3.NewListObjectsV2Paginator(bucket.client, &s3.ListObjectsV2Input{Bucket: aws.String(bucket.name), Prefix: aws.String(prefix)})
+	for pages.HasMorePages() {
+		page, err := pages.NextPage(ctx)
+		if err != nil {
+			return nil, classify(err, "list "+prefix)
+		}
+		for _, item := range page.Contents {
+			objects = append(objects, objectstore.Object{Key: aws.ToString(item.Key), SizeBytes: aws.ToInt64(item.Size), ModifiedAt: aws.ToTime(item.LastModified)})
+		}
+	}
+	return objects, nil
 }
 
 func (bucket *Bucket) Delete(ctx context.Context, key string) error {

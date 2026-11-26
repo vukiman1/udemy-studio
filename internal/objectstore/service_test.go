@@ -43,12 +43,17 @@ func (bucket *fakeBucket) Open(_ context.Context, key string) (io.ReadCloser, er
 	return io.NopCloser(bytes.NewReader(body)), nil
 }
 
-func (bucket *fakeBucket) Put(_ context.Context, key string, body []byte) error {
+func (bucket *fakeBucket) Put(_ context.Context, upload objectstore.Upload) error {
 	if bucket.isReadOnly {
 		return objectstore.ErrAccessDenied
 	}
-	bucket.objects[key] = body
-	return nil
+	body, err := io.ReadAll(upload.Body)
+	bucket.objects[upload.Key] = body
+	return err
+}
+
+func (*fakeBucket) List(context.Context, string) ([]objectstore.Object, error) {
+	return nil, nil
 }
 
 func (bucket *fakeBucket) Delete(_ context.Context, key string) error {

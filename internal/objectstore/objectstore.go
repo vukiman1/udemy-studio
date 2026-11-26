@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"io"
+	"time"
 
 	"github.com/vukiman1/udemy-studio/internal/platform/secret"
 )
@@ -38,10 +39,24 @@ type Connection struct {
 	Credentials Credentials
 }
 
+type Object struct {
+	Key        string
+	SizeBytes  int64
+	ModifiedAt time.Time
+}
+
+type Upload struct {
+	Key         string
+	Body        io.ReadSeeker
+	SizeBytes   int64
+	ContentType string
+}
+
 type Bucket interface {
 	Open(ctx context.Context, key string) (io.ReadCloser, error)
-	Put(ctx context.Context, key string, body []byte) error
+	Put(ctx context.Context, upload Upload) error
 	Delete(ctx context.Context, key string) error
+	List(ctx context.Context, prefix string) ([]Object, error)
 }
 
 type BucketOpener func(connection Connection) Bucket
