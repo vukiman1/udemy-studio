@@ -1,4 +1,3 @@
-import { X, type LucideIcon } from 'lucide-react'
 import { useEffect, useRef, type ReactElement, type ReactNode } from 'react'
 
 interface DialogProps {
@@ -22,36 +21,6 @@ export function Dialog({ label, onClose, children }: DialogProps): ReactElement 
     >
       {children}
     </dialog>
-  )
-}
-
-interface DialogHeaderProps {
-  readonly icon: LucideIcon
-  readonly title: string
-  readonly subtitle: string
-}
-
-export function DialogHeader({ icon: Icon, title, subtitle }: DialogHeaderProps): ReactElement {
-  return (
-    <header className="flex items-center gap-3.5 border-b border-line py-5 pr-4 pl-6">
-      <span className="grid size-10 shrink-0 place-items-center rounded-[10px] bg-accent/20">
-        <Icon className="size-[18px]" aria-hidden="true" />
-      </span>
-      <span className="grid min-w-0 flex-1 gap-0.5">
-        <h2 className="text-[17px] font-semibold">{title}</h2>
-        <span className="truncate text-[13px] text-muted">{subtitle}</span>
-      </span>
-      <button
-        type="button"
-        className="grid size-8 shrink-0 place-items-center rounded-lg bg-transparent p-0 text-muted hover:bg-ink/7 hover:text-ink"
-        aria-label="Close"
-        onClick={(event) => {
-          event.currentTarget.closest('dialog')?.close()
-        }}
-      >
-        <X className="size-[18px]" aria-hidden="true" />
-      </button>
-    </header>
   )
 }
 

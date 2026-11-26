@@ -314,9 +314,15 @@ paths:
           $ref: "#/components/responses/CompressionUnavailable"
     post:
       operationId: startCourseCompression
-      summary: Queue a course to have its H.264 videos re-encoded to H.265 in the background
+      summary: Queue chosen chapters to have their H.264 videos re-encoded to H.265 in the background
       parameters:
         - $ref: "#/components/parameters/CourseId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CompressionRequest"
       responses:
         "202":
           description: Queued
@@ -324,6 +330,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CompressionRun"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "404":
           $ref: "#/components/responses/NotFound"
         "409":
@@ -1210,23 +1218,42 @@ components:
         run:
           $ref: "#/components/schemas/CompressionRun"
 
-    CompressionPlan:
+    CompressionRequest:
       type: object
-      required: [files, totalBytes, totalSeconds, estimatedSeconds, alreadyHevc, otherCodec, notWorthIt, unreadable]
+      required: [chapters]
       properties:
-        files:
+        chapters:
+          type: array
+          description: Chapter folders whose H.264 videos to encode
+          items:
+            type: string
+
+    CompressionChapter:
+      type: object
+      required: [dir, videos, totalBytes, estimatedSeconds]
+      properties:
+        dir:
+          type: string
+        videos:
           type: integer
           description: H.264 videos that would be encoded
         totalBytes:
           type: integer
           format: int64
-        totalSeconds:
-          type: number
-          format: double
         estimatedSeconds:
           type: number
           format: double
           description: Rough encode time on this machine
+
+    CompressionPlan:
+      type: object
+      required: [chapters, alreadyHevc, otherCodec, notWorthIt, unreadable]
+      properties:
+        chapters:
+          type: array
+          description: Chapters holding videos that would be encoded
+          items:
+            $ref: "#/components/schemas/CompressionChapter"
         alreadyHevc:
           type: integer
         otherCodec:

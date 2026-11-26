@@ -1,12 +1,12 @@
 import { useState, type ReactElement, type ReactNode } from 'react'
-import { CircleAlert, CloudUpload } from 'lucide-react'
+import { CircleAlert, Cloud, CloudUpload } from 'lucide-react'
 import { usePublishPlan } from '../../api/publish-queries'
 import type { PublishPlan } from '../../api/types'
 import { DialogBody, DialogFooter } from '../../app/Dialog'
 import { Button, ButtonVariant } from '../../ui/Button'
+import { ChapterPicker } from '../../ui/ChapterPicker'
 import { StatTile } from '../../ui/StatTile'
 import { formatBytes } from '../compression/format'
-import { ChapterPicker } from './ChapterPicker'
 import { initialSelection, selectedBytes } from './chapter-selection'
 
 const NOTE = 'flex gap-2.5 rounded-xl bg-page px-4 py-3 text-[13px]'
@@ -89,7 +89,21 @@ function PublishPlanForm({
             value={formatBytes(totalBytes)}
           />
         </div>
-        <ChapterPicker chapters={plan.chapters} selected={selected} onChange={setSelected} />
+        <ChapterPicker
+          chapters={plan.chapters.map((chapter) => ({
+            dir: chapter.dir,
+            detail: (
+              <>
+                {chapter.published && (
+                  <Cloud className="size-3.5 text-accent-soft" aria-label="On R2" />
+                )}
+                {formatBytes(chapter.sizeBytes)}
+              </>
+            ),
+          }))}
+          selected={selected}
+          onChange={setSelected}
+        />
         {!fits && (
           <p className={`${NOTE} text-danger`} role="alert">
             <CircleAlert className={NOTE_ICON} aria-hidden="true" />

@@ -271,7 +271,7 @@ export interface paths {
         /** The latest compression of a course since the server started */
         get: operations["getCourseCompression"];
         put?: never;
-        /** Queue a course to have its H.264 videos re-encoded to H.265 in the background */
+        /** Queue chosen chapters to have their H.264 videos re-encoded to H.265 in the background */
         post: operations["startCourseCompression"];
         /** Stop compressing a course; videos already compressed stay compressed */
         delete: operations["cancelCourseCompression"];
@@ -831,18 +831,25 @@ export interface components {
             unchecked: number;
             run?: components["schemas"]["CompressionRun"];
         };
-        CompressionPlan: {
+        CompressionRequest: {
+            /** @description Chapter folders whose H.264 videos to encode */
+            chapters: string[];
+        };
+        CompressionChapter: {
+            dir: string;
             /** @description H.264 videos that would be encoded */
-            files: number;
+            videos: number;
             /** Format: int64 */
             totalBytes: number;
-            /** Format: double */
-            totalSeconds: number;
             /**
              * Format: double
              * @description Rough encode time on this machine
              */
             estimatedSeconds: number;
+        };
+        CompressionPlan: {
+            /** @description Chapters holding videos that would be encoded */
+            chapters: components["schemas"]["CompressionChapter"][];
             alreadyHevc: number;
             /** @description Videos in neither H.264 nor H.265, left as they are */
             otherCodec: number;
@@ -1626,7 +1633,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CompressionRequest"];
+            };
+        };
         responses: {
             /** @description Queued */
             202: {
@@ -1637,6 +1648,7 @@ export interface operations {
                     "application/json": components["schemas"]["CompressionRun"];
                 };
             };
+            400: components["responses"]["BadRequest"];
             404: components["responses"]["NotFound"];
             409: components["responses"]["Conflict"];
             503: components["responses"]["CompressionUnavailable"];

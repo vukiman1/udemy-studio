@@ -2,6 +2,7 @@ package transcode
 
 import (
 	"context"
+	"errors"
 	"io/fs"
 	"log/slog"
 	"maps"
@@ -14,15 +15,18 @@ import (
 )
 
 const (
-	shrinks     = "course/01 - Intro/001 Shrinks.mp4"
-	drifts      = "course/01 - Intro/002 Drifts.mp4"
-	alreadyH265 = "course/01 - Intro/003 Already.mp4"
-	grows       = "course/01 - Intro/004 Grows.mp4"
-	unfinished  = "course/01 - Intro/005 Unfinished.mp4"
-	mpeg4       = "course/01 - Intro/006 Mpeg4.mp4"
-	h264Codec   = "h264"
-	waitStep    = 5 * time.Millisecond
-	waitLimit   = 2 * time.Second
+	shrinks      = "course/01 - Intro/001 Shrinks.mp4"
+	drifts       = "course/01 - Intro/002 Drifts.mp4"
+	alreadyH265  = "course/01 - Intro/003 Already.mp4"
+	grows        = "course/01 - Intro/004 Grows.mp4"
+	unfinished   = "course/01 - Intro/005 Unfinished.mp4"
+	mpeg4        = "course/01 - Intro/006 Mpeg4.mp4"
+	h264Codec    = "h264"
+	deep         = "course/02 - Deep/007 Deep.mp4"
+	introChapter = "01 - Intro"
+	deepChapter  = "02 - Deep"
+	waitStep     = 5 * time.Millisecond
+	waitLimit    = 2 * time.Second
 )
 
 // fakeVideos stands in for ffprobe, ffmpeg and the library directory, keyed by library path.
@@ -137,10 +141,10 @@ func newFakeVideos() *fakeVideos {
 	}
 }
 
-func startService(t *testing.T, videos *fakeVideos) (*Service, string) {
+func startService(t *testing.T, videos *fakeVideos, extraVideos ...string) (*Service, string) {
 	t.Helper()
 	files := fstest.MapFS{}
-	for _, path := range []string{shrinks, drifts, alreadyH265, grows, unfinished, mpeg4} {
+	for _, path := range append([]string{shrinks, drifts, alreadyH265, grows, unfinished, mpeg4}, extraVideos...) {
 		files[path] = &fstest.MapFile{}
 	}
 	catalog, err := library.NewCatalog(files)
@@ -176,7 +180,7 @@ func waitFor(t *testing.T, service *Service, courseID string, want State) Run {
 func TestCompressionReplacesOnlyVerifiedSmallerEncodes(t *testing.T) {
 	videos := newFakeVideos()
 	service, courseID := startService(t, videos)
-	if _, err := service.Start(t.Context(), courseID); err != nil {
+	if _, err := service.Start(t.Context(), courseID, []string{introChapter}); err != nil {
 		t.Fatalf("Start: %v", err)
 	}
 	run := waitFor(t, service, courseID, StateDone)
@@ -212,7 +216,7 @@ func TestCancellingKeepsFinishedVideosAndDiscardsTheOneInProgress(t *testing.T) 
 	videos := newFakeVideos()
 	videos.blockOn = drifts
 	service, courseID := startService(t, videos)
-	if _, err := service.Start(t.Context(), courseID); err != nil {
+	if _, err := service.Start(t.Context(), courseID, []string{introChapter}); err != nil {
 		t.Fatalf("Start: %v", err)
 	}
 	for deadline := time.Now().Add(waitLimit); time.Now().Before(deadline); time.Sleep(waitStep) {
@@ -252,7 +256,7 @@ func TestTheLibraryPageCountsWhatIsLeftFromVideosReadOnce(t *testing.T) {
 	if err != nil || read.Unchecked != 0 || read.Pending != 2 {
 		t.Errorf("summary after reading = %+v, %v; want the 2 H.264 videos not found not worth it", read, err)
 	}
-	if _, err := service.Start(t.Context(), courseID); err != nil {
+	if _, err := service.Start(t.Context(), courseID, []string{introChapter}); err != nil {
 		t.Fatalf("Start: %v", err)
 	}
 	waitFor(t, service, courseID, StateDone)
@@ -275,5 +279,35 @@ func TestAVideoFfprobeFailedOnIsReadAgainAtTheNextPlan(t *testing.T) {
 	videos.mutex.Unlock()
 	if plan, _ := service.Plan(t.Context(), courseID); plan.Unreadable != 1 || len(plan.Candidates) != 3 {
 		t.Errorf("plan once ffprobe recovers = %+v; want the video back among the candidates", plan)
+	}
+}
+
+func TestOnlyTheChosenChaptersAreCompressed(t *testing.T) {
+	videos := newFakeVideos()
+	videos.media[deep] = Media{Codec: h264Codec, Duration: time.Minute, SizeBytes: 1000}
+	videos.encodeAs[deep] = Media{Codec: HEVCCodec, Duration: time.Minute, SizeBytes: 400}
+	service, courseID := startService(t, videos, deep)
+	plan, err := service.Plan(t.Context(), courseID)
+	if chapters := plan.Chapters(); err != nil || len(chapters) != 2 || chapters[1].Dir != deepChapter || chapters[1].Videos != 1 || chapters[1].TotalBytes != 1000 {
+		t.Fatalf("chapters = %+v, %v; want the intro and the deep chapter with its one video", plan.Chapters(), err)
+	}
+
+	if _, err := service.Start(t.Context(), courseID, []string{deepChapter}); err != nil {
+		t.Fatalf("Start: %v", err)
+	}
+	run := waitFor(t, service, courseID, StateDone)
+	files := videos.snapshot()
+	if run.Total != 1 || files[deep].Codec != HEVCCodec || files[shrinks].Codec != h264Codec {
+		t.Errorf("run = %+v, library = %+v; want only the deep chapter encoded", run, files)
+	}
+}
+
+func TestAChapterTheCourseLacksIsRefused(t *testing.T) {
+	service, courseID := startService(t, newFakeVideos())
+	if _, err := service.Start(t.Context(), courseID, []string{"99 - Missing"}); !errors.Is(err, ErrUnknownChapter) {
+		t.Errorf("Start error = %v, want ErrUnknownChapter", err)
+	}
+	if _, err := service.Start(t.Context(), courseID, nil); !errors.Is(err, ErrNoChapters) {
+		t.Errorf("Start error = %v, want ErrNoChapters", err)
 	}
 }

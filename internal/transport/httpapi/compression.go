@@ -19,16 +19,14 @@ func (server apiServer) PlanCourseCompression(ctx context.Context, request gen.P
 	if err != nil {
 		return nil, err
 	}
-	return gen.PlanCourseCompression200JSONResponse{
-		Files:            len(plan.Candidates),
-		TotalBytes:       plan.TotalBytes,
-		TotalSeconds:     plan.TotalLength.Seconds(),
-		EstimatedSeconds: plan.EstimatedFor.Seconds(),
-		AlreadyHevc:      plan.AlreadyHEVC,
-		OtherCodec:       plan.OtherCodec,
-		NotWorthIt:       plan.NotWorthIt,
-		Unreadable:       plan.Unreadable,
-	}, nil
+	response := gen.PlanCourseCompression200JSONResponse{
+		Chapters:    toCompressionChapters(plan.Chapters()),
+		AlreadyHevc: plan.AlreadyHEVC,
+		OtherCodec:  plan.OtherCodec,
+		NotWorthIt:  plan.NotWorthIt,
+		Unreadable:  plan.Unreadable,
+	}
+	return response, nil
 }
 
 func (server apiServer) GetCourseCompression(_ context.Context, request gen.GetCourseCompressionRequestObject) (gen.GetCourseCompressionResponseObject, error) {
@@ -46,8 +44,10 @@ func (server apiServer) StartCourseCompression(ctx context.Context, request gen.
 	if server.deps.Compression == nil {
 		return gen.StartCourseCompression503ApplicationProblemPlusJSONResponse{CompressionUnavailableApplicationProblemPlusJSONResponse: compressionUnavailable()}, nil
 	}
-	run, err := server.deps.Compression.Start(ctx, request.CourseId)
+	run, err := server.deps.Compression.Start(ctx, request.CourseId, request.Body.Chapters)
 	switch {
+	case errors.Is(err, transcode.ErrNoChapters), errors.Is(err, transcode.ErrUnknownChapter):
+		return gen.StartCourseCompression400ApplicationProblemPlusJSONResponse{BadRequestApplicationProblemPlusJSONResponse: badRequest(err)}, nil
 	case errors.Is(err, transcode.ErrCourseNotFound):
 		return gen.StartCourseCompression404ApplicationProblemPlusJSONResponse{NotFoundApplicationProblemPlusJSONResponse: notFound(err.Error())}, nil
 	case errors.Is(err, transcode.ErrAlreadyQueued):
@@ -70,6 +70,19 @@ func (server apiServer) CancelCourseCompression(_ context.Context, request gen.C
 		return nil, err
 	}
 	return gen.CancelCourseCompression204Response{}, nil
+}
+
+func toCompressionChapters(chapters []transcode.ChapterPlan) []gen.CompressionChapter {
+	converted := make([]gen.CompressionChapter, len(chapters))
+	for position, chapter := range chapters {
+		converted[position] = gen.CompressionChapter{
+			Dir:              chapter.Dir,
+			Videos:           chapter.Videos,
+			TotalBytes:       chapter.TotalBytes,
+			EstimatedSeconds: chapter.EstimatedFor.Seconds(),
+		}
+	}
+	return converted
 }
 
 func toCompressionRun(run transcode.Run) gen.CompressionRun {
