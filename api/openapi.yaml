@@ -251,6 +251,18 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
 
+  /api/library/refresh:
+    post:
+      operationId: refreshLibrary
+      summary: Re-read the course index in cloud storage now instead of at the next periodic check
+      responses:
+        "204":
+          description: The library matches cloud storage
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "502":
+          $ref: "#/components/responses/ProviderUnreachable"
+
   /api/library/tools:
     get:
       operationId: listCourseTools
@@ -433,6 +445,154 @@ paths:
         "502":
           $ref: "#/components/responses/ProviderUnreachable"
 
+  /api/storage:
+    get:
+      operationId: getStorageSettings
+      summary: The saved cloud storage connection; the secret key is never sent back
+      responses:
+        "200":
+          description: Settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StorageSettings"
+    put:
+      operationId: saveStorageSettings
+      summary: Save a cloud storage connection once the bucket has answered with its keys
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StorageDraft"
+      responses:
+        "200":
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StorageSettings"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "502":
+          $ref: "#/components/responses/ProviderUnreachable"
+    delete:
+      operationId: forgetStorageSettings
+      summary: Forget the cloud storage connection and its keys
+      responses:
+        "204":
+          description: Forgotten
+
+  /api/storage/check:
+    post:
+      operationId: checkStorage
+      summary: Read and write a tiny object to learn what the keys may do; empty keys use the saved ones
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StorageDraft"
+      responses:
+        "200":
+          description: The bucket answered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StorageCheck"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "502":
+          $ref: "#/components/responses/ProviderUnreachable"
+
+
+  /api/courses/{courseId}/publish/plan:
+    get:
+      operationId: planCoursePublish
+      summary: What publishing a course to cloud storage would send, and what it would replace
+      parameters:
+        - $ref: "#/components/parameters/CourseId"
+      responses:
+        "200":
+          description: Plan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublishPlan"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "502":
+          $ref: "#/components/responses/ProviderUnreachable"
+
+  /api/courses/{courseId}/publish:
+    post:
+      operationId: startCoursePublish
+      summary: Publish chosen chapters of a course to cloud storage, replacing what is there
+      parameters:
+        - $ref: "#/components/parameters/CourseId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PublishRequest"
+      responses:
+        "202":
+          description: Started
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublishRun"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "502":
+          $ref: "#/components/responses/ProviderUnreachable"
+
+  /api/publish:
+    get:
+      operationId: getPublishRun
+      summary: The latest publish since the server started
+      responses:
+        "200":
+          description: The publish run
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublishRun"
+        "204":
+          description: Nothing published since the server started
+    delete:
+      operationId: cancelPublish
+      summary: Stop the running publish; the course already in the bucket stays listed
+      responses:
+        "204":
+          description: Stopping
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /api/publish/published:
+    get:
+      operationId: getPublishedCourse
+      summary: The course the cloud storage index lists, if storage is set up and holds one
+      responses:
+        "200":
+          description: Published course
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublishedCourse"
+        "204":
+          description: No storage is set up or it holds no course
+        "502":
+          $ref: "#/components/responses/ProviderUnreachable"
 
   /api/courses/{courseId}/translation/plan:
     get:
@@ -800,13 +960,17 @@ components:
   schemas:
     Health:
       type: object
-      required: [status, version]
+      required: [status, version, role]
       properties:
         status:
           type: string
           enum: [ok]
         version:
           type: string
+        role:
+          type: string
+          enum: [library, cloud]
+          description: library holds the downloaded courses; cloud only reads the course published to cloud storage
 
     Problem:
       description: RFC 9457 problem details
@@ -1220,6 +1384,146 @@ components:
           type: integer
           format: int64
         reply:
+          type: string
+
+    StorageSettings:
+      type: object
+      required: [configured]
+      properties:
+        configured:
+          type: boolean
+        url:
+          type: string
+          description: The S3 API URL, bucket included
+        accessKeyIdHint:
+          type: string
+          description: The access key ID's first and last four characters, the rest masked
+
+    StorageDraft:
+      type: object
+      required: [url]
+      properties:
+        url:
+          type: string
+          description: The S3 API URL, such as https://<account-id>.r2.cloudflarestorage.com/<bucket>
+        accessKeyId:
+          type: string
+          description: Leave out with the secret to keep the saved keys
+        secretAccessKey:
+          type: string
+
+    StorageAccess:
+      type: string
+      enum: [read-only, read-write]
+
+    StorageCheck:
+      type: object
+      required: [access, hasCourse]
+      properties:
+        access:
+          $ref: "#/components/schemas/StorageAccess"
+        hasCourse:
+          type: boolean
+          description: Whether the bucket already holds a published course index
+
+
+    PublishedCourse:
+      type: object
+      required: [dir, title, sizeBytes, publishedAt, chapters, totalChapters]
+      properties:
+        chapters:
+          type: integer
+          description: Chapters in the bucket
+        totalChapters:
+          type: integer
+          description: Chapters the course had when published; 0 when the index predates chapter selection
+        courseId:
+          type: string
+          description: The library course in the same folder, when this library has it
+        dir:
+          type: string
+        title:
+          type: string
+        sizeBytes:
+          type: integer
+          format: int64
+        publishedAt:
+          type: string
+          format: date-time
+
+    PublishRequest:
+      type: object
+      required: [chapters]
+      properties:
+        chapters:
+          type: array
+          description: Chapter folders to publish; anything else of the course in the bucket is removed
+          items:
+            type: string
+
+    PublishChapter:
+      type: object
+      required: [dir, files, sizeBytes, published]
+      properties:
+        dir:
+          type: string
+        files:
+          type: integer
+        sizeBytes:
+          type: integer
+          format: int64
+        published:
+          type: boolean
+
+    PublishPlan:
+      type: object
+      required: [sharedBytes, limitBytes, chapters, replaces]
+      properties:
+        sharedBytes:
+          type: integer
+          format: int64
+          description: Files outside chapter folders, such as the cover, sent with any chapter
+        limitBytes:
+          type: integer
+          format: int64
+        chapters:
+          type: array
+          items:
+            $ref: "#/components/schemas/PublishChapter"
+        replaces:
+          type: boolean
+          description: Whether another course in the bucket will be removed first
+        published:
+          $ref: "#/components/schemas/PublishedCourse"
+
+    PublishRun:
+      type: object
+      required: [courseId, title, state, totalFiles, sentFiles, skippedFiles, totalBytes, sentBytes]
+      properties:
+        courseId:
+          type: string
+        title:
+          type: string
+        state:
+          type: string
+          enum: [running, done, failed, cancelled]
+        totalFiles:
+          type: integer
+        sentFiles:
+          type: integer
+        skippedFiles:
+          type: integer
+          description: Files already in the bucket, unchanged since they were sent
+        totalBytes:
+          type: integer
+          format: int64
+        sentBytes:
+          type: integer
+          format: int64
+          description: Bytes of the files sent or skipped so far
+        currentFile:
+          type: string
+        failure:
           type: string
 
     TranslationPlan:

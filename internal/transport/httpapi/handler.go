@@ -1,6 +1,7 @@
 package httpapi
 
 import (
+	"context"
 	"io/fs"
 	"log/slog"
 	"net/http"
@@ -10,25 +11,36 @@ import (
 	"github.com/vukiman1/udemy-studio/internal/llm"
 	"github.com/vukiman1/udemy-studio/internal/login"
 	"github.com/vukiman1/udemy-studio/internal/notes"
+	"github.com/vukiman1/udemy-studio/internal/objectstore"
 	"github.com/vukiman1/udemy-studio/internal/progress"
+	"github.com/vukiman1/udemy-studio/internal/publish"
 	"github.com/vukiman1/udemy-studio/internal/search"
 	"github.com/vukiman1/udemy-studio/internal/transcode"
 	"github.com/vukiman1/udemy-studio/internal/translate"
 	"github.com/vukiman1/udemy-studio/internal/transport/httpapi/gen"
 )
 
+type MediaLinks interface {
+	Link(ctx context.Context, filePath, contentDisposition string) (string, error)
+}
+
 type Deps struct {
-	Version  string
-	Frontend fs.FS
-	Catalog  *library.Catalog
-	Media    fs.FS
-	Progress *progress.Service
-	Search   *search.Service
-	Notes    *notes.Service
+	Version     string
+	Frontend    fs.FS
+	Catalog     *library.Catalog
+	Media       fs.FS
+	MediaLinks  MediaLinks
+	SyncLibrary func(ctx context.Context) error
+	IsCloud     bool
+	Progress    *progress.Service
+	Search      *search.Service
+	Notes       *notes.Service
 	// Compression is nil when ffmpeg or ffprobe is missing.
 	Compression *transcode.Service
 	Translation *translate.Queue
 	AI          *llm.Service
+	Storage     *objectstore.Service
+	Publish     *publish.Service
 	Login       *login.Service
 	Jobs        *jobs.Manager
 	Logger      *slog.Logger
@@ -44,7 +56,7 @@ func NewHandler(deps Deps) http.Handler {
 		ErrorHandlerFunc: writeBadRequestProblem,
 	})
 
-	files := libraryFiles{catalog: deps.Catalog, media: deps.Media, logger: deps.Logger}
+	files := libraryFiles{catalog: deps.Catalog, media: deps.Media, links: deps.MediaLinks, logger: deps.Logger}
 	mux.HandleFunc("GET "+mediaPrefix+"{lectureId}", files.serveVideo)
 	mux.HandleFunc("GET "+articlesPrefix+"{lectureId}", files.serveArticle)
 	mux.HandleFunc("GET "+attachmentsPrefix+"{attachmentId}", files.serveAttachment)
@@ -54,7 +66,11 @@ func NewHandler(deps Deps) http.Handler {
 	if deps.Frontend != nil {
 		mux.Handle("GET /", spaHandler(deps.Frontend))
 	}
-	return RejectForeignHosts(deps.PublicHosts, RejectCrossSiteWrites(mux))
+	var handler http.Handler = mux
+	if deps.IsCloud {
+		handler = RejectLibraryOnlyRoutes(mux)
+	}
+	return RejectForeignHosts(deps.PublicHosts, RejectCrossSiteWrites(handler))
 }
 
 type apiServer struct {

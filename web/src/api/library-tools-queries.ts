@@ -8,9 +8,10 @@ import type { CourseTools } from './types'
 const ACTIVE_POLL_MS = 2000
 
 // One query feeds every course card, polled only while something is translating or compressing.
-export function useCourseTools(): UseQueryResult<CourseTools[]> {
+export function useCourseTools(isEnabled: boolean): UseQueryResult<CourseTools[]> {
   return useQuery({
     queryKey: QUERY_KEYS.courseTools,
+    enabled: isEnabled,
     refetchInterval: (query) => (query.state.data?.some(isBusy) === true ? ACTIVE_POLL_MS : false),
     queryFn: async () => {
       const { data, response } = await apiClient.GET('/api/library/tools')

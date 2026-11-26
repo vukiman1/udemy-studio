@@ -3,21 +3,32 @@ import type { ReactElement } from 'react'
 import { Link } from 'react-router'
 import { useCourseTools } from '../../api/library-tools-queries'
 import { ApiRequestError, useCourses } from '../../api/queries'
+import { useIsCloudCopy, useIsLibraryCopy } from '../../api/server-queries'
 import { DOWNLOADS_PATH } from '../../app/paths'
 import { StaleDataNotice } from '../../app/StaleDataNotice'
 import { Button, ButtonSize, ButtonVariant, buttonClass } from '../../ui/Button'
 import { EmptyState } from '../../ui/EmptyState'
 import { CourseCard } from './CourseCard'
+import { PublishedCourseBanner } from './PublishedCourseBanner'
+import { RefreshLibraryButton } from './RefreshLibraryButton'
+import { useCoursePublishing } from './use-course-publishing'
 
 const SKELETON_ROWS = ['first', 'second', 'third'] as const
 
 export function LibraryPage(): ReactElement {
   const courses = useCourses()
-  const tools = useCourseTools()
+  const isLibraryCopy = useIsLibraryCopy()
+  const isCloudCopy = useIsCloudCopy()
+  const tools = useCourseTools(isLibraryCopy)
+  const publishing = useCoursePublishing(isLibraryCopy)
 
   return (
     <main className="grid gap-7 px-5 py-8 md:px-10 md:py-10">
-      <h1 className="m-0 text-[30px] font-semibold">Thư viện</h1>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="m-0 text-[30px] font-semibold">Thư viện</h1>
+        {isCloudCopy && <RefreshLibraryButton />}
+      </div>
+      {publishing.isConfigured && <PublishedCourseBanner published={publishing.published} />}
       {courses.data === undefined ? (
         courses.isError ? (
           <LoadFailure
@@ -54,6 +65,7 @@ export function LibraryPage(): ReactElement {
                   <CourseCard
                     course={course}
                     tools={tools.data?.find((entry) => entry.courseId === course.id)}
+                    publish={publishing.of(course.id)}
                   />
                 </li>
               ))}
