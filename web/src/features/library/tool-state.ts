@@ -1,6 +1,7 @@
 import { isCompressing } from '../../api/compression-queries'
+import { isPublishing } from '../../api/publish-queries'
 import { isTranslating } from '../../api/translation-queries'
-import type { CourseTools } from '../../api/types'
+import type { CourseTools, PublishRun } from '../../api/types'
 
 export enum ToolState {
   Idle = 'idle',
@@ -21,6 +22,9 @@ export interface ToolStatus {
 
 const TRANSLATE_LABEL = 'Dịch'
 const COMPRESS_LABEL = 'Nén'
+const PUBLISH_LABEL = 'Đưa lên R2'
+const PUBLISHED_LABEL = 'Cập nhật R2'
+const PERCENT = 100
 
 const NOTHING_RUNNING = 0
 
@@ -111,5 +115,37 @@ export function compressionStatus(tools: CourseTools['compression']): ToolStatus
     progress: NOTHING_RUNNING,
     label: COMPRESS_LABEL,
     detail: `Nén video: còn ${String(pending)} video H.264`,
+  }
+}
+
+export function publishStatus(run: PublishRun | undefined, isPublished: boolean): ToolStatus {
+  if (run !== undefined && isPublishing(run)) {
+    const share = run.totalBytes === 0 ? 0 : run.sentBytes / run.totalBytes
+    return {
+      state: ToolState.Running,
+      progress: share,
+      label: `Đang đưa lên ${String(Math.round(share * PERCENT))}%`,
+      detail: `Đang đưa lên R2 ${String(run.sentFiles + run.skippedFiles)}/${String(run.totalFiles)} file`,
+    }
+  }
+  if (run?.state === 'failed')
+    return {
+      state: ToolState.Failed,
+      progress: NOTHING_RUNNING,
+      label: PUBLISH_LABEL,
+      detail: 'Lần đưa lên R2 trước bị lỗi',
+    }
+  if (isPublished)
+    return {
+      state: ToolState.Idle,
+      progress: NOTHING_RUNNING,
+      label: PUBLISHED_LABEL,
+      detail: 'Khoá đang ở trên R2; bấm để gửi các file mới hoặc đã đổi',
+    }
+  return {
+    state: ToolState.Idle,
+    progress: NOTHING_RUNNING,
+    label: PUBLISH_LABEL,
+    detail: 'Đưa khoá này lên R2 để học ở mọi nơi',
   }
 }
