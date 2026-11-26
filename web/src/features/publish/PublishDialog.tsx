@@ -10,6 +10,8 @@ import { Button, ButtonVariant } from '../../ui/Button'
 import { PublishPlanSummary } from './PublishPlanSummary'
 import { PublishProgress } from './PublishProgress'
 import { PublishResult } from './PublishResult'
+import { RemoveFromR2Button } from './RemoveFromR2Button'
+import { useRemoveFromR2 } from './use-remove-from-r2'
 
 interface PublishDialogProps {
   readonly courseId: string
@@ -27,7 +29,8 @@ export function PublishDialog({ courseId, title, run, onClose }: PublishDialogPr
     onSuccess: refresh,
   })
   const cancel = useMutation({ mutationFn: cancelPublish, onSuccess: refresh })
-  const error = start.error ?? cancel.error
+  const removal = useRemoveFromR2(onClose)
+  const error = start.error ?? cancel.error ?? removal.error
   const errorNote = error !== null && (
     <p className="text-[13px] text-danger" role="alert">
       {error.message}
@@ -46,13 +49,14 @@ export function PublishDialog({ courseId, title, run, onClose }: PublishDialogPr
             <Button
               variant={ButtonVariant.Ghost}
               icon={Pause}
-              disabled={cancel.isPending}
+              disabled={cancel.isPending || removal.isPending}
               onClick={() => {
                 cancel.mutate()
               }}
             >
               Stop
             </Button>
+            <RemoveFromR2Button removal={removal} label="Stop & remove" />
             <RunInBackgroundButton onClick={onClose} />
           </DialogFooter>
         </>
@@ -64,6 +68,7 @@ export function PublishDialog({ courseId, title, run, onClose }: PublishDialogPr
             start.mutate(chapters)
           }}
           onDismiss={onClose}
+          removeButton={<RemoveFromR2Button removal={removal} label="Remove from R2" />}
         >
           {run !== undefined && run.state !== 'running' && (
             <PublishResult run={run} state={run.state} />

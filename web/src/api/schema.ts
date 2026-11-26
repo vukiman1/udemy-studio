@@ -482,7 +482,7 @@ export interface paths {
         get: operations["getPublishedCourse"];
         put?: never;
         post?: never;
-        /** Delete the published course and its index from cloud storage */
+        /** Delete the published course and its index from cloud storage, stopping a running publish first */
         delete: operations["removePublishedCourse"];
         options?: never;
         head?: never;

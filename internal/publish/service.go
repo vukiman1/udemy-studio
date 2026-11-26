@@ -86,6 +86,7 @@ type Service struct {
 	run           *Run
 	cancelRunning context.CancelFunc
 	isRemoving    bool
+	done          chan struct{}
 }
 
 func NewService(deps Deps) *Service {
@@ -126,6 +127,7 @@ func (service *Service) Start(ctx context.Context, courseID string, chapters []s
 		return Run{}, fmt.Errorf("%w: removing the course from storage", ErrBusy)
 	}
 	service.run = &Run{CourseID: courseID, Title: plan.Course.Title, State: StateRunning, TotalFiles: len(selection.Files), TotalBytes: selection.TotalBytes}
+	service.done = make(chan struct{})
 	service.requests <- pushRequest{run: service.run, plan: plan, selection: selection, bucket: bucket}
 	return *service.run, nil
 }
@@ -136,12 +138,17 @@ func (service *Service) Cancel() error {
 	if service.run == nil || service.run.State != StateRunning {
 		return ErrNotRunning
 	}
+	service.cancelLocked()
+	return nil
+}
+
+func (service *Service) cancelLocked() {
 	if service.cancelRunning != nil {
 		service.cancelRunning()
-		return nil
+		return
 	}
 	service.run.State = StateCancelled
-	return nil
+	close(service.done)
 }
 
 func (service *Service) Status() (Run, bool) {
@@ -230,6 +237,7 @@ func (service *Service) finish(ctx context.Context, err error) {
 	service.mutex.Lock()
 	defer service.mutex.Unlock()
 	service.cancelRunning = nil
+	defer close(service.done)
 	service.run.CurrentFile = ""
 	switch {
 	case err == nil:
