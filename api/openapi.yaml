@@ -619,7 +619,7 @@ paths:
           $ref: "#/components/responses/ProviderUnreachable"
     delete:
       operationId: removePublishedCourse
-      summary: Delete the published course and its index from cloud storage
+      summary: Delete the published course and its index from cloud storage, stopping a running publish first
       responses:
         "204":
           description: Removed

@@ -996,7 +996,7 @@ type ServerInterface interface {
 	// GetPublishRun The latest publish since the server started
 	// (GET /api/publish)
 	GetPublishRun(w http.ResponseWriter, r *http.Request)
-	// RemovePublishedCourse Delete the published course and its index from cloud storage
+	// RemovePublishedCourse Delete the published course and its index from cloud storage, stopping a running publish first
 	// (DELETE /api/publish/published)
 	RemovePublishedCourse(w http.ResponseWriter, r *http.Request)
 	// GetPublishedCourse The course the cloud storage index lists, if storage is set up and holds one
@@ -4526,7 +4526,7 @@ type StrictServerInterface interface {
 	// GetPublishRun The latest publish since the server started
 	// (GET /api/publish)
 	GetPublishRun(ctx context.Context, request GetPublishRunRequestObject) (GetPublishRunResponseObject, error)
-	// RemovePublishedCourse Delete the published course and its index from cloud storage
+	// RemovePublishedCourse Delete the published course and its index from cloud storage, stopping a running publish first
 	// (DELETE /api/publish/published)
 	RemovePublishedCourse(ctx context.Context, request RemovePublishedCourseRequestObject) (RemovePublishedCourseResponseObject, error)
 	// GetPublishedCourse The course the cloud storage index lists, if storage is set up and holds one
