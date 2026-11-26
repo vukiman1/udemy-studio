@@ -2,9 +2,9 @@ import type { ReactElement } from 'react'
 import type { AIProvider, AISettings } from '../../api/types'
 import { ApiKeyField } from './ApiKeyField'
 import { ProviderModel } from './ProviderModel'
-import { SettingsCard } from './SettingsCard'
+import { SettingsCard } from '../../ui/SettingsCard'
 import { SettingsFooter } from './SettingsFooter'
-import { SETTINGS_LABEL, SETTINGS_ROW } from './settings-row'
+import { SETTINGS_LABEL, SETTINGS_ROW } from '../../ui/settings-row'
 import type { AIDraftEditor } from './use-ai-draft'
 
 interface AIConfigCardProps {
