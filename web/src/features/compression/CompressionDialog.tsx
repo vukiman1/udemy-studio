@@ -4,7 +4,7 @@ import { Archive, Pause } from 'lucide-react'
 import { cancelCompression, isCompressing, startCompression } from '../../api/compression-queries'
 import { QUERY_KEYS } from '../../api/queries'
 import type { CompressionRun } from '../../api/types'
-import { Dialog, DialogBody, DialogFooter } from '../../app/Dialog'
+import { Dialog, DialogBody, DialogFooter, DialogHeader } from '../../app/Dialog'
 import { RunInBackgroundButton } from '../../app/RunInBackgroundButton'
 import { Button, ButtonVariant } from '../../ui/Button'
 import { CompressionPlanSummary } from './CompressionPlanSummary'
@@ -37,7 +37,8 @@ export function CompressionDialog({
   )
 
   return (
-    <Dialog icon={Archive} title="Nén video (H.265)" subtitle={title} onClose={onClose}>
+    <Dialog label="Nén video (H.265)" onClose={onClose}>
+      <DialogHeader icon={Archive} title="Nén video (H.265)" subtitle={title} />
       {run !== undefined && isCompressing(run) ? (
         <>
           <DialogBody>

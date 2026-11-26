@@ -16,14 +16,14 @@ const RESULT_LOOKS: Readonly<Record<FinishedState, ResultLook>> = {
     icon: CircleCheck,
     box: 'bg-success-soft',
     accent: 'text-success',
-    heading: 'Đã đưa lên R2',
+    heading: 'Xong',
   },
   cancelled: { icon: CircleStop, box: 'bg-page', accent: 'text-muted', heading: 'Đã dừng' },
   failed: {
     icon: CircleAlert,
     box: 'bg-danger-soft',
     accent: 'text-danger',
-    heading: 'Đưa lên bị lỗi',
+    heading: 'Lỗi',
   },
 }
 
@@ -47,9 +47,6 @@ export function PublishResult({ run, state }: PublishResultProps): ReactElement 
 }
 
 function detail(run: PublishRun, state: FinishedState): string {
-  const counts = `${String(run.sentFiles)} file gửi mới, ${String(run.skippedFiles)} file đã có sẵn.`
-  if (state === 'done') return counts
-  if (state === 'cancelled')
-    return `${counts} Bản trên VPS chưa thấy bản mới cho đến khi đưa lên xong.`
-  return run.failure ?? 'Không rõ lỗi.'
+  if (state === 'failed') return run.failure ?? ''
+  return `${String(run.sentFiles)} mới · ${String(run.skippedFiles)} có sẵn`
 }

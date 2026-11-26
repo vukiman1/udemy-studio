@@ -31,10 +31,9 @@ export function PublishedCourseBanner({ published }: PublishedCourseBannerProps)
 }
 
 function BannerBody({ published }: PublishedCourseBannerProps): ReactElement {
-  if (published.isError)
-    return <span className="text-danger">Không đọc được R2 ({published.error.message}).</span>
-  if (published.data === undefined) return <span className="text-muted">Đang đọc R2…</span>
-  if (published.data === null) return <span className="text-muted">Chưa có khoá học nào.</span>
+  if (published.isError) return <span className="text-danger">{published.error.message}</span>
+  if (published.data === undefined) return <span className="text-muted">…</span>
+  if (published.data === null) return <span className="text-muted">Trống</span>
   const course = published.data
   return (
     <>
@@ -46,10 +45,15 @@ function BannerBody({ published }: PublishedCourseBannerProps): ReactElement {
         </Link>
       )}
       <span className="text-muted">
-        {formatBytes(course.sizeBytes)} · đưa lên lúc{' '}
-        {PUBLISHED_AT_FORMAT.format(new Date(course.publishedAt))}
-        {course.courseId === undefined && ' · không có trong thư viện máy này'}
+        {isPartial(course) &&
+          `${String(course.chapters)}/${String(course.totalChapters)} chương · `}
+        {formatBytes(course.sizeBytes)} · {PUBLISHED_AT_FORMAT.format(new Date(course.publishedAt))}
+        {course.courseId === undefined && ' · không có trên máy'}
       </span>
     </>
   )
+}
+
+function isPartial(course: PublishedCourse): boolean {
+  return course.totalChapters > 0 && course.chapters < course.totalChapters
 }

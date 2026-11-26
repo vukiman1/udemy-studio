@@ -8,6 +8,7 @@ import (
 	"io/fs"
 	"log/slog"
 	"path"
+	"slices"
 	"sync"
 	"time"
 
@@ -49,17 +50,12 @@ type Deps struct {
 type Plan struct {
 	Course     library.Course
 	Files      []courseFile
-	TotalBytes int64
 	LimitBytes int64
-	Published  *IndexCourse
-}
-
-func (plan Plan) Fits() bool {
-	return plan.TotalBytes <= plan.LimitBytes
+	Published  *Index
 }
 
 func (plan Plan) Replaces() bool {
-	return plan.Published != nil && plan.Published.Dir != plan.Course.Dir
+	return plan.Published != nil && plan.Published.Course.Dir != plan.Course.Dir
 }
 
 type Run struct {
@@ -76,9 +72,10 @@ type Run struct {
 }
 
 type pushRequest struct {
-	run    *Run
-	plan   Plan
-	bucket objectstore.Bucket
+	run       *Run
+	plan      Plan
+	selection Selection
+	bucket    objectstore.Bucket
 }
 
 type Service struct {
@@ -106,21 +103,25 @@ func (service *Service) Published(ctx context.Context) (Index, bool, error) {
 	return ReadIndex(ctx, bucket)
 }
 
-func (service *Service) Start(ctx context.Context, courseID string) (Run, error) {
+func (service *Service) Start(ctx context.Context, courseID string, chapters []string) (Run, error) {
 	plan, bucket, err := service.plan(ctx, courseID)
 	if err != nil {
 		return Run{}, err
 	}
-	if !plan.Fits() {
-		return Run{}, fmt.Errorf("%w: %d bytes, limit %d", ErrTooLarge, plan.TotalBytes, plan.LimitBytes)
+	selection, err := plan.Select(chapters)
+	if err != nil {
+		return Run{}, err
+	}
+	if selection.TotalBytes > plan.LimitBytes {
+		return Run{}, fmt.Errorf("%w: %d bytes, limit %d", ErrTooLarge, selection.TotalBytes, plan.LimitBytes)
 	}
 	service.mutex.Lock()
 	defer service.mutex.Unlock()
 	if service.run != nil && service.run.State == StateRunning {
 		return Run{}, fmt.Errorf("%w: %s", ErrBusy, service.run.Title)
 	}
-	service.run = &Run{CourseID: courseID, Title: plan.Course.Title, State: StateRunning, TotalFiles: len(plan.Files), TotalBytes: plan.TotalBytes}
-	service.requests <- pushRequest{run: service.run, plan: plan, bucket: bucket}
+	service.run = &Run{CourseID: courseID, Title: plan.Course.Title, State: StateRunning, TotalFiles: len(selection.Files), TotalBytes: selection.TotalBytes}
+	service.requests <- pushRequest{run: service.run, plan: plan, selection: selection, bucket: bucket}
 	return *service.run, nil
 }
 
@@ -163,7 +164,7 @@ func (service *Service) plan(ctx context.Context, courseID string) (Plan, object
 	if !found {
 		return Plan{}, nil, fmt.Errorf("%w: %s", ErrCourseNotFound, courseID)
 	}
-	files, total, err := listCourseFiles(service.deps.Files, course.Dir)
+	files, err := listCourseFiles(service.deps.Files, course.Dir)
 	if err != nil {
 		return Plan{}, nil, err
 	}
@@ -171,13 +172,13 @@ func (service *Service) plan(ctx context.Context, courseID string) (Plan, object
 	if err != nil {
 		return Plan{}, nil, err
 	}
-	plan := Plan{Course: course, Files: files, TotalBytes: total, LimitBytes: service.deps.LimitBytes}
+	plan := Plan{Course: course, Files: files, LimitBytes: service.deps.LimitBytes}
 	index, found, err := ReadIndex(ctx, bucket)
 	if err != nil {
 		return Plan{}, nil, err
 	}
 	if found {
-		plan.Published = &index.Course
+		plan.Published = &index
 	}
 	return plan, bucket, nil
 }
@@ -220,44 +221,56 @@ func (service *Service) finish(ctx context.Context, err error) {
 }
 
 func (service *Service) upload(ctx context.Context, request pushRequest) error {
-	plan, bucket := request.plan, request.bucket
-	if plan.Replaces() {
+	plan, selection, bucket := request.plan, request.selection, request.bucket
+	listed, err := bucket.List(ctx, CoursesPrefix)
+	if err != nil {
+		return err
+	}
+	kept, unwanted := splitByWanted(listed, plan.Course.Dir, selection.Files)
+	if plan.Replaces() || listsAny(plan.Published, unwanted) {
 		if err := bucket.Delete(ctx, objectstore.IndexKey); err != nil {
 			return err
 		}
 	}
-	remote, err := service.removeOthers(ctx, bucket, plan)
-	if err != nil {
-		return err
-	}
-	for _, file := range plan.Files {
-		if err := service.send(ctx, bucket, plan.Course.Dir, file, remote); err != nil {
+	for _, key := range unwanted {
+		if err := bucket.Delete(ctx, key); err != nil {
 			return err
 		}
 	}
-	return writeIndex(ctx, bucket, service.index(plan))
+	for _, file := range selection.Files {
+		if err := service.send(ctx, bucket, plan.Course.Dir, file, kept); err != nil {
+			return err
+		}
+	}
+	return writeIndex(ctx, bucket, service.index(plan, selection))
 }
 
-func (service *Service) removeOthers(ctx context.Context, bucket objectstore.Bucket, plan Plan) (map[string]objectstore.Object, error) {
-	listed, err := bucket.List(ctx, CoursesPrefix)
-	if err != nil {
-		return nil, err
+func listsAny(index *Index, keys []string) bool {
+	if index == nil {
+		return false
 	}
-	wanted := make(map[string]bool, len(plan.Files))
-	for _, file := range plan.Files {
-		wanted[ObjectKey(plan.Course.Dir, file.Path)] = true
+	listed := make(map[string]bool, len(index.Files))
+	for _, file := range index.Files {
+		listed[ObjectKey(index.Course.Dir, file.Path)] = true
+	}
+	return slices.ContainsFunc(keys, func(key string) bool { return listed[key] })
+}
+
+func splitByWanted(listed []objectstore.Object, courseDir string, files []courseFile) (map[string]objectstore.Object, []string) {
+	wanted := make(map[string]bool, len(files))
+	for _, file := range files {
+		wanted[ObjectKey(courseDir, file.Path)] = true
 	}
 	kept := make(map[string]objectstore.Object, len(listed))
+	var unwanted []string
 	for _, object := range listed {
 		if wanted[object.Key] {
 			kept[object.Key] = object
 			continue
 		}
-		if err := bucket.Delete(ctx, object.Key); err != nil {
-			return nil, err
-		}
+		unwanted = append(unwanted, object.Key)
 	}
-	return kept, nil
+	return kept, unwanted
 }
 
 func (service *Service) send(ctx context.Context, bucket objectstore.Bucket, courseDir string, file courseFile, remote map[string]objectstore.Object) error {
@@ -291,16 +304,22 @@ func uploadFile(ctx context.Context, bucket objectstore.Bucket, files fs.FS, loc
 	return bucket.Put(ctx, objectstore.Upload{Key: key, Body: body, SizeBytes: size, ContentType: contentType(localPath)})
 }
 
-func (service *Service) index(plan Plan) Index {
-	files := make([]IndexFile, len(plan.Files))
-	for position, file := range plan.Files {
+func (service *Service) index(plan Plan, selection Selection) Index {
+	files := make([]IndexFile, len(selection.Files))
+	for position, file := range selection.Files {
 		files[position] = IndexFile{Path: file.Path, SizeBytes: file.SizeBytes}
 	}
 	return Index{
 		Format:      IndexFormat,
 		PublishedAt: service.deps.Now().UTC(),
-		Course:      IndexCourse{Dir: plan.Course.Dir, Title: plan.Course.Title, SizeBytes: plan.TotalBytes},
-		Files:       files,
+		Course: IndexCourse{
+			Dir:          plan.Course.Dir,
+			Title:        plan.Course.Title,
+			SizeBytes:    selection.TotalBytes,
+			ChapterCount: len(plan.Chapters()),
+		},
+		Chapters: selection.Chapters,
+		Files:    files,
 	}
 }
 

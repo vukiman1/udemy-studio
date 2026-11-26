@@ -32,14 +32,16 @@ type courseFile struct {
 	ModifiedAt time.Time
 }
 
-func listCourseFiles(files fs.FS, courseDir string) ([]courseFile, int64, error) {
+func listCourseFiles(files fs.FS, courseDir string) ([]courseFile, error) {
 	var listed []courseFile
-	var total int64
 	err := fs.WalkDir(files, courseDir, func(walked string, entry fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
-		if entry.IsDir() || !isPublishable(entry.Name()) {
+		if entry.IsDir() {
+			return skipHiddenDir(walked, courseDir, entry.Name())
+		}
+		if !isPublishable(entry.Name()) {
 			return nil
 		}
 		info, err := entry.Info()
@@ -47,13 +49,19 @@ func listCourseFiles(files fs.FS, courseDir string) ([]courseFile, int64, error)
 			return err
 		}
 		listed = append(listed, courseFile{Path: strings.TrimPrefix(walked, courseDir+"/"), SizeBytes: info.Size(), ModifiedAt: info.ModTime()})
-		total += info.Size()
 		return nil
 	})
 	if err != nil {
-		return nil, 0, fmt.Errorf("list course %s: %w", courseDir, err)
+		return nil, fmt.Errorf("list course %s: %w", courseDir, err)
 	}
-	return listed, total, nil
+	return listed, nil
+}
+
+func skipHiddenDir(walked, courseDir, name string) error {
+	if walked != courseDir && strings.HasPrefix(name, ".") {
+		return fs.SkipDir
+	}
+	return nil
 }
 
 func isPublishable(name string) bool {

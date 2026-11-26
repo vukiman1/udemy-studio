@@ -55,9 +55,13 @@ export function usePublishPlan(courseId: string): UseQueryResult<PublishPlan> {
   })
 }
 
-export async function startPublish(courseId: string): Promise<PublishRun> {
+export async function startPublish(
+  courseId: string,
+  chapters: readonly string[],
+): Promise<PublishRun> {
   const { data, error, response } = await apiClient.POST('/api/courses/{courseId}/publish', {
     params: { path: { courseId } },
+    body: { chapters: [...chapters] },
   })
   if (data === undefined)
     throw new ApiRequestError(`publish ${courseId}`, response.status, error.detail)

@@ -23,13 +23,22 @@ type Index struct {
 	Format      int         `json:"format"`
 	PublishedAt time.Time   `json:"publishedAt"`
 	Course      IndexCourse `json:"course"`
+	Chapters    []string    `json:"chapters,omitempty"`
 	Files       []IndexFile `json:"files"`
 }
 
 type IndexCourse struct {
-	Dir       string `json:"dir"`
-	Title     string `json:"title"`
-	SizeBytes int64  `json:"sizeBytes"`
+	Dir          string `json:"dir"`
+	Title        string `json:"title"`
+	SizeBytes    int64  `json:"sizeBytes"`
+	ChapterCount int    `json:"chapterCount,omitempty"`
+}
+
+func (index Index) PublishedChapters() int {
+	if len(index.Chapters) == 0 {
+		return index.Course.ChapterCount
+	}
+	return len(index.Chapters)
 }
 
 type IndexFile struct {
