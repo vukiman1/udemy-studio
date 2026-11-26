@@ -622,6 +622,8 @@ type ProgressReport struct {
 
 // PublishChapter defines model for PublishChapter.
 type PublishChapter struct {
+	// Changed Whether publishing the chapter again would send or remove files
+	Changed   bool   `json:"changed"`
 	Dir       string `json:"dir"`
 	Files     int    `json:"files"`
 	Published bool   `json:"published"`
@@ -639,6 +641,9 @@ type PublishPlan struct {
 
 	// SharedBytes Files outside chapter folders, such as the cover, sent with any chapter
 	SharedBytes int64 `json:"sharedBytes"`
+
+	// SharedChanged Whether files outside chapters, or of chapters gone from disk, differ from the bucket
+	SharedChanged bool `json:"sharedChanged"`
 }
 
 // PublishRequest defines model for PublishRequest.

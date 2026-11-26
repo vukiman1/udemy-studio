@@ -1494,7 +1494,7 @@ components:
 
     PublishChapter:
       type: object
-      required: [dir, files, sizeBytes, published]
+      required: [dir, files, sizeBytes, published, changed]
       properties:
         dir:
           type: string
@@ -1505,11 +1505,17 @@ components:
           format: int64
         published:
           type: boolean
+        changed:
+          type: boolean
+          description: Whether publishing the chapter again would send or remove files
 
     PublishPlan:
       type: object
-      required: [sharedBytes, limitBytes, chapters, replaces]
+      required: [sharedBytes, limitBytes, chapters, replaces, sharedChanged]
       properties:
+        sharedChanged:
+          type: boolean
+          description: Whether files outside chapters, or of chapters gone from disk, differ from the bucket
         sharedBytes:
           type: integer
           format: int64

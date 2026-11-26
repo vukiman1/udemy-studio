@@ -52,6 +52,7 @@ type Plan struct {
 	Files      []courseFile
 	LimitBytes int64
 	Published  *Index
+	Remote     map[string]objectstore.Object
 }
 
 func (plan Plan) Replaces() bool {
@@ -177,10 +178,28 @@ func (service *Service) plan(ctx context.Context, courseID string) (Plan, object
 	if err != nil {
 		return Plan{}, nil, err
 	}
-	if found {
-		plan.Published = &index
+	if !found {
+		return plan, bucket, nil
+	}
+	plan.Published = &index
+	if index.Course.Dir == course.Dir {
+		if plan.Remote, err = listObjects(ctx, bucket, ObjectKey(course.Dir, "")+"/"); err != nil {
+			return Plan{}, nil, err
+		}
 	}
 	return plan, bucket, nil
+}
+
+func listObjects(ctx context.Context, bucket objectstore.Bucket, prefix string) (map[string]objectstore.Object, error) {
+	listed, err := bucket.List(ctx, prefix)
+	if err != nil {
+		return nil, err
+	}
+	objects := make(map[string]objectstore.Object, len(listed))
+	for _, object := range listed {
+		objects[object.Key] = object
+	}
+	return objects, nil
 }
 
 func (service *Service) push(ctx context.Context, request pushRequest) {

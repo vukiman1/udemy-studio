@@ -369,3 +369,50 @@ func TestLeftoversTheIndexDoesNotListKeepItPublished(t *testing.T) {
 		t.Error("the leftover is still in the bucket")
 	}
 }
+
+func changedChapters(t *testing.T, service *Service, dir string) (map[string]bool, bool) {
+	t.Helper()
+	plan, err := service.Plan(t.Context(), courseID(t, service, dir))
+	if err != nil {
+		t.Fatalf("Plan %s: %v", dir, err)
+	}
+	changed := map[string]bool{}
+	for _, chapter := range plan.Chapters() {
+		changed[chapter.Dir] = chapter.HasChanges
+	}
+	return changed, plan.SharedChanged()
+}
+
+func TestThePlanSeesNothingToSendRightAfterPublishing(t *testing.T) {
+	service := newTestService(t, courseTree(), newMemoryBucket())
+	publish(t, service, firstCourseDir)
+
+	changed, shared := changedChapters(t, service, firstCourseDir)
+	if changed[introChapter] || changed[deepChapter] || shared {
+		t.Errorf("changes = %v, shared = %v; want none", changed, shared)
+	}
+}
+
+func TestThePlanMarksTheChapterWhoseFilesChangedOrVanished(t *testing.T) {
+	tree := courseTree()
+	service := newTestService(t, tree, newMemoryBucket())
+	publish(t, service, firstCourseDir)
+	tree[firstCourseDir+"/"+deepChapter+"/003 Deep.mp4"] = &fstest.MapFile{Data: []byte("compressed"), ModTime: time.Now().Add(time.Hour)}
+	delete(tree, firstCourseDir+"/"+introChapter+"/001 Welcome_en.vtt")
+
+	changed, shared := changedChapters(t, service, firstCourseDir)
+	if !changed[deepChapter] || !changed[introChapter] || shared {
+		t.Errorf("changes = %v, shared = %v; want both chapters and nothing shared", changed, shared)
+	}
+}
+
+func TestThePlanMarksSharedChangesForACourseFile(t *testing.T) {
+	tree := courseTree()
+	service := newTestService(t, tree, newMemoryBucket())
+	publish(t, service, firstCourseDir)
+	delete(tree, firstCourseDir+"/cover.jpg")
+
+	if _, shared := changedChapters(t, service, firstCourseDir); !shared {
+		t.Error("a removed cover is not marked as a shared change")
+	}
+}

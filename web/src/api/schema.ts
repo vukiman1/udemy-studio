@@ -982,8 +982,12 @@ export interface components {
             /** Format: int64 */
             sizeBytes: number;
             published: boolean;
+            /** @description Whether publishing the chapter again would send or remove files */
+            changed: boolean;
         };
         PublishPlan: {
+            /** @description Whether files outside chapters, or of chapters gone from disk, differ from the bucket */
+            sharedChanged: boolean;
             /**
              * Format: int64
              * @description Files outside chapter folders, such as the cover, sent with any chapter

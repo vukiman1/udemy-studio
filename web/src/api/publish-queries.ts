@@ -42,6 +42,7 @@ export function usePublishedCourse(isEnabled: boolean): UseQueryResult<Published
 export function usePublishPlan(courseId: string): UseQueryResult<PublishPlan> {
   return useQuery({
     queryKey: QUERY_KEYS.publishPlan(courseId),
+    gcTime: 0,
     queryFn: async () => {
       const { data, error, response } = await apiClient.GET(
         '/api/courses/{courseId}/publish/plan',

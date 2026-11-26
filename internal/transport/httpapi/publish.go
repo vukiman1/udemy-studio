@@ -24,10 +24,11 @@ func (server apiServer) PlanCoursePublish(ctx context.Context, request gen.PlanC
 		return nil, err
 	}
 	response := gen.PlanCoursePublish200JSONResponse{
-		SharedBytes: plan.SharedBytes(),
-		LimitBytes:  plan.LimitBytes,
-		Chapters:    toPublishChapters(plan.Chapters()),
-		Replaces:    plan.Replaces(),
+		SharedBytes:   plan.SharedBytes(),
+		LimitBytes:    plan.LimitBytes,
+		Chapters:      toPublishChapters(plan.Chapters()),
+		Replaces:      plan.Replaces(),
+		SharedChanged: plan.SharedChanged(),
 	}
 	if plan.Published != nil {
 		published := server.publishedCourse(*plan.Published)
@@ -127,7 +128,7 @@ func toPublishRun(run publish.Run) gen.PublishRun {
 func toPublishChapters(chapters []publish.ChapterPlan) []gen.PublishChapter {
 	converted := make([]gen.PublishChapter, len(chapters))
 	for position, chapter := range chapters {
-		converted[position] = gen.PublishChapter{Dir: chapter.Dir, Files: chapter.Files, SizeBytes: chapter.SizeBytes, Published: chapter.IsPublished}
+		converted[position] = gen.PublishChapter{Dir: chapter.Dir, Files: chapter.Files, SizeBytes: chapter.SizeBytes, Published: chapter.IsPublished, Changed: chapter.HasChanges}
 	}
 	return converted
 }
