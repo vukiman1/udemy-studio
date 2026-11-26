@@ -9,7 +9,7 @@ import type { AIProvider, TranslationRun } from '../../api/types'
 import { Dialog, DialogBody, DialogFooter, DialogHeader } from '../../app/Dialog'
 import { AI_SETTINGS_PATH } from '../../app/paths'
 import { RunInBackgroundButton } from '../../app/RunInBackgroundButton'
-import { Button, ButtonSize, ButtonVariant, buttonClass } from '../../ui/Button'
+import { Button, ButtonVariant } from '../../ui/Button'
 import { TranslationPlanSummary } from './TranslationPlanSummary'
 import { TranslationRunStatus } from './TranslationRunStatus'
 
@@ -95,12 +95,9 @@ export function TranslationDialog({
           </DialogBody>
           <DialogFooter>
             <Button onClick={onClose}>Cancel</Button>
-            <Link
-              to={AI_SETTINGS_PATH}
-              className={buttonClass(ButtonVariant.Primary, ButtonSize.Medium)}
-            >
+            <Button to={AI_SETTINGS_PATH} variant={ButtonVariant.Primary}>
               Open AI settings
-            </Link>
+            </Button>
           </DialogFooter>
         </>
       )}

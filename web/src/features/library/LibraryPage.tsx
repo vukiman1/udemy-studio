@@ -1,12 +1,11 @@
 import { Book, Download, WifiOff } from 'lucide-react'
 import type { ReactElement } from 'react'
-import { Link } from 'react-router'
 import { useCourseTools } from '../../api/library-tools-queries'
 import { ApiRequestError, useCourses } from '../../api/queries'
 import { useIsCloudCopy, useIsLibraryCopy } from '../../api/server-queries'
 import { DOWNLOADS_PATH } from '../../app/paths'
 import { StaleDataNotice } from '../../app/StaleDataNotice'
-import { Button, ButtonSize, ButtonVariant, buttonClass } from '../../ui/Button'
+import { Button, ButtonVariant } from '../../ui/Button'
 import { EmptyState } from '../../ui/EmptyState'
 import { CourseCard } from './CourseCard'
 import { PublishedCourseBanner } from './PublishedCourseBanner'
@@ -49,13 +48,9 @@ export function LibraryPage(): ReactElement {
               title="No courses yet"
               body="Download a course to start."
               action={
-                <Link
-                  className={buttonClass(ButtonVariant.Primary, ButtonSize.Medium)}
-                  to={DOWNLOADS_PATH}
-                >
-                  <Download aria-hidden="true" />
+                <Button to={DOWNLOADS_PATH} variant={ButtonVariant.Primary} icon={Download}>
                   Download a course
-                </Link>
+                </Button>
               }
             />
           ) : (

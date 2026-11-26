@@ -1,7 +1,6 @@
 import type { ReactElement } from 'react'
-import { Link } from 'react-router'
 import { ChevronLeft, FileQuestion } from 'lucide-react'
-import { ButtonSize, ButtonVariant, buttonClass } from '../ui/Button'
+import { Button, ButtonSize, ButtonVariant } from '../ui/Button'
 import { EmptyState } from '../ui/EmptyState'
 import { LIBRARY_PATH } from './paths'
 
@@ -12,10 +11,14 @@ export function NotFoundPage(): ReactElement {
         icon={FileQuestion}
         title="Page not found."
         action={
-          <Link to={LIBRARY_PATH} className={buttonClass(ButtonVariant.Primary, ButtonSize.Small)}>
-            <ChevronLeft aria-hidden="true" />
+          <Button
+            to={LIBRARY_PATH}
+            variant={ButtonVariant.Primary}
+            size={ButtonSize.Small}
+            icon={ChevronLeft}
+          >
             Back to library
-          </Link>
+          </Button>
         }
       />
     </main>

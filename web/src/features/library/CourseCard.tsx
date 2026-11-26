@@ -4,7 +4,7 @@ import { Link } from 'react-router'
 import type { CourseSummary, CourseTools, PublishRun } from '../../api/types'
 import { coursePath, lecturePath } from '../../app/paths'
 import { ProgressBar } from '../../app/ProgressBar'
-import { ButtonSize, ButtonVariant, buttonClass } from '../../ui/Button'
+import { Button, ButtonVariant } from '../../ui/Button'
 import { CompressionDialog } from '../compression/CompressionDialog'
 import { formatBytes } from '../compression/format'
 import { PublishDialog } from '../publish/PublishDialog'
@@ -80,10 +80,9 @@ export function CourseCard({ course, tools, publish }: CourseCardProps): ReactEl
         </div>
       </div>
       <div className="flex basis-full flex-wrap gap-2 md:basis-auto md:flex-nowrap">
-        <Link className={buttonClass(ButtonVariant.Primary, ButtonSize.Medium)} to={resumeTo}>
-          <Play aria-hidden="true" />
+        <Button to={resumeTo} variant={ButtonVariant.Primary} icon={Play}>
           Continue
-        </Link>
+        </Button>
         {translation !== undefined && (
           <CourseToolButton
             icon={Languages}

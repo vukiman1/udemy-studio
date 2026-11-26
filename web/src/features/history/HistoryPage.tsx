@@ -1,11 +1,10 @@
 import type { ReactElement } from 'react'
-import { Link } from 'react-router'
 import { ArrowRight, History } from 'lucide-react'
 import { useHistory } from '../../api/queries'
 import type { HistoryEntry } from '../../api/types'
 import { lectureAtPath, lecturePath } from '../../app/paths'
 import { MS_PER_SECOND, formatTimestamp } from '../../app/timestamp'
-import { ButtonSize, ButtonVariant, buttonClass } from '../../ui/Button'
+import { Button, ButtonSize, ButtonVariant } from '../../ui/Button'
 import { EmptyState } from '../../ui/EmptyState'
 
 export function HistoryPage(): ReactElement {
@@ -62,13 +61,15 @@ function HistoryCard({ entry }: HistoryCardProps): ReactElement {
             ? 'Completed'
             : `In progress · stopped at ${formatTimestamp(entry.positionSeconds * MS_PER_SECOND)}`}
         </p>
-        <Link
+        <Button
           to={resumeTo}
-          className={`${buttonClass(ButtonVariant.Ghost, ButtonSize.Large)} max-md:-mr-5`}
+          variant={ButtonVariant.Ghost}
+          size={ButtonSize.Large}
+          icon={ArrowRight}
+          className="max-md:-mr-5"
         >
-          <ArrowRight aria-hidden="true" />
           Continue
-        </Link>
+        </Button>
       </div>
     </article>
   )
