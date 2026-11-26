@@ -7,5 +7,9 @@ import (
 )
 
 func (server apiServer) GetHealth(context.Context, gen.GetHealthRequestObject) (gen.GetHealthResponseObject, error) {
-	return gen.GetHealth200JSONResponse{Status: gen.Ok, Version: server.deps.Version}, nil
+	role := gen.Library
+	if server.deps.IsCloud {
+		role = gen.Cloud
+	}
+	return gen.GetHealth200JSONResponse{Status: gen.Ok, Version: server.deps.Version, Role: role}, nil
 }

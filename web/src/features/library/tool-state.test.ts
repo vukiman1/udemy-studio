@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import type { CourseTools, TranslationRun } from '../../api/types'
-import { ToolState, compressionStatus, translationStatus } from './tool-state'
+import type { CourseTools, PublishRun, TranslationRun } from '../../api/types'
+import { ToolState, compressionStatus, publishStatus, translationStatus } from './tool-state'
 
 function translationRun(state: TranslationRun['state'], failed = 0): TranslationRun {
   return {
@@ -54,5 +54,37 @@ describe('compressionStatus', () => {
 
   it('is unavailable without ffmpeg', () => {
     expect(compressionStatus(undefined).state).toBe(ToolState.Unavailable)
+  })
+})
+
+function publishRun(state: PublishRun['state']): PublishRun {
+  return {
+    courseId: 'course',
+    title: 'Course',
+    state,
+    totalFiles: 40,
+    sentFiles: 10,
+    skippedFiles: 10,
+    totalBytes: 1000,
+    sentBytes: 250,
+  }
+}
+
+describe('publishStatus', () => {
+  it('follows the bytes sent while a publish runs', () => {
+    const status = publishStatus(publishRun('running'), false)
+    expect(status.state).toBe(ToolState.Running)
+    expect(status.progress).toBeCloseTo(0.25)
+    expect(status.label).toBe('Đang đưa lên 25%')
+  })
+
+  it('stays open on a published course so changed files can be sent again', () => {
+    const status = publishStatus(publishRun('done'), true)
+    expect(status.state).toBe(ToolState.Idle)
+    expect(status.label).toBe('Cập nhật R2')
+  })
+
+  it('shows a failed publish until it is retried', () => {
+    expect(publishStatus(publishRun('failed'), false).state).toBe(ToolState.Failed)
   })
 })

@@ -4,7 +4,7 @@ import { CircleCheck, Eye, LoaderCircle } from 'lucide-react'
 import { checkAI } from '../../api/ai-queries'
 import { Button, ButtonVariant } from '../../ui/Button'
 import { TEXT_FIELD } from '../../ui/text-field'
-import { SETTINGS_LABEL, SETTINGS_ROW } from './settings-row'
+import { SETTINGS_LABEL, SETTINGS_ROW } from '../../ui/settings-row'
 import type { AIDraftEditor } from './use-ai-draft'
 
 const MS_PER_SECOND = 1000

@@ -1,0 +1,29 @@
+name: udemy-studio-v2
+
+services:
+  udemy-studio:
+    image: ghcr.io/vukiman1/udemy-studio:latest
+    ports:
+      - "127.0.0.1:8765:8765"
+    volumes:
+      - type: bind
+        source: ./library
+        target: /library
+        bind:
+          create_host_path: false
+      - ./data:/data
+    environment:
+      UDEMY_STUDIO_PUBLIC_HOST: ${PUBLIC_HOST:?set PUBLIC_HOST to the tunnel hostname, such as learn-dev.example.com}
+      UDEMY_STUDIO_ROLE: cloud
+    mem_limit: 384m
+    restart: unless-stopped
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    command: tunnel --no-autoupdate --protocol http2 run
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN:?set CLOUDFLARE_TUNNEL_TOKEN to the VPS tunnel token}
+    depends_on:
+      - udemy-studio
+    mem_limit: 128m
+    restart: unless-stopped

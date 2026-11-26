@@ -20,3 +20,4 @@ export function lectureAtPath(courseId: string, lectureId: string, startSeconds:
 }
 
 export const AI_SETTINGS_PATH = '/settings/ai'
+export const STORAGE_SETTINGS_PATH = '/settings/storage'

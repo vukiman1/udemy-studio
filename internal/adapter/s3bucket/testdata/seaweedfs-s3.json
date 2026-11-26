@@ -1,0 +1,14 @@
+{
+  "identities": [
+    {
+      "name": "writer",
+      "credentials": [{ "accessKey": "studio-writer", "secretKey": "studio-writer-secret" }],
+      "actions": ["Admin", "Read", "List", "Write", "Tagging"]
+    },
+    {
+      "name": "reader",
+      "credentials": [{ "accessKey": "studio-reader", "secretKey": "studio-reader-secret" }],
+      "actions": ["Read", "List"]
+    }
+  ]
+}

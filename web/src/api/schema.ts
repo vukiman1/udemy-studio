@@ -210,6 +210,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/library/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Re-read the course index in cloud storage now instead of at the next periodic check */
+        post: operations["refreshLibrary"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/library/tools": {
         parameters: {
             query?: never;
@@ -343,6 +360,111 @@ export interface paths {
         put?: never;
         /** Call the provider's model with a tiny prompt and time the answer; an empty key uses the saved one */
         post: operations["checkAI"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/storage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The saved cloud storage connection; the secret key is never sent back */
+        get: operations["getStorageSettings"];
+        /** Save a cloud storage connection once the bucket has answered with its keys */
+        put: operations["saveStorageSettings"];
+        post?: never;
+        /** Forget the cloud storage connection and its keys */
+        delete: operations["forgetStorageSettings"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/storage/check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Read and write a tiny object to learn what the keys may do; empty keys use the saved ones */
+        post: operations["checkStorage"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/courses/{courseId}/publish/plan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** What publishing a course to cloud storage would send, and what it would replace */
+        get: operations["planCoursePublish"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/courses/{courseId}/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Publish chosen chapters of a course to cloud storage, replacing what is there */
+        post: operations["startCoursePublish"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The latest publish since the server started */
+        get: operations["getPublishRun"];
+        put?: never;
+        post?: never;
+        /** Stop the running publish; the course already in the bucket stays listed */
+        delete: operations["cancelPublish"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/publish/published": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The course the cloud storage index lists, if storage is set up and holds one */
+        get: operations["getPublishedCourse"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -582,6 +704,11 @@ export interface components {
             /** @enum {string} */
             status: "ok";
             version: string;
+            /**
+             * @description library holds the downloaded courses; cloud only reads the course published to cloud storage
+             * @enum {string}
+             */
+            role: "library" | "cloud";
         };
         /** @description RFC 9457 problem details */
         Problem: {
@@ -797,6 +924,84 @@ export interface components {
             /** Format: int64 */
             latencyMs: number;
             reply: string;
+        };
+        StorageSettings: {
+            configured: boolean;
+            /** @description The S3 API URL, bucket included */
+            url?: string;
+            /** @description The access key ID's first and last four characters, the rest masked */
+            accessKeyIdHint?: string;
+        };
+        StorageDraft: {
+            /** @description The S3 API URL, such as https://<account-id>.r2.cloudflarestorage.com/<bucket> */
+            url: string;
+            /** @description Leave out with the secret to keep the saved keys */
+            accessKeyId?: string;
+            secretAccessKey?: string;
+        };
+        /** @enum {string} */
+        StorageAccess: "read-only" | "read-write";
+        StorageCheck: {
+            access: components["schemas"]["StorageAccess"];
+            /** @description Whether the bucket already holds a published course index */
+            hasCourse: boolean;
+        };
+        PublishedCourse: {
+            /** @description Chapters in the bucket */
+            chapters: number;
+            /** @description Chapters the course had when published; 0 when the index predates chapter selection */
+            totalChapters: number;
+            /** @description The library course in the same folder, when this library has it */
+            courseId?: string;
+            dir: string;
+            title: string;
+            /** Format: int64 */
+            sizeBytes: number;
+            /** Format: date-time */
+            publishedAt: string;
+        };
+        PublishRequest: {
+            /** @description Chapter folders to publish; anything else of the course in the bucket is removed */
+            chapters: string[];
+        };
+        PublishChapter: {
+            dir: string;
+            files: number;
+            /** Format: int64 */
+            sizeBytes: number;
+            published: boolean;
+        };
+        PublishPlan: {
+            /**
+             * Format: int64
+             * @description Files outside chapter folders, such as the cover, sent with any chapter
+             */
+            sharedBytes: number;
+            /** Format: int64 */
+            limitBytes: number;
+            chapters: components["schemas"]["PublishChapter"][];
+            /** @description Whether another course in the bucket will be removed first */
+            replaces: boolean;
+            published?: components["schemas"]["PublishedCourse"];
+        };
+        PublishRun: {
+            courseId: string;
+            title: string;
+            /** @enum {string} */
+            state: "running" | "done" | "failed" | "cancelled";
+            totalFiles: number;
+            sentFiles: number;
+            /** @description Files already in the bucket, unchanged since they were sent */
+            skippedFiles: number;
+            /** Format: int64 */
+            totalBytes: number;
+            /**
+             * Format: int64
+             * @description Bytes of the files sent or skipped so far
+             */
+            sentBytes: number;
+            currentFile?: string;
+            failure?: string;
         };
         TranslationPlan: {
             /** @description Lectures with English subtitles and no Vietnamese ones */
@@ -1318,6 +1523,26 @@ export interface operations {
             404: components["responses"]["NotFound"];
         };
     };
+    refreshLibrary: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The library matches cloud storage */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            409: components["responses"]["Conflict"];
+            502: components["responses"]["ProviderUnreachable"];
+        };
+    };
     listCourseTools: {
         parameters: {
             query?: never;
@@ -1573,6 +1798,226 @@ export interface operations {
                 };
             };
             400: components["responses"]["BadRequest"];
+            502: components["responses"]["ProviderUnreachable"];
+        };
+    };
+    getStorageSettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Settings */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StorageSettings"];
+                };
+            };
+        };
+    };
+    saveStorageSettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StorageDraft"];
+            };
+        };
+        responses: {
+            /** @description Saved */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StorageSettings"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            502: components["responses"]["ProviderUnreachable"];
+        };
+    };
+    forgetStorageSettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Forgotten */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    checkStorage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StorageDraft"];
+            };
+        };
+        responses: {
+            /** @description The bucket answered */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StorageCheck"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            502: components["responses"]["ProviderUnreachable"];
+        };
+    };
+    planCoursePublish: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                courseId: components["parameters"]["CourseId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Plan */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublishPlan"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            502: components["responses"]["ProviderUnreachable"];
+        };
+    };
+    startCoursePublish: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                courseId: components["parameters"]["CourseId"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PublishRequest"];
+            };
+        };
+        responses: {
+            /** @description Started */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublishRun"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            502: components["responses"]["ProviderUnreachable"];
+        };
+    };
+    getPublishRun: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The publish run */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublishRun"];
+                };
+            };
+            /** @description Nothing published since the server started */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    cancelPublish: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Stopping */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            409: components["responses"]["Conflict"];
+        };
+    };
+    getPublishedCourse: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Published course */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublishedCourse"];
+                };
+            };
+            /** @description No storage is set up or it holds no course */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             502: components["responses"]["ProviderUnreachable"];
         };
     };

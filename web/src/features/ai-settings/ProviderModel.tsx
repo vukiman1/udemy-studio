@@ -1,6 +1,6 @@
 import type { ReactElement } from 'react'
 import type { AIProvider } from '../../api/types'
-import { SETTINGS_LABEL, SETTINGS_ROW } from './settings-row'
+import { SETTINGS_LABEL, SETTINGS_ROW } from '../../ui/settings-row'
 
 const PRICE_FORMAT = new Intl.NumberFormat('vi-VN', {
   style: 'currency',
