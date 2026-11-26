@@ -41,6 +41,9 @@ export const QUERY_KEYS = {
   aiProviders: ['ai-providers'],
   aiSettings: ['ai-settings'],
   storageSettings: ['storage-settings'],
+  publishPlan: (courseId: string) => ['publish-plan', courseId],
+  publishRun: ['publish-run'],
+  publishedCourse: ['published-course'],
   courseTools: ['course-tools'],
   translationPlan: (courseId: string) => ['translation-plan', courseId],
 } as const

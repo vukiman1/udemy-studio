@@ -155,6 +155,30 @@ func (e LectureKind) Valid() bool {
 	}
 }
 
+// Defines values for PublishRunState.
+const (
+	PublishRunStateCancelled PublishRunState = "cancelled"
+	PublishRunStateDone      PublishRunState = "done"
+	PublishRunStateFailed    PublishRunState = "failed"
+	PublishRunStateRunning   PublishRunState = "running"
+)
+
+// Valid indicates whether the value is a known member of the PublishRunState enum.
+func (e PublishRunState) Valid() bool {
+	switch e {
+	case PublishRunStateCancelled:
+		return true
+	case PublishRunStateDone:
+		return true
+	case PublishRunStateFailed:
+		return true
+	case PublishRunStateRunning:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for StorageAccess.
 const (
 	ReadOnly  StorageAccess = "read-only"
@@ -557,6 +581,49 @@ type ProgressReport struct {
 	PositionSeconds float64 `json:"positionSeconds"`
 }
 
+// PublishPlan defines model for PublishPlan.
+type PublishPlan struct {
+	Files      int              `json:"files"`
+	Fits       bool             `json:"fits"`
+	LimitBytes int64            `json:"limitBytes"`
+	Published  *PublishedCourse `json:"published,omitempty"`
+
+	// Replaces Whether another course in the bucket will be removed first
+	Replaces   bool  `json:"replaces"`
+	TotalBytes int64 `json:"totalBytes"`
+}
+
+// PublishRun defines model for PublishRun.
+type PublishRun struct {
+	CourseId    string  `json:"courseId"`
+	CurrentFile *string `json:"currentFile,omitempty"`
+	Failure     *string `json:"failure,omitempty"`
+
+	// SentBytes Bytes of the files sent or skipped so far
+	SentBytes int64 `json:"sentBytes"`
+	SentFiles int   `json:"sentFiles"`
+
+	// SkippedFiles Files already in the bucket, unchanged since they were sent
+	SkippedFiles int             `json:"skippedFiles"`
+	State        PublishRunState `json:"state"`
+	Title        string          `json:"title"`
+	TotalBytes   int64           `json:"totalBytes"`
+	TotalFiles   int             `json:"totalFiles"`
+}
+
+// PublishRunState defines model for PublishRun.State.
+type PublishRunState string
+
+// PublishedCourse defines model for PublishedCourse.
+type PublishedCourse struct {
+	// CourseId The library course in the same folder, when this library has it
+	CourseId    *string   `json:"courseId,omitempty"`
+	Dir         string    `json:"dir"`
+	PublishedAt time.Time `json:"publishedAt"`
+	SizeBytes   int64     `json:"sizeBytes"`
+	Title       string    `json:"title"`
+}
+
 // SearchHit defines model for SearchHit.
 type SearchHit struct {
 	CourseId     string `json:"courseId"`
@@ -771,6 +838,12 @@ type ServerInterface interface {
 	// ExportCourseNotes Every note of a course as a Markdown file, in course order
 	// (GET /api/courses/{courseId}/notes.md)
 	ExportCourseNotes(w http.ResponseWriter, r *http.Request, courseId CourseId)
+	// StartCoursePublish Publish a course to cloud storage, replacing the one there
+	// (POST /api/courses/{courseId}/publish)
+	StartCoursePublish(w http.ResponseWriter, r *http.Request, courseId CourseId)
+	// PlanCoursePublish What publishing a course to cloud storage would send, and what it would replace
+	// (GET /api/courses/{courseId}/publish/plan)
+	PlanCoursePublish(w http.ResponseWriter, r *http.Request, courseId CourseId)
 	// CancelCourseTranslation Stop translating a course; lectures already translated keep their subtitles
 	// (DELETE /api/courses/{courseId}/translation)
 	CancelCourseTranslation(w http.ResponseWriter, r *http.Request, courseId CourseId)
@@ -837,6 +910,15 @@ type ServerInterface interface {
 	// EditNote Rewrite a note; its moment stays
 	// (PATCH /api/notes/{noteId})
 	EditNote(w http.ResponseWriter, r *http.Request, noteId NoteId)
+	// CancelPublish Stop the running publish; the course already in the bucket stays listed
+	// (DELETE /api/publish)
+	CancelPublish(w http.ResponseWriter, r *http.Request)
+	// GetPublishRun The latest publish since the server started
+	// (GET /api/publish)
+	GetPublishRun(w http.ResponseWriter, r *http.Request)
+	// GetPublishedCourse The course the cloud storage index lists, if storage is set up and holds one
+	// (GET /api/publish/published)
+	GetPublishedCourse(w http.ResponseWriter, r *http.Request)
 	// SearchSubtitles Find the moments a phrase is said in any lecture, diacritics ignored and the last word matched as a prefix
 	// (GET /api/search)
 	SearchSubtitles(w http.ResponseWriter, r *http.Request, params SearchSubtitlesParams)
@@ -1137,6 +1219,58 @@ func (siw *ServerInterfaceWrapper) ExportCourseNotes(w http.ResponseWriter, r *h
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.ExportCourseNotes(w, r, courseId)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// StartCoursePublish operation middleware
+func (siw *ServerInterfaceWrapper) StartCoursePublish(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "courseId" -------------
+	var courseId CourseId
+
+	err = runtime.BindStyledParameterWithOptions("simple", "courseId", r.PathValue("courseId"), &courseId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "courseId", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.StartCoursePublish(w, r, courseId)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// PlanCoursePublish operation middleware
+func (siw *ServerInterfaceWrapper) PlanCoursePublish(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "courseId" -------------
+	var courseId CourseId
+
+	err = runtime.BindStyledParameterWithOptions("simple", "courseId", r.PathValue("courseId"), &courseId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "", ValueIsUnescaped: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "courseId", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PlanCoursePublish(w, r, courseId)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -1642,6 +1776,48 @@ func (siw *ServerInterfaceWrapper) EditNote(w http.ResponseWriter, r *http.Reque
 	handler.ServeHTTP(w, r)
 }
 
+// CancelPublish operation middleware
+func (siw *ServerInterfaceWrapper) CancelPublish(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CancelPublish(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetPublishRun operation middleware
+func (siw *ServerInterfaceWrapper) GetPublishRun(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetPublishRun(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetPublishedCourse operation middleware
+func (siw *ServerInterfaceWrapper) GetPublishedCourse(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetPublishedCourse(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
 // SearchSubtitles operation middleware
 func (siw *ServerInterfaceWrapper) SearchSubtitles(w http.ResponseWriter, r *http.Request) {
 
@@ -1894,6 +2070,11 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/storage", wrapper.GetStorageSettings)
 	m.HandleFunc(http.MethodPut+" "+options.BaseURL+"/api/storage", wrapper.SaveStorageSettings)
 	m.HandleFunc(http.MethodPost+" "+options.BaseURL+"/api/storage/check", wrapper.CheckStorage)
+	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/courses/{courseId}/publish/plan", wrapper.PlanCoursePublish)
+	m.HandleFunc(http.MethodPost+" "+options.BaseURL+"/api/courses/{courseId}/publish", wrapper.StartCoursePublish)
+	m.HandleFunc(http.MethodDelete+" "+options.BaseURL+"/api/publish", wrapper.CancelPublish)
+	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/publish", wrapper.GetPublishRun)
+	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/publish/published", wrapper.GetPublishedCourse)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/courses/{courseId}/translation/plan", wrapper.PlanCourseTranslation)
 	m.HandleFunc(http.MethodDelete+" "+options.BaseURL+"/api/courses/{courseId}/translation", wrapper.CancelCourseTranslation)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/courses/{courseId}/translation", wrapper.GetCourseTranslation)
@@ -2485,6 +2666,178 @@ func (response ExportCourseNotes404ApplicationProblemPlusJSONResponse) VisitExpo
 	}
 	w.Header().Set("Content-Type", "application/problem+json")
 	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type StartCoursePublishRequestObject struct {
+	CourseId CourseId `json:"courseId"`
+}
+
+type StartCoursePublishResponseObject interface {
+	VisitStartCoursePublishResponse(w http.ResponseWriter) error
+}
+
+type StartCoursePublish202JSONResponse PublishRun
+
+func (response StartCoursePublish202JSONResponse) VisitStartCoursePublishResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(202)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type StartCoursePublish400ApplicationProblemPlusJSONResponse struct {
+	BadRequestApplicationProblemPlusJSONResponse
+}
+
+func (response StartCoursePublish400ApplicationProblemPlusJSONResponse) VisitStartCoursePublishResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.BadRequestApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type StartCoursePublish404ApplicationProblemPlusJSONResponse struct {
+	NotFoundApplicationProblemPlusJSONResponse
+}
+
+func (response StartCoursePublish404ApplicationProblemPlusJSONResponse) VisitStartCoursePublishResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.NotFoundApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type StartCoursePublish409ApplicationProblemPlusJSONResponse struct {
+	ConflictApplicationProblemPlusJSONResponse
+}
+
+func (response StartCoursePublish409ApplicationProblemPlusJSONResponse) VisitStartCoursePublishResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.ConflictApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(409)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type StartCoursePublish502ApplicationProblemPlusJSONResponse struct {
+	ProviderUnreachableApplicationProblemPlusJSONResponse
+}
+
+func (response StartCoursePublish502ApplicationProblemPlusJSONResponse) VisitStartCoursePublishResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.ProviderUnreachableApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(502)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PlanCoursePublishRequestObject struct {
+	CourseId CourseId `json:"courseId"`
+}
+
+type PlanCoursePublishResponseObject interface {
+	VisitPlanCoursePublishResponse(w http.ResponseWriter) error
+}
+
+type PlanCoursePublish200JSONResponse PublishPlan
+
+func (response PlanCoursePublish200JSONResponse) VisitPlanCoursePublishResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PlanCoursePublish400ApplicationProblemPlusJSONResponse struct {
+	BadRequestApplicationProblemPlusJSONResponse
+}
+
+func (response PlanCoursePublish400ApplicationProblemPlusJSONResponse) VisitPlanCoursePublishResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.BadRequestApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PlanCoursePublish404ApplicationProblemPlusJSONResponse struct {
+	NotFoundApplicationProblemPlusJSONResponse
+}
+
+func (response PlanCoursePublish404ApplicationProblemPlusJSONResponse) VisitPlanCoursePublishResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.NotFoundApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PlanCoursePublish409ApplicationProblemPlusJSONResponse struct {
+	ConflictApplicationProblemPlusJSONResponse
+}
+
+func (response PlanCoursePublish409ApplicationProblemPlusJSONResponse) VisitPlanCoursePublishResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.ConflictApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(409)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type PlanCoursePublish502ApplicationProblemPlusJSONResponse struct {
+	ProviderUnreachableApplicationProblemPlusJSONResponse
+}
+
+func (response PlanCoursePublish502ApplicationProblemPlusJSONResponse) VisitPlanCoursePublishResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.ProviderUnreachableApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(502)
 	_, err := buf.WriteTo(w)
 	return err
 }
@@ -3452,6 +3805,111 @@ func (response EditNote404ApplicationProblemPlusJSONResponse) VisitEditNoteRespo
 	return err
 }
 
+type CancelPublishRequestObject struct {
+}
+
+type CancelPublishResponseObject interface {
+	VisitCancelPublishResponse(w http.ResponseWriter) error
+}
+
+type CancelPublish204Response struct {
+}
+
+func (response CancelPublish204Response) VisitCancelPublishResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type CancelPublish409ApplicationProblemPlusJSONResponse struct {
+	ConflictApplicationProblemPlusJSONResponse
+}
+
+func (response CancelPublish409ApplicationProblemPlusJSONResponse) VisitCancelPublishResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.ConflictApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(409)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetPublishRunRequestObject struct {
+}
+
+type GetPublishRunResponseObject interface {
+	VisitGetPublishRunResponse(w http.ResponseWriter) error
+}
+
+type GetPublishRun200JSONResponse PublishRun
+
+func (response GetPublishRun200JSONResponse) VisitGetPublishRunResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetPublishRun204Response struct {
+}
+
+func (response GetPublishRun204Response) VisitGetPublishRunResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type GetPublishedCourseRequestObject struct {
+}
+
+type GetPublishedCourseResponseObject interface {
+	VisitGetPublishedCourseResponse(w http.ResponseWriter) error
+}
+
+type GetPublishedCourse200JSONResponse PublishedCourse
+
+func (response GetPublishedCourse200JSONResponse) VisitGetPublishedCourseResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetPublishedCourse204Response struct {
+}
+
+func (response GetPublishedCourse204Response) VisitGetPublishedCourseResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type GetPublishedCourse502ApplicationProblemPlusJSONResponse struct {
+	ProviderUnreachableApplicationProblemPlusJSONResponse
+}
+
+func (response GetPublishedCourse502ApplicationProblemPlusJSONResponse) VisitGetPublishedCourseResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.ProviderUnreachableApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(502)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 type SearchSubtitlesRequestObject struct {
 	Params SearchSubtitlesParams
 }
@@ -3683,6 +4141,12 @@ type StrictServerInterface interface {
 	// ExportCourseNotes Every note of a course as a Markdown file, in course order
 	// (GET /api/courses/{courseId}/notes.md)
 	ExportCourseNotes(ctx context.Context, request ExportCourseNotesRequestObject) (ExportCourseNotesResponseObject, error)
+	// StartCoursePublish Publish a course to cloud storage, replacing the one there
+	// (POST /api/courses/{courseId}/publish)
+	StartCoursePublish(ctx context.Context, request StartCoursePublishRequestObject) (StartCoursePublishResponseObject, error)
+	// PlanCoursePublish What publishing a course to cloud storage would send, and what it would replace
+	// (GET /api/courses/{courseId}/publish/plan)
+	PlanCoursePublish(ctx context.Context, request PlanCoursePublishRequestObject) (PlanCoursePublishResponseObject, error)
 	// CancelCourseTranslation Stop translating a course; lectures already translated keep their subtitles
 	// (DELETE /api/courses/{courseId}/translation)
 	CancelCourseTranslation(ctx context.Context, request CancelCourseTranslationRequestObject) (CancelCourseTranslationResponseObject, error)
@@ -3749,6 +4213,15 @@ type StrictServerInterface interface {
 	// EditNote Rewrite a note; its moment stays
 	// (PATCH /api/notes/{noteId})
 	EditNote(ctx context.Context, request EditNoteRequestObject) (EditNoteResponseObject, error)
+	// CancelPublish Stop the running publish; the course already in the bucket stays listed
+	// (DELETE /api/publish)
+	CancelPublish(ctx context.Context, request CancelPublishRequestObject) (CancelPublishResponseObject, error)
+	// GetPublishRun The latest publish since the server started
+	// (GET /api/publish)
+	GetPublishRun(ctx context.Context, request GetPublishRunRequestObject) (GetPublishRunResponseObject, error)
+	// GetPublishedCourse The course the cloud storage index lists, if storage is set up and holds one
+	// (GET /api/publish/published)
+	GetPublishedCourse(ctx context.Context, request GetPublishedCourseRequestObject) (GetPublishedCourseResponseObject, error)
 	// SearchSubtitles Find the moments a phrase is said in any lecture, diacritics ignored and the last word matched as a prefix
 	// (GET /api/search)
 	SearchSubtitles(ctx context.Context, request SearchSubtitlesRequestObject) (SearchSubtitlesResponseObject, error)
@@ -4175,6 +4648,58 @@ func (sh *strictHandler) ExportCourseNotes(w http.ResponseWriter, r *http.Reques
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(ExportCourseNotesResponseObject); ok {
 		if err := validResponse.VisitExportCourseNotesResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// StartCoursePublish operation middleware
+func (sh *strictHandler) StartCoursePublish(w http.ResponseWriter, r *http.Request, courseId CourseId) {
+	var request StartCoursePublishRequestObject
+
+	request.CourseId = courseId
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error) {
+		return sh.ssi.StartCoursePublish(ctx, request.(StartCoursePublishRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "StartCoursePublish")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(StartCoursePublishResponseObject); ok {
+		if err := validResponse.VisitStartCoursePublishResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// PlanCoursePublish operation middleware
+func (sh *strictHandler) PlanCoursePublish(w http.ResponseWriter, r *http.Request, courseId CourseId) {
+	var request PlanCoursePublishRequestObject
+
+	request.CourseId = courseId
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error) {
+		return sh.ssi.PlanCoursePublish(ctx, request.(PlanCoursePublishRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PlanCoursePublish")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(PlanCoursePublishResponseObject); ok {
+		if err := validResponse.VisitPlanCoursePublishResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {
@@ -4773,6 +5298,78 @@ func (sh *strictHandler) EditNote(w http.ResponseWriter, r *http.Request, noteId
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(EditNoteResponseObject); ok {
 		if err := validResponse.VisitEditNoteResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// CancelPublish operation middleware
+func (sh *strictHandler) CancelPublish(w http.ResponseWriter, r *http.Request) {
+	var request CancelPublishRequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error) {
+		return sh.ssi.CancelPublish(ctx, request.(CancelPublishRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CancelPublish")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(CancelPublishResponseObject); ok {
+		if err := validResponse.VisitCancelPublishResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetPublishRun operation middleware
+func (sh *strictHandler) GetPublishRun(w http.ResponseWriter, r *http.Request) {
+	var request GetPublishRunRequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error) {
+		return sh.ssi.GetPublishRun(ctx, request.(GetPublishRunRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetPublishRun")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetPublishRunResponseObject); ok {
+		if err := validResponse.VisitGetPublishRunResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetPublishedCourse operation middleware
+func (sh *strictHandler) GetPublishedCourse(w http.ResponseWriter, r *http.Request) {
+	var request GetPublishedCourseRequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error) {
+		return sh.ssi.GetPublishedCourse(ctx, request.(GetPublishedCourseRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetPublishedCourse")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetPublishedCourseResponseObject); ok {
+		if err := validResponse.VisitGetPublishedCourseResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

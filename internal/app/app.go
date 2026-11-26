@@ -95,6 +95,7 @@ func Run(ctx context.Context, options Options, logger *slog.Logger) error {
 	}
 	ai := newAISettings(box, database, logger)
 	storage := newStorageSettings(box, database, logger)
+	publishing := newPublish(storage, catalog, media.FS(), logger)
 	translation := newTranslationQueue(media, refresher, ai, logger)
 	handler := httpapi.NewHandler(httpapi.Deps{
 		Version:     options.Version,
@@ -108,6 +109,7 @@ func Run(ctx context.Context, options Options, logger *slog.Logger) error {
 		Translation: translation,
 		AI:          ai,
 		Storage:     storage,
+		Publish:     publishing,
 		Login:       downloads.login,
 		Jobs:        downloads.jobs,
 		Logger:      logger,
@@ -131,7 +133,7 @@ func Run(ctx context.Context, options Options, logger *slog.Logger) error {
 		}
 	}
 	logger.Info("http server listening", "addr", listener.Addr().String(), "version", options.Version)
-	workers := append(downloads.workers(), refresher.indexSubtitles, translation.Run)
+	workers := append(downloads.workers(), refresher.indexSubtitles, translation.Run, publishing.Run)
 	if compression != nil {
 		workers = append(workers, compression.Run, compression.Survey)
 	}
