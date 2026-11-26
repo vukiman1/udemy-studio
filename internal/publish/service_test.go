@@ -109,6 +109,7 @@ func courseTree() fstest.MapFS {
 		firstCourseDir + "/01 - Intro/002 Setup.mp4":         {Data: []byte("video-two")},
 		firstCourseDir + "/01 - Intro/002 Setup.mp4.aria2":   {Data: []byte("partial")},
 		firstCourseDir + "/.DS_Store":                        {Data: []byte("finder")},
+		firstCourseDir + "/.cache/thumb.jpg":                 {Data: []byte("cache")},
 		secondCourseDir + "/01 - Basics/001 Hello.mp4":       {Data: []byte("hello")},
 		secondCourseDir + "/01 - Basics/001 Hello_en.vtt":    {Data: []byte("WEBVTT")},
 		secondCourseDir + "/01 - Basics/001 Hello.mp4.aria2": {Data: []byte("partial")},

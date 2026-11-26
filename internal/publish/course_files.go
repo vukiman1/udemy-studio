@@ -39,7 +39,10 @@ func listCourseFiles(files fs.FS, courseDir string) ([]courseFile, int64, error)
 		if err != nil {
 			return err
 		}
-		if entry.IsDir() || !isPublishable(entry.Name()) {
+		if entry.IsDir() {
+			return skipHiddenDir(walked, courseDir, entry.Name())
+		}
+		if !isPublishable(entry.Name()) {
 			return nil
 		}
 		info, err := entry.Info()
@@ -54,6 +57,13 @@ func listCourseFiles(files fs.FS, courseDir string) ([]courseFile, int64, error)
 		return nil, 0, fmt.Errorf("list course %s: %w", courseDir, err)
 	}
 	return listed, total, nil
+}
+
+func skipHiddenDir(walked, courseDir, name string) error {
+	if walked != courseDir && strings.HasPrefix(name, ".") {
+		return fs.SkipDir
+	}
+	return nil
 }
 
 func isPublishable(name string) bool {
