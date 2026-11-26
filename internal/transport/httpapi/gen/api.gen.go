@@ -155,6 +155,24 @@ func (e LectureKind) Valid() bool {
 	}
 }
 
+// Defines values for StorageAccess.
+const (
+	ReadOnly  StorageAccess = "read-only"
+	ReadWrite StorageAccess = "read-write"
+)
+
+// Valid indicates whether the value is a known member of the StorageAccess enum.
+func (e StorageAccess) Valid() bool {
+	switch e {
+	case ReadOnly:
+		return true
+	case ReadWrite:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for TranslationRunState.
 const (
 	TranslationRunStateCancelled TranslationRunState = "cancelled"
@@ -552,6 +570,37 @@ type SearchHit struct {
 	StartMs int64  `json:"startMs"`
 }
 
+// StorageAccess defines model for StorageAccess.
+type StorageAccess string
+
+// StorageCheck defines model for StorageCheck.
+type StorageCheck struct {
+	Access StorageAccess `json:"access"`
+
+	// HasCourse Whether the bucket already holds a published course index
+	HasCourse bool `json:"hasCourse"`
+}
+
+// StorageDraft defines model for StorageDraft.
+type StorageDraft struct {
+	// AccessKeyId Leave out with the secret to keep the saved keys
+	AccessKeyId     *string `json:"accessKeyId,omitempty"`
+	SecretAccessKey *string `json:"secretAccessKey,omitempty"`
+
+	// Url The S3 API URL, such as https://<account-id>.r2.cloudflarestorage.com/<bucket>
+	Url string `json:"url"`
+}
+
+// StorageSettings defines model for StorageSettings.
+type StorageSettings struct {
+	// AccessKeyIdHint The access key ID's first and last four characters, the rest masked
+	AccessKeyIdHint *string `json:"accessKeyIdHint,omitempty"`
+	Configured      bool    `json:"configured"`
+
+	// Url The S3 API URL, bucket included
+	Url *string `json:"url,omitempty"`
+}
+
 // TranslationOutcome defines model for TranslationOutcome.
 type TranslationOutcome struct {
 	LectureTitle string `json:"lectureTitle"`
@@ -672,6 +721,12 @@ type PutLectureProgressJSONRequestBody = ProgressReport
 // EditNoteJSONRequestBody defines body for EditNote for application/json ContentType.
 type EditNoteJSONRequestBody = NoteEdit
 
+// SaveStorageSettingsJSONRequestBody defines body for SaveStorageSettings for application/json ContentType.
+type SaveStorageSettingsJSONRequestBody = StorageDraft
+
+// CheckStorageJSONRequestBody defines body for CheckStorage for application/json ContentType.
+type CheckStorageJSONRequestBody = StorageDraft
+
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 	// CheckAI Call the provider's model with a tiny prompt and time the answer; an empty key uses the saved one
@@ -785,6 +840,18 @@ type ServerInterface interface {
 	// SearchSubtitles Find the moments a phrase is said in any lecture, diacritics ignored and the last word matched as a prefix
 	// (GET /api/search)
 	SearchSubtitles(w http.ResponseWriter, r *http.Request, params SearchSubtitlesParams)
+	// ForgetStorageSettings Forget the cloud storage connection and its keys
+	// (DELETE /api/storage)
+	ForgetStorageSettings(w http.ResponseWriter, r *http.Request)
+	// GetStorageSettings The saved cloud storage connection; the secret key is never sent back
+	// (GET /api/storage)
+	GetStorageSettings(w http.ResponseWriter, r *http.Request)
+	// SaveStorageSettings Save a cloud storage connection once the bucket has answered with its keys
+	// (PUT /api/storage)
+	SaveStorageSettings(w http.ResponseWriter, r *http.Request)
+	// CheckStorage Read and write a tiny object to learn what the keys may do; empty keys use the saved ones
+	// (POST /api/storage/check)
+	CheckStorage(w http.ResponseWriter, r *http.Request)
 	// GetHealth Liveness probe and build version
 	// (GET /healthz)
 	GetHealth(w http.ResponseWriter, r *http.Request)
@@ -1608,6 +1675,62 @@ func (siw *ServerInterfaceWrapper) SearchSubtitles(w http.ResponseWriter, r *htt
 	handler.ServeHTTP(w, r)
 }
 
+// ForgetStorageSettings operation middleware
+func (siw *ServerInterfaceWrapper) ForgetStorageSettings(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ForgetStorageSettings(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetStorageSettings operation middleware
+func (siw *ServerInterfaceWrapper) GetStorageSettings(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetStorageSettings(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// SaveStorageSettings operation middleware
+func (siw *ServerInterfaceWrapper) SaveStorageSettings(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.SaveStorageSettings(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// CheckStorage operation middleware
+func (siw *ServerInterfaceWrapper) CheckStorage(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CheckStorage(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
 // GetHealth operation middleware
 func (siw *ServerInterfaceWrapper) GetHealth(w http.ResponseWriter, r *http.Request) {
 
@@ -1767,6 +1890,10 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 	m.HandleFunc(http.MethodDelete+" "+options.BaseURL+"/api/ai/settings/providers/{provider}", wrapper.ForgetAIProvider)
 	m.HandleFunc(http.MethodPut+" "+options.BaseURL+"/api/ai/settings/enabled", wrapper.SetAIEnabled)
 	m.HandleFunc(http.MethodPost+" "+options.BaseURL+"/api/ai/check", wrapper.CheckAI)
+	m.HandleFunc(http.MethodDelete+" "+options.BaseURL+"/api/storage", wrapper.ForgetStorageSettings)
+	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/storage", wrapper.GetStorageSettings)
+	m.HandleFunc(http.MethodPut+" "+options.BaseURL+"/api/storage", wrapper.SaveStorageSettings)
+	m.HandleFunc(http.MethodPost+" "+options.BaseURL+"/api/storage/check", wrapper.CheckStorage)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/courses/{courseId}/translation/plan", wrapper.PlanCourseTranslation)
 	m.HandleFunc(http.MethodDelete+" "+options.BaseURL+"/api/courses/{courseId}/translation", wrapper.CancelCourseTranslation)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/courses/{courseId}/translation", wrapper.GetCourseTranslation)
@@ -3347,6 +3474,150 @@ func (response SearchSubtitles200JSONResponse) VisitSearchSubtitlesResponse(w ht
 	return err
 }
 
+type ForgetStorageSettingsRequestObject struct {
+}
+
+type ForgetStorageSettingsResponseObject interface {
+	VisitForgetStorageSettingsResponse(w http.ResponseWriter) error
+}
+
+type ForgetStorageSettings204Response struct {
+}
+
+func (response ForgetStorageSettings204Response) VisitForgetStorageSettingsResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type GetStorageSettingsRequestObject struct {
+}
+
+type GetStorageSettingsResponseObject interface {
+	VisitGetStorageSettingsResponse(w http.ResponseWriter) error
+}
+
+type GetStorageSettings200JSONResponse StorageSettings
+
+func (response GetStorageSettings200JSONResponse) VisitGetStorageSettingsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SaveStorageSettingsRequestObject struct {
+	Body *SaveStorageSettingsJSONRequestBody
+}
+
+type SaveStorageSettingsResponseObject interface {
+	VisitSaveStorageSettingsResponse(w http.ResponseWriter) error
+}
+
+type SaveStorageSettings200JSONResponse StorageSettings
+
+func (response SaveStorageSettings200JSONResponse) VisitSaveStorageSettingsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SaveStorageSettings400ApplicationProblemPlusJSONResponse struct {
+	BadRequestApplicationProblemPlusJSONResponse
+}
+
+func (response SaveStorageSettings400ApplicationProblemPlusJSONResponse) VisitSaveStorageSettingsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.BadRequestApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type SaveStorageSettings502ApplicationProblemPlusJSONResponse struct {
+	ProviderUnreachableApplicationProblemPlusJSONResponse
+}
+
+func (response SaveStorageSettings502ApplicationProblemPlusJSONResponse) VisitSaveStorageSettingsResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.ProviderUnreachableApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(502)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CheckStorageRequestObject struct {
+	Body *CheckStorageJSONRequestBody
+}
+
+type CheckStorageResponseObject interface {
+	VisitCheckStorageResponse(w http.ResponseWriter) error
+}
+
+type CheckStorage200JSONResponse StorageCheck
+
+func (response CheckStorage200JSONResponse) VisitCheckStorageResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CheckStorage400ApplicationProblemPlusJSONResponse struct {
+	BadRequestApplicationProblemPlusJSONResponse
+}
+
+func (response CheckStorage400ApplicationProblemPlusJSONResponse) VisitCheckStorageResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.BadRequestApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type CheckStorage502ApplicationProblemPlusJSONResponse struct {
+	ProviderUnreachableApplicationProblemPlusJSONResponse
+}
+
+func (response CheckStorage502ApplicationProblemPlusJSONResponse) VisitCheckStorageResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.ProviderUnreachableApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(502)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 type GetHealthRequestObject struct {
 }
 
@@ -3481,6 +3752,18 @@ type StrictServerInterface interface {
 	// SearchSubtitles Find the moments a phrase is said in any lecture, diacritics ignored and the last word matched as a prefix
 	// (GET /api/search)
 	SearchSubtitles(ctx context.Context, request SearchSubtitlesRequestObject) (SearchSubtitlesResponseObject, error)
+	// ForgetStorageSettings Forget the cloud storage connection and its keys
+	// (DELETE /api/storage)
+	ForgetStorageSettings(ctx context.Context, request ForgetStorageSettingsRequestObject) (ForgetStorageSettingsResponseObject, error)
+	// GetStorageSettings The saved cloud storage connection; the secret key is never sent back
+	// (GET /api/storage)
+	GetStorageSettings(ctx context.Context, request GetStorageSettingsRequestObject) (GetStorageSettingsResponseObject, error)
+	// SaveStorageSettings Save a cloud storage connection once the bucket has answered with its keys
+	// (PUT /api/storage)
+	SaveStorageSettings(ctx context.Context, request SaveStorageSettingsRequestObject) (SaveStorageSettingsResponseObject, error)
+	// CheckStorage Read and write a tiny object to learn what the keys may do; empty keys use the saved ones
+	// (POST /api/storage/check)
+	CheckStorage(ctx context.Context, request CheckStorageRequestObject) (CheckStorageResponseObject, error)
 	// GetHealth Liveness probe and build version
 	// (GET /healthz)
 	GetHealth(ctx context.Context, request GetHealthRequestObject) (GetHealthResponseObject, error)
@@ -4516,6 +4799,116 @@ func (sh *strictHandler) SearchSubtitles(w http.ResponseWriter, r *http.Request,
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(SearchSubtitlesResponseObject); ok {
 		if err := validResponse.VisitSearchSubtitlesResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ForgetStorageSettings operation middleware
+func (sh *strictHandler) ForgetStorageSettings(w http.ResponseWriter, r *http.Request) {
+	var request ForgetStorageSettingsRequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error) {
+		return sh.ssi.ForgetStorageSettings(ctx, request.(ForgetStorageSettingsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ForgetStorageSettings")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ForgetStorageSettingsResponseObject); ok {
+		if err := validResponse.VisitForgetStorageSettingsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetStorageSettings operation middleware
+func (sh *strictHandler) GetStorageSettings(w http.ResponseWriter, r *http.Request) {
+	var request GetStorageSettingsRequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error) {
+		return sh.ssi.GetStorageSettings(ctx, request.(GetStorageSettingsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetStorageSettings")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetStorageSettingsResponseObject); ok {
+		if err := validResponse.VisitGetStorageSettingsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// SaveStorageSettings operation middleware
+func (sh *strictHandler) SaveStorageSettings(w http.ResponseWriter, r *http.Request) {
+	var request SaveStorageSettingsRequestObject
+
+	var body SaveStorageSettingsJSONRequestBody
+	if err := runtime.BindJSONBody(r, &body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error) {
+		return sh.ssi.SaveStorageSettings(ctx, request.(SaveStorageSettingsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "SaveStorageSettings")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(SaveStorageSettingsResponseObject); ok {
+		if err := validResponse.VisitSaveStorageSettingsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// CheckStorage operation middleware
+func (sh *strictHandler) CheckStorage(w http.ResponseWriter, r *http.Request) {
+	var request CheckStorageRequestObject
+
+	var body CheckStorageJSONRequestBody
+	if err := runtime.BindJSONBody(r, &body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error) {
+		return sh.ssi.CheckStorage(ctx, request.(CheckStorageRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CheckStorage")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(CheckStorageResponseObject); ok {
+		if err := validResponse.VisitCheckStorageResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

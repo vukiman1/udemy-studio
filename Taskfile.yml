@@ -63,6 +63,26 @@ tasks:
     cmds:
       - LIBRARY_DIR="{{.LIBRARY_DIR}}" go test ./internal/subtitle/ -run Pysrt -count=1
 
+  test:s3:
+    desc: Run the S3 bucket adapter against a throwaway SeaweedFS in Docker
+    vars:
+      S3_CONTAINER: udemy-studio-s3-test
+      S3_ADDRESS: 127.0.0.1:8333
+      S3_BUCKET: studio-test
+      S3_CONFIG: "{{.ROOT_DIR}}/internal/adapter/s3bucket/testdata/seaweedfs-s3.json"
+    cmds:
+      - docker run -d --rm --name {{.S3_CONTAINER}} -p {{.S3_ADDRESS}}:8333 -v "{{.S3_CONFIG}}:/etc/seaweedfs/s3.json:ro" chrislusf/seaweedfs server -s3 -s3.config=/etc/seaweedfs/s3.json
+      - defer: docker stop {{.S3_CONTAINER}}
+      - curl -s --retry 30 --retry-delay 1 --retry-all-errors -o /dev/null http://{{.S3_ADDRESS}}/
+      - echo "s3.bucket.create -name {{.S3_BUCKET}}" | docker exec -i {{.S3_CONTAINER}} weed shell
+      - >-
+        UDEMY_STUDIO_TEST_S3_URL=http://{{.S3_ADDRESS}}/{{.S3_BUCKET}}
+        UDEMY_STUDIO_TEST_S3_KEY_ID=studio-writer
+        UDEMY_STUDIO_TEST_S3_SECRET=studio-writer-secret
+        UDEMY_STUDIO_TEST_S3_READER_KEY_ID=studio-reader
+        UDEMY_STUDIO_TEST_S3_READER_SECRET=studio-reader-secret
+        go test ./internal/adapter/s3bucket/ -count=1 -v
+
   build:web:
     dir: web
     cmds:

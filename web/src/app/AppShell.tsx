@@ -1,7 +1,14 @@
-import { Book, Download, History, Search, Settings, type LucideIcon } from 'lucide-react'
+import { Book, Cloud, Download, History, Search, Settings, type LucideIcon } from 'lucide-react'
 import type { ReactElement } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router'
-import { AI_SETTINGS_PATH, DOWNLOADS_PATH, HISTORY_PATH, LIBRARY_PATH, SEARCH_PATH } from './paths'
+import {
+  AI_SETTINGS_PATH,
+  DOWNLOADS_PATH,
+  HISTORY_PATH,
+  LIBRARY_PATH,
+  SEARCH_PATH,
+  STORAGE_SETTINGS_PATH,
+} from './paths'
 
 interface NavItem {
   readonly to: string
@@ -15,6 +22,7 @@ const NAV_ITEMS: readonly NavItem[] = [
   { to: DOWNLOADS_PATH, label: 'Tải khoá học', icon: Download },
   { to: HISTORY_PATH, label: 'Lịch sử', icon: History },
   { to: AI_SETTINGS_PATH, label: 'Cài đặt AI', icon: Settings },
+  { to: STORAGE_SETTINGS_PATH, label: 'Lưu trữ', icon: Cloud },
 ]
 
 const SIDEBAR_LINK =

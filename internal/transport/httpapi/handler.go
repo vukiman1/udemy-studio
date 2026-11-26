@@ -10,6 +10,7 @@ import (
 	"github.com/vukiman1/udemy-studio/internal/llm"
 	"github.com/vukiman1/udemy-studio/internal/login"
 	"github.com/vukiman1/udemy-studio/internal/notes"
+	"github.com/vukiman1/udemy-studio/internal/objectstore"
 	"github.com/vukiman1/udemy-studio/internal/progress"
 	"github.com/vukiman1/udemy-studio/internal/search"
 	"github.com/vukiman1/udemy-studio/internal/transcode"
@@ -29,6 +30,7 @@ type Deps struct {
 	Compression *transcode.Service
 	Translation *translate.Queue
 	AI          *llm.Service
+	Storage     *objectstore.Service
 	Login       *login.Service
 	Jobs        *jobs.Manager
 	Logger      *slog.Logger

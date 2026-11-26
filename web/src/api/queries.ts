@@ -40,6 +40,7 @@ export const QUERY_KEYS = {
   compressionPlan: (courseId: string) => ['compression-plan', courseId],
   aiProviders: ['ai-providers'],
   aiSettings: ['ai-settings'],
+  storageSettings: ['storage-settings'],
   courseTools: ['course-tools'],
   translationPlan: (courseId: string) => ['translation-plan', courseId],
 } as const

@@ -433,6 +433,66 @@ paths:
         "502":
           $ref: "#/components/responses/ProviderUnreachable"
 
+  /api/storage:
+    get:
+      operationId: getStorageSettings
+      summary: The saved cloud storage connection; the secret key is never sent back
+      responses:
+        "200":
+          description: Settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StorageSettings"
+    put:
+      operationId: saveStorageSettings
+      summary: Save a cloud storage connection once the bucket has answered with its keys
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StorageDraft"
+      responses:
+        "200":
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StorageSettings"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "502":
+          $ref: "#/components/responses/ProviderUnreachable"
+    delete:
+      operationId: forgetStorageSettings
+      summary: Forget the cloud storage connection and its keys
+      responses:
+        "204":
+          description: Forgotten
+
+  /api/storage/check:
+    post:
+      operationId: checkStorage
+      summary: Read and write a tiny object to learn what the keys may do; empty keys use the saved ones
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StorageDraft"
+      responses:
+        "200":
+          description: The bucket answered
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StorageCheck"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "502":
+          $ref: "#/components/responses/ProviderUnreachable"
+
 
   /api/courses/{courseId}/translation/plan:
     get:
@@ -1221,6 +1281,47 @@ components:
           format: int64
         reply:
           type: string
+
+    StorageSettings:
+      type: object
+      required: [configured]
+      properties:
+        configured:
+          type: boolean
+        url:
+          type: string
+          description: The S3 API URL, bucket included
+        accessKeyIdHint:
+          type: string
+          description: The access key ID's first and last four characters, the rest masked
+
+    StorageDraft:
+      type: object
+      required: [url]
+      properties:
+        url:
+          type: string
+          description: The S3 API URL, such as https://<account-id>.r2.cloudflarestorage.com/<bucket>
+        accessKeyId:
+          type: string
+          description: Leave out with the secret to keep the saved keys
+        secretAccessKey:
+          type: string
+
+    StorageAccess:
+      type: string
+      enum: [read-only, read-write]
+
+    StorageCheck:
+      type: object
+      required: [access, hasCourse]
+      properties:
+        access:
+          $ref: "#/components/schemas/StorageAccess"
+        hasCourse:
+          type: boolean
+          description: Whether the bucket already holds a published course index
+
 
     TranslationPlan:
       type: object
