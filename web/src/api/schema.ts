@@ -210,6 +210,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/library/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Re-read the course index in cloud storage now instead of at the next periodic check */
+        post: operations["refreshLibrary"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/library/tools": {
         parameters: {
             query?: never;
@@ -1504,6 +1521,26 @@ export interface operations {
                 };
             };
             404: components["responses"]["NotFound"];
+        };
+    };
+    refreshLibrary: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The library matches cloud storage */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            409: components["responses"]["Conflict"];
+            502: components["responses"]["ProviderUnreachable"];
         };
     };
     listCourseTools: {

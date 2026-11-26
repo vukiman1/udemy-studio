@@ -25,15 +25,16 @@ type MediaLinks interface {
 }
 
 type Deps struct {
-	Version    string
-	Frontend   fs.FS
-	Catalog    *library.Catalog
-	Media      fs.FS
-	MediaLinks MediaLinks
-	IsCloud    bool
-	Progress   *progress.Service
-	Search     *search.Service
-	Notes      *notes.Service
+	Version     string
+	Frontend    fs.FS
+	Catalog     *library.Catalog
+	Media       fs.FS
+	MediaLinks  MediaLinks
+	SyncLibrary func(ctx context.Context) error
+	IsCloud     bool
+	Progress    *progress.Service
+	Search      *search.Service
+	Notes       *notes.Service
 	// Compression is nil when ffmpeg or ffprobe is missing.
 	Compression *transcode.Service
 	Translation *translate.Queue

@@ -22,10 +22,11 @@ type BucketSource interface {
 }
 
 type Library struct {
-	buckets  BucketSource
-	logger   *slog.Logger
-	mutex    sync.RWMutex
-	snapshot snapshot
+	buckets   BucketSource
+	logger    *slog.Logger
+	mutex     sync.RWMutex
+	snapshot  snapshot
+	syncMutex sync.Mutex
 }
 
 func New(buckets BucketSource, logger *slog.Logger) *Library {
@@ -63,24 +64,25 @@ func (library *Library) Watch(ctx context.Context, every time.Duration, onChange
 		case <-ctx.Done():
 			return nil
 		case <-ticker.C:
-			library.refreshAndNotify(ctx, onChanged)
+			if err := library.Sync(ctx, onChanged); err != nil {
+				library.logger.Warn("cloud library not refreshed; keeping the last one", "err", err)
+			}
 		}
 	}
 }
 
-func (library *Library) refreshAndNotify(ctx context.Context, onChanged func(context.Context) error) {
+func (library *Library) Sync(ctx context.Context, onChanged func(context.Context) error) error {
+	library.syncMutex.Lock()
+	defer library.syncMutex.Unlock()
 	changed, err := library.Refresh(ctx)
-	if err != nil {
-		library.logger.Warn("cloud library not refreshed; keeping the last one", "err", err)
-		return
-	}
-	if !changed {
-		return
+	if err != nil || !changed {
+		return err
 	}
 	library.logger.Info("cloud library changed", "files", len(library.current().tree.nodes))
 	if err := onChanged(ctx); err != nil {
-		library.logger.Error("follow the changed cloud library", "err", err)
+		return fmt.Errorf("follow the changed cloud library: %w", err)
 	}
+	return nil
 }
 
 func (library *Library) Link(ctx context.Context, filePath, contentDisposition string) (string, error) {

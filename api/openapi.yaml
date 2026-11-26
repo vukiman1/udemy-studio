@@ -251,6 +251,18 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
 
+  /api/library/refresh:
+    post:
+      operationId: refreshLibrary
+      summary: Re-read the course index in cloud storage now instead of at the next periodic check
+      responses:
+        "204":
+          description: The library matches cloud storage
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "502":
+          $ref: "#/components/responses/ProviderUnreachable"
+
   /api/library/tools:
     get:
       operationId: listCourseTools

@@ -49,3 +49,18 @@ func TestTheCloudCopyRefusesLibraryOnlyRoutesButServesTheCourse(t *testing.T) {
 		t.Errorf("GET /api/courses status = %d, want 200", result.status)
 	}
 }
+
+func TestRefreshingTheCloudLibrarySyncsItNow(t *testing.T) {
+	syncs := 0
+	app := newTestAppWithDeps(t, libraryFixture, func(deps *Deps) {
+		deps.IsCloud = true
+		deps.SyncLibrary = func(context.Context) error { syncs++; return nil }
+	})
+	if result := app.do(t, http.MethodPost, "/api/library/refresh", nil); result.status != http.StatusNoContent || syncs != 1 {
+		t.Errorf("status=%d syncs=%d, want 204 after one sync", result.status, syncs)
+	}
+}
+
+func TestTheLibraryCopyHasNothingToRefresh(t *testing.T) {
+	assertProblem(t, newTestApp(t).do(t, http.MethodPost, "/api/library/refresh", nil), http.StatusConflict)
+}

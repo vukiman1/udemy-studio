@@ -112,6 +112,7 @@ func Run(ctx context.Context, options Options, logger *slog.Logger) error {
 		Catalog:     catalog,
 		Media:       source.files,
 		MediaLinks:  source.links,
+		SyncLibrary: source.syncer(refresher.afterLibraryChanged),
 		IsCloud:     options.Role == RoleCloud,
 		Progress:    progressService,
 		Search:      refresher.search,

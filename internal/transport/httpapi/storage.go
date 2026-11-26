@@ -26,6 +26,7 @@ func (server apiServer) SaveStorageSettings(ctx context.Context, request gen.Sav
 	case err != nil:
 		return nil, err
 	}
+	server.followStorage(ctx)
 	settings, err := server.storageSettings(ctx)
 	if err != nil {
 		return nil, err
@@ -37,7 +38,17 @@ func (server apiServer) ForgetStorageSettings(ctx context.Context, _ gen.ForgetS
 	if err := server.deps.Storage.Forget(ctx); err != nil {
 		return nil, err
 	}
+	server.followStorage(ctx)
 	return gen.ForgetStorageSettings204Response{}, nil
+}
+
+func (server apiServer) followStorage(ctx context.Context) {
+	if server.deps.SyncLibrary == nil {
+		return
+	}
+	if err := server.deps.SyncLibrary(ctx); err != nil {
+		server.deps.Logger.Warn("cloud library not refreshed after the storage settings changed", "err", err)
+	}
 }
 
 func (server apiServer) CheckStorage(ctx context.Context, request gen.CheckStorageRequestObject) (gen.CheckStorageResponseObject, error) {
