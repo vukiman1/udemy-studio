@@ -143,3 +143,19 @@ func TestNoStorageYetMeansAnEmptyLibrary(t *testing.T) {
 		t.Errorf("Link error = %v, want ErrNoBucket", err)
 	}
 }
+
+func TestSyncFollowsTheIndexOnlyWhenItChanged(t *testing.T) {
+	source := &bucketSource{bucket: publishedBucket(t, firstPublish, 4)}
+	cloud := New(source, slog.New(slog.DiscardHandler))
+	follows := 0
+	follow := func(context.Context) error { follows++; return nil }
+	for _, publishedAt := range []time.Time{firstPublish, firstPublish, firstPublish.Add(time.Hour)} {
+		source.bucket = publishedBucket(t, publishedAt, 4)
+		if err := cloud.Sync(t.Context(), follow); err != nil {
+			t.Fatalf("Sync: %v", err)
+		}
+	}
+	if follows != 2 {
+		t.Errorf("followed %d times, want 2: the first index and the changed one", follows)
+	}
+}

@@ -948,6 +948,9 @@ type ServerInterface interface {
 	// GetLectureSubtitlesVtt WebVTT with one line per language, for the native iOS fullscreen player
 	// (GET /api/lectures/{lectureId}/subtitles.vtt)
 	GetLectureSubtitlesVtt(w http.ResponseWriter, r *http.Request, lectureId LectureId, params GetLectureSubtitlesVttParams)
+	// RefreshLibrary Re-read the course index in cloud storage now instead of at the next periodic check
+	// (POST /api/library/refresh)
+	RefreshLibrary(w http.ResponseWriter, r *http.Request)
 	// ListCourseTools What is left to translate and compress in every course, with the runs in progress
 	// (GET /api/library/tools)
 	ListCourseTools(w http.ResponseWriter, r *http.Request)
@@ -1757,6 +1760,20 @@ func (siw *ServerInterfaceWrapper) GetLectureSubtitlesVtt(w http.ResponseWriter,
 	handler.ServeHTTP(w, r)
 }
 
+// RefreshLibrary operation middleware
+func (siw *ServerInterfaceWrapper) RefreshLibrary(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.RefreshLibrary(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
 // ListCourseTools operation middleware
 func (siw *ServerInterfaceWrapper) ListCourseTools(w http.ResponseWriter, r *http.Request) {
 
@@ -2102,6 +2119,7 @@ func HandlerWithOptions(si ServerInterface, options StdHTTPServerOptions) http.H
 	m.HandleFunc(http.MethodDelete+" "+options.BaseURL+"/api/notes/{noteId}", wrapper.DeleteNote)
 	m.HandleFunc(http.MethodPatch+" "+options.BaseURL+"/api/notes/{noteId}", wrapper.EditNote)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/courses/{courseId}/notes.md", wrapper.ExportCourseNotes)
+	m.HandleFunc(http.MethodPost+" "+options.BaseURL+"/api/library/refresh", wrapper.RefreshLibrary)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/library/tools", wrapper.ListCourseTools)
 	m.HandleFunc(http.MethodGet+" "+options.BaseURL+"/api/courses/{courseId}/compression/plan", wrapper.PlanCourseCompression)
 	m.HandleFunc(http.MethodDelete+" "+options.BaseURL+"/api/courses/{courseId}/compression", wrapper.CancelCourseCompression)
@@ -3745,6 +3763,53 @@ func (response GetLectureSubtitlesVtt404ApplicationProblemPlusJSONResponse) Visi
 	return err
 }
 
+type RefreshLibraryRequestObject struct {
+}
+
+type RefreshLibraryResponseObject interface {
+	VisitRefreshLibraryResponse(w http.ResponseWriter) error
+}
+
+type RefreshLibrary204Response struct {
+}
+
+func (response RefreshLibrary204Response) VisitRefreshLibraryResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type RefreshLibrary409ApplicationProblemPlusJSONResponse struct {
+	ConflictApplicationProblemPlusJSONResponse
+}
+
+func (response RefreshLibrary409ApplicationProblemPlusJSONResponse) VisitRefreshLibraryResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.ConflictApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(409)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type RefreshLibrary502ApplicationProblemPlusJSONResponse struct {
+	ProviderUnreachableApplicationProblemPlusJSONResponse
+}
+
+func (response RefreshLibrary502ApplicationProblemPlusJSONResponse) VisitRefreshLibraryResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.ProviderUnreachableApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(502)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 type ListCourseToolsRequestObject struct {
 }
 
@@ -4252,6 +4317,9 @@ type StrictServerInterface interface {
 	// GetLectureSubtitlesVtt WebVTT with one line per language, for the native iOS fullscreen player
 	// (GET /api/lectures/{lectureId}/subtitles.vtt)
 	GetLectureSubtitlesVtt(ctx context.Context, request GetLectureSubtitlesVttRequestObject) (GetLectureSubtitlesVttResponseObject, error)
+	// RefreshLibrary Re-read the course index in cloud storage now instead of at the next periodic check
+	// (POST /api/library/refresh)
+	RefreshLibrary(ctx context.Context, request RefreshLibraryRequestObject) (RefreshLibraryResponseObject, error)
 	// ListCourseTools What is left to translate and compress in every course, with the runs in progress
 	// (GET /api/library/tools)
 	ListCourseTools(ctx context.Context, request ListCourseToolsRequestObject) (ListCourseToolsResponseObject, error)
@@ -5270,6 +5338,30 @@ func (sh *strictHandler) GetLectureSubtitlesVtt(w http.ResponseWriter, r *http.R
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(GetLectureSubtitlesVttResponseObject); ok {
 		if err := validResponse.VisitGetLectureSubtitlesVttResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// RefreshLibrary operation middleware
+func (sh *strictHandler) RefreshLibrary(w http.ResponseWriter, r *http.Request) {
+	var request RefreshLibraryRequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error) {
+		return sh.ssi.RefreshLibrary(ctx, request.(RefreshLibraryRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "RefreshLibrary")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(RefreshLibraryResponseObject); ok {
+		if err := validResponse.VisitRefreshLibraryResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {
