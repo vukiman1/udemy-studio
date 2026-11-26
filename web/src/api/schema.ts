@@ -850,6 +850,11 @@ export interface components {
         CompressionPlan: {
             /** @description Chapters holding videos that would be encoded */
             chapters: components["schemas"]["CompressionChapter"][];
+            /**
+             * Format: double
+             * @description Share of the size that earlier encodes kept, preferring this course; absent until one is recorded
+             */
+            expectedShareAfter?: number;
             alreadyHevc: number;
             /** @description Videos in neither H.264 nor H.265, left as they are */
             otherCodec: number;

@@ -75,6 +75,8 @@ type Plan struct {
 	NotWorthIt int
 	// Unreadable counts videos ffprobe cannot read, such as a download left unfinished.
 	Unreadable int
+	// ShareAfter is how much of the size earlier encodes kept; zero until one is recorded.
+	ShareAfter float64
 }
 
 type State string

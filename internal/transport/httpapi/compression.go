@@ -26,6 +26,9 @@ func (server apiServer) PlanCourseCompression(ctx context.Context, request gen.P
 		NotWorthIt:  plan.NotWorthIt,
 		Unreadable:  plan.Unreadable,
 	}
+	if plan.ShareAfter > 0 {
+		response.ExpectedShareAfter = &plan.ShareAfter
+	}
 	return response, nil
 }
 

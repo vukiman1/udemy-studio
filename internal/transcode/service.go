@@ -20,6 +20,7 @@ type Deps struct {
 	Encoder Encoder
 	Files   Files
 	Skips   SkipStore
+	Savings SavingStore
 	Logger  *slog.Logger
 }
 
@@ -56,6 +57,11 @@ func (service *Service) Plan(ctx context.Context, courseID string) (Plan, error)
 			}
 		}
 	}
+	share, err := service.expectedShareAfter(ctx, course.Dir)
+	if err != nil {
+		service.deps.Logger.Warn("planning without a learned size estimate", "course", course.Dir, "err", err)
+	}
+	plan.ShareAfter = share
 	return plan, nil
 }
 

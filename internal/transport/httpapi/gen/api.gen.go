@@ -358,6 +358,9 @@ type CompressionPlan struct {
 	// Chapters Chapters holding videos that would be encoded
 	Chapters []CompressionChapter `json:"chapters"`
 
+	// ExpectedShareAfter Share of the size that earlier encodes kept, preferring this course; absent until one is recorded
+	ExpectedShareAfter *float64 `json:"expectedShareAfter,omitempty"`
+
 	// NotWorthIt Videos an earlier run found not worth re-encoding
 	NotWorthIt int `json:"notWorthIt"`
 

@@ -37,6 +37,8 @@ type fakeVideos struct {
 	encodeAs map[string]Media
 	blockOn  string
 	skips    map[string]Skip
+	savings  []Saving
+	sumError error
 }
 
 func (videos *fakeVideos) Probe(_ context.Context, path string) (Media, error) {
@@ -116,6 +118,36 @@ func (videos *fakeVideos) Save(_ context.Context, skip Skip) error {
 	return nil
 }
 
+type fakeSavings struct{ videos *fakeVideos }
+
+func (savings fakeSavings) Save(_ context.Context, saving Saving) error {
+	savings.videos.mutex.Lock()
+	defer savings.videos.mutex.Unlock()
+	savings.videos.savings = append(savings.videos.savings, saving)
+	return nil
+}
+
+func (savings fakeSavings) CourseTotals(_ context.Context, courseDir string) (SizeTotals, error) {
+	return savings.totals(courseDir), savings.videos.sumError
+}
+
+func (savings fakeSavings) AllTotals(context.Context) (SizeTotals, error) {
+	return savings.totals(""), nil
+}
+
+func (savings fakeSavings) totals(courseDir string) SizeTotals {
+	savings.videos.mutex.Lock()
+	defer savings.videos.mutex.Unlock()
+	var totals SizeTotals
+	for _, saving := range savings.videos.savings {
+		if courseDir == "" || saving.CourseDir == courseDir {
+			totals.BytesBefore += saving.BytesBefore
+			totals.BytesAfter += saving.BytesAfter
+		}
+	}
+	return totals
+}
+
 func (videos *fakeVideos) snapshot() map[string]Media {
 	videos.mutex.Lock()
 	defer videos.mutex.Unlock()
@@ -151,7 +183,7 @@ func startService(t *testing.T, videos *fakeVideos, extraVideos ...string) (*Ser
 	if err != nil {
 		t.Fatalf("NewCatalog: %v", err)
 	}
-	service := NewService(Deps{Catalog: catalog, Prober: videos, Encoder: videos, Files: videos, Skips: videos, Logger: slog.New(slog.DiscardHandler)})
+	service := NewService(Deps{Catalog: catalog, Prober: videos, Encoder: videos, Files: videos, Skips: videos, Savings: fakeSavings{videos}, Logger: slog.New(slog.DiscardHandler)})
 	ctx, cancel := context.WithCancel(t.Context())
 	done := make(chan struct{})
 	go func() {
@@ -309,5 +341,31 @@ func TestAChapterTheCourseLacksIsRefused(t *testing.T) {
 	}
 	if _, err := service.Start(t.Context(), courseID, nil); !errors.Is(err, ErrNoChapters) {
 		t.Errorf("Start error = %v, want ErrNoChapters", err)
+	}
+}
+
+func TestTheEstimateLearnsFromEarlierEncodesPreferringTheSameCourse(t *testing.T) {
+	videos := newFakeVideos()
+	videos.savings = []Saving{{CourseDir: "other", BytesBefore: 100, BytesAfter: 90}}
+	service, courseID := startService(t, videos)
+	if plan, err := service.Plan(t.Context(), courseID); err != nil || plan.ShareAfter != 0.9 {
+		t.Fatalf("share = %v, %v; want 0.9 from other courses", plan.ShareAfter, err)
+	}
+
+	if _, err := service.Start(t.Context(), courseID, []string{introChapter}); err != nil {
+		t.Fatalf("Start: %v", err)
+	}
+	waitFor(t, service, courseID, StateDone)
+	if plan, err := service.Plan(t.Context(), courseID); err != nil || plan.ShareAfter != 0.4 {
+		t.Errorf("share = %v, %v; want 0.4 from this course's own encode", plan.ShareAfter, err)
+	}
+}
+
+func TestAFailingSavingsStoreOnlyDropsTheEstimate(t *testing.T) {
+	videos := newFakeVideos()
+	videos.sumError = errors.New("database is locked")
+	service, courseID := startService(t, videos)
+	if plan, err := service.Plan(t.Context(), courseID); err != nil || plan.ShareAfter != 0 || len(plan.Candidates) != 3 {
+		t.Errorf("plan = %+v, %v; want the candidates without an estimate", plan, err)
 	}
 }

@@ -7,7 +7,7 @@ import { Button, ButtonVariant } from '../../ui/Button'
 import { ChapterPicker } from '../../ui/ChapterPicker'
 import { StatTile } from '../../ui/StatTile'
 import { formatBytes, formatRoughDuration } from './format'
-import { selectionTotals } from './selection-totals'
+import { estimatedSizeAfter, selectionTotals, type SizeEstimate } from './selection-totals'
 
 const NOTHING_SELECTED = '—'
 
@@ -77,6 +77,7 @@ function CompressionPlanForm({
     () => new Set(plan.chapters.map((chapter) => chapter.dir)),
   )
   const totals = selectionTotals(plan.chapters, selected)
+  const after = estimatedSizeAfter(totals.totalBytes, plan.expectedShareAfter)
 
   return (
     <>
@@ -85,6 +86,7 @@ function CompressionPlanForm({
         <div className="flex flex-wrap gap-3">
           <StatTile label="Videos" value={String(totals.videos)} />
           <StatTile label="Current size" value={formatBytes(totals.totalBytes)} />
+          <SizeAfterTile estimate={after} hasSelection={totals.videos > 0} />
           <StatTile
             label="Estimated time"
             value={
@@ -123,6 +125,19 @@ function CompressionPlanForm({
 
 function videoCount(videos: number): string {
   return videos === 1 ? '1 video' : `${String(videos)} videos`
+}
+
+interface SizeAfterTileProps {
+  readonly estimate: SizeEstimate
+  readonly hasSelection: boolean
+}
+
+function SizeAfterTile({ estimate, hasSelection }: SizeAfterTileProps): ReactElement {
+  const label = 'Size after (estimate)'
+  if (!hasSelection) return <StatTile label={label} value={NOTHING_SELECTED} />
+  const range = `${formatBytes(estimate.lowBytes)} – ${formatBytes(estimate.highBytes)}`
+  if (estimate.likelyBytes === undefined) return <StatTile label={label} value={range} />
+  return <StatTile label={label} value={`≈ ${formatBytes(estimate.likelyBytes)}`} note={range} />
 }
 
 interface SkippedVideosProps {

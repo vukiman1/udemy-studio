@@ -1254,6 +1254,10 @@ components:
           description: Chapters holding videos that would be encoded
           items:
             $ref: "#/components/schemas/CompressionChapter"
+        expectedShareAfter:
+          type: number
+          format: double
+          description: Share of the size that earlier encodes kept, preferring this course; absent until one is recorded
         alreadyHevc:
           type: integer
         otherCodec:
