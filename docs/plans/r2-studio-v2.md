@@ -85,7 +85,7 @@ courses/<course-dir>/…            bản sao nguyên thư mục khoá (video, p
 ### 3.6 Thư viện ngoài (cần duyệt)
 
 - **aws-sdk-go-v2** (`service/s3`, `feature/s3/manager`): S3 client, multipart, presign. Cloudflare có hướng dẫn chính thức cho nó.
-- Kiểm thử tích hợp: **MinIO** (server tương thích S3) chạy trong Docker trên máy dev, để test không tốn quota R2 và không cần mạng.
+- Kiểm thử tích hợp: **SeaweedFS** (server tương thích S3) chạy trong Docker trên máy dev qua `task test:s3`, để test không tốn quota R2 và không cần mạng. MinIO đã ngừng phát hành image công khai nên không dùng được.
 
 ## 4. Các phase
 
@@ -106,14 +106,14 @@ Mỗi phase là một hoặc vài PR vào `feature/r2`. **Chỉ sang phase sau k
 
 - Backend: domain `objectstore` (cổng S3 dạng interface), adapter R2/S3, store cấu hình mã hoá, API `GET/PUT/DELETE /api/storage`, `POST /api/storage/check`.
 - Web: trang "Lưu trữ đám mây" (theo thiết kế trang Cài đặt AI), mục điều hướng mới.
-- Test: tách S3 URL (URL hợp lệ, sai, thiếu bucket); khoá được mã hoá; kiểm tra quyền đọc / đọc–ghi bằng MinIO.
+- Test: tách S3 URL (URL hợp lệ, sai, thiếu bucket); khoá được mã hoá; kiểm tra quyền đọc / đọc–ghi bằng SeaweedFS.
 - **Đạt khi:** dán bộ thông tin `studio-dev` vào cả hai bản → "Kiểm tra" báo đúng quyền (localv2: đọc–ghi; vpsv2: chỉ đọc).
 
 ### Phase 2: Đẩy khoá từ localv2
 
 - Tác vụ "Đưa lên R2": kiểm tra dung lượng, xoá khoá cũ, multipart, tải tiếp khi bị ngắt, ghi `studio.json` sau cùng, huỷ giữa chừng.
 - Web: nút trên thẻ khoá, hộp thoại kế hoạch/tiến độ/kết quả (mẫu hộp thoại Nén), nhãn "Đang trên R2" ở thẻ khoá.
-- Test (MinIO):
+- Test (SeaweedFS):
   - đẩy trọn một khoá nhỏ;
   - chạy lại thì không tải lại gì;
   - huỷ giữa chừng thì `studio.json` cũ còn nguyên;
@@ -157,7 +157,7 @@ Mỗi phase là một hoặc vài PR vào `feature/r2`. **Chỉ sang phase sau k
 
 ## 6. Quyết định đã chốt (2026-11-25)
 
-1. Dùng **aws-sdk-go-v2**; test tích hợp dùng **MinIO**.
+1. Dùng **aws-sdk-go-v2**; test tích hợp dùng **SeaweedFS** (ban đầu chốt MinIO, đổi ngày 2026-11-26 vì MinIO ngừng phát hành image).
 2. Image `:v2-dev` do **workflow CI riêng** `docker-image-v2.yml` build: chạy khi push `feature/r2`, concurrency group riêng, chỉ đẩy tag `v2-dev`.
 3. VPS: 1 CPU, 2 GB RAM, trống 5 GB, có Docker. Đủ cho vpsv2: video nằm trên R2 và đi thẳng tới trình duyệt; VPS chỉ phục vụ giao diện, phụ đề, tiến độ.
 4. Ngưỡng **9,5 GB**; link ký hết hạn sau **6 giờ**.
