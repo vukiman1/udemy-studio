@@ -39,7 +39,7 @@ export function StorageFooter({ editor }: StorageFooterProps): ReactElement {
             save.mutate(editor.draft)
           }}
         >
-          {save.isPending ? 'Đang kiểm tra & lưu…' : 'Lưu'}
+          {save.isPending ? 'Checking & saving…' : 'Save'}
         </Button>
         {editor.saved.configured && (
           <Button
@@ -51,7 +51,7 @@ export function StorageFooter({ editor }: StorageFooterProps): ReactElement {
               else setIsConfirmingDelete(true)
             }}
           >
-            {isConfirmingDelete ? 'Xoá hẳn kết nối?' : 'Xoá'}
+            {isConfirmingDelete ? 'Delete connection?' : 'Delete'}
           </Button>
         )}
       </div>
@@ -73,14 +73,12 @@ function FooterStatus({ editor }: FooterStatusProps): ReactElement {
     return (
       <span className="mr-auto flex items-center gap-1.5 text-xs font-semibold text-success">
         <span className="size-2 rounded-full bg-success" aria-hidden="true" />
-        Đã kết nối bucket {bucketName(editor.saved.url)}
+        Connected to {bucketName(editor.saved.url)}
       </span>
     )
   return (
     <span className="mr-auto text-xs text-muted">
-      {editor.saved.configured || editor.isComplete
-        ? 'Có thay đổi chưa lưu.'
-        : 'Chưa kết nối bucket nào.'}
+      {editor.saved.configured || editor.isComplete ? 'Unsaved changes.' : 'No bucket connected.'}
     </span>
   )
 }

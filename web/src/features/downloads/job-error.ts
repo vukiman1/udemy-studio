@@ -3,14 +3,14 @@ import type { Job } from '../../api/types'
 type JobErrorKind = NonNullable<Job['errorKind']>
 
 const ERROR_ADVICE: Readonly<Record<Exclude<JobErrorKind, 'other'>, string>> = {
-  login: 'Đăng nhập Udemy đã hết hạn. Dán token mới rồi tải lại.',
+  login: 'Udemy login expired. Paste a new token and download again.',
   course_not_found:
-    'Không thấy khoá này trong tài khoản Udemy. Kiểm tra link, hoặc mở khoá một lần trên trình duyệt rồi tải lại.',
+    'Course not found in this Udemy account. Check the link, or open the course once in a browser and download again.',
   blocked:
-    'Udemy đang chặn yêu cầu từ app (Cloudflare). Thử lại sau; nếu vẫn bị, cần cập nhật udemy-studio.',
+    'Udemy is blocking the app (Cloudflare). Try later; if it persists, update udemy-studio.',
   chrome_access:
-    'Không đọc được đăng nhập trong Chrome. Cấp quyền cho app hoặc dán token rồi tải lại.',
-  interrupted: 'Server đã tắt giữa chừng. Tải lại để làm tiếp phần còn thiếu.',
+    'Could not read the Chrome login. Grant access or paste a token, then download again.',
+  interrupted: 'The server stopped mid-way. Download again to finish.',
 }
 
 export function jobErrorText(job: Job): string | undefined {

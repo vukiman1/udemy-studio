@@ -44,7 +44,7 @@ export function DialogHeader({ icon: Icon, title, subtitle }: DialogHeaderProps)
       <button
         type="button"
         className="grid size-8 shrink-0 place-items-center rounded-lg bg-transparent p-0 text-muted hover:bg-ink/7 hover:text-ink"
-        aria-label="Đóng"
+        aria-label="Close"
         onClick={(event) => {
           event.currentTarget.closest('dialog')?.close()
         }}

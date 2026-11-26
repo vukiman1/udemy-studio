@@ -5,8 +5,9 @@ import { Link } from 'react-router'
 import type { PublishedCourse } from '../../api/types'
 import { coursePath } from '../../app/paths'
 import { formatBytes } from '../compression/format'
+import { DISPLAY_LOCALE } from '../../app/display-locale'
 
-const PUBLISHED_AT_FORMAT = new Intl.DateTimeFormat('vi-VN', {
+const PUBLISHED_AT_FORMAT = new Intl.DateTimeFormat(DISPLAY_LOCALE, {
   dateStyle: 'short',
   timeStyle: 'short',
 })
@@ -19,11 +20,11 @@ export function PublishedCourseBanner({ published }: PublishedCourseBannerProps)
   return (
     <section
       className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-2xl bg-card px-5 py-3.5 text-[13px]"
-      aria-label="Khoá học trên R2"
+      aria-label="Course on R2"
     >
       <span className="flex items-center gap-2 font-semibold text-accent-soft">
         <Cloud className="size-[18px]" aria-hidden="true" />
-        Trên R2
+        On R2
       </span>
       <BannerBody published={published} />
     </section>
@@ -33,7 +34,7 @@ export function PublishedCourseBanner({ published }: PublishedCourseBannerProps)
 function BannerBody({ published }: PublishedCourseBannerProps): ReactElement {
   if (published.isError) return <span className="text-danger">{published.error.message}</span>
   if (published.data === undefined) return <span className="text-muted">…</span>
-  if (published.data === null) return <span className="text-muted">Trống</span>
+  if (published.data === null) return <span className="text-muted">Empty</span>
   const course = published.data
   return (
     <>
@@ -46,9 +47,9 @@ function BannerBody({ published }: PublishedCourseBannerProps): ReactElement {
       )}
       <span className="text-muted">
         {isPartial(course) &&
-          `${String(course.chapters)}/${String(course.totalChapters)} chương · `}
+          `${String(course.chapters)}/${String(course.totalChapters)} chapters · `}
         {formatBytes(course.sizeBytes)} · {PUBLISHED_AT_FORMAT.format(new Date(course.publishedAt))}
-        {course.courseId === undefined && ' · không có trên máy'}
+        {course.courseId === undefined && ' · not on this machine'}
       </span>
     </>
   )

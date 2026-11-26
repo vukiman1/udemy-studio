@@ -38,7 +38,7 @@ export function NoteComposer({ lectureId, videoRef, children }: NoteComposerProp
       }}
     >
       <div className="flex flex-wrap items-center gap-3">
-        <h3 className="mr-auto text-[15px] font-semibold text-muted">Ghi chú</h3>
+        <h3 className="mr-auto text-[15px] font-semibold text-muted">Notes</h3>
         {children}
         <Button
           type="submit"
@@ -48,13 +48,13 @@ export function NoteComposer({ lectureId, videoRef, children }: NoteComposerProp
           disabled={!canSave}
         >
           {videoRef === null || draft === ''
-            ? 'Lưu ghi chú'
-            : `Lưu ghi chú tại ${formatTimestamp(atSeconds * MS_PER_SECOND)}`}
+            ? 'Save note'
+            : `Save note at ${formatTimestamp(atSeconds * MS_PER_SECOND)}`}
         </Button>
       </div>
       <textarea
         className="min-h-24 rounded-xl px-4 py-3.5 text-sm placeholder:text-muted"
-        placeholder="Viết ghi chú… (⌘/Ctrl + Enter để lưu)"
+        placeholder="Write a note… (⌘/Ctrl + Enter to save)"
         value={draft}
         readOnly={save.isPending}
         onChange={(event) => {

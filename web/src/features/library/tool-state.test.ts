@@ -23,7 +23,7 @@ describe('translationStatus', () => {
     const status = translationStatus({ lectures: 10, pending: 6, run: translationRun('running') })
     expect(status.state).toBe(ToolState.Running)
     expect(status.progress).toBeCloseTo(0.4)
-    expect(status.label).toBe('Đang dịch 4/10')
+    expect(status.label).toBe('Translating 4/10')
   })
 
   it('is done once every lecture has Vietnamese subtitles, whatever the last run did', () => {
@@ -75,13 +75,13 @@ describe('publishStatus', () => {
     const status = publishStatus(publishRun('running'), false)
     expect(status.state).toBe(ToolState.Running)
     expect(status.progress).toBeCloseTo(0.25)
-    expect(status.label).toBe('Đang đưa lên 25%')
+    expect(status.label).toBe('Publishing 25%')
   })
 
   it('stays open on a published course so changed files can be sent again', () => {
     const status = publishStatus(publishRun('done'), true)
     expect(status.state).toBe(ToolState.Idle)
-    expect(status.label).toBe('Cập nhật R2')
+    expect(status.label).toBe('Update R2')
   })
 
   it('shows a failed publish until it is retried', () => {

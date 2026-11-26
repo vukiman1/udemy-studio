@@ -15,7 +15,7 @@ const FAILED_JOB: Job = {
 describe('jobErrorText', () => {
   it('tells what to do when the server knows why the download stopped', () => {
     expect(jobErrorText({ ...FAILED_JOB, errorKind: 'login' })).toBe(
-      'Đăng nhập Udemy đã hết hạn. Dán token mới rồi tải lại.',
+      'Udemy login expired. Paste a new token and download again.',
     )
   })
 

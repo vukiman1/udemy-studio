@@ -9,7 +9,7 @@ interface RunInBackgroundButtonProps {
 export function RunInBackgroundButton({ onClick }: RunInBackgroundButtonProps): ReactElement {
   return (
     <Button variant={ButtonVariant.Primary} onClick={onClick}>
-      Chạy nền
+      Run in background
     </Button>
   )
 }

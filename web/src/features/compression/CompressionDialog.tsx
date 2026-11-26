@@ -37,8 +37,8 @@ export function CompressionDialog({
   )
 
   return (
-    <Dialog label="Nén video (H.265)" onClose={onClose}>
-      <DialogHeader icon={Archive} title="Nén video (H.265)" subtitle={title} />
+    <Dialog label="Compress videos (H.265)" onClose={onClose}>
+      <DialogHeader icon={Archive} title="Compress videos (H.265)" subtitle={title} />
       {run !== undefined && isCompressing(run) ? (
         <>
           <DialogBody>
@@ -54,7 +54,7 @@ export function CompressionDialog({
                 cancel.mutate()
               }}
             >
-              Dừng nén
+              Stop
             </Button>
             <RunInBackgroundButton onClick={onClose} />
           </DialogFooter>

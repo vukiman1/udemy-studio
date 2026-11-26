@@ -30,28 +30,27 @@ export function CompressionPlanSummary({
         {children}
         {plan.isError && (
           <p className="text-danger" role="alert">
-            Không kiểm tra được video ({plan.error.message}).
+            Could not check the videos ({plan.error.message}).
           </p>
         )}
-        {plan.isPending && <p className="text-muted">Đang kiểm tra các video…</p>}
+        {plan.isPending && <p className="text-muted">Checking videos…</p>}
         {plan.data !== undefined && (
           <>
             {files === 0 ? (
-              <p>Không còn video nào cần nén.</p>
+              <p>Nothing left to compress.</p>
             ) : (
               <>
                 <div className="flex flex-wrap gap-3">
-                  <StatTile label="Video sẽ nén" value={String(files)} />
-                  <StatTile label="Dung lượng hiện tại" value={formatBytes(plan.data.totalBytes)} />
+                  <StatTile label="Videos" value={String(files)} />
+                  <StatTile label="Current size" value={formatBytes(plan.data.totalBytes)} />
                   <StatTile
-                    label="Thời gian ước tính"
+                    label="Estimated time"
                     value={`~ ${formatRoughDuration(plan.data.estimatedSeconds)}`}
                   />
                 </div>
                 <p className="flex gap-2.5 rounded-xl bg-page px-4 py-3 text-[13px] text-muted">
                   <Info className="mt-0.5 size-4 shrink-0 text-accent-soft" aria-hidden="true" />
-                  Trong lúc nén vẫn học được. Bài đang được nén có thể giật một lần lúc file được
-                  thay, tải lại trang là hết.
+                  Playback keeps working; reload if the lecture being replaced stutters.
                 </p>
               </>
             )}
@@ -62,19 +61,19 @@ export function CompressionPlanSummary({
       <DialogFooter>
         {files > 0 ? (
           <>
-            <Button onClick={onDismiss}>Thôi</Button>
+            <Button onClick={onDismiss}>Cancel</Button>
             <Button
               variant={ButtonVariant.Primary}
               icon={Archive}
               disabled={isStarting}
               onClick={onStart}
             >
-              Bắt đầu nén
+              Compress
             </Button>
           </>
         ) : (
           <Button variant={ButtonVariant.Primary} onClick={onDismiss}>
-            Đóng
+            Close
           </Button>
         )}
       </DialogFooter>
@@ -96,11 +95,11 @@ function SkippedVideos({
   unreadable,
 }: SkippedVideosProps): ReactElement | null {
   const leftAlone = [
-    alreadyHevc > 0 ? `${String(alreadyHevc)} video đã là H.265` : '',
-    otherCodec > 0 ? `${String(otherCodec)} video mã hoá khác` : '',
-    notWorthIt > 0 ? `${String(notWorthIt)} video lần trước nén không lợi hơn` : '',
-    unreadable > 0 ? `${String(unreadable)} video không đọc được (có thể tải chưa xong)` : '',
+    alreadyHevc > 0 ? `${String(alreadyHevc)} already H.265` : '',
+    otherCodec > 0 ? `${String(otherCodec)} other codec` : '',
+    notWorthIt > 0 ? `${String(notWorthIt)} not smaller last time` : '',
+    unreadable > 0 ? `${String(unreadable)} unreadable (maybe still downloading)` : '',
   ].filter((part) => part !== '')
   if (leftAlone.length === 0) return null
-  return <p className="text-xs text-muted">Bỏ qua: {leftAlone.join(', ')}.</p>
+  return <p className="text-xs text-muted">Skipped: {leftAlone.join(', ')}.</p>
 }

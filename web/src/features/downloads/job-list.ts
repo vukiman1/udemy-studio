@@ -3,11 +3,11 @@ import type { Job, JobStatus } from '../../api/types'
 const ACTIVE_STATUSES: readonly JobStatus[] = ['queued', 'running']
 
 export const JOB_STATUS_LABELS: Readonly<Record<JobStatus, string>> = {
-  queued: 'Đang chờ',
-  running: 'Đang tải',
+  queued: 'Queued',
+  running: 'Downloading',
   succeeded: 'Xong',
-  failed: 'Lỗi',
-  cancelled: 'Đã huỷ',
+  failed: 'Failed',
+  cancelled: 'Cancelled',
 }
 
 const JOB_STATUSES: readonly string[] = Object.keys(JOB_STATUS_LABELS)

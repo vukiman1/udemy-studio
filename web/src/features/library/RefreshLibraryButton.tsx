@@ -27,7 +27,7 @@ export function RefreshLibraryButton(): ReactElement {
           refresh.mutate()
         }}
       >
-        Làm mới
+        Refresh
       </Button>
     </div>
   )

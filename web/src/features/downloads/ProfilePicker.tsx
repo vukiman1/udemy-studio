@@ -3,8 +3,9 @@ import type { ReactElement } from 'react'
 import { selectChromeProfile, useChromeProfiles, useLoginStatus } from '../../api/download-queries'
 import { QUERY_KEYS } from '../../api/queries'
 import { TEXT_FIELD } from '../../ui/text-field'
+import { DISPLAY_LOCALE } from '../../app/display-locale'
 
-const DATE_FORMAT = new Intl.DateTimeFormat('vi-VN', { dateStyle: 'medium' })
+const DATE_FORMAT = new Intl.DateTimeFormat(DISPLAY_LOCALE, { dateStyle: 'medium' })
 
 // A machine without Chrome, such as a Docker host, lists no profiles, so the picker gives way to pasted tokens.
 export function ProfilePicker(): ReactElement | null {
@@ -26,7 +27,7 @@ export function ProfilePicker(): ReactElement | null {
   return (
     <div className="grid gap-4 border-b border-line pb-4">
       <label className="grid gap-2 text-sm font-semibold">
-        Đọc đăng nhập từ profile Chrome
+        Chrome profile login
         <select
           className={`${TEXT_FIELD} font-normal`}
           value={selected?.dir ?? ''}
@@ -36,7 +37,7 @@ export function ProfilePicker(): ReactElement | null {
           }}
         >
           <option value="" disabled>
-            Chọn profile…
+            Choose a profile…
           </option>
           {profiles.data?.map((profile) => (
             <option key={profile.dir} value={profile.dir}>
@@ -74,8 +75,8 @@ export function ProfilePicker(): ReactElement | null {
               />
               {host.host} —{' '}
               {host.isExpired
-                ? 'đăng nhập đã hết hạn, hãy đăng nhập lại trong Chrome'
-                : `đăng nhập còn hạn${host.expiresAt === undefined ? '' : ` tới ${DATE_FORMAT.format(new Date(host.expiresAt))}`}`}
+                ? 'login expired; sign in again in Chrome'
+                : `logged in${host.expiresAt === undefined ? '' : ` until ${DATE_FORMAT.format(new Date(host.expiresAt))}`}`}
             </li>
           ))}
         </ul>

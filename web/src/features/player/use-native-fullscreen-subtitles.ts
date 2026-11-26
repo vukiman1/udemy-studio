@@ -19,7 +19,7 @@ export function useNativeFullscreenSubtitles(
       track.kind = 'subtitles'
       track.src = trackSource
       track.srclang = language ?? ''
-      track.label = 'Phụ đề'
+      track.label = 'Subtitles'
       track.default = true
       video.appendChild(track)
       track.track.mode = 'showing'

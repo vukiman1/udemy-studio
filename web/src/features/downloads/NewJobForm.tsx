@@ -8,7 +8,7 @@ import { Button, ButtonSize, ButtonVariant } from '../../ui/Button'
 import { TEXT_FIELD } from '../../ui/text-field'
 import { upsertJob } from './job-list'
 
-const COURSE_URL_PLACEHOLDER = 'https://<portal>.udemy.com/course/<tên-khoá>/'
+const COURSE_URL_PLACEHOLDER = 'https://<portal>.udemy.com/course/<course-slug>/'
 
 export function NewJobForm(): ReactElement {
   const queryClient = useQueryClient()
@@ -39,10 +39,10 @@ export function NewJobForm(): ReactElement {
         submitForm()
       }}
     >
-      <h2 className="text-base font-semibold">Tải khoá học mới</h2>
+      <h2 className="text-base font-semibold">New download</h2>
       <div className="flex flex-wrap items-end gap-3">
         <label className="grid min-w-64 flex-1 gap-2 text-sm font-semibold">
-          Link khoá học
+          Course link
           <input
             className={`${TEXT_FIELD} font-normal`}
             type="url"
@@ -55,10 +55,10 @@ export function NewJobForm(): ReactElement {
           />
         </label>
         <label className="grid w-full gap-2 text-sm font-semibold sm:w-[280px]">
-          Chương cần tải
+          Chapters
           <input
             className={`${TEXT_FIELD} font-normal`}
-            placeholder="Để trống để tải hết · ví dụ: 1,3-5"
+            placeholder="Empty for all · e.g. 1,3-5"
             value={chapters}
             onChange={(event) => {
               setChapters(event.target.value)
@@ -72,7 +72,7 @@ export function NewJobForm(): ReactElement {
           icon={Download}
           disabled={submit.isPending}
         >
-          Bắt đầu tải
+          Download
         </Button>
       </div>
       {submit.isError && (

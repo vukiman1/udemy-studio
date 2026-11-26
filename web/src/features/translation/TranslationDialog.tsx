@@ -9,7 +9,7 @@ import type { AIProvider, TranslationRun } from '../../api/types'
 import { Dialog, DialogBody, DialogFooter, DialogHeader } from '../../app/Dialog'
 import { AI_SETTINGS_PATH } from '../../app/paths'
 import { RunInBackgroundButton } from '../../app/RunInBackgroundButton'
-import { Button, ButtonSize, ButtonVariant, buttonClass } from '../../ui/Button'
+import { Button, ButtonVariant } from '../../ui/Button'
 import { TranslationPlanSummary } from './TranslationPlanSummary'
 import { TranslationRunStatus } from './TranslationRunStatus'
 
@@ -43,8 +43,8 @@ export function TranslationDialog({
   )
 
   return (
-    <Dialog label="Dịch phụ đề" onClose={onClose}>
-      <DialogHeader icon={Languages} title="Dịch phụ đề" subtitle={title} />
+    <Dialog label="Translate subtitles" onClose={onClose}>
+      <DialogHeader icon={Languages} title="Translate subtitles" subtitle={title} />
       {run !== undefined && isTranslating(run) ? (
         <>
           <DialogBody>
@@ -61,7 +61,7 @@ export function TranslationDialog({
                 cancel.mutate()
               }}
             >
-              Dừng dịch
+              Stop
             </Button>
             <RunInBackgroundButton onClick={onClose} />
           </DialogFooter>
@@ -86,21 +86,18 @@ export function TranslationDialog({
             {settings.data === undefined ? (
               <p className="text-muted" role={settings.isError ? 'alert' : 'status'}>
                 {settings.isError
-                  ? `Không đọc được cài đặt AI (${settings.error.message}).`
-                  : 'Đang đọc cài đặt AI…'}
+                  ? `Could not read AI settings (${settings.error.message}).`
+                  : 'Reading AI settings…'}
               </p>
             ) : (
               <NoAIEnabled />
             )}
           </DialogBody>
           <DialogFooter>
-            <Button onClick={onClose}>Thôi</Button>
-            <Link
-              to={AI_SETTINGS_PATH}
-              className={buttonClass(ButtonVariant.Primary, ButtonSize.Medium)}
-            >
-              Mở Cài đặt AI
-            </Link>
+            <Button onClick={onClose}>Cancel</Button>
+            <Button to={AI_SETTINGS_PATH} variant={ButtonVariant.Primary}>
+              Open AI settings
+            </Button>
           </DialogFooter>
         </>
       )}
@@ -116,10 +113,10 @@ function ActiveAI({ provider }: ActiveAIProps): ReactElement {
   return (
     <p className="flex items-center justify-between gap-3 text-[13px] text-muted">
       <span className="min-w-0 truncate">
-        Đang dùng {provider?.label ?? '…'} · {provider?.model.label ?? '…'}
+        Using {provider?.label ?? '…'} · {provider?.model.label ?? '…'}
       </span>
       <Link to={AI_SETTINGS_PATH} className="shrink-0 font-medium text-accent-soft">
-        Cài đặt AI
+        AI settings
       </Link>
     </p>
   )
@@ -129,9 +126,9 @@ function NoAIEnabled(): ReactElement {
   return (
     <div className="grid justify-items-center gap-1.5 py-3 text-center">
       <Info className="mb-1 size-6 text-accent-soft" aria-hidden="true" />
-      <p className="text-[15px] font-semibold">Chưa bật AI nào</p>
+      <p className="text-[15px] font-semibold">No AI enabled</p>
       <p className="text-[13px] text-muted">
-        Bật một nhà cung cấp AI trong Cài đặt AI để dịch phụ đề tự động.
+        Enable a provider in AI settings to translate subtitles.
       </p>
     </div>
   )
