@@ -14,6 +14,7 @@ services:
       - ./data:/data
     environment:
       UDEMY_STUDIO_PUBLIC_HOST: ${PUBLIC_HOST:?set PUBLIC_HOST to the tunnel hostname, such as learn-dev.example.com}
+      UDEMY_STUDIO_ROLE: cloud
     mem_limit: 384m
     restart: unless-stopped
 

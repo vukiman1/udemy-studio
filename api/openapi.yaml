@@ -948,13 +948,17 @@ components:
   schemas:
     Health:
       type: object
-      required: [status, version]
+      required: [status, version, role]
       properties:
         status:
           type: string
           enum: [ok]
         version:
           type: string
+        role:
+          type: string
+          enum: [library, cloud]
+          description: library holds the downloaded courses; cloud only reads the course published to cloud storage
 
     Problem:
       description: RFC 9457 problem details

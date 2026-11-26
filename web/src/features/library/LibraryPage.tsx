@@ -3,6 +3,7 @@ import type { ReactElement } from 'react'
 import { Link } from 'react-router'
 import { useCourseTools } from '../../api/library-tools-queries'
 import { ApiRequestError, useCourses } from '../../api/queries'
+import { useIsLibraryCopy } from '../../api/server-queries'
 import { DOWNLOADS_PATH } from '../../app/paths'
 import { StaleDataNotice } from '../../app/StaleDataNotice'
 import { Button, ButtonSize, ButtonVariant, buttonClass } from '../../ui/Button'
@@ -15,8 +16,9 @@ const SKELETON_ROWS = ['first', 'second', 'third'] as const
 
 export function LibraryPage(): ReactElement {
   const courses = useCourses()
-  const tools = useCourseTools()
-  const publishing = useCoursePublishing()
+  const isLibraryCopy = useIsLibraryCopy()
+  const tools = useCourseTools(isLibraryCopy)
+  const publishing = useCoursePublishing(isLibraryCopy)
 
   return (
     <main className="grid gap-7 px-5 py-8 md:px-10 md:py-10">

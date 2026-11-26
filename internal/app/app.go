@@ -17,6 +17,7 @@ import (
 	"github.com/vukiman1/udemy-studio/internal/notes"
 	"github.com/vukiman1/udemy-studio/internal/progress"
 	"github.com/vukiman1/udemy-studio/internal/search"
+	"github.com/vukiman1/udemy-studio/internal/transcode"
 	"github.com/vukiman1/udemy-studio/internal/transport/httpapi"
 	"github.com/vukiman1/udemy-studio/web"
 )
@@ -35,6 +36,7 @@ type Options struct {
 	LibraryDir    string
 	DataDir       string
 	LANMode       bool
+	Role          Role
 	// PublicHosts are hostnames a tunnel or proxy serves the app under, trusted besides localhost and IPs.
 	PublicHosts []string
 	Downloads   DownloadOptions
@@ -50,17 +52,23 @@ func Run(ctx context.Context, options Options, logger *slog.Logger) error {
 		return fmt.Errorf("open library %s: %w", options.LibraryDir, err)
 	}
 	defer media.Close()
-	catalog, err := library.NewCatalog(media.FS())
-	if err != nil {
-		return fmt.Errorf("scan library %s: %w", options.LibraryDir, err)
-	}
-	logger.Info("library scanned", "dir", options.LibraryDir, "courses", len(catalog.Current().Courses))
-
 	database, err := openDatabase(ctx, options.DataDir)
 	if err != nil {
 		return err
 	}
 	defer database.Close()
+	box, err := openSettingsBox(options.DataDir)
+	if err != nil {
+		return err
+	}
+	storage := newStorageSettings(box, database, logger)
+	source := openLibrarySource(ctx, options.Role, media, storage, logger)
+	catalog, err := library.NewCatalog(source.files)
+	if err != nil {
+		return fmt.Errorf("scan the %s library: %w", options.Role, err)
+	}
+	logger.Info("library scanned", "role", options.Role, "dir", options.LibraryDir, "courses", len(catalog.Current().Courses))
+
 	progressService := progress.NewService(sqlite.NewProgressStore(database), time.Now)
 	notesService := notes.NewService(sqlite.NewNotesStore(database), time.Now)
 	if err := adoptLectureKeys(ctx, catalog, progressService, notesService); err != nil {
@@ -75,33 +83,36 @@ func Run(ctx context.Context, options Options, logger *slog.Logger) error {
 		return fmt.Errorf("load embedded frontend: %w", err)
 	}
 
-	compression := newCompression(options.Compression, options.LibraryDir, media, database, catalog, logger)
+	var compression *transcode.Service
+	if options.Role != RoleCloud {
+		compression = newCompression(options.Compression, options.LibraryDir, media, database, catalog, logger)
+	}
 	refresher := libraryRefresher{
 		catalog:     catalog,
-		media:       media.FS(),
+		media:       source.files,
 		progress:    progressService,
 		notes:       notesService,
 		search:      search.NewService(sqlite.NewCueIndex(database), logger),
 		compression: compression,
 		logger:      logger,
 	}
-	box, err := openSettingsBox(options.DataDir)
-	if err != nil {
-		return err
-	}
-	downloads, err := newDownloads(ctx, options.Downloads, options.DataDir, database, box, refresher.afterLibraryChanged, logger)
-	if err != nil {
-		return err
+	var downloads downloads
+	if options.Role != RoleCloud {
+		downloads, err = newDownloads(ctx, options.Downloads, options.DataDir, database, box, refresher.afterLibraryChanged, logger)
+		if err != nil {
+			return err
+		}
 	}
 	ai := newAISettings(box, database, logger)
-	storage := newStorageSettings(box, database, logger)
 	publishing := newPublish(storage, catalog, media.FS(), logger)
 	translation := newTranslationQueue(media, refresher, ai, logger)
 	handler := httpapi.NewHandler(httpapi.Deps{
 		Version:     options.Version,
 		Frontend:    frontend,
 		Catalog:     catalog,
-		Media:       media.FS(),
+		Media:       source.files,
+		MediaLinks:  source.links,
+		IsCloud:     options.Role == RoleCloud,
 		Progress:    progressService,
 		Search:      refresher.search,
 		Notes:       notesService,
@@ -134,6 +145,7 @@ func Run(ctx context.Context, options Options, logger *slog.Logger) error {
 	}
 	logger.Info("http server listening", "addr", listener.Addr().String(), "version", options.Version)
 	workers := append(downloads.workers(), refresher.indexSubtitles, translation.Run, publishing.Run)
+	workers = append(workers, source.workers(refresher.afterLibraryChanged)...)
 	if compression != nil {
 		workers = append(workers, compression.Run, compression.Survey)
 	}

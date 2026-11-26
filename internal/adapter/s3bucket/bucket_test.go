@@ -1,11 +1,14 @@
 package s3bucket
 
 import (
+	"context"
 	"errors"
 	"io"
+	"net/http"
 	"os"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/vukiman1/udemy-studio/internal/objectstore"
 	"github.com/vukiman1/udemy-studio/internal/platform/secret"
@@ -22,6 +25,7 @@ const (
 	testContentType       = "text/vtt"
 	wrongSecretAccessKey  = "not-the-secret" //nolint:gosec // reason: deliberately wrong key
 	testObjectBodyContent = "WEBVTT"
+	testLinkLifetime      = time.Minute
 )
 
 func testConnection(t *testing.T) objectstore.Connection {
@@ -93,5 +97,31 @@ func TestAReadOnlyKeyIsDeniedWrites(t *testing.T) {
 	connection.Credentials = objectstore.Credentials{AccessKeyID: keyID, SecretAccessKey: secret.New(secretKey)}
 	if err := Open(connection).Put(t.Context(), testUpload()); !errors.Is(err, objectstore.ErrAccessDenied) {
 		t.Errorf("Put error = %v, want ErrAccessDenied", err)
+	}
+}
+
+func TestASignedLinkServesTheObjectWithoutKeys(t *testing.T) {
+	bucket := Open(testConnection(t))
+	if err := bucket.Put(t.Context(), testUpload()); err != nil {
+		t.Fatalf("Put: %v", err)
+	}
+	t.Cleanup(func() { _ = bucket.Delete(context.Background(), testObjectKey) })
+	link, err := bucket.Link(t.Context(), objectstore.LinkRequest{Key: testObjectKey, ExpiresIn: testLinkLifetime})
+	if err != nil {
+		t.Fatalf("Link: %v", err)
+	}
+	request, err := http.NewRequestWithContext(t.Context(), http.MethodGet, link, nil)
+	if err != nil {
+		t.Fatalf("NewRequest: %v", err)
+	}
+	request.Header.Set("Range", "bytes=0-1")
+	response, err := http.DefaultClient.Do(request)
+	if err != nil {
+		t.Fatalf("GET link: %v", err)
+	}
+	defer func() { _ = response.Body.Close() }()
+	body, err := io.ReadAll(response.Body)
+	if err != nil || response.StatusCode != http.StatusPartialContent || string(body) != testObjectBodyContent[:2] {
+		t.Errorf("GET link = %d %q, %v; want 206 %q", response.StatusCode, body, err, testObjectBodyContent[:2])
 	}
 }

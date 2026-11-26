@@ -52,8 +52,15 @@ type Upload struct {
 	ContentType string
 }
 
+type LinkRequest struct {
+	Key                string
+	ExpiresIn          time.Duration
+	ContentDisposition string
+}
+
 type Bucket interface {
 	Open(ctx context.Context, key string) (io.ReadCloser, error)
+	Link(ctx context.Context, request LinkRequest) (string, error)
 	Put(ctx context.Context, upload Upload) error
 	Delete(ctx context.Context, key string) error
 	List(ctx context.Context, prefix string) ([]Object, error)

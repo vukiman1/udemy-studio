@@ -28,6 +28,7 @@ const (
 type libraryFiles struct {
 	catalog *library.Catalog
 	media   fs.FS
+	links   MediaLinks
 	logger  *slog.Logger
 }
 
@@ -35,6 +36,10 @@ func (files libraryFiles) serveVideo(writer http.ResponseWriter, request *http.R
 	lecture, ok := files.catalog.Current().Lecture(request.PathValue("lectureId"))
 	if !ok || lecture.VideoPath == "" {
 		writeProblem(writer, http.StatusNotFound, "no video for lecture "+request.PathValue("lectureId"))
+		return
+	}
+	if files.links != nil {
+		files.redirect(writer, request, lecture.VideoPath, "")
 		return
 	}
 	files.serve(writer, request, lecture.VideoPath, http.Header{"Content-Type": {videoContentType}})
@@ -74,13 +79,18 @@ func (files libraryFiles) serveAttachment(writer http.ResponseWriter, request *h
 		writeProblem(writer, http.StatusNotFound, "no attachment "+request.PathValue("attachmentId"))
 		return
 	}
+	disposition := mime.FormatMediaType("attachment", map[string]string{"filename": attachment.Name})
+	if files.links != nil {
+		files.redirect(writer, request, attachment.Path, disposition)
+		return
+	}
 	contentType := mime.TypeByExtension(path.Ext(attachment.Name))
 	if contentType == "" {
 		contentType = binaryContentType
 	}
 	files.serve(writer, request, attachment.Path, http.Header{
 		"Content-Type":        {contentType},
-		"Content-Disposition": {mime.FormatMediaType("attachment", map[string]string{"filename": attachment.Name})},
+		"Content-Disposition": {disposition},
 	})
 }
 
@@ -125,6 +135,17 @@ func (files libraryFiles) open(writer http.ResponseWriter, filePath string) (fs.
 		return nil, nil, false
 	}
 	return file, info, true
+}
+
+func (files libraryFiles) redirect(writer http.ResponseWriter, request *http.Request, filePath, contentDisposition string) {
+	link, err := files.links.Link(request.Context(), filePath, contentDisposition)
+	if err != nil {
+		files.logger.Error("sign a link to a library file", "path", filePath, "err", err)
+		writeProblem(writer, http.StatusBadGateway, "the file cannot be linked from cloud storage")
+		return
+	}
+	writer.Header().Set("Cache-Control", "no-store")
+	http.Redirect(writer, request, link, http.StatusFound)
 }
 
 func setFileHeaders(writer http.ResponseWriter, headers http.Header) {

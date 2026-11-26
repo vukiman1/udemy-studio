@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"cmp"
 	"errors"
 	"fmt"
 	"log/slog"
@@ -20,10 +21,12 @@ const (
 	defaultListenAddress = "127.0.0.1:8765"
 	libraryDirEnv        = "UDEMY_STUDIO_LIBRARY"
 	publicHostEnv        = "UDEMY_STUDIO_PUBLIC_HOST"
+	roleEnv              = "UDEMY_STUDIO_ROLE"
 )
 
 func newServeCommand(version string) *cobra.Command {
 	options := app.Options{Version: version}
+	var role string
 	command := &cobra.Command{
 		Use:   "serve",
 		Short: "Run the web app over a downloads/ directory",
@@ -42,6 +45,9 @@ func newServeCommand(version string) *cobra.Command {
 			if options.PublicHosts, err = publicHosts(options.PublicHosts); err != nil {
 				return err
 			}
+			if options.Role, err = app.ParseRole(role); err != nil {
+				return err
+			}
 			logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
 			return app.Run(command.Context(), options, logger)
 		},
@@ -51,6 +57,8 @@ func newServeCommand(version string) *cobra.Command {
 	flags.StringVar(&options.LibraryDir, "library", os.Getenv(libraryDirEnv),
 		"downloads/ directory the player reads and downloads go to by default (env "+libraryDirEnv+")")
 	flags.StringVar(&options.DataDir, "data-dir", "", dataDirUsage)
+	flags.StringVar(&role, "role", cmp.Or(os.Getenv(roleEnv), string(app.RoleLibrary)),
+		"library serves the downloaded courses; cloud only reads the course published to cloud storage (env "+roleEnv+")")
 	flags.BoolVar(&options.LANMode, "lan", false, "listen on the local network; other devices need the printed access code")
 	flags.StringSliceVar(&options.PublicHosts, "public-host", splitList(os.Getenv(publicHostEnv)),
 		"hostname a tunnel or proxy serves the app under, such as studio.example.com; put a login such as Cloudflare Access in front (env "+publicHostEnv+")")
