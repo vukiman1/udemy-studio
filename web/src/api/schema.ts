@@ -385,6 +385,75 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/courses/{courseId}/publish/plan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** What publishing a course to cloud storage would send, and what it would replace */
+        get: operations["planCoursePublish"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/courses/{courseId}/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Publish a course to cloud storage, replacing the one there */
+        post: operations["startCoursePublish"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The latest publish since the server started */
+        get: operations["getPublishRun"];
+        put?: never;
+        post?: never;
+        /** Stop the running publish; the course already in the bucket stays listed */
+        delete: operations["cancelPublish"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/publish/published": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The course the cloud storage index lists, if storage is set up and holds one */
+        get: operations["getPublishedCourse"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/courses/{courseId}/translation/plan": {
         parameters: {
             query?: never;
@@ -854,6 +923,46 @@ export interface components {
             access: components["schemas"]["StorageAccess"];
             /** @description Whether the bucket already holds a published course index */
             hasCourse: boolean;
+        };
+        PublishedCourse: {
+            /** @description The library course in the same folder, when this library has it */
+            courseId?: string;
+            dir: string;
+            title: string;
+            /** Format: int64 */
+            sizeBytes: number;
+            /** Format: date-time */
+            publishedAt: string;
+        };
+        PublishPlan: {
+            files: number;
+            /** Format: int64 */
+            totalBytes: number;
+            /** Format: int64 */
+            limitBytes: number;
+            fits: boolean;
+            /** @description Whether another course in the bucket will be removed first */
+            replaces: boolean;
+            published?: components["schemas"]["PublishedCourse"];
+        };
+        PublishRun: {
+            courseId: string;
+            title: string;
+            /** @enum {string} */
+            state: "running" | "done" | "failed" | "cancelled";
+            totalFiles: number;
+            sentFiles: number;
+            /** @description Files already in the bucket, unchanged since they were sent */
+            skippedFiles: number;
+            /** Format: int64 */
+            totalBytes: number;
+            /**
+             * Format: int64
+             * @description Bytes of the files sent or skipped so far
+             */
+            sentBytes: number;
+            currentFile?: string;
+            failure?: string;
         };
         TranslationPlan: {
             /** @description Lectures with English subtitles and no Vietnamese ones */
@@ -1720,6 +1829,132 @@ export interface operations {
                 };
             };
             400: components["responses"]["BadRequest"];
+            502: components["responses"]["ProviderUnreachable"];
+        };
+    };
+    planCoursePublish: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                courseId: components["parameters"]["CourseId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Plan */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublishPlan"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            502: components["responses"]["ProviderUnreachable"];
+        };
+    };
+    startCoursePublish: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                courseId: components["parameters"]["CourseId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Started */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublishRun"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            502: components["responses"]["ProviderUnreachable"];
+        };
+    };
+    getPublishRun: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The publish run */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublishRun"];
+                };
+            };
+            /** @description Nothing published since the server started */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    cancelPublish: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Stopping */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            409: components["responses"]["Conflict"];
+        };
+    };
+    getPublishedCourse: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Published course */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PublishedCourse"];
+                };
+            };
+            /** @description No storage is set up or it holds no course */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
             502: components["responses"]["ProviderUnreachable"];
         };
     };

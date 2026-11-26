@@ -494,6 +494,88 @@ paths:
           $ref: "#/components/responses/ProviderUnreachable"
 
 
+  /api/courses/{courseId}/publish/plan:
+    get:
+      operationId: planCoursePublish
+      summary: What publishing a course to cloud storage would send, and what it would replace
+      parameters:
+        - $ref: "#/components/parameters/CourseId"
+      responses:
+        "200":
+          description: Plan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublishPlan"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "502":
+          $ref: "#/components/responses/ProviderUnreachable"
+
+  /api/courses/{courseId}/publish:
+    post:
+      operationId: startCoursePublish
+      summary: Publish a course to cloud storage, replacing the one there
+      parameters:
+        - $ref: "#/components/parameters/CourseId"
+      responses:
+        "202":
+          description: Started
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublishRun"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "502":
+          $ref: "#/components/responses/ProviderUnreachable"
+
+  /api/publish:
+    get:
+      operationId: getPublishRun
+      summary: The latest publish since the server started
+      responses:
+        "200":
+          description: The publish run
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublishRun"
+        "204":
+          description: Nothing published since the server started
+    delete:
+      operationId: cancelPublish
+      summary: Stop the running publish; the course already in the bucket stays listed
+      responses:
+        "204":
+          description: Stopping
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /api/publish/published:
+    get:
+      operationId: getPublishedCourse
+      summary: The course the cloud storage index lists, if storage is set up and holds one
+      responses:
+        "200":
+          description: Published course
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PublishedCourse"
+        "204":
+          description: No storage is set up or it holds no course
+        "502":
+          $ref: "#/components/responses/ProviderUnreachable"
+
   /api/courses/{courseId}/translation/plan:
     get:
       operationId: planCourseTranslation
@@ -1322,6 +1404,74 @@ components:
           type: boolean
           description: Whether the bucket already holds a published course index
 
+
+    PublishedCourse:
+      type: object
+      required: [dir, title, sizeBytes, publishedAt]
+      properties:
+        courseId:
+          type: string
+          description: The library course in the same folder, when this library has it
+        dir:
+          type: string
+        title:
+          type: string
+        sizeBytes:
+          type: integer
+          format: int64
+        publishedAt:
+          type: string
+          format: date-time
+
+    PublishPlan:
+      type: object
+      required: [files, totalBytes, limitBytes, fits, replaces]
+      properties:
+        files:
+          type: integer
+        totalBytes:
+          type: integer
+          format: int64
+        limitBytes:
+          type: integer
+          format: int64
+        fits:
+          type: boolean
+        replaces:
+          type: boolean
+          description: Whether another course in the bucket will be removed first
+        published:
+          $ref: "#/components/schemas/PublishedCourse"
+
+    PublishRun:
+      type: object
+      required: [courseId, title, state, totalFiles, sentFiles, skippedFiles, totalBytes, sentBytes]
+      properties:
+        courseId:
+          type: string
+        title:
+          type: string
+        state:
+          type: string
+          enum: [running, done, failed, cancelled]
+        totalFiles:
+          type: integer
+        sentFiles:
+          type: integer
+        skippedFiles:
+          type: integer
+          description: Files already in the bucket, unchanged since they were sent
+        totalBytes:
+          type: integer
+          format: int64
+        sentBytes:
+          type: integer
+          format: int64
+          description: Bytes of the files sent or skipped so far
+        currentFile:
+          type: string
+        failure:
+          type: string
 
     TranslationPlan:
       type: object
