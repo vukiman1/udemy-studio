@@ -323,6 +323,18 @@ type ChromeProfile struct {
 	UdemyHosts []string `json:"udemyHosts"`
 }
 
+// CompressionChapter defines model for CompressionChapter.
+type CompressionChapter struct {
+	Dir string `json:"dir"`
+
+	// EstimatedSeconds Rough encode time on this machine
+	EstimatedSeconds float64 `json:"estimatedSeconds"`
+	TotalBytes       int64   `json:"totalBytes"`
+
+	// Videos H.264 videos that would be encoded
+	Videos int `json:"videos"`
+}
+
 // CompressionCurrent defines model for CompressionCurrent.
 type CompressionCurrent struct {
 	EncodedSeconds float64 `json:"encodedSeconds"`
@@ -343,22 +355,26 @@ type CompressionOutcome struct {
 type CompressionPlan struct {
 	AlreadyHevc int `json:"alreadyHevc"`
 
-	// EstimatedSeconds Rough encode time on this machine
-	EstimatedSeconds float64 `json:"estimatedSeconds"`
+	// Chapters Chapters holding videos that would be encoded
+	Chapters []CompressionChapter `json:"chapters"`
 
-	// Files H.264 videos that would be encoded
-	Files int `json:"files"`
+	// ExpectedShareAfter Share of the size that earlier encodes kept, preferring this course; absent until one is recorded
+	ExpectedShareAfter *float64 `json:"expectedShareAfter,omitempty"`
 
 	// NotWorthIt Videos an earlier run found not worth re-encoding
 	NotWorthIt int `json:"notWorthIt"`
 
 	// OtherCodec Videos in neither H.264 nor H.265, left as they are
-	OtherCodec   int     `json:"otherCodec"`
-	TotalBytes   int64   `json:"totalBytes"`
-	TotalSeconds float64 `json:"totalSeconds"`
+	OtherCodec int `json:"otherCodec"`
 
 	// Unreadable Videos ffprobe cannot read, such as an unfinished download
 	Unreadable int `json:"unreadable"`
+}
+
+// CompressionRequest defines model for CompressionRequest.
+type CompressionRequest struct {
+	// Chapters Chapter folders whose H.264 videos to encode
+	Chapters []string `json:"chapters"`
 }
 
 // CompressionRun defines model for CompressionRun.
@@ -814,6 +830,9 @@ type SaveAISettingsJSONRequestBody = AISettingsDraft
 // SetAIEnabledJSONRequestBody defines body for SetAIEnabled for application/json ContentType.
 type SetAIEnabledJSONRequestBody = AIEnabled
 
+// StartCourseCompressionJSONRequestBody defines body for StartCourseCompression for application/json ContentType.
+type StartCourseCompressionJSONRequestBody = CompressionRequest
+
 // StartCoursePublishJSONRequestBody defines body for StartCoursePublish for application/json ContentType.
 type StartCoursePublishJSONRequestBody = PublishRequest
 
@@ -876,7 +895,7 @@ type ServerInterface interface {
 	// GetCourseCompression The latest compression of a course since the server started
 	// (GET /api/courses/{courseId}/compression)
 	GetCourseCompression(w http.ResponseWriter, r *http.Request, courseId CourseId)
-	// StartCourseCompression Queue a course to have its H.264 videos re-encoded to H.265 in the background
+	// StartCourseCompression Queue chosen chapters to have their H.264 videos re-encoded to H.265 in the background
 	// (POST /api/courses/{courseId}/compression)
 	StartCourseCompression(w http.ResponseWriter, r *http.Request, courseId CourseId)
 	// PlanCourseCompression What compressing a course to H.265 would encode, and roughly how long it takes
@@ -2557,6 +2576,7 @@ func (response GetCourseCompression503ApplicationProblemPlusJSONResponse) VisitG
 
 type StartCourseCompressionRequestObject struct {
 	CourseId CourseId `json:"courseId"`
+	Body     *StartCourseCompressionJSONRequestBody
 }
 
 type StartCourseCompressionResponseObject interface {
@@ -2573,6 +2593,22 @@ func (response StartCourseCompression202JSONResponse) VisitStartCourseCompressio
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(202)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type StartCourseCompression400ApplicationProblemPlusJSONResponse struct {
+	BadRequestApplicationProblemPlusJSONResponse
+}
+
+func (response StartCourseCompression400ApplicationProblemPlusJSONResponse) VisitStartCourseCompressionResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := runtime.JSONMarshalWrite(&buf, response.BadRequestApplicationProblemPlusJSONResponse); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(400)
 	_, err := buf.WriteTo(w)
 	return err
 }
@@ -4245,7 +4281,7 @@ type StrictServerInterface interface {
 	// GetCourseCompression The latest compression of a course since the server started
 	// (GET /api/courses/{courseId}/compression)
 	GetCourseCompression(ctx context.Context, request GetCourseCompressionRequestObject) (GetCourseCompressionResponseObject, error)
-	// StartCourseCompression Queue a course to have its H.264 videos re-encoded to H.265 in the background
+	// StartCourseCompression Queue chosen chapters to have their H.264 videos re-encoded to H.265 in the background
 	// (POST /api/courses/{courseId}/compression)
 	StartCourseCompression(ctx context.Context, request StartCourseCompressionRequestObject) (StartCourseCompressionResponseObject, error)
 	// PlanCourseCompression What compressing a course to H.265 would encode, and roughly how long it takes
@@ -4698,6 +4734,13 @@ func (sh *strictHandler) StartCourseCompression(w http.ResponseWriter, r *http.R
 	var request StartCourseCompressionRequestObject
 
 	request.CourseId = courseId
+
+	var body StartCourseCompressionJSONRequestBody
+	if err := runtime.BindJSONBody(r, &body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
 
 	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request any) (any, error) {
 		return sh.ssi.StartCourseCompression(ctx, request.(StartCourseCompressionRequestObject))

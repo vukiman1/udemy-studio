@@ -37,6 +37,7 @@ func newCompression(options CompressionOptions, libraryDir string, media *os.Roo
 		Encoder: tools,
 		Files:   media,
 		Skips:   sqlite.NewCompressionSkipStore(database),
+		Savings: sqlite.NewCompressionSavingStore(database),
 		Logger:  logger,
 	})
 }

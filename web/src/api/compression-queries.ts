@@ -10,6 +10,7 @@ export function isCompressing(run: CompressionRun | undefined): boolean {
 export function useCompressionPlan(courseId: string): UseQueryResult<CompressionPlan> {
   return useQuery({
     queryKey: QUERY_KEYS.compressionPlan(courseId),
+    gcTime: 0,
     queryFn: async () => {
       const { data, error, response } = await apiClient.GET(
         '/api/courses/{courseId}/compression/plan',
@@ -24,9 +25,13 @@ export function useCompressionPlan(courseId: string): UseQueryResult<Compression
   })
 }
 
-export async function startCompression(courseId: string): Promise<CompressionRun> {
+export async function startCompression(
+  courseId: string,
+  chapters: readonly string[],
+): Promise<CompressionRun> {
   const { data, error, response } = await apiClient.POST('/api/courses/{courseId}/compression', {
     params: { path: { courseId } },
+    body: { chapters: [...chapters] },
   })
   if (data === undefined)
     throw new ApiRequestError(`start compression of ${courseId}`, response.status, error.detail)

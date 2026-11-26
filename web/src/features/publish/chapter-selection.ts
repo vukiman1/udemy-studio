@@ -13,10 +13,3 @@ export function selectedBytes(plan: PublishPlan, selected: ReadonlySet<string>):
     .filter((chapter) => selected.has(chapter.dir))
     .reduce((total, chapter) => total + chapter.sizeBytes, plan.sharedBytes)
 }
-
-export function toggled(selected: ReadonlySet<string>, dir: string): ReadonlySet<string> {
-  const next = new Set(selected)
-  if (next.has(dir)) next.delete(dir)
-  else next.add(dir)
-  return next
-}

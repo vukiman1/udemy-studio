@@ -1,10 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { ReactElement } from 'react'
-import { Archive, Pause } from 'lucide-react'
+import { Pause } from 'lucide-react'
 import { cancelCompression, isCompressing, startCompression } from '../../api/compression-queries'
 import { QUERY_KEYS } from '../../api/queries'
 import type { CompressionRun } from '../../api/types'
-import { Dialog, DialogBody, DialogFooter, DialogHeader } from '../../app/Dialog'
+import { Dialog, DialogBody, DialogFooter } from '../../app/Dialog'
 import { RunInBackgroundButton } from '../../app/RunInBackgroundButton'
 import { Button, ButtonVariant } from '../../ui/Button'
 import { CompressionPlanSummary } from './CompressionPlanSummary'
@@ -27,7 +27,10 @@ export function CompressionDialog({
   const queryClient = useQueryClient()
   const refresh = (): Promise<void> =>
     queryClient.invalidateQueries({ queryKey: QUERY_KEYS.courseTools })
-  const start = useMutation({ mutationFn: () => startCompression(courseId), onSuccess: refresh })
+  const start = useMutation({
+    mutationFn: (chapters: readonly string[]) => startCompression(courseId, chapters),
+    onSuccess: refresh,
+  })
   const cancel = useMutation({ mutationFn: () => cancelCompression(courseId), onSuccess: refresh })
   const error = start.error ?? cancel.error
   const errorNote = error !== null && (
@@ -37,8 +40,7 @@ export function CompressionDialog({
   )
 
   return (
-    <Dialog label="Compress videos (H.265)" onClose={onClose}>
-      <DialogHeader icon={Archive} title="Compress videos (H.265)" subtitle={title} />
+    <Dialog label={`Compress videos: ${title}`} onClose={onClose}>
       {run !== undefined && isCompressing(run) ? (
         <>
           <DialogBody>
@@ -63,8 +65,8 @@ export function CompressionDialog({
         <CompressionPlanSummary
           courseId={courseId}
           isStarting={start.isPending}
-          onStart={() => {
-            start.mutate()
+          onStart={(chapters) => {
+            start.mutate(chapters)
           }}
           onDismiss={onClose}
         >

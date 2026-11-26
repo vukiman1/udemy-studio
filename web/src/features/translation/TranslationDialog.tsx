@@ -1,12 +1,12 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { ReactElement } from 'react'
 import { Link } from 'react-router'
-import { Info, Languages, Pause } from 'lucide-react'
+import { Info, Pause } from 'lucide-react'
 import { useAIProviders, useAISettings } from '../../api/ai-queries'
 import { QUERY_KEYS } from '../../api/queries'
 import { cancelTranslation, isTranslating, startTranslation } from '../../api/translation-queries'
 import type { AIProvider, TranslationRun } from '../../api/types'
-import { Dialog, DialogBody, DialogFooter, DialogHeader } from '../../app/Dialog'
+import { Dialog, DialogBody, DialogFooter } from '../../app/Dialog'
 import { AI_SETTINGS_PATH } from '../../app/paths'
 import { RunInBackgroundButton } from '../../app/RunInBackgroundButton'
 import { Button, ButtonVariant } from '../../ui/Button'
@@ -43,8 +43,7 @@ export function TranslationDialog({
   )
 
   return (
-    <Dialog label="Translate subtitles" onClose={onClose}>
-      <DialogHeader icon={Languages} title="Translate subtitles" subtitle={title} />
+    <Dialog label={`Translate subtitles: ${title}`} onClose={onClose}>
       {run !== undefined && isTranslating(run) ? (
         <>
           <DialogBody>

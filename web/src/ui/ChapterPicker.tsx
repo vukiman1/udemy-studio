@@ -1,11 +1,13 @@
-import type { ReactElement } from 'react'
-import { Cloud } from 'lucide-react'
-import type { PublishChapter } from '../../api/types'
-import { formatBytes } from '../compression/format'
-import { toggled } from './chapter-selection'
+import type { ReactElement, ReactNode } from 'react'
+import { toggled } from './toggled'
+
+export interface PickableChapter {
+  readonly dir: string
+  readonly detail: ReactNode
+}
 
 interface ChapterPickerProps {
-  readonly chapters: readonly PublishChapter[]
+  readonly chapters: readonly PickableChapter[]
   readonly selected: ReadonlySet<string>
   readonly onChange: (selected: ReadonlySet<string>) => void
 }
@@ -39,11 +41,8 @@ export function ChapterPicker({ chapters, selected, onChange }: ChapterPickerPro
                 }}
               />
               <span className="min-w-0 flex-1 truncate">{chapter.dir}</span>
-              {chapter.published && (
-                <Cloud className="size-3.5 shrink-0 text-accent-soft" aria-label="On R2" />
-              )}
-              <span className="shrink-0 text-xs text-muted tabular-nums">
-                {formatBytes(chapter.sizeBytes)}
+              <span className="flex shrink-0 items-center gap-2 text-xs text-muted tabular-nums">
+                {chapter.detail}
               </span>
             </label>
           </li>
