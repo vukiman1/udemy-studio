@@ -94,6 +94,7 @@ func Run(ctx context.Context, options Options, logger *slog.Logger) error {
 		return err
 	}
 	ai := newAISettings(box, database, logger)
+	storage := newStorageSettings(box, database, logger)
 	translation := newTranslationQueue(media, refresher, ai, logger)
 	handler := httpapi.NewHandler(httpapi.Deps{
 		Version:     options.Version,
@@ -106,6 +107,7 @@ func Run(ctx context.Context, options Options, logger *slog.Logger) error {
 		Compression: compression,
 		Translation: translation,
 		AI:          ai,
+		Storage:     storage,
 		Login:       downloads.login,
 		Jobs:        downloads.jobs,
 		Logger:      logger,

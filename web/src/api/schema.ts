@@ -349,6 +349,42 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/storage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The saved cloud storage connection; the secret key is never sent back */
+        get: operations["getStorageSettings"];
+        /** Save a cloud storage connection once the bucket has answered with its keys */
+        put: operations["saveStorageSettings"];
+        post?: never;
+        /** Forget the cloud storage connection and its keys */
+        delete: operations["forgetStorageSettings"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/storage/check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Read and write a tiny object to learn what the keys may do; empty keys use the saved ones */
+        post: operations["checkStorage"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/courses/{courseId}/translation/plan": {
         parameters: {
             query?: never;
@@ -797,6 +833,27 @@ export interface components {
             /** Format: int64 */
             latencyMs: number;
             reply: string;
+        };
+        StorageSettings: {
+            configured: boolean;
+            /** @description The S3 API URL, bucket included */
+            url?: string;
+            /** @description The access key ID's first and last four characters, the rest masked */
+            accessKeyIdHint?: string;
+        };
+        StorageDraft: {
+            /** @description The S3 API URL, such as https://<account-id>.r2.cloudflarestorage.com/<bucket> */
+            url: string;
+            /** @description Leave out with the secret to keep the saved keys */
+            accessKeyId?: string;
+            secretAccessKey?: string;
+        };
+        /** @enum {string} */
+        StorageAccess: "read-only" | "read-write";
+        StorageCheck: {
+            access: components["schemas"]["StorageAccess"];
+            /** @description Whether the bucket already holds a published course index */
+            hasCourse: boolean;
         };
         TranslationPlan: {
             /** @description Lectures with English subtitles and no Vietnamese ones */
@@ -1570,6 +1627,96 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AICheck"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            502: components["responses"]["ProviderUnreachable"];
+        };
+    };
+    getStorageSettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Settings */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StorageSettings"];
+                };
+            };
+        };
+    };
+    saveStorageSettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StorageDraft"];
+            };
+        };
+        responses: {
+            /** @description Saved */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StorageSettings"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            502: components["responses"]["ProviderUnreachable"];
+        };
+    };
+    forgetStorageSettings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Forgotten */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    checkStorage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StorageDraft"];
+            };
+        };
+        responses: {
+            /** @description The bucket answered */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StorageCheck"];
                 };
             };
             400: components["responses"]["BadRequest"];
