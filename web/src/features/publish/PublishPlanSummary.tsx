@@ -17,6 +17,7 @@ interface PublishPlanSummaryProps {
   readonly isStarting: boolean
   readonly onStart: (chapters: readonly string[]) => void
   readonly onDismiss: () => void
+  readonly removeButton: ReactNode
   readonly children: ReactNode
 }
 
@@ -25,6 +26,7 @@ export function PublishPlanSummary({
   isStarting,
   onStart,
   onDismiss,
+  removeButton,
   children,
 }: PublishPlanSummaryProps): ReactElement {
   const plan = usePublishPlan(courseId)
@@ -37,6 +39,7 @@ export function PublishPlanSummary({
         isStarting={isStarting}
         onStart={onStart}
         onDismiss={onDismiss}
+        removeButton={removeButton}
       >
         {children}
       </PublishPlanForm>
@@ -54,7 +57,9 @@ export function PublishPlanSummary({
           <p className="text-muted">Loading…</p>
         )}
       </DialogBody>
-      <PlanFooter startLabel="Publish" canStart={false} onStart={onDismiss} onDismiss={onDismiss} />
+      <DialogFooter>
+        <Button onClick={onDismiss}>Cancel</Button>
+      </DialogFooter>
     </>
   )
 }
@@ -69,11 +74,13 @@ function PublishPlanForm({
   isStarting,
   onStart,
   onDismiss,
+  removeButton,
   children,
 }: PublishPlanFormProps): ReactElement {
   const [selected, setSelected] = useState(() => initialSelection(plan, courseId))
   const totalBytes = selectedBytes(plan, selected)
   const fits = totalBytes <= plan.limitBytes
+  const isOnR2 = plan.published?.courseId === courseId
 
   return (
     <>
@@ -117,37 +124,27 @@ function PublishPlanForm({
           </p>
         )}
       </DialogBody>
-      <PlanFooter
-        startLabel={plan.published?.courseId === courseId ? 'Update' : 'Publish'}
-        canStart={fits && selected.size > 0 && !isStarting && hasChanges(plan, courseId, selected)}
-        onStart={() => {
-          onStart(plan.chapters.map((chapter) => chapter.dir).filter((dir) => selected.has(dir)))
-        }}
-        onDismiss={onDismiss}
-      />
+      <DialogFooter>
+        <Button onClick={onDismiss}>Cancel</Button>
+        {isOnR2 && selected.size === 0 ? (
+          removeButton
+        ) : (
+          <Button
+            variant={ButtonVariant.Primary}
+            icon={CloudUpload}
+            disabled={
+              !fits || selected.size === 0 || isStarting || !hasChanges(plan, courseId, selected)
+            }
+            onClick={() => {
+              onStart(
+                plan.chapters.map((chapter) => chapter.dir).filter((dir) => selected.has(dir)),
+              )
+            }}
+          >
+            {isOnR2 ? 'Update' : 'Publish'}
+          </Button>
+        )}
+      </DialogFooter>
     </>
-  )
-}
-
-interface PlanFooterProps {
-  readonly startLabel: string
-  readonly canStart: boolean
-  readonly onStart: () => void
-  readonly onDismiss: () => void
-}
-
-function PlanFooter({ startLabel, canStart, onStart, onDismiss }: PlanFooterProps): ReactElement {
-  return (
-    <DialogFooter>
-      <Button onClick={onDismiss}>Cancel</Button>
-      <Button
-        variant={ButtonVariant.Primary}
-        icon={CloudUpload}
-        disabled={!canStart}
-        onClick={onStart}
-      >
-        {startLabel}
-      </Button>
-    </DialogFooter>
   )
 }

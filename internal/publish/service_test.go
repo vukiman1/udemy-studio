@@ -431,19 +431,29 @@ func TestRemoveEmptiesTheCourseAndItsIndexOnly(t *testing.T) {
 	}
 }
 
-func TestRemoveIsRefusedWhileACourseIsBeingPublished(t *testing.T) {
+func TestRemoveStopsTheRunningPublishAndLeavesNothingBehind(t *testing.T) {
 	bucket := newMemoryBucket()
 	service := newTestService(t, courseTree(), bucket)
-	removed := make(chan error, 1)
-	bucket.onPut = func(ctx context.Context, _ string) error {
-		select {
-		case removed <- service.Remove(ctx):
-		default:
+	uploading := make(chan struct{})
+	var once sync.Once
+	bucket.onPut = func(ctx context.Context, key string) error {
+		if !strings.HasSuffix(key, "Welcome.mp4") {
+			return nil
 		}
-		return nil
+		once.Do(func() { close(uploading) })
+		<-ctx.Done()
+		return ctx.Err()
 	}
-	publish(t, service, firstCourseDir)
-	if err := <-removed; !errors.Is(err, ErrBusy) {
-		t.Errorf("Remove error = %v, want ErrBusy", err)
+	if _, err := service.Start(t.Context(), courseID(t, service, firstCourseDir), allChapters(t, service, firstCourseDir)); err != nil {
+		t.Fatalf("Start: %v", err)
+	}
+	<-uploading
+
+	if err := service.Remove(t.Context()); err != nil {
+		t.Fatalf("Remove: %v", err)
+	}
+	run, _ := service.Status()
+	if run.State != StateCancelled || len(bucket.objects) != 0 {
+		t.Errorf("run = %+v, objects = %v; want a cancelled run and an empty bucket", run, bucket.objects)
 	}
 }

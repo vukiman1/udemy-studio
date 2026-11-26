@@ -11,10 +11,16 @@ func (service *Service) Remove(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	if err := service.startRemoving(); err != nil {
+	stopped, err := service.startRemoving()
+	if err != nil {
 		return err
 	}
 	defer service.stopRemoving()
+	select {
+	case <-stopped:
+	case <-ctx.Done():
+		return ctx.Err()
+	}
 	if err := bucket.Delete(ctx, objectstore.IndexKey); err != nil {
 		return err
 	}
@@ -30,14 +36,22 @@ func (service *Service) Remove(ctx context.Context) error {
 	return nil
 }
 
-func (service *Service) startRemoving() error {
+func (service *Service) startRemoving() (<-chan struct{}, error) {
 	service.mutex.Lock()
 	defer service.mutex.Unlock()
-	if service.isRemoving || (service.run != nil && service.run.State == StateRunning) {
-		return ErrBusy
+	if service.isRemoving {
+		return nil, ErrBusy
 	}
 	service.isRemoving = true
-	return nil
+	if service.run != nil && service.run.State == StateRunning {
+		service.cancelLocked()
+	}
+	if service.done == nil {
+		idle := make(chan struct{})
+		close(idle)
+		return idle, nil
+	}
+	return service.done, nil
 }
 
 func (service *Service) stopRemoving() {
