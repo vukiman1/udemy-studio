@@ -1,7 +1,6 @@
 import type { ReactElement } from 'react'
-import { Link } from 'react-router'
 import { ChevronLeft, FileQuestion } from 'lucide-react'
-import { ButtonSize, ButtonVariant, buttonClass } from '../ui/Button'
+import { Button, ButtonSize, ButtonVariant } from '../ui/Button'
 import { EmptyState } from '../ui/EmptyState'
 import { LIBRARY_PATH } from './paths'
 
@@ -10,12 +9,16 @@ export function NotFoundPage(): ReactElement {
     <main className="grid content-start px-5 py-8 md:px-10 md:py-10">
       <EmptyState
         icon={FileQuestion}
-        title="Không có trang này."
+        title="Page not found."
         action={
-          <Link to={LIBRARY_PATH} className={buttonClass(ButtonVariant.Primary, ButtonSize.Small)}>
-            <ChevronLeft aria-hidden="true" />
-            Về thư viện
-          </Link>
+          <Button
+            to={LIBRARY_PATH}
+            variant={ButtonVariant.Primary}
+            size={ButtonSize.Small}
+            icon={ChevronLeft}
+          >
+            Back to library
+          </Button>
         }
       />
     </main>

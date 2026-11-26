@@ -90,10 +90,10 @@ export function NoteItem({ note, lectureId, onSeek }: NoteItemProps): ReactEleme
                 size={ButtonSize.Small}
                 disabled={!canSave}
               >
-                Lưu
+                Save
               </Button>
               <Button variant={ButtonVariant.Ghost} size={ButtonSize.Small} onClick={stopEditing}>
-                Huỷ
+                Cancel
               </Button>
             </div>
           </form>
@@ -113,7 +113,7 @@ export function NoteItem({ note, lectureId, onSeek }: NoteItemProps): ReactEleme
               setEditedBody(note.body)
             }}
           >
-            Sửa
+            Edit
           </button>
         )}
         {isConfirmingDelete ? (
@@ -126,7 +126,7 @@ export function NoteItem({ note, lectureId, onSeek }: NoteItemProps): ReactEleme
                 remove.mutate()
               }}
             >
-              Xoá hẳn
+              Delete
             </button>
             <button
               type="button"
@@ -136,7 +136,7 @@ export function NoteItem({ note, lectureId, onSeek }: NoteItemProps): ReactEleme
                 remove.reset()
               }}
             >
-              Giữ lại
+              Keep
             </button>
           </>
         ) : (
@@ -147,7 +147,7 @@ export function NoteItem({ note, lectureId, onSeek }: NoteItemProps): ReactEleme
               setIsConfirmingDelete(true)
             }}
           >
-            Xoá
+            Delete
           </button>
         )}
       </span>

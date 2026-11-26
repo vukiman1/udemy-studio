@@ -10,9 +10,9 @@ interface TranslationRunStatusProps {
 const FINISHED_TEXT: Readonly<
   Record<Exclude<TranslationRun['state'], 'running' | 'queued'>, string>
 > = {
-  done: 'Dịch xong.',
-  cancelled: 'Đã dừng.',
-  failed: 'Đã dừng vì lỗi.',
+  done: 'Done.',
+  cancelled: 'Stopped.',
+  failed: 'Stopped on an error.',
 }
 
 export function TranslationRunStatus({ run }: TranslationRunStatusProps): ReactElement {
@@ -26,7 +26,7 @@ export function TranslationRunStatus({ run }: TranslationRunStatusProps): ReactE
       )}
       {run.failed.map((outcome) => (
         <p key={outcome.path} className="text-danger">
-          Không dịch được: {outcome.lectureTitle} ({outcome.reason})
+          Not translated: {outcome.lectureTitle} ({outcome.reason})
         </p>
       ))}
     </div>
@@ -34,28 +34,29 @@ export function TranslationRunStatus({ run }: TranslationRunStatusProps): ReactE
 }
 
 function RunSummary({ run }: TranslationRunStatusProps): ReactElement {
-  if (run.state === 'queued') return <p className="text-muted">Đang chờ khoá khác dịch xong…</p>
+  if (run.state === 'queued')
+    return <p className="text-muted">Waiting for another course to finish…</p>
   if (run.state === 'running')
     return (
       <>
         <p className="flex items-baseline justify-between gap-3">
           <span className="text-[15px] font-semibold">
-            Đang dịch {Math.min(run.finished + 1, run.total)}/{run.total}
+            Translating {Math.min(run.finished + 1, run.total)}/{run.total}
           </span>
           <span className="text-muted tabular-nums">
             {completionPercent(run.finished, run.total)}%
           </span>
         </p>
-        <p className="wrap-anywhere text-muted">Bài hiện tại: {run.currentLecture ?? '…'}</p>
+        <p className="wrap-anywhere text-muted">{run.currentLecture ?? '…'}</p>
         <ProgressBar className="h-2 rounded" completed={run.finished} total={run.total} />
-        <p className="text-xs text-muted">Đã tốn {formatUsd(run.costUsd)}</p>
+        <p className="text-xs text-muted">Spent {formatUsd(run.costUsd)}</p>
       </>
     )
   const translated = run.finished - run.failed.length
   return (
     <p>
-      {FINISHED_TEXT[run.state]} {translated}/{run.total} bài có phụ đề mới.{' '}
-      <span className="text-muted">Đã tốn {formatUsd(run.costUsd)}.</span>
+      {FINISHED_TEXT[run.state]} {translated}/{run.total} lectures translated.{' '}
+      <span className="text-muted">Spent {formatUsd(run.costUsd)}.</span>
     </p>
   )
 }

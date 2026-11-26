@@ -17,7 +17,7 @@ export function LectureNav({ courseId, neighbours }: LectureNavProps): ReactElem
   return (
     <nav
       className="flex justify-between gap-4 border-t border-line pt-4 text-[15px] font-medium text-accent-soft"
-      aria-label="Chuyển bài"
+      aria-label="Lecture navigation"
     >
       {previous !== undefined ? (
         <Link className={NEIGHBOUR_LINK} to={lecturePath(courseId, previous.id)}>

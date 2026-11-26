@@ -24,10 +24,11 @@ func (server apiServer) PlanCoursePublish(ctx context.Context, request gen.PlanC
 		return nil, err
 	}
 	response := gen.PlanCoursePublish200JSONResponse{
-		SharedBytes: plan.SharedBytes(),
-		LimitBytes:  plan.LimitBytes,
-		Chapters:    toPublishChapters(plan.Chapters()),
-		Replaces:    plan.Replaces(),
+		SharedBytes:   plan.SharedBytes(),
+		LimitBytes:    plan.LimitBytes,
+		Chapters:      toPublishChapters(plan.Chapters()),
+		Replaces:      plan.Replaces(),
+		SharedChanged: plan.SharedChanged(),
 	}
 	if plan.Published != nil {
 		published := server.publishedCourse(*plan.Published)
@@ -86,6 +87,22 @@ func (server apiServer) GetPublishedCourse(ctx context.Context, _ gen.GetPublish
 	return gen.GetPublishedCourse200JSONResponse(server.publishedCourse(index)), nil
 }
 
+func (server apiServer) RemovePublishedCourse(ctx context.Context, _ gen.RemovePublishedCourseRequestObject) (gen.RemovePublishedCourseResponseObject, error) {
+	err := server.deps.Publish.Remove(ctx)
+	switch {
+	case err == nil:
+		return gen.RemovePublishedCourse204Response{}, nil
+	case errors.Is(err, objectstore.ErrNotConfigured), errors.Is(err, publish.ErrBusy):
+		return gen.RemovePublishedCourse409ApplicationProblemPlusJSONResponse{ConflictApplicationProblemPlusJSONResponse: conflict(err)}, nil
+	case isBadStorageRequest(err):
+		return gen.RemovePublishedCourse400ApplicationProblemPlusJSONResponse{BadRequestApplicationProblemPlusJSONResponse: badRequest(err)}, nil
+	case errors.Is(err, objectstore.ErrUnreachable):
+		return gen.RemovePublishedCourse502ApplicationProblemPlusJSONResponse{ProviderUnreachableApplicationProblemPlusJSONResponse: providerUnreachable(err)}, nil
+	default:
+		return nil, err
+	}
+}
+
 func (server apiServer) publishedCourse(index publish.Index) gen.PublishedCourse {
 	published := gen.PublishedCourse{
 		Dir:           index.Course.Dir,
@@ -127,7 +144,7 @@ func toPublishRun(run publish.Run) gen.PublishRun {
 func toPublishChapters(chapters []publish.ChapterPlan) []gen.PublishChapter {
 	converted := make([]gen.PublishChapter, len(chapters))
 	for position, chapter := range chapters {
-		converted[position] = gen.PublishChapter{Dir: chapter.Dir, Files: chapter.Files, SizeBytes: chapter.SizeBytes, Published: chapter.IsPublished}
+		converted[position] = gen.PublishChapter{Dir: chapter.Dir, Files: chapter.Files, SizeBytes: chapter.SizeBytes, Published: chapter.IsPublished, Changed: chapter.HasChanges}
 	}
 	return converted
 }

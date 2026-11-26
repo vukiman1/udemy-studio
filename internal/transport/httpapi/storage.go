@@ -65,6 +65,17 @@ func (server apiServer) CheckStorage(ctx context.Context, request gen.CheckStora
 	}
 }
 
+func (server apiServer) GetStorageUsage(ctx context.Context, _ gen.GetStorageUsageRequestObject) (gen.GetStorageUsageResponseObject, error) {
+	used, err := server.deps.Storage.UsedBytes(ctx)
+	switch {
+	case errors.Is(err, objectstore.ErrNotConfigured):
+		return gen.GetStorageUsage204Response{}, nil
+	case err != nil:
+		return gen.GetStorageUsage502ApplicationProblemPlusJSONResponse{ProviderUnreachableApplicationProblemPlusJSONResponse: providerUnreachable(err)}, nil
+	}
+	return gen.GetStorageUsage200JSONResponse{UsedBytes: used, QuotaBytes: objectstore.FreeQuotaBytes}, nil
+}
+
 func (server apiServer) storageSettings(ctx context.Context) (gen.StorageSettings, error) {
 	view, err := server.deps.Storage.View(ctx)
 	if err != nil || !view.IsConfigured {

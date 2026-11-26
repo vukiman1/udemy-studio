@@ -1,11 +1,13 @@
-import type { ReactElement } from 'react'
-import { Cloud } from 'lucide-react'
-import type { PublishChapter } from '../../api/types'
-import { formatBytes } from '../compression/format'
-import { toggled } from './chapter-selection'
+import type { ReactElement, ReactNode } from 'react'
+import { toggled } from './toggled'
+
+export interface PickableChapter {
+  readonly dir: string
+  readonly detail: ReactNode
+}
 
 interface ChapterPickerProps {
-  readonly chapters: readonly PublishChapter[]
+  readonly chapters: readonly PickableChapter[]
   readonly selected: ReadonlySet<string>
   readonly onChange: (selected: ReadonlySet<string>) => void
 }
@@ -15,7 +17,7 @@ export function ChapterPicker({ chapters, selected, onChange }: ChapterPickerPro
   return (
     <fieldset className="grid gap-2">
       <legend className="mb-2 flex w-full items-center justify-between text-[13px] font-semibold">
-        Chương
+        Chapters
         <button
           type="button"
           className="bg-transparent px-0 py-0 text-xs font-semibold text-accent-soft hover:underline"
@@ -23,7 +25,7 @@ export function ChapterPicker({ chapters, selected, onChange }: ChapterPickerPro
             onChange(new Set(isAllSelected ? [] : chapters.map((chapter) => chapter.dir)))
           }}
         >
-          {isAllSelected ? 'Bỏ hết' : 'Tất cả'}
+          {isAllSelected ? 'None' : 'All'}
         </button>
       </legend>
       <ul className="m-0 grid max-h-64 [scrollbar-width:thin] list-none gap-1 overflow-y-auto rounded-xl bg-page p-1.5">
@@ -39,11 +41,8 @@ export function ChapterPicker({ chapters, selected, onChange }: ChapterPickerPro
                 }}
               />
               <span className="min-w-0 flex-1 truncate">{chapter.dir}</span>
-              {chapter.published && (
-                <Cloud className="size-3.5 shrink-0 text-accent-soft" aria-label="Đang trên R2" />
-              )}
-              <span className="shrink-0 text-xs text-muted tabular-nums">
-                {formatBytes(chapter.sizeBytes)}
+              <span className="flex shrink-0 items-center gap-2 text-xs text-muted tabular-nums">
+                {chapter.detail}
               </span>
             </label>
           </li>

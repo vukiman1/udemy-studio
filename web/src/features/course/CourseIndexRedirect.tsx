@@ -8,9 +8,9 @@ import { startingLectureId } from './course-navigation'
 export function CourseIndexRedirect(): ReactElement {
   const { courseId = '' } = useParams()
   const course = useCourse(courseId)
-  if (course.data === undefined) return <PageStatus tone="info" message="Đang mở khoá học…" />
+  if (course.data === undefined) return <PageStatus tone="info" message="Opening course…" />
   const lectureId = startingLectureId(course.data)
   if (lectureId === undefined)
-    return <PageStatus tone="info" message="Khoá học này chưa có bài nào xem được." />
+    return <PageStatus tone="info" message="This course has no playable lectures yet." />
   return <Navigate replace to={lecturePath(courseId, lectureId)} />
 }

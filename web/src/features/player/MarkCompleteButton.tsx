@@ -13,8 +13,8 @@ interface MarkCompleteButtonProps {
 const READ_THROUGH = { positionSeconds: 1, durationSeconds: 1, completed: true } as const
 
 const COMPLETION_TEXT = {
-  article: { done: 'Đã đọc xong bài này.', action: 'Đánh dấu đã đọc' },
-  quiz: { done: 'Đã làm xong bài này.', action: 'Đánh dấu đã làm' },
+  article: { done: 'Read.', action: 'Mark as read' },
+  quiz: { done: 'Done.', action: 'Mark as done' },
 } as const
 
 export function MarkCompleteButton({ lecture, courseId }: MarkCompleteButtonProps): ReactElement {
@@ -53,7 +53,7 @@ export function MarkCompleteButton({ lecture, courseId }: MarkCompleteButtonProp
       </Button>
       {markComplete.isError && (
         <p className="text-[13px] text-danger" role="alert">
-          Không lưu được: {markComplete.error.message}
+          Could not save: {markComplete.error.message}
         </p>
       )}
     </div>

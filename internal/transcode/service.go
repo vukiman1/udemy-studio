@@ -20,6 +20,7 @@ type Deps struct {
 	Encoder Encoder
 	Files   Files
 	Skips   SkipStore
+	Savings SavingStore
 	Logger  *slog.Logger
 }
 
@@ -56,7 +57,11 @@ func (service *Service) Plan(ctx context.Context, courseID string) (Plan, error)
 			}
 		}
 	}
-	plan.EstimatedFor = time.Duration(float64(plan.TotalLength) / assumedRealtimeSpeed)
+	share, err := service.expectedShareAfter(ctx, course.Dir)
+	if err != nil {
+		service.deps.Logger.Warn("planning without a learned size estimate", "course", course.Dir, "err", err)
+	}
+	plan.ShareAfter = share
 	return plan, nil
 }
 
@@ -81,8 +86,6 @@ func (service *Service) addToPlan(ctx context.Context, plan *Plan, lecture libra
 		plan.NotWorthIt++
 	case videoPending:
 		plan.Candidates = append(plan.Candidates, Candidate{LectureTitle: lecture.Title, Path: lecture.VideoPath, Media: media})
-		plan.TotalBytes += media.SizeBytes
-		plan.TotalLength += media.Duration
 	}
 	return nil
 }
@@ -148,14 +151,22 @@ func (service *Service) Summarize(ctx context.Context, course library.Course) (S
 }
 
 // Start plans the course again, since files may have changed since it was shown, and queues it.
-func (service *Service) Start(ctx context.Context, courseID string) (Run, error) {
+func (service *Service) Start(ctx context.Context, courseID string, chapters []string) (Run, error) {
 	if run, ok := service.Status(courseID); ok && run.State.IsActive() {
 		return Run{}, fmt.Errorf("%w: %s", ErrAlreadyQueued, courseID)
+	}
+	course, ok := service.deps.Catalog.Current().Course(courseID)
+	if !ok {
+		return Run{}, fmt.Errorf("%w: %s", ErrCourseNotFound, courseID)
+	}
+	if err := checkChapters(course, chapters); err != nil {
+		return Run{}, err
 	}
 	plan, err := service.Plan(ctx, courseID)
 	if err != nil {
 		return Run{}, err
 	}
+	plan.Candidates = plan.only(chapters)
 	service.mutex.Lock()
 	defer service.mutex.Unlock()
 	if run, ok := service.runs[courseID]; ok && run.State.IsActive() {

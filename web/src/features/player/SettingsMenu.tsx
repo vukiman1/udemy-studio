@@ -30,10 +30,10 @@ const MENU_ITEM =
   'flex cursor-pointer items-center justify-between gap-4 rounded-md px-2.5 py-2 outline-none data-highlighted:bg-white/12'
 
 export const SUBTITLE_MODE_LABELS: Readonly<Record<SubtitleMode, string>> = {
-  [SubtitleMode.Bilingual]: 'Song ngữ',
-  [SubtitleMode.Primary]: 'Tiếng Việt',
+  [SubtitleMode.Bilingual]: 'Bilingual',
+  [SubtitleMode.Primary]: 'Vietnamese',
   [SubtitleMode.Secondary]: 'English',
-  [SubtitleMode.Off]: 'Tắt',
+  [SubtitleMode.Off]: 'Off',
 }
 
 export function SettingsMenu({
@@ -45,7 +45,7 @@ export function SettingsMenu({
     <Menu.Root side="top" align="end">
       <Menu.Trigger
         className="inline-grid size-10 place-items-center rounded-md border-0 bg-transparent p-0 text-inherit hover:bg-white/15 data-open:bg-white/15"
-        aria-label="Cài đặt"
+        aria-label="Settings"
         render={<button type="button" />}
       >
         <GearIcon className="size-5" />
@@ -53,7 +53,7 @@ export function SettingsMenu({
       <Menu.Popup className="grid min-w-[230px] rounded-[10px] bg-[rgb(28_28_32/0.96)] p-1.5 text-[0.9rem] text-white shadow-[0_8px_24px_rgb(0_0_0/0.4)] outline-none">
         <Menu.Content className={MENU_PAGE}>
           <SettingsSubmenu
-            label="Tốc độ"
+            label="Speed"
             value={String(settings.playbackRate)}
             choices={PLAYBACK_RATES.map((rate) => ({
               value: String(rate),
@@ -65,7 +65,7 @@ export function SettingsMenu({
           />
           {subtitleModes.length > 1 && (
             <SettingsSubmenu
-              label="Phụ đề"
+              label="Subtitles"
               value={settings.subtitleMode}
               choices={subtitleModes.map((mode) => ({
                 value: mode,
@@ -79,7 +79,7 @@ export function SettingsMenu({
             />
           )}
           <SettingsSubmenu
-            label="Cỡ chữ phụ đề"
+            label="Subtitle size"
             value={String(settings.fontScale)}
             choices={FONT_SCALES.map((scale) => ({
               value: String(scale),
@@ -90,7 +90,7 @@ export function SettingsMenu({
             }}
           />
           <SettingsSubmenu
-            label="Độ đậm chữ phụ đề"
+            label="Subtitle opacity"
             value={String(settings.textOpacity)}
             choices={TEXT_OPACITIES.map((opacity) => ({
               value: String(opacity),
@@ -101,11 +101,11 @@ export function SettingsMenu({
             }}
           />
           <SettingsSubmenu
-            label="Nền phụ đề"
+            label="Subtitle background"
             value={String(settings.backgroundOpacity)}
             choices={BACKGROUND_OPACITIES.map((opacity) => ({
               value: String(opacity),
-              label: opacity === 0 ? 'Trong suốt' : asPercent(opacity),
+              label: opacity === 0 ? 'None' : asPercent(opacity),
             }))}
             onSelect={(value) => {
               onChange((current) => ({ ...current, backgroundOpacity: Number(value) }))

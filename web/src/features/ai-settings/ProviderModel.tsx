@@ -1,8 +1,9 @@
 import type { ReactElement } from 'react'
 import type { AIProvider } from '../../api/types'
 import { SETTINGS_LABEL, SETTINGS_ROW } from '../../ui/settings-row'
+import { DISPLAY_LOCALE } from '../../app/display-locale'
 
-const PRICE_FORMAT = new Intl.NumberFormat('vi-VN', {
+const PRICE_FORMAT = new Intl.NumberFormat(DISPLAY_LOCALE, {
   style: 'currency',
   currency: 'USD',
   maximumFractionDigits: 2,
@@ -19,7 +20,7 @@ export function ProviderModel({ provider }: ProviderModelProps): ReactElement {
       <span className={SETTINGS_LABEL}>Model</span>
       <span>
         {provider.model.label}
-        {` · ${PRICE_FORMAT.format(provider.inputUsdPerMillion)} vào, ${PRICE_FORMAT.format(provider.outputUsdPerMillion)} ra mỗi triệu token`}
+        {` · ${PRICE_FORMAT.format(provider.inputUsdPerMillion)} in, ${PRICE_FORMAT.format(provider.outputUsdPerMillion)} out per million tokens`}
       </span>
     </div>
   )

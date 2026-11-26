@@ -31,19 +31,19 @@ describe('AppShell', () => {
 
   it('marks only the current page in both the sidebar and the tab bar', async () => {
     renderShell('library', '/downloads')
-    await screen.findAllByRole('link', { name: 'Tải khoá học' })
-    for (const nav of screen.getAllByRole('navigation', { name: 'Điều hướng chính' })) {
+    await screen.findAllByRole('link', { name: 'Downloads' })
+    for (const nav of screen.getAllByRole('navigation', { name: 'Main navigation' })) {
       const current = within(nav)
         .getAllByRole('link')
         .filter((link) => link.getAttribute('aria-current') === 'page')
-      expect(current.map((link) => link.textContent)).toEqual(['Tải khoá học'])
+      expect(current.map((link) => link.textContent)).toEqual(['Downloads'])
     }
   })
 
   it('leaves downloads and AI settings out of the cloud copy', async () => {
     renderShell('cloud', '/')
-    await screen.findAllByRole('link', { name: 'Lưu trữ' })
-    expect(screen.queryByRole('link', { name: 'Tải khoá học' })).toBeNull()
-    expect(screen.queryByRole('link', { name: 'Cài đặt AI' })).toBeNull()
+    await screen.findAllByRole('link', { name: 'Storage' })
+    expect(screen.queryByRole('link', { name: 'Downloads' })).toBeNull()
+    expect(screen.queryByRole('link', { name: 'AI settings' })).toBeNull()
   })
 })

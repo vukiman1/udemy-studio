@@ -20,10 +20,10 @@ export interface ToolStatus {
   readonly detail: string
 }
 
-const TRANSLATE_LABEL = 'Dịch'
-const COMPRESS_LABEL = 'Nén'
-const PUBLISH_LABEL = 'Đưa lên R2'
-const PUBLISHED_LABEL = 'Cập nhật R2'
+const TRANSLATE_LABEL = 'Translate'
+const COMPRESS_LABEL = 'Compress'
+const PUBLISH_LABEL = 'Publish'
+const PUBLISHED_LABEL = 'Update R2'
 const PERCENT = 100
 
 const NOTHING_RUNNING = 0
@@ -35,35 +35,35 @@ export function translationStatus(tools: CourseTools['translation']): ToolStatus
     return {
       state: ToolState.Running,
       progress: run.total === 0 ? 0 : run.finished / run.total,
-      label: `Đang dịch ${String(run.finished)}/${String(run.total)}`,
-      detail: `Đang dịch ${String(run.finished)}/${String(run.total)} bài`,
+      label: `Translating ${String(run.finished)}/${String(run.total)}`,
+      detail: `Translating ${String(run.finished)}/${String(run.total)} lectures`,
     }
   if (lectures === 0)
     return {
       state: ToolState.Unavailable,
       progress: NOTHING_RUNNING,
       label: TRANSLATE_LABEL,
-      detail: 'Khoá này không có phụ đề tiếng Anh',
+      detail: 'No English subtitles',
     }
   if (pending === 0)
     return {
       state: ToolState.Done,
       progress: NOTHING_RUNNING,
       label: TRANSLATE_LABEL,
-      detail: `Đã dịch đủ ${String(lectures)}/${String(lectures)} bài`,
+      detail: `All ${String(lectures)} lectures translated`,
     }
   if (run !== undefined && (run.state === 'failed' || run.failed.length > 0))
     return {
       state: ToolState.Failed,
       progress: NOTHING_RUNNING,
       label: TRANSLATE_LABEL,
-      detail: `Lần dịch trước có lỗi; còn ${String(pending)} bài chưa dịch`,
+      detail: `Last run had errors; ${String(pending)} left`,
     }
   return {
     state: ToolState.Idle,
     progress: NOTHING_RUNNING,
     label: TRANSLATE_LABEL,
-    detail: `Dịch phụ đề: còn ${String(pending)}/${String(lectures)} bài`,
+    detail: `${String(pending)}/${String(lectures)} lectures to translate`,
   }
 }
 
@@ -73,7 +73,7 @@ export function compressionStatus(tools: CourseTools['compression']): ToolStatus
       state: ToolState.Unavailable,
       progress: NOTHING_RUNNING,
       label: COMPRESS_LABEL,
-      detail: 'Máy chưa có ffmpeg',
+      detail: 'ffmpeg not installed',
     }
   const { run, pending, unchecked, videos } = tools
   if (run !== undefined && isCompressing(run)) {
@@ -85,36 +85,36 @@ export function compressionStatus(tools: CourseTools['compression']): ToolStatus
     return {
       state: ToolState.Running,
       progress: run.total === 0 ? 0 : (run.finished + Math.min(1, currentShare)) / run.total,
-      label: `Đang nén ${String(Math.min(run.finished + 1, run.total))}/${String(run.total)}`,
-      detail: `Đang nén ${String(Math.min(run.finished + 1, run.total))}/${String(run.total)} video`,
+      label: `Compressing ${String(Math.min(run.finished + 1, run.total))}/${String(run.total)}`,
+      detail: `Compressing ${String(Math.min(run.finished + 1, run.total))}/${String(run.total)} videos`,
     }
   }
   if (unchecked > 0 && pending === 0)
     return {
       state: ToolState.Checking,
       progress: NOTHING_RUNNING,
-      label: `Kiểm tra ${String(videos - unchecked)}/${String(videos)}`,
-      detail: `Đang kiểm tra video (${String(videos - unchecked)}/${String(videos)})`,
+      label: `Checking ${String(videos - unchecked)}/${String(videos)}`,
+      detail: `Checking videos (${String(videos - unchecked)}/${String(videos)})`,
     }
   if (pending === 0)
     return {
       state: ToolState.Done,
       progress: NOTHING_RUNNING,
       label: COMPRESS_LABEL,
-      detail: 'Không còn video nào cần nén',
+      detail: 'Nothing left to compress',
     }
   if (run !== undefined && run.failed.length > 0)
     return {
       state: ToolState.Failed,
       progress: NOTHING_RUNNING,
       label: COMPRESS_LABEL,
-      detail: `Lần nén trước có lỗi; còn ${String(pending)} video H.264`,
+      detail: `Last run had errors; ${String(pending)} H.264 videos left`,
     }
   return {
     state: ToolState.Idle,
     progress: NOTHING_RUNNING,
     label: COMPRESS_LABEL,
-    detail: `Nén video: còn ${String(pending)} video H.264`,
+    detail: `${String(pending)} H.264 videos to compress`,
   }
 }
 
@@ -124,8 +124,8 @@ export function publishStatus(run: PublishRun | undefined, isPublished: boolean)
     return {
       state: ToolState.Running,
       progress: share,
-      label: `Đang đưa lên ${String(Math.round(share * PERCENT))}%`,
-      detail: `Đang đưa lên R2 ${String(run.sentFiles + run.skippedFiles)}/${String(run.totalFiles)} file`,
+      label: `Publishing ${String(Math.round(share * PERCENT))}%`,
+      detail: `Publishing ${String(run.sentFiles + run.skippedFiles)}/${String(run.totalFiles)} files`,
     }
   }
   if (run?.state === 'failed')
@@ -133,19 +133,19 @@ export function publishStatus(run: PublishRun | undefined, isPublished: boolean)
       state: ToolState.Failed,
       progress: NOTHING_RUNNING,
       label: PUBLISH_LABEL,
-      detail: 'Lần đưa lên R2 trước bị lỗi',
+      detail: 'Last publish failed',
     }
   if (isPublished)
     return {
       state: ToolState.Idle,
       progress: NOTHING_RUNNING,
       label: PUBLISHED_LABEL,
-      detail: 'Khoá đang ở trên R2; bấm để gửi các file mới hoặc đã đổi',
+      detail: 'On R2; send new or changed files',
     }
   return {
     state: ToolState.Idle,
     progress: NOTHING_RUNNING,
     label: PUBLISH_LABEL,
-    detail: 'Đưa khoá này lên R2 để học ở mọi nơi',
+    detail: 'Publish to R2',
   }
 }

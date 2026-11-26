@@ -17,12 +17,12 @@ export function DownloadsPage(): ReactElement {
 
   return (
     <main className="grid max-w-[1056px] content-start gap-5 px-5 py-8 md:px-10 md:py-10">
-      <h1 className="text-[30px] font-semibold">Tải khoá học</h1>
+      <h1 className="text-[30px] font-semibold">Downloads</h1>
       {isUnavailable ? (
         <EmptyState
           icon={Download}
-          title="Chưa tải được khoá học trên máy này"
-          body="Máy chạy server cần yt-dlp và aria2c. Cài chúng, hoặc chỉ đường dẫn bằng --yt-dlp và --aria2c."
+          title="Downloads unavailable on this machine"
+          body="The server needs yt-dlp and aria2c. Install them or pass --yt-dlp and --aria2c."
         />
       ) : (
         <>
@@ -31,7 +31,7 @@ export function DownloadsPage(): ReactElement {
             aria-labelledby="udemy-account-title"
           >
             <h2 id="udemy-account-title" className="text-base font-semibold">
-              Tài khoản Udemy
+              Udemy account
             </h2>
             <ProfilePicker />
             <PastedLogins />
@@ -39,14 +39,14 @@ export function DownloadsPage(): ReactElement {
           <NewJobForm />
           <section className="grid gap-3" aria-labelledby="job-history-title">
             <h2 id="job-history-title" className="text-[19px] font-semibold">
-              Lịch sử tải
+              Download history
             </h2>
             {jobs.isError && (
               <p className="text-sm text-danger" role="alert">
-                Không tải được lịch sử tải ({jobs.error.message}).
+                Could not load download history ({jobs.error.message}).
               </p>
             )}
-            {jobs.data?.length === 0 && <p className="text-sm text-muted">Chưa có lần tải nào.</p>}
+            {jobs.data?.length === 0 && <p className="text-sm text-muted">No downloads yet.</p>}
             {jobs.data?.map((job) => (
               <JobCard key={job.id} job={job} />
             ))}

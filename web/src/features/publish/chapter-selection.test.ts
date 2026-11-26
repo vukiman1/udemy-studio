@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { PublishPlan } from '../../api/types'
-import { initialSelection, selectedBytes } from './chapter-selection'
+import { hasChanges, initialSelection, selectedBytes } from './chapter-selection'
 
 const COURSE_ID = 'course'
 
@@ -9,11 +9,12 @@ function plan(published: PublishPlan['published']): PublishPlan {
     sharedBytes: 100,
     limitBytes: 2_000,
     replaces: false,
+    sharedChanged: false,
     published,
     chapters: [
-      { dir: '01 - Intro', files: 3, sizeBytes: 1_000, published: true },
-      { dir: '02 - Deep', files: 3, sizeBytes: 1_000, published: false },
-      { dir: '03 - Extra', files: 3, sizeBytes: 1_000, published: true },
+      { dir: '01 - Intro', files: 3, sizeBytes: 1_000, published: true, changed: false },
+      { dir: '02 - Deep', files: 3, sizeBytes: 1_000, published: false, changed: true },
+      { dir: '03 - Extra', files: 3, sizeBytes: 1_000, published: true, changed: false },
     ],
   }
 }
@@ -42,5 +43,29 @@ describe('chapter selection', () => {
 
   it('counts the shared course files with the chosen chapters', () => {
     expect(selectedBytes(plan(undefined), new Set(['02 - Deep']))).toBe(1_100)
+  })
+})
+
+describe('hasChanges', () => {
+  const published = new Set(['01 - Intro', '03 - Extra'])
+
+  it('finds nothing to do while the selection matches what is on R2', () => {
+    expect(hasChanges(plan(PUBLISHED_HERE), COURSE_ID, published)).toBe(false)
+  })
+
+  it('sees a chapter added or removed', () => {
+    const added = new Set([...published, '02 - Deep'])
+    expect(hasChanges(plan(PUBLISHED_HERE), COURSE_ID, added)).toBe(true)
+    expect(hasChanges(plan(PUBLISHED_HERE), COURSE_ID, new Set(['01 - Intro']))).toBe(true)
+  })
+
+  it('sees changed files in a published chapter', () => {
+    const edited = plan(PUBLISHED_HERE)
+    const chapters = edited.chapters.map((chapter) => ({ ...chapter, changed: true }))
+    expect(hasChanges({ ...edited, chapters }, COURSE_ID, published)).toBe(true)
+  })
+
+  it('treats a course not on R2 as new', () => {
+    expect(hasChanges(plan(undefined), COURSE_ID, published)).toBe(true)
   })
 })

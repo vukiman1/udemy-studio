@@ -15,9 +15,9 @@ interface AIConfigCardProps {
 
 export function AIConfigCard({ providers, saved, editor }: AIConfigCardProps): ReactElement {
   return (
-    <SettingsCard title="Cấu hình">
+    <SettingsCard title="Configuration">
       <label className={SETTINGS_ROW}>
-        <span className={SETTINGS_LABEL}>Loại AI</span>
+        <span className={SETTINGS_LABEL}>Provider</span>
         <select
           className="h-[50px] rounded-[11px] border-line-strong pr-4 pl-[18px] text-sm font-semibold"
           value={editor.draft.provider}
