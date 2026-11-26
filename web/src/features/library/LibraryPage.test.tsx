@@ -43,7 +43,7 @@ describe('LibraryPage', () => {
     respondWith({ '/api/courses': () => Response.json([COURSE]) })
     renderPage()
     expect(await screen.findByText('Backend Fundamentals')).toBeInTheDocument()
-    expect(screen.getByText('1 / 4 bài đã học · 15,8 GB')).toBeInTheDocument()
+    expect(screen.getByText('1 / 4 lectures · 15.8 GB')).toBeInTheDocument()
   })
 
   it('continues each course where the learner left it', async () => {
@@ -55,7 +55,7 @@ describe('LibraryPage', () => {
     }
     respondWith({ '/api/courses': () => Response.json([COURSE, resumed]) })
     renderPage()
-    const links = await screen.findAllByRole('link', { name: 'Tiếp tục' })
+    const links = await screen.findAllByRole('link', { name: 'Continue' })
     expect(links.map((link) => link.getAttribute('href'))).toEqual([
       '/courses/c1',
       '/courses/c2/lectures/l7',
@@ -69,17 +69,20 @@ describe('LibraryPage', () => {
         isServerBack ? Response.json([COURSE]) : new Response(null, { status: 500 }),
     })
     renderPage()
-    expect(await screen.findByRole('alert')).toHaveTextContent('Không tải được thư viện')
+    expect(await screen.findByRole('alert')).toHaveTextContent('Could not load the library')
     isServerBack = true
-    fireEvent.click(screen.getByRole('button', { name: 'Tải lại' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Reload' }))
     expect(await screen.findByText('Backend Fundamentals')).toBeInTheDocument()
   })
 
   it('points to the downloads page when the library is empty', async () => {
     respondWith({ '/api/courses': () => Response.json([]) })
     renderPage()
-    expect(await screen.findByText('Chưa có khoá học nào')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Tải khoá học' })).toHaveAttribute('href', '/downloads')
+    expect(await screen.findByText('No courses yet')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Download a course' })).toHaveAttribute(
+      'href',
+      '/downloads',
+    )
   })
 })
 
@@ -104,7 +107,7 @@ describe('LibraryPage after a failed background refresh', () => {
     expect(await screen.findByText('Backend Fundamentals')).toBeInTheDocument()
     failNext = true
     await client.refetchQueries({ queryKey: ['courses'] })
-    expect(await screen.findByText(/Không làm mới được/)).toBeInTheDocument()
+    expect(await screen.findByText(/Could not refresh/)).toBeInTheDocument()
     expect(screen.getByText('Backend Fundamentals')).toBeInTheDocument()
   })
 })

@@ -68,7 +68,7 @@ export function CourseCard({ course, tools, publish }: CourseCardProps): ReactEl
             className="h-2 rounded"
           />
           <span className="flex flex-wrap items-center gap-x-2 text-[13px] text-muted">
-            {course.completedLectures} / {course.playableLectures} bài đã học ·{' '}
+            {course.completedLectures} / {course.playableLectures} lectures ·{' '}
             {formatBytes(course.sizeBytes)}
             {publish?.isPublished === true && (
               <span className="inline-flex items-center gap-1 rounded-full bg-accent/15 px-2 py-0.5 text-xs font-semibold text-accent-soft">
@@ -82,7 +82,7 @@ export function CourseCard({ course, tools, publish }: CourseCardProps): ReactEl
       <div className="flex basis-full flex-wrap gap-2 md:basis-auto md:flex-nowrap">
         <Link className={buttonClass(ButtonVariant.Primary, ButtonSize.Medium)} to={resumeTo}>
           <Play aria-hidden="true" />
-          Tiếp tục
+          Continue
         </Link>
         {translation !== undefined && (
           <CourseToolButton

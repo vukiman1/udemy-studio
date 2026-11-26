@@ -19,8 +19,8 @@ describe('DownloadsPage', () => {
       </QueryClientProvider>,
     )
     expect(await screen.findByRole('status')).toHaveTextContent(
-      'Chưa tải được khoá học trên máy này',
+      'Downloads unavailable on this machine',
     )
-    expect(screen.queryByRole('heading', { name: 'Tài khoản Udemy' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Udemy account' })).not.toBeInTheDocument()
   })
 })

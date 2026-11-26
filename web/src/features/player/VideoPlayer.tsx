@@ -31,7 +31,7 @@ interface VideoPlayerProps {
 }
 
 const NO_CUES: readonly Cue[] = []
-const PLAYER_LOCALE = 'vi'
+const PLAYER_LOCALE = 'en'
 
 export function VideoPlayer({
   videoRef,
@@ -117,12 +117,12 @@ export function VideoPlayer({
       </Player>
       {cuesQuery.isError && (
         <p className="m-0 text-[0.9rem] text-danger" role="alert">
-          Không tải được phụ đề ({cuesQuery.error.message}).
+          Could not load subtitles ({cuesQuery.error.message}).
         </p>
       )}
       {lastError !== undefined && (
         <p className="m-0 text-[0.9rem] text-danger" role="alert">
-          Chưa lưu được tiến độ ({lastError.message}). Sẽ thử lại ở lần lưu sau.
+          Progress not saved ({lastError.message}); retrying on the next save.
         </p>
       )}
     </div>

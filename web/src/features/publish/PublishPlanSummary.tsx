@@ -51,7 +51,7 @@ export function PublishPlanSummary({
             {plan.error.message}
           </p>
         ) : (
-          <p className="text-muted">Đang tải…</p>
+          <p className="text-muted">Loading…</p>
         )}
       </DialogBody>
       <PlanFooter canStart={false} onStart={onDismiss} onDismiss={onDismiss} />
@@ -81,11 +81,11 @@ function PublishPlanForm({
         {children}
         <div className="flex flex-wrap gap-3">
           <StatTile
-            label="Chương"
+            label="Chapters"
             value={`${String(selected.size)}/${String(plan.chapters.length)}`}
           />
           <StatTile
-            label={`Dung lượng (≤ ${formatBytes(plan.limitBytes)})`}
+            label={`Size (≤ ${formatBytes(plan.limitBytes)})`}
             value={formatBytes(totalBytes)}
           />
         </div>
@@ -93,13 +93,13 @@ function PublishPlanForm({
         {!fits && (
           <p className={`${NOTE} text-danger`} role="alert">
             <CircleAlert className={NOTE_ICON} aria-hidden="true" />
-            Vượt hạn mức
+            Over the limit
           </p>
         )}
         {plan.replaces && plan.published !== undefined && (
           <p className={`${NOTE} text-muted`}>
             <CircleAlert className={`${NOTE_ICON} text-danger`} aria-hidden="true" />
-            Thay «{plan.published.title}» trên R2
+            Replaces «{plan.published.title}» on R2
           </p>
         )}
       </DialogBody>
@@ -123,14 +123,14 @@ interface PlanFooterProps {
 function PlanFooter({ canStart, onStart, onDismiss }: PlanFooterProps): ReactElement {
   return (
     <DialogFooter>
-      <Button onClick={onDismiss}>Thôi</Button>
+      <Button onClick={onDismiss}>Cancel</Button>
       <Button
         variant={ButtonVariant.Primary}
         icon={CloudUpload}
         disabled={!canStart}
         onClick={onStart}
       >
-        Đưa lên R2
+        Publish
       </Button>
     </DialogFooter>
   )

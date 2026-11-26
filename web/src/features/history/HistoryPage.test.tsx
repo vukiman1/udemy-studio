@@ -34,8 +34,8 @@ afterEach(() => {
 describe('HistoryPage', () => {
   it('resumes an unfinished lecture at the moment it was left', async () => {
     renderWithHistory([LEFT_MIDWAY])
-    expect(await screen.findByText('Đang học dở · dừng ở 12:45')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Học tiếp' })).toHaveAttribute(
+    expect(await screen.findByText('In progress · stopped at 12:45')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Continue' })).toHaveAttribute(
       'href',
       '/courses/c1/lectures/l3?t=765',
     )
@@ -43,8 +43,8 @@ describe('HistoryPage', () => {
 
   it('reopens a finished lecture from its start', async () => {
     renderWithHistory([{ ...LEFT_MIDWAY, completed: true }])
-    expect(await screen.findByText('Đã học xong')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Học tiếp' })).toHaveAttribute(
+    expect(await screen.findByText('Completed')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Continue' })).toHaveAttribute(
       'href',
       '/courses/c1/lectures/l3',
     )
@@ -52,6 +52,6 @@ describe('HistoryPage', () => {
 
   it('points to the library before anything was watched', async () => {
     renderWithHistory([])
-    expect(await screen.findByText('Chưa học bài nào')).toBeInTheDocument()
+    expect(await screen.findByText('Nothing watched yet')).toBeInTheDocument()
   })
 })

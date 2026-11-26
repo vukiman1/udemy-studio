@@ -10,11 +10,11 @@ export function NotFoundPage(): ReactElement {
     <main className="grid content-start px-5 py-8 md:px-10 md:py-10">
       <EmptyState
         icon={FileQuestion}
-        title="Không có trang này."
+        title="Page not found."
         action={
           <Link to={LIBRARY_PATH} className={buttonClass(ButtonVariant.Primary, ButtonSize.Small)}>
             <ChevronLeft aria-hidden="true" />
-            Về thư viện
+            Back to library
           </Link>
         }
       />

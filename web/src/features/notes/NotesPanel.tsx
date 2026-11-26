@@ -21,19 +21,19 @@ export function NotesPanel({ lecture, courseId, videoRef }: NotesPanelProps): Re
         }
 
   return (
-    <section className="grid gap-3" aria-label="Ghi chú">
+    <section className="grid gap-3" aria-label="Notes">
       <NoteComposer key={lecture.id} lectureId={lecture.id} videoRef={videoRef}>
         <a
           href={courseNotesUrl(courseId)}
           download
           className="text-[13px] font-medium text-muted hover:text-ink"
         >
-          Tải ghi chú cả khoá (.md)
+          Download course notes (.md)
         </a>
       </NoteComposer>
       {notes.isError && (
         <p className="text-sm text-danger" role="alert">
-          Không tải được ghi chú ({notes.error.message}).
+          Could not load notes ({notes.error.message}).
         </p>
       )}
       {notes.data !== undefined && notes.data.length > 0 && (

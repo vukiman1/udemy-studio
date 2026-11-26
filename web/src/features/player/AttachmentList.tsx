@@ -12,7 +12,7 @@ export function AttachmentList({ attachments }: AttachmentListProps): ReactEleme
   return (
     <section className="grid gap-2 rounded-2xl bg-card p-4" aria-labelledby="attachments-title">
       <h3 id="attachments-title" className="text-sm font-semibold">
-        Tài liệu kèm theo
+        Attachments
       </h3>
       <ul className="grid list-none text-[13px] text-accent-soft">
         {attachments.map((attachment) => (

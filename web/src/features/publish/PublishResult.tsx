@@ -18,12 +18,12 @@ const RESULT_LOOKS: Readonly<Record<FinishedState, ResultLook>> = {
     accent: 'text-success',
     heading: 'Xong',
   },
-  cancelled: { icon: CircleStop, box: 'bg-page', accent: 'text-muted', heading: 'Đã dừng' },
+  cancelled: { icon: CircleStop, box: 'bg-page', accent: 'text-muted', heading: 'Stopped' },
   failed: {
     icon: CircleAlert,
     box: 'bg-danger-soft',
     accent: 'text-danger',
-    heading: 'Lỗi',
+    heading: 'Failed',
   },
 }
 
@@ -48,5 +48,5 @@ export function PublishResult({ run, state }: PublishResultProps): ReactElement 
 
 function detail(run: PublishRun, state: FinishedState): string {
   if (state === 'failed') return run.failure ?? ''
-  return `${String(run.sentFiles)} mới · ${String(run.skippedFiles)} có sẵn`
+  return `${String(run.sentFiles)} sent · ${String(run.skippedFiles)} already there`
 }

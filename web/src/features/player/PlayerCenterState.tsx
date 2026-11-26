@@ -18,7 +18,7 @@ export function PlayerCenterState(): ReactElement | null {
       <div
         className="pointer-events-none absolute inset-0 grid place-items-center"
         role="status"
-        aria-label="Đang tải video"
+        aria-label="Loading video"
       >
         <span className="grid size-16 place-items-center rounded-full bg-black/45 backdrop-blur-sm">
           <LoaderCircle className="size-8 animate-spin" aria-hidden="true" />
