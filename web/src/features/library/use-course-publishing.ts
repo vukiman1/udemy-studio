@@ -12,11 +12,11 @@ export interface CoursePublishing {
   readonly of: (courseId: string) => CoursePublish | undefined
 }
 
-export function useCoursePublishing(): CoursePublishing {
+export function useCoursePublishing(isLibraryCopy: boolean): CoursePublishing {
   const queryClient = useQueryClient()
   const storage = useStorageSettings()
-  const isConfigured = storage.data?.configured === true
-  const run = usePublishRun()
+  const isConfigured = isLibraryCopy && storage.data?.configured === true
+  const run = usePublishRun(isLibraryCopy)
   const published = usePublishedCourse(isConfigured)
   const latestRun = run.data ?? undefined
   const runState = latestRun?.state

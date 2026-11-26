@@ -10,9 +10,10 @@ export function isPublishing(run: PublishRun | undefined): boolean {
   return run?.state === 'running'
 }
 
-export function usePublishRun(): UseQueryResult<PublishRun | null> {
+export function usePublishRun(isEnabled: boolean): UseQueryResult<PublishRun | null> {
   return useQuery({
     queryKey: QUERY_KEYS.publishRun,
+    enabled: isEnabled,
     refetchInterval: (query) =>
       isPublishing(query.state.data ?? undefined) ? ACTIVE_POLL_MS : false,
     queryFn: async () => {

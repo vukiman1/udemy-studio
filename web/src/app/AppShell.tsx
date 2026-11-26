@@ -1,6 +1,7 @@
 import { Book, Cloud, Download, History, Search, Settings, type LucideIcon } from 'lucide-react'
 import type { ReactElement } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router'
+import { useIsLibraryCopy } from '../api/server-queries'
 import {
   AI_SETTINGS_PATH,
   DOWNLOADS_PATH,
@@ -14,14 +15,15 @@ interface NavItem {
   readonly to: string
   readonly label: string
   readonly icon: LucideIcon
+  readonly isLibraryOnly?: boolean
 }
 
 const NAV_ITEMS: readonly NavItem[] = [
   { to: LIBRARY_PATH, label: 'Thư viện', icon: Book },
   { to: SEARCH_PATH, label: 'Tìm phụ đề', icon: Search },
-  { to: DOWNLOADS_PATH, label: 'Tải khoá học', icon: Download },
+  { to: DOWNLOADS_PATH, label: 'Tải khoá học', icon: Download, isLibraryOnly: true },
   { to: HISTORY_PATH, label: 'Lịch sử', icon: History },
-  { to: AI_SETTINGS_PATH, label: 'Cài đặt AI', icon: Settings },
+  { to: AI_SETTINGS_PATH, label: 'Cài đặt AI', icon: Settings, isLibraryOnly: true },
   { to: STORAGE_SETTINGS_PATH, label: 'Lưu trữ', icon: Cloud },
 ]
 
@@ -31,13 +33,15 @@ const TAB_LINK = 'grid justify-items-center gap-1 py-2 text-[11px]'
 
 export function AppShell(): ReactElement {
   const { pathname } = useLocation()
+  const isLibraryCopy = useIsLibraryCopy()
+  const navItems = NAV_ITEMS.filter((item) => isLibraryCopy || item.isLibraryOnly !== true)
   return (
     <div className="min-h-dvh md:grid md:grid-cols-[232px_minmax(0,1fr)]">
       <aside className="hidden border-r border-sidebar-edge bg-sidebar md:sticky md:top-0 md:flex md:h-dvh md:flex-col md:gap-12 md:rounded-r-2xl md:px-5 md:py-8">
         <span className="px-1.5 text-[21px] font-semibold">udemy-studio</span>
         <nav aria-label="Điều hướng chính">
           <ul className="m-0 grid list-none gap-2.5 p-0">
-            {NAV_ITEMS.map((item) => (
+            {navItems.map((item) => (
               <li key={item.to}>
                 <NavLink
                   to={item.to}
@@ -62,7 +66,7 @@ export function AppShell(): ReactElement {
         className="fixed inset-x-0 bottom-0 border-t border-line bg-sidebar md:hidden"
       >
         <ul className="m-0 grid list-none auto-cols-fr grid-flow-col p-0">
-          {NAV_ITEMS.map((item) => (
+          {navItems.map((item) => (
             <li key={item.to}>
               <NavLink
                 to={item.to}
